@@ -25,7 +25,7 @@ Distributed as-is; no warranty is given.
 #else
  #include "WProgram.h"
 #endif
-#include <Wire.h>
+#include <i2c_t3.h>
 class TMP102
 {
 	public:

@@ -27,13 +27,13 @@ local pub, and you've found our code helpful, please buy us a round!
 Distributed as-is; no warranty is given.
 ******************************************************************************/
 
-#include <Wire.h> // Wire library is used for I2C
+#include <i2c_t3.h> // Wire library is used for I2C
 #include "SparkFun_MS5803_I2C.h"
 
 MS5803::MS5803(ms5803_addr address)
 // Base library type I2C
 {
-	Wire.begin(); // Arduino Wire library initializer
+	// Wire.begin(); // Arduino Wire library initializer
 	_address = address; //set interface used for communication
 }
 
@@ -163,7 +163,7 @@ uint32_t MS5803::getADCconversion(measurement _measurement, precision _precision
 // Select measurement type and precision
 {	
 	uint32_t result;
-	uint8_t highByte, midByte, lowByte;
+	uint8_t highByte = 0, midByte = 0, lowByte = 0;
 	
 	sendCommand(CMD_ADC_CONV + _measurement + _precision);
 	// Wait for conversion to complete

@@ -1,6 +1,6 @@
 #include "SparkFun_LIS331.h"
 #include <SPI.h>
-#include <Wire.h>
+#include <i2c_t3.h>
 #include <stdint.h>
 
 LIS331::LIS331(void)

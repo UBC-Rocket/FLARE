@@ -20,7 +20,7 @@ local, and you've found our code helpful, please buy us a round!
 Distributed as-is; no warranty is given.
 ******************************************************************************/
 #include "SparkFunTMP102.h"
-#include <Wire.h>
+#include <i2c_t3.h>
 
 #define TEMPERATURE_REGISTER 0x00
 #define CONFIG_REGISTER 0x01
@@ -348,7 +348,7 @@ float TMP102::readLowTempC(void)
   int registerByte[2];	// Store the data from the register here
   bool extendedMode;	// Store extended mode bit here 0:-55C to +128C, 1:-55C to +150C
   int digitalTemp;		// Store the digital temperature value here
-  float temperature;	// Store the analog temperature value here
+  // float temperature;	// Store the analog temperature value here
   
   // Check if temperature should be 12 or 13 bits
   openPointerRegister(CONFIG_REGISTER);	// Read configuration register settings
@@ -393,7 +393,7 @@ float TMP102::readHighTempC(void)
   int registerByte[2];	// Store the data from the register here
   bool extendedMode;	// Store extended mode bit here 0:-55C to +128C, 1:-55C to +150C
   int digitalTemp;		// Store the digital temperature value here
-  float temperature;	// Store the analog temperature value here
+  // float temperature;	// Store the analog temperature value here
   
   // Check if temperature should be 12 or 13 bits
   openPointerRegister(CONFIG_REGISTER);	// read configuration register settings
