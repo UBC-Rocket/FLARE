@@ -4,15 +4,19 @@
 #include "SparkFun_LIS331.h"        //accelerometer
 #include "SparkFun_MS5803_I2C.h"    //barometer
 #include "SparkFunTMP102.h"         //temp sensor
+#include "MPU9250.h"                //IMU
 
+#include <i2c_t3.h>
 #include <SD.h>
 
 /*Constants------------------------------------------------------------*/
 #define TESTING //enable or disable debug output
 
+#define EARTHS_GRAVITY          9.80665
+
 #define ACCELEROMETER_ADDRESS   0x18
 #define TEMP_SENSOR_ADDRESS     0x48
-
+#define IMU_ADDRESS             0x68
 #define ACCELEROMETER_SCALE     6
 
 /*Variables------------------------------------------------------------*/
@@ -21,6 +25,7 @@ File datalog;
 LIS331 accelerometer;
 MS5803 barometer(ADDRESS_HIGH);
 TMP102 temp_sensor(TEMP_SENSOR_ADDRESS);
+MPU9250 IMU(Wire, IMU_ADDRESS);
 
 /*Functions------------------------------------------------------------*/
 void setup()
@@ -35,7 +40,7 @@ void setup()
     #endif
 
     /*init I2C bus*/
-    Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, 100000); //100kHz
+    Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400); //400kHz
     Wire.setDefaultTimeout(500000); //500ms
 
     /*init SD card*/
@@ -52,7 +57,13 @@ void setup()
             Serial.println("ERROR: Opening file failed!");
             #endif       
         } else {
-            datalog.write("SENSOR LOG DATA \n");
+            datalog.write("SENSOR LOG DATA\n");
+            datalog.write("Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),\
+            Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),\
+            Temperature Sensor - Temperature (C),IMU - Acceleration X (g),IMU - Acceleration Y (g),\
+            IMU - Acceleration Z (g),IMU - Angular Velocity X (rad/s),IMU - Angular Velocity Y (rad/s),\
+            IMU - Angular Velocity Z (rad/s),IMU - Magnetism X (uT),IMU - Magnetism Y (uT),\
+            IMU - Magnetism Z (uT),IMU - Temperature (C)\n");
         }
     }
 
@@ -67,6 +78,17 @@ void setup()
     /*init temp sensor*/
     temp_sensor.begin();
 
+    /*init IMU*/
+    int error = 0;
+    status = IMU.begin();
+    if (error < 0) {
+        status = false;
+        #ifdef TESTING
+        Serial.print("ERROR: IMU initialization failed! Error code ");
+        Serial.println(error);
+        #endif
+    }
+
     /*if something went wrong spin infinitely, otherwise indicate completion*/
     if(!status){
         while(1){}
@@ -80,49 +102,102 @@ void setup()
 void loop()
 {
     int16_t x, y, z;
-    float temp_b, press, temp;
+    float acc_data[3], bar_data[2], temp_data, IMU_data[10];
 
     /*poll all the sensors*/
     accelerometer.readAxes(x, y, z);
-    x = accelerometer.convertToG(ACCELEROMETER_SCALE, x);
-    y = accelerometer.convertToG(ACCELEROMETER_SCALE, y);
-    z = accelerometer.convertToG(ACCELEROMETER_SCALE, z);
+    acc_data[0] = accelerometer.convertToG(ACCELEROMETER_SCALE, x);
+    acc_data[1] = accelerometer.convertToG(ACCELEROMETER_SCALE, y);
+    acc_data[2] = accelerometer.convertToG(ACCELEROMETER_SCALE, z);
 
-    temp_b = barometer.getTemperature(CELSIUS, ADC_512);
-    press = barometer.getPressure(ADC_4096);
+    bar_data[0] = barometer.getPressure(ADC_4096);
+    bar_data[1] = barometer.getTemperature(CELSIUS, ADC_512);
 
     temp_sensor.wakeup();
-    temp = temp_sensor.readTempC();
+    temp_data = temp_sensor.readTempC();
     temp_sensor.sleep();
 
+    IMU.readSensor();
+    IMU_data[0] = IMU.getAccelX_mss() / EARTHS_GRAVITY; //convert to g
+    IMU_data[1] = IMU.getAccelY_mss() / EARTHS_GRAVITY; //convert to g
+    IMU_data[2] = IMU.getAccelZ_mss() / EARTHS_GRAVITY; //convert to g
+    IMU_data[3] = IMU.getGyroX_rads();
+    IMU_data[4] = IMU.getGyroY_rads();
+    IMU_data[5] = IMU.getGyroZ_rads();
+    IMU_data[6] = IMU.getMagX_uT();
+    IMU_data[7] = IMU.getMagY_uT();
+    IMU_data[8] = IMU.getMagZ_uT();
+    IMU_data[9] = IMU.getTemperature_C();
+
     /*write data to SD card*/
-    datalog.write("AX: \n");
-    datalog.print(x);
-    datalog.write("AY: \n");
-    datalog.print(y);
-    datalog.write("AZ: \n");
-    datalog.print(z);
-    datalog.write("Tb: \n");
-    datalog.print(temp_b);
-    datalog.write("P:  \n");
-    datalog.print(press);
-    datalog.write("T:  \n");
-    datalog.print(temp);
+    datalog.print(acc_data[0]);
+    datalog.print(",");
+    datalog.print(acc_data[1]);
+    datalog.print(",");
+    datalog.print(acc_data[2]);
+    datalog.print(",");
+    datalog.print(bar_data[0]);
+    datalog.print(",");
+    datalog.print(bar_data[1]);
+    datalog.print(",");
+    datalog.print(temp_data);
+    datalog.print(",");
+    datalog.print(IMU_data[0]);
+    datalog.print(",");
+    datalog.print(IMU_data[1]);
+    datalog.print(",");
+    datalog.print(IMU_data[2]);
+    datalog.print(",");
+    datalog.print(IMU_data[3]);
+    datalog.print(",");
+    datalog.print(IMU_data[4]);
+    datalog.print(",");
+    datalog.print(IMU_data[5]);
+    datalog.print(",");
+    datalog.print(IMU_data[6]);
+    datalog.print(",");
+    datalog.print(IMU_data[7]);
+    datalog.print(",");
+    datalog.print(IMU_data[8]);
+    datalog.print(",");
+    datalog.print(IMU_data[9]);
+    datalog.print("\n");
+    datalog.flush();
 
     /*output data to serial*/
     #ifdef TESTING
-    Serial.println("Acceleration X (G): ");
-    Serial.print(x);
-    Serial.println("Acceleration Y (G): ");
-    Serial.print(y);
-    Serial.println("Acceleration Z (G): ");
-    Serial.print(z);
-    Serial.println("Temperature (C):    ");
-    Serial.print(temp_b);
-    Serial.println("Pressure (mbar):    ");
-    Serial.print(press);
-    Serial.println("Temperature (C):    ");
-    Serial.print(temp);
+    Serial.print("Accelerometer acceleration X (g):   ");
+    Serial.println(acc_data[0]);
+    Serial.print("Accelerometer acceleration Y (g):   ");
+    Serial.println(acc_data[1]);
+    Serial.print("Accelerometer acceleration Z (g):   ");
+    Serial.println(acc_data[2]);
+    Serial.print("Barometer temperature (C):          ");
+    Serial.println(bar_data[0]);
+    Serial.print("Barometer pressure (mbar):          ");
+    Serial.println(bar_data[1]);
+    Serial.print("Temperature sensor temperature (C): ");
+    Serial.println(temp_data);
+    Serial.print("IMU acceleration X (g):             ");
+    Serial.println(IMU_data[0]);
+    Serial.print("IMU acceleration Y (g):             ");
+    Serial.println(IMU_data[1]);
+    Serial.print("IMU acceleration Z (g):             ");
+    Serial.println(IMU_data[2]);
+    Serial.print("IMU angular velocity X (rad/s):     ");
+    Serial.println(IMU_data[3]);
+    Serial.print("IMU angular velocity Y (rad/s):     ");
+    Serial.println(IMU_data[4]);
+    Serial.print("IMU angular velocity Z (rad/s):     "); 
+    Serial.println(IMU_data[5]);  
+    Serial.print("IMU magnetism X (uT):               ");
+    Serial.println(IMU_data[6]);
+    Serial.print("IMU magnetism X (uT):               ");
+    Serial.println(IMU_data[7]);
+    Serial.print("IMU magnetism X (uT):               ");
+    Serial.println(IMU_data[8]);
+    Serial.print("IMU temperature (C):                ");
+    Serial.println(IMU_data[9]);
     Serial.println("");
     #endif
 
