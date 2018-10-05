@@ -1,4 +1,4 @@
-/*Main Arduino sketch*/
+/*Main Arduino Sketch*/
 
 /*Includes------------------------------------------------------------*/
 #include "SparkFun_LIS331.h"        //accelerometer
