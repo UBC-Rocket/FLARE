@@ -88,7 +88,7 @@ void setup()
         Serial.println(error);
         #endif
     }
-
+    
     /*if something went wrong spin infinitely, otherwise indicate completion*/
     if(!status){
         while(1){}
@@ -130,37 +130,22 @@ void loop()
     IMU_data[9] = IMU.getTemperature_C();
 
     /*write data to SD card*/
-    datalog.print(acc_data[0]);
-    datalog.print(",");
-    datalog.print(acc_data[1]);
-    datalog.print(",");
-    datalog.print(acc_data[2]);
-    datalog.print(",");
-    datalog.print(bar_data[0]);
-    datalog.print(",");
-    datalog.print(bar_data[1]);
-    datalog.print(",");
+   
+    for (unsigned int i = 0; i < sizeof(acc_data)/sizeof(float); i++){
+       datalog.print(acc_data[i]); 
+       datalog.print(",");  
+    }
+    for (unsigned int i=0; i < sizeof(bar_data)/sizeof(float); i++){
+        datalog.print(bar_data[i]);
+        datalog.print(","); 
+    }
     datalog.print(temp_data);
     datalog.print(",");
-    datalog.print(IMU_data[0]);
-    datalog.print(",");
-    datalog.print(IMU_data[1]);
-    datalog.print(",");
-    datalog.print(IMU_data[2]);
-    datalog.print(",");
-    datalog.print(IMU_data[3]);
-    datalog.print(",");
-    datalog.print(IMU_data[4]);
-    datalog.print(",");
-    datalog.print(IMU_data[5]);
-    datalog.print(",");
-    datalog.print(IMU_data[6]);
-    datalog.print(",");
-    datalog.print(IMU_data[7]);
-    datalog.print(",");
-    datalog.print(IMU_data[8]);
-    datalog.print(",");
-    datalog.print(IMU_data[9]);
+    for (unsigned int i=0; i < sizeof(IMU_data)/sizeof(float); i++){
+        datalog.print(IMU_data[i]);
+        datalog.print(",");
+    }
+    
     datalog.print("\n");
     datalog.flush();
 
