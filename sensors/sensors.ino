@@ -1,5 +1,5 @@
 /*Main Arduino Sketch*/
-
+   
 /*Includes------------------------------------------------------------*/
 #include "SparkFun_LIS331.h"        //accelerometer
 #include "SparkFun_MS5803_I2C.h"    //barometer
@@ -74,7 +74,7 @@ void setup()
     /*init barometer*/
     barometer.reset();
     barometer.begin();
-
+    
     /*init temp sensor*/
     temp_sensor.begin();
 
@@ -111,7 +111,7 @@ void loop()
     acc_data[2] = accelerometer.convertToG(ACCELEROMETER_SCALE, z);
 
     bar_data[0] = barometer.getPressure(ADC_4096);
-    bar_data[1] = barometer.getTemperature(CELSIUS, ADC_512);
+    bar_data[1] = barometer.getTemperature(CELSIUS, ADC_4096);
 
     temp_sensor.wakeup();
     temp_data = temp_sensor.readTempC();
@@ -138,8 +138,10 @@ void loop()
     datalog.print(",");
     datalog.print(bar_data[0]);
     datalog.print(",");
+
     datalog.print(bar_data[1]);
     datalog.print(",");
+
     datalog.print(temp_data);
     datalog.print(",");
     datalog.print(IMU_data[0]);
@@ -172,10 +174,10 @@ void loop()
     Serial.println(acc_data[1]);
     Serial.print("Accelerometer acceleration Z (g):   ");
     Serial.println(acc_data[2]);
-    Serial.print("Barometer temperature (C):          ");
-    Serial.println(bar_data[0]);
     Serial.print("Barometer pressure (mbar):          ");
-    Serial.println(bar_data[1]);
+    Serial.println(bar_data[0]);
+    Serial.print("Barometer temperature (C):          ");
+    Serial.println(bar_data[1]); 
     Serial.print("Temperature sensor temperature (C): ");
     Serial.println(temp_data);
     Serial.print("IMU acceleration X (g):             ");
