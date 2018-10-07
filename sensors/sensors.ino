@@ -80,7 +80,7 @@ void setup()
 
     /*init IMU*/
     int error = 0;
-    status = IMU.begin();
+    error = IMU.begin();
     if (error < 0) {
         status = false;
         #ifdef TESTING
