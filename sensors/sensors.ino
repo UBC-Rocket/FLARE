@@ -1,5 +1,5 @@
 /*Main Arduino Sketch*/
-   
+
 /*Includes------------------------------------------------------------*/
 #include "SparkFun_LIS331.h"        //accelerometer
 #include "SparkFun_MS5803_I2C.h"    //barometer
@@ -59,7 +59,7 @@ void setup()
             status = false;
             #ifdef TESTING
             Serial.println("ERROR: Opening file failed!");
-            #endif       
+            #endif
         } else {
             datalog.write("SENSOR LOG DATA\n");
             datalog.write("Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
@@ -78,7 +78,7 @@ void setup()
     /*init barometer*/
     barometer.reset();
     barometer.begin();
-    
+
     /*init temp sensor*/
     temp_sensor.begin();
 
@@ -92,7 +92,7 @@ void setup()
         Serial.println(error);
         #endif
     }
-    
+
     /*if something went wrong spin infinitely, otherwise indicate completion*/
     if(!status){
         while(1){}
@@ -115,7 +115,7 @@ void loop()
     acc_data[2] = accelerometer.convertToG(ACCELEROMETER_SCALE, z);
 
     bar_data[0] = barometer.getPressure(ADC_4096);
-    bar_data[1] = barometer.getTemperature(CELSIUS, ADC_4096);
+    bar_data[1] = barometer.getTemperature(CELSIUS, ADC_512);
 
     temp_sensor.wakeup();
     temp_data = temp_sensor.readTempC();
@@ -134,22 +134,20 @@ void loop()
     IMU_data[9] = IMU.getTemperature_C();
 
     /*write data to SD card*/
-   
     for (unsigned int i = 0; i < sizeof(acc_data)/sizeof(float); i++){
-       datalog.print(acc_data[i]); 
-       datalog.print(",");  
+       datalog.print(acc_data[i]);
+       datalog.print(",");
     }
-    for (unsigned int i=0; i < sizeof(bar_data)/sizeof(float); i++){
+    for (unsigned int i = 0; i < sizeof(bar_data)/sizeof(float); i++){
         datalog.print(bar_data[i]);
-        datalog.print(","); 
+        datalog.print(",");
     }
     datalog.print(temp_data);
     datalog.print(",");
-    for (unsigned int i=0; i < sizeof(IMU_data)/sizeof(float); i++){
+    for (unsigned int i = 0; i < sizeof(IMU_data)/sizeof(float); i++){
         datalog.print(IMU_data[i]);
         datalog.print(",");
     }
-    
     datalog.print("\n");
     datalog.flush();
 
@@ -164,7 +162,7 @@ void loop()
     Serial.print("Barometer pressure (mbar):          ");
     Serial.println(bar_data[0]);
     Serial.print("Barometer temperature (C):          ");
-    Serial.println(bar_data[1]); 
+    Serial.println(bar_data[1]);
     Serial.print("Temperature sensor temperature (C): ");
     Serial.println(temp_data);
     Serial.print("IMU acceleration X (g):             ");
@@ -177,8 +175,8 @@ void loop()
     Serial.println(IMU_data[3]);
     Serial.print("IMU angular velocity Y (rad/s):     ");
     Serial.println(IMU_data[4]);
-    Serial.print("IMU angular velocity Z (rad/s):     "); 
-    Serial.println(IMU_data[5]);  
+    Serial.print("IMU angular velocity Z (rad/s):     ");
+    Serial.println(IMU_data[5]);
     Serial.print("IMU magnetism X (uT):               ");
     Serial.println(IMU_data[6]);
     Serial.print("IMU magnetism X (uT):               ");
