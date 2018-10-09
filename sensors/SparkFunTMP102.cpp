@@ -36,7 +36,7 @@ TMP102::TMP102(byte address)
 
 void TMP102::begin(void)
 {
-  Wire.begin();  // Join I2C bus
+  // Wire.begin();  // Join I2C bus
 }
 
 

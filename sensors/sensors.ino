@@ -33,15 +33,19 @@ void setup()
     bool status = true;
 
     /*init serial comms*/
-    #ifdef TESTING
     Serial.begin(9600);
     while (!Serial) {}
+    #ifdef TESTING
     Serial.println("Initializing...");
     #endif
 
     /*init I2C bus*/
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400); //400kHz
     Wire.setDefaultTimeout(500000); //500ms
+
+    /*init serial bus*/
+    Serial1.begin(9600);
+    while (!Serial1) {}
 
     /*init SD card*/
     if (!SD.begin(BUILTIN_SDCARD)){
@@ -58,12 +62,12 @@ void setup()
             #endif       
         } else {
             datalog.write("SENSOR LOG DATA\n");
-            datalog.write("Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),\
-            Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),\
-            Temperature Sensor - Temperature (C),IMU - Acceleration X (g),IMU - Acceleration Y (g),\
-            IMU - Acceleration Z (g),IMU - Angular Velocity X (rad/s),IMU - Angular Velocity Y (rad/s),\
-            IMU - Angular Velocity Z (rad/s),IMU - Magnetism X (uT),IMU - Magnetism Y (uT),\
-            IMU - Magnetism Z (uT),IMU - Temperature (C)\n");
+            datalog.write("Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
+            "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
+            "Temperature Sensor - Temperature (C),IMU - Acceleration X (g),IMU - Acceleration Y (g),"
+            "IMU - Acceleration Z (g),IMU - Angular Velocity X (rad/s),IMU - Angular Velocity Y (rad/s),"
+            "IMU - Angular Velocity Z (rad/s),IMU - Magnetism X (uT),IMU - Magnetism Y (uT),"
+            "IMU - Magnetism Z (uT),IMU - Temperature (C)\n");
         }
     }
 

@@ -48,7 +48,8 @@ uint8_t MS5803::begin(void)
 // Initialize library for subsequent pressure measurements
 {  
 	uint8_t i;
-	for(i = 0; i <= 7; i++){
+	for(i = 0; i <= 7; i++)
+  {
 		sendCommand(CMD_PROM + (i * 2));
 		Wire.requestFrom( _address, 2);
 		uint8_t highByte = Wire.read(); 
@@ -70,15 +71,17 @@ float MS5803::getTemperature(temperature_units units, precision _precision)
 	getMeasurements(_precision);
 	float temperature_reported;
 	// If Fahrenheit is selected return the temperature converted to F
-	if(units == FAHRENHEIT){
-		temperature_reported = _temperature_actual / 100;
+	if(units == FAHRENHEIT)
+  {
+		temperature_reported = _temperature_actual / 100.0f;
 		temperature_reported = (((temperature_reported) * 9) / 5) + 32;
 		return temperature_reported;
 		}
 		
 	// If Celsius is selected return the temperature converted to C	
-	else {
-		temperature_reported = _temperature_actual / 100;
+	else
+  {
+		temperature_reported = _temperature_actual / 100.0f;
 		return temperature_reported;
 	}
 }
@@ -89,7 +92,7 @@ float MS5803::getPressure(precision _precision)
 	getMeasurements(_precision);
 	float pressure_reported;
 	pressure_reported = _pressure_actual;
-	pressure_reported = pressure_reported / 10;
+	pressure_reported = pressure_reported / 10.0f;
 	return pressure_reported;
 }
 
@@ -205,6 +208,4 @@ void MS5803::sensorWait(uint8_t time)
 // Delay function.  This can be modified to work outside of Arduino based MCU's
 {
 	delay(time);
-};
-
-
+}
