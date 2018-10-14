@@ -13,7 +13,7 @@
 
 /*Constants------------------------------------------------------------*/
 #define TESTING //enable or disable debug output
-    
+
 #define EARTHS_GRAVITY          9.80665
 
 #define ACCELEROMETER_ADDRESS   0x18
@@ -21,6 +21,7 @@
 #define IMU_ADDRESS             0x68
 #define ACCELEROMETER_SCALE     6
 
+#define SD_PRINT_BUFF_SIZE      200
 /*Variables------------------------------------------------------------*/
 File datalog;
 char tempString[10];
@@ -108,8 +109,7 @@ void setup()
 
 void loop()
 {
-    char sdPrintBuff[200] = {'\0'};
-
+    char sdPrintBuff[SD_PRINT_BUFF_SIZE] = {'\0'};
 
     int16_t x, y, z;
     float acc_data[3], bar_data[2], temp_data, IMU_data[10];
@@ -166,7 +166,6 @@ void loop()
     datalog.print(sdPrintBuff);
 
     datalog.flush();
-
 
     /*output data to serial*/
     #ifdef TESTING
