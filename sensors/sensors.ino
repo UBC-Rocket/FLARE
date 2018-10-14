@@ -9,8 +9,6 @@
 #include <i2c_t3.h>
 #include <SD.h>
 
-#include <stdio.h>
-
 /*Constants------------------------------------------------------------*/
 #define TESTING //enable or disable debug output
 
