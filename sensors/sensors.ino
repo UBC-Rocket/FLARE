@@ -9,6 +9,8 @@
 #include <i2c_t3.h>
 #include <SD.h>
 
+#include <stdio.h>
+
 /*Constants------------------------------------------------------------*/
 #define TESTING //enable or disable debug output
 
@@ -21,6 +23,7 @@
 
 /*Variables------------------------------------------------------------*/
 File datalog;
+char tempString[10];
 
 LIS331 accelerometer;
 MS5803 barometer(ADDRESS_HIGH);
@@ -105,6 +108,9 @@ void setup()
 
 void loop()
 {
+    char sdPrintBuff[200] = {'\0'};
+
+
     int16_t x, y, z;
     float acc_data[3], bar_data[2], temp_data, IMU_data[10];
 
@@ -134,6 +140,7 @@ void loop()
     IMU_data[9] = IMU.getTemperature_C();
 
     /*write data to SD card*/
+    timeZero = micros();
     for (unsigned int i = 0; i < sizeof(acc_data)/sizeof(float); i++){
        datalog.print(acc_data[i]);
        datalog.print(",");
@@ -142,14 +149,55 @@ void loop()
         datalog.print(bar_data[i]);
         datalog.print(",");
     }
+
     datalog.print(temp_data);
+
     datalog.print(",");
     for (unsigned int i = 0; i < sizeof(IMU_data)/sizeof(float); i++){
         datalog.print(IMU_data[i]);
         datalog.print(",");
     }
     datalog.print("\n");
+
+    timeQuery = micros();
     datalog.flush();
+
+    Serial.print("Timing original: ");
+    Serial.println(timeQuery - timeZero);
+
+    /*write data to SD card, except every time they print something it goes into a buffer*/
+
+    timeZero = micros();
+    for (unsigned int i = 0; i < sizeof(acc_data)/sizeof(float); i++){
+        sprintf(tempString, "%.2f", acc_data[i]);
+        strcat(sdPrintBuff, tempString);
+        strcat(sdPrintBuff, ",");
+    }
+    for (unsigned int i = 0; i < sizeof(bar_data)/sizeof(float); i++){
+        sprintf(tempString, "%.2f", bar_data[i]);
+        strcat(sdPrintBuff, tempString);
+        strcat(sdPrintBuff, ",");
+    }
+
+    sprintf(tempString, "%.2f", temp_data);
+    strcat(sdPrintBuff, tempString);
+    strcat(sdPrintBuff, ",");
+
+    for (unsigned int i = 0; i < sizeof(IMU_data)/sizeof(float); i++){
+        sprintf(tempString,  "%.2f", IMU_data[i]);
+        strcat(sdPrintBuff, tempString);
+        strcat(sdPrintBuff, ",");
+    }
+    strcat(sdPrintBuff, "\n");
+
+    datalog.print(sdPrintBuff);
+
+    timeQuery = micros();
+    datalog.flush();
+
+    Serial.print("Timing new: ");
+    Serial.println(timeQuery - timeZero);
+
 
     /*output data to serial*/
     #ifdef TESTING
