@@ -19,6 +19,7 @@
 #define IMU_ADDRESS             0x68
 #define ACCELEROMETER_SCALE     6
 
+#define CYCLES_PER_FLUSH        10
 /*Variables------------------------------------------------------------*/
 File datalog;
 
@@ -26,6 +27,8 @@ LIS331 accelerometer;
 MS5803 barometer(ADDRESS_HIGH);
 TMP102 temp_sensor(TEMP_SENSOR_ADDRESS);
 MPU9250 IMU(Wire, IMU_ADDRESS);
+
+int flushCount = 0; //counts when to flush
 
 /*Functions------------------------------------------------------------*/
 void setup()
@@ -55,7 +58,7 @@ void setup()
             status = false;
             #ifdef TESTING
             Serial.println("ERROR: Opening file failed!");
-            #endif       
+            #endif
         } else {
             datalog.write("SENSOR LOG DATA\n");
             datalog.write("Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),\
@@ -162,7 +165,11 @@ void loop()
     datalog.print(",");
     datalog.print(IMU_data[9]);
     datalog.print("\n");
-    datalog.flush();
+
+    if(++flushCount >= CYCLES_PER_FLUSH){ //shaves ~1.5 seconds
+        datalog.flush();
+        flushCount = 0;
+    }
 
     /*output data to serial*/
     #ifdef TESTING
@@ -188,8 +195,8 @@ void loop()
     Serial.println(IMU_data[3]);
     Serial.print("IMU angular velocity Y (rad/s):     ");
     Serial.println(IMU_data[4]);
-    Serial.print("IMU angular velocity Z (rad/s):     "); 
-    Serial.println(IMU_data[5]);  
+    Serial.print("IMU angular velocity Z (rad/s):     ");
+    Serial.println(IMU_data[5]);
     Serial.print("IMU magnetism X (uT):               ");
     Serial.println(IMU_data[6]);
     Serial.print("IMU magnetism X (uT):               ");
