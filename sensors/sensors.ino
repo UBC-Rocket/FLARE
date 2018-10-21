@@ -5,8 +5,11 @@
 #include "SparkFun_MS5803_I2C.h"    //barometer
 #include "SparkFunTMP102.h"         //temp sensor
 #include "MPU9250.h"                //IMU
+#include "Venus638FLPx.h"           //GPS
 
+#include <Arduino.h>
 #include <i2c_t3.h>
+#include <HardwareSerial.h>
 #include <SD.h>
 
 /*Constants------------------------------------------------------------*/
@@ -26,6 +29,7 @@ LIS331 accelerometer;
 MS5803 barometer(ADDRESS_HIGH);
 TMP102 temp_sensor(TEMP_SENSOR_ADDRESS);
 MPU9250 IMU(Wire, IMU_ADDRESS);
+Venus638FLPx GPS(Serial1);
 
 /*Functions------------------------------------------------------------*/
 void setup()
@@ -48,14 +52,14 @@ void setup()
     while (!Serial1) {}
 
     /*init SD card*/
-    if (!SD.begin(BUILTIN_SDCARD)){
+    if (!SD.begin(BUILTIN_SDCARD)) {
         status = false;
         #ifdef TESTING
         Serial.println("ERROR: SD card initialization failed!");
         #endif
     } else {
         datalog = SD.open("datalog.txt", FILE_WRITE);
-        if(!datalog){
+        if (!datalog) {
             status = false;
             #ifdef TESTING
             Serial.println("ERROR: Opening file failed!");
@@ -67,7 +71,8 @@ void setup()
             "Temperature Sensor - Temperature (C),IMU - Acceleration X (g),IMU - Acceleration Y (g),"
             "IMU - Acceleration Z (g),IMU - Angular Velocity X (rad/s),IMU - Angular Velocity Y (rad/s),"
             "IMU - Angular Velocity Z (rad/s),IMU - Magnetism X (uT),IMU - Magnetism Y (uT),"
-            "IMU - Magnetism Z (uT),IMU - Temperature (C)\n");
+            "IMU - Magnetism Z (uT),IMU - Temperature (C),GPS - Latitude,GPS - N/S,"
+            "GPS - Longitude,GPS - E/W\n");
         }
     }
 
@@ -94,8 +99,8 @@ void setup()
     }
 
     /*if something went wrong spin infinitely, otherwise indicate completion*/
-    if(!status){
-        while(1){}
+    if (!status) {
+        while (1) {}
     } else {
         pinMode(LED_BUILTIN,OUTPUT);
         digitalWrite(LED_BUILTIN,HIGH);
@@ -107,6 +112,7 @@ void loop()
 {
     int16_t x, y, z;
     float acc_data[3], bar_data[2], temp_data, IMU_data[10];
+    char GPS_data[4][20];
 
     /*poll all the sensors*/
     accelerometer.readAxes(x, y, z);
@@ -133,19 +139,29 @@ void loop()
     IMU_data[8] = IMU.getMagZ_uT();
     IMU_data[9] = IMU.getTemperature_C();
 
+    GPS.getGPS();
+    GPS.getField(GPS_data[0], 3); //latitude
+    GPS.getField(GPS_data[1], 4); //NS
+    GPS.getField(GPS_data[2], 5); //longitude
+    GPS.getField(GPS_data[3], 6); //EW
+
     /*write data to SD card*/
-    for (unsigned int i = 0; i < sizeof(acc_data)/sizeof(float); i++){
+    for (unsigned int i = 0; i < sizeof(acc_data)/sizeof(float); i++) {
        datalog.print(acc_data[i]);
        datalog.print(",");
     }
-    for (unsigned int i = 0; i < sizeof(bar_data)/sizeof(float); i++){
+    for (unsigned int i = 0; i < sizeof(bar_data)/sizeof(float); i++) {
         datalog.print(bar_data[i]);
         datalog.print(",");
     }
     datalog.print(temp_data);
     datalog.print(",");
-    for (unsigned int i = 0; i < sizeof(IMU_data)/sizeof(float); i++){
+    for (unsigned int i = 0; i < sizeof(IMU_data)/sizeof(float); i++) {
         datalog.print(IMU_data[i]);
+        datalog.print(",");
+    }
+    for (unsigned int i = 0; i < sizeof(GPS_data)/sizeof(GPS_data[0]); i++) {
+        datalog.print(GPS_data[i]);
         datalog.print(",");
     }
     datalog.print("\n");
@@ -185,6 +201,12 @@ void loop()
     Serial.println(IMU_data[8]);
     Serial.print("IMU temperature (C):                ");
     Serial.println(IMU_data[9]);
+    Serial.print("GPS coordinates (lat,long):        ");
+    Serial.print(GPS_data[0]);
+    Serial.print(GPS_data[1]);
+    Serial.print(",");
+    Serial.print(GPS_data[2]);
+    Serial.println(GPS_data[3]);
     Serial.println("");
     #endif
 
