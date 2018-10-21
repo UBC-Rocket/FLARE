@@ -20,7 +20,7 @@ void Venus638FLPx::getGPS()
                 _sentence[i] = '\0';
                 i = 0;
                 getField(field, 0);
-                if (strcmp(field, "$GPRMC") == 0){
+                if (strcmp(field, "$GPGGA") == 0){
                     success = true;
                 }
             }

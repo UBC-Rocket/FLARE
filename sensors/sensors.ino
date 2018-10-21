@@ -35,6 +35,10 @@ Venus638FLPx GPS(Serial1);
 void setup()
 {
     bool status = true;
+    byte reset_defaults[] = {0xA0, 0xA1, 0x00, 0x02, 0x04, 0x00, 0x04, 0x0D, 0x0A};
+    byte set_baud_rate[] = {0xA0, 0xA1, 0x00, 0x04, 0x05, 0x00, 0x05, 0x00, 0x00, 0x0D, 0x0A}; //115200
+    byte set_NMEA_message[] = {0xA0, 0xA1, 0x00, 0x09, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x0D, 0x0A}; //GPGGA
+    byte set_update_rate[] = {0xA0, 0xA1, 0x00, 0x03, 0x0E, 0x10, 0x00, 0x1E, 0x0D, 0x0A}; //10 Hz
 
     /*init serial comms*/
     Serial.begin(9600);
@@ -52,6 +56,9 @@ void setup()
     while (!Serial1) {}
 
     /*init SD card*/
+    #ifdef TESTING
+    Serial.println("Initializing SD card");
+    #endif
     if (!SD.begin(BUILTIN_SDCARD)) {
         status = false;
         #ifdef TESTING
@@ -71,23 +78,35 @@ void setup()
             "Temperature Sensor - Temperature (C),IMU - Acceleration X (g),IMU - Acceleration Y (g),"
             "IMU - Acceleration Z (g),IMU - Angular Velocity X (rad/s),IMU - Angular Velocity Y (rad/s),"
             "IMU - Angular Velocity Z (rad/s),IMU - Magnetism X (uT),IMU - Magnetism Y (uT),"
-            "IMU - Magnetism Z (uT),IMU - Temperature (C),GPS - Latitude,GPS - N/S,"
-            "GPS - Longitude,GPS - E/W\n");
+            "IMU - Magnetism Z (uT),IMU - Temperature (C),GPS - Latitude (DDM),GPS - Longitude (DDM),"
+            "GPS - Altitude (m)\n");
         }
     }
 
     /*init accerlerometer*/
+    #ifdef TESTING
+    Serial.println("Initializing accelerometer");
+    #endif
     accelerometer.setI2CAddr(ACCELEROMETER_ADDRESS);
     accelerometer.begin(LIS331::USE_I2C);
 
     /*init barometer*/
+    #ifdef TESTING
+    Serial.println("Initializing barometer");
+    #endif
     barometer.reset();
     barometer.begin();
 
     /*init temp sensor*/
+    #ifdef TESTING
+    Serial.println("Initializing temperature sensor");
+    #endif
     temp_sensor.begin();
 
     /*init IMU*/
+    #ifdef TESTING
+    Serial.println("Initializing IMU");
+    #endif
     int error = 0;
     error = IMU.begin();
     if (error < 0) {
@@ -97,6 +116,17 @@ void setup()
         Serial.println(error);
         #endif
     }
+
+    /*/init GPS*/
+    #ifdef TESTING
+    Serial.println("Initializing GPS");
+    #endif
+    Serial1.write(reset_defaults, sizeof(reset_defaults));
+    Serial1.write(set_baud_rate, sizeof(set_baud_rate));
+    delay(10);
+    Serial1.begin(115200);
+    Serial1.write(set_NMEA_message, sizeof(set_NMEA_message));
+    Serial1.write(set_update_rate, sizeof(set_update_rate));
 
     /*if something went wrong spin infinitely, otherwise indicate completion*/
     if (!status) {
@@ -112,21 +142,33 @@ void loop()
 {
     int16_t x, y, z;
     float acc_data[3], bar_data[2], temp_data, IMU_data[10];
-    char GPS_data[4][20];
+    char GPS_data[3][20];
 
     /*poll all the sensors*/
+    #ifdef TESTING
+    Serial.println("Polling accelerometer");
+    #endif
     accelerometer.readAxes(x, y, z);
     acc_data[0] = accelerometer.convertToG(ACCELEROMETER_SCALE, x);
     acc_data[1] = accelerometer.convertToG(ACCELEROMETER_SCALE, y);
     acc_data[2] = accelerometer.convertToG(ACCELEROMETER_SCALE, z);
 
+    #ifdef TESTING
+    Serial.println("Polling barometer");
+    #endif
     bar_data[0] = barometer.getPressure(ADC_4096);
     bar_data[1] = barometer.getTemperature(CELSIUS, ADC_512);
 
+    #ifdef TESTING
+    Serial.println("Polling temperature sensor");
+    #endif
     temp_sensor.wakeup();
     temp_data = temp_sensor.readTempC();
     temp_sensor.sleep();
 
+    #ifdef TESTING
+    Serial.println("Polling IMU");
+    #endif
     IMU.readSensor();
     IMU_data[0] = IMU.getAccelX_mss() / EARTHS_GRAVITY; //convert to g
     IMU_data[1] = IMU.getAccelY_mss() / EARTHS_GRAVITY; //convert to g
@@ -139,12 +181,17 @@ void loop()
     IMU_data[8] = IMU.getMagZ_uT();
     IMU_data[9] = IMU.getTemperature_C();
 
+    #ifdef TESTING
+    Serial.println("Polling GPS");
+    #endif
     GPS.getGPS();
-    GPS.getField(GPS_data[0], 3); //latitude
-    GPS.getField(GPS_data[1], 4); //NS
-    GPS.getField(GPS_data[2], 5); //longitude
-    GPS.getField(GPS_data[3], 6); //EW
+    GPS.getField(GPS_data[0], 2); //latitude
+    GPS.getField(GPS_data[1], 4); //longitude
+    GPS.getField(GPS_data[2], 9); //altitude
 
+    #ifdef TESTING
+    Serial.println("Writing to SD card");
+    #endif
     /*write data to SD card*/
     for (unsigned int i = 0; i < sizeof(acc_data)/sizeof(float); i++) {
        datalog.print(acc_data[i]);
@@ -201,12 +248,12 @@ void loop()
     Serial.println(IMU_data[8]);
     Serial.print("IMU temperature (C):                ");
     Serial.println(IMU_data[9]);
-    Serial.print("GPS coordinates (lat,long):        ");
-    Serial.print(GPS_data[0]);
-    Serial.print(GPS_data[1]);
-    Serial.print(",");
-    Serial.print(GPS_data[2]);
-    Serial.println(GPS_data[3]);
+    Serial.print("GPS latitude:                       ");
+    Serial.println(GPS_data[0]);
+    Serial.print("GPS longitude:                      ");
+    Serial.println(GPS_data[1]);
+    Serial.print("GPS altitude:                       ");
+    Serial.println(GPS_data[2]);
     Serial.println("");
     #endif
 
