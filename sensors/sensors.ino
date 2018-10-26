@@ -20,6 +20,7 @@
 #define ACCELEROMETER_SCALE     6
 
 #define CYCLES_PER_FLUSH        10
+
 /*Variables------------------------------------------------------------*/
 File datalog;
 
@@ -27,8 +28,6 @@ LIS331 accelerometer;
 MS5803 barometer(ADDRESS_HIGH);
 TMP102 temp_sensor(TEMP_SENSOR_ADDRESS);
 MPU9250 IMU(Wire, IMU_ADDRESS);
-
-int flushCount = 0; //counts when to flush
 
 /*Functions------------------------------------------------------------*/
 void setup()
@@ -104,6 +103,7 @@ void setup()
 
 void loop()
 {
+    int flushCount = 0;
     int16_t x, y, z;
     float acc_data[3], bar_data[2], temp_data, IMU_data[10];
 
@@ -166,7 +166,7 @@ void loop()
     datalog.print(IMU_data[9]);
     datalog.print("\n");
 
-    if(++flushCount >= CYCLES_PER_FLUSH){ //shaves ~1.5 seconds
+    if (flushCount++ >= CYCLES_PER_FLUSH) {
         datalog.flush();
         flushCount = 0;
     }
