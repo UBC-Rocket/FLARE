@@ -6,7 +6,7 @@ Venus638FLPx::Venus638FLPx(HardwareSerial serial){
 
 void Venus638FLPx::getGPS()
 {
-    static int i = 0;
+    int i = 0;
     char field[20];
     bool success = false;
 
