@@ -57,10 +57,8 @@ void loop()
             Serial.print(temp);
         }
     }
-    Serial.println(bar_data[0]);
     pollSensors(acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
     //run algorithm
-    Serial.println(bar_data[0]);
     logData(acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
     Serial2.print(bar_data[0]);
 
