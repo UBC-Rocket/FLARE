@@ -166,7 +166,7 @@ void loop()
     datalog.print(IMU_data[9]);
     datalog.print("\n");
 
-    if (flushCount++ >= CYCLES_PER_FLUSH) {
+    if (++flushCount >= CYCLES_PER_FLUSH) {
         datalog.flush();
         flushCount = 0;
     }
