@@ -168,7 +168,7 @@ void loop()
 
     if (++flush_count >= CYCLES_PER_FLUSH) {
         datalog.flush();
-        flushCount = 0;
+        flush_count = 0;
     }
 
     /*output data to serial*/
