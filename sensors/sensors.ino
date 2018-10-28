@@ -33,11 +33,12 @@ void setup()
 
     /*if something went wrong spin infinitely, otherwise indicate completion*/
     if (!status) {
+        Serial.println("Initialization failed! >:-{");
         while (1) {}
     } else {
         pinMode(LED_BUILTIN,OUTPUT);
         digitalWrite(LED_BUILTIN,HIGH);
-        Serial.println("Initialization complete!");
+        Serial.println("Initialization complete! :D");
     }
 }
 
@@ -47,11 +48,21 @@ void loop()
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE];
     char GPS_data[GPS_DATA_ARRAY_SIZE][GPS_SENTENCE_LENGTH];
 
-    //listen radio
+    char temp;
+    while (Serial2.available()) {
+        temp = Serial2.read();
+        if (temp == '\0') {
+            Serial.println();
+        } else {
+            Serial.print(temp);
+        }
+    }
+    Serial.println(bar_data[0]);
     pollSensors(acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
     //run algorithm
+    Serial.println(bar_data[0]);
     logData(acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
-    //send radio
+    Serial2.print(bar_data[0]);
 
     #ifdef TESTING
     delay(1000);

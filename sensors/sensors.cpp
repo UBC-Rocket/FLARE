@@ -99,6 +99,13 @@ bool initSensors(void)
     Serial1.write(GPS_set_NMEA_message, sizeof(GPS_set_NMEA_message));
     Serial1.write(GPS_set_update_rate, sizeof(GPS_set_update_rate));
 
+    /*init radio*/
+    #ifdef TESTING
+    Serial.println("Initializing radio");
+    #endif
+    Serial2.begin(921600);
+    while (!Serial2) {}
+
     return status;
 }
 
@@ -107,6 +114,7 @@ void pollSensors(float acc_data[], float bar_data[],
                 float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_SENTENCE_LENGTH])
 {
     int16_t x, y, z;
+    bool gps_status;
 
     #ifdef TESTING
     Serial.println("Polling accelerometer");
@@ -119,8 +127,10 @@ void pollSensors(float acc_data[], float bar_data[],
     #ifdef TESTING
     Serial.println("Polling barometer");
     #endif
+    Serial.println(bar_data[0]);
     bar_data[0] = barometer.getPressure(ADC_4096);
     bar_data[1] = barometer.getTemperature(CELSIUS, ADC_512);
+    Serial.println(bar_data[0]);
 
     #ifdef TESTING
     Serial.println("Polling temperature sensor");
@@ -146,10 +156,12 @@ void pollSensors(float acc_data[], float bar_data[],
     #ifdef TESTING
     Serial.println("Polling GPS");
     #endif
-    GPS.getGPS();
-    GPS.getField(GPS_data[0], 2); //latitude
-    GPS.getField(GPS_data[1], 4); //longitude
-    GPS.getField(GPS_data[2], 9); //altitude
+    GPS.getGPS(&gps_status);
+    if (gps_status) {
+        GPS.getField(GPS_data[0], 2); //latitude
+        GPS.getField(GPS_data[1], 4); //longitude
+        GPS.getField(GPS_data[2], 9); //altitude
+    }
 }
 
 /*log all the data*/
@@ -164,6 +176,7 @@ void logData(float acc_data[], float bar_data[],
        datalog.print(acc_data[i]);
        datalog.print(",");
     }
+    Serial.println(bar_data[0]);
     for (unsigned int i = 0; i < BAR_DATA_ARRAY_SIZE; i++) {
         datalog.print(bar_data[i]);
         datalog.print(",");

@@ -1,18 +1,21 @@
 #ifndef Venus638FLPx_h
 #define Venus638FLPx_h
 
+#include <Arduino.h> //for elapsedMillis
 #include <HardwareSerial.h>
+
+#define SENTENCE_SIZE 100
 
 class Venus638FLPx {
     public:
         Venus638FLPx(HardwareSerial serial);
-        void getGPS();
+        void getGPS(bool* status);
         void getField(char* buffer, int index);
 
     private:
         HardwareSerial _serial;
-        const int _sentenceSize = 80;
-        char _sentence[80];
+        const int _sentenceSize = SENTENCE_SIZE;
+        char _sentence[SENTENCE_SIZE];
 };
 
 #endif
