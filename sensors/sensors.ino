@@ -103,7 +103,7 @@ void setup()
 
 void loop()
 {
-    int flushCount = 0;
+    int flush_count = 0;
     int16_t x, y, z;
     float acc_data[3], bar_data[2], temp_data, IMU_data[10];
 
@@ -166,7 +166,7 @@ void loop()
     datalog.print(IMU_data[9]);
     datalog.print("\n");
 
-    if (++flushCount >= CYCLES_PER_FLUSH) {
+    if (++flush_count >= CYCLES_PER_FLUSH) {
         datalog.flush();
         flushCount = 0;
     }
