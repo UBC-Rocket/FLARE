@@ -11,6 +11,7 @@
 /*Constants------------------------------------------------------------*/
 
 /*Variables------------------------------------------------------------*/
+File radiolog;
 
 /*Functions------------------------------------------------------------*/
 void setup()
@@ -18,10 +19,10 @@ void setup()
     bool status = true;
 
     /*init serial comms*/
-    Serial.begin(9600);
-    while (!Serial) {}
     #ifdef TESTING
-    Serial.println("Initializing...");
+    SerialUSB.begin(9600);
+    while (!SerialUSB) {}
+    SerialUSB.println("Initializing...");
     #endif
 
     /*init I2C bus*/
@@ -33,12 +34,16 @@ void setup()
 
     /*if something went wrong spin infinitely, otherwise indicate completion*/
     if (!status) {
-        Serial.println("Initialization failed! >:-{");
+        #ifdef TESTING
+        SerialUSB.println("Initialization failed! >:-{");
+        #endif
         while (1) {}
     } else {
         pinMode(LED_BUILTIN,OUTPUT);
         digitalWrite(LED_BUILTIN,HIGH);
-        Serial.println("Initialization complete! :D");
+        #ifdef TESTING
+        SerialUSB.println("Initialization complete! :D");
+        #endif
     }
 }
 
@@ -48,19 +53,36 @@ void loop()
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE];
     char GPS_data[GPS_DATA_ARRAY_SIZE][GPS_SENTENCE_LENGTH];
 
-    char temp;
-    while (Serial2.available()) {
-        temp = Serial2.read();
-        if (temp == '\0') {
-            Serial.println();
+    radiolog.print("Received Message: ");
+    #ifdef TESTING
+    SerialUSB.print("Received Message: ");
+    #endif
+    while (SerialRadio.available()) {
+        char temp = SerialRadio.read();
+        if (temp == '\n') {
+            radiolog.println();
+            #ifdef TESTING
+            SerialUSB.println();
+            #endif
         } else {
-            Serial.print(temp);
+            radiolog.print(temp);
+            #ifdef TESTING
+            SerialUSB.print(temp);
+            #endif
         }
     }
+
     pollSensors(acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
-    //run algorithm
+    //algorithm
     logData(acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
-    Serial2.print(bar_data[0]);
+
+    SerialRadio.print(bar_data[0]);
+    radiolog.print("Sent Message: ");
+    radiolog.println(bar_data[0]);
+    #ifdef TESTING
+    SerialUSB.print("Sent Message: ");
+    SerialUSB.println(bar_data[0]);
+    #endif
 
     #ifdef TESTING
     delay(1000);

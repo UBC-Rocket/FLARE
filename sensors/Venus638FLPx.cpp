@@ -1,3 +1,5 @@
+/*GPS Venus638FLPx Driver Source*/
+
 #include "Venus638FLPx.h"
 
 Venus638FLPx::Venus638FLPx(HardwareSerial serial){
@@ -10,8 +12,8 @@ void Venus638FLPx::getGPS(bool* status)
     char field[20];
     elapsedMillis timeout;
 
-    while ((! *status) && (timeout < 1000)) {
-        if (_serial.available()){
+    while (timeout < 100) {
+        if (_serial.available()) {
             char ch = _serial.read();
             if (ch != '\n' && i < _sentenceSize) {
                 _sentence[i] = ch;
@@ -20,8 +22,9 @@ void Venus638FLPx::getGPS(bool* status)
                 _sentence[i] = '\0';
                 i = 0;
                 getField(field, 0);
-                if (strcmp(field, "$GPGGA") == 0){
+                if (strcmp(field, "$GPGGA") == 0) {
                     *status = true;
+                    break;
                 }
             }
         }

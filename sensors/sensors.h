@@ -3,19 +3,14 @@
 #define SENSORS_H
 
 /*Includes------------------------------------------------------------*/
-#include "SparkFun_LIS331.h"        //accelerometer
-#include "SparkFun_MS5803_I2C.h"    //barometer
-#include "SparkFunTMP102.h"         //temp sensor
-#include "MPU9250.h"                //IMU
-#include "Venus638FLPx.h"           //GPS
-
 #include <Arduino.h>
-#include <HardwareSerial.h>
-#include <i2c_t3.h>
-#include <SD.h>
 
 /*Constants------------------------------------------------------------*/
 #define TESTING //enable or disable debug output
+
+#define SerialUSB               Serial
+#define SerialGPS               Serial1
+#define SerialRadio             Serial2
 
 #define EARTHS_GRAVITY          9.80665
 
@@ -31,10 +26,14 @@
 #define GPS_SENTENCE_LENGTH     20
 
 /*Variables------------------------------------------------------------*/
+const uint8_t GPS_reset_defaults[] = {0xA0, 0xA1, 0x00, 0x02, 0x04, 0x00, 0x04, 0x0D, 0x0A};
+const uint8_t GPS_set_baud_rate[] = {0xA0, 0xA1, 0x00, 0x04, 0x05, 0x00, 0x05, 0x00, 0x00, 0x0D, 0x0A}; //115200
+const uint8_t GPS_set_NMEA_message[] = {0xA0, 0xA1, 0x00, 0x09, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x0D, 0x0A}; //GPGGA
+const uint8_t GPS_set_update_rate[] = {0xA0, 0xA1, 0x00, 0x03, 0x0E, 0x10, 0x00, 0x1E, 0x0D, 0x0A}; //10 Hz
 
 /*Functions------------------------------------------------------------*/
 bool initSensors(void);
-void pollSensors(float*, float*, float*, float*, char [][GPS_SENTENCE_LENGTH]);
-void logData(float*, float*, float*, float*, char [][GPS_SENTENCE_LENGTH]);
+void pollSensors(float*, float*, float*, float*, char[][GPS_SENTENCE_LENGTH]);
+void logData(float*, float*, float*, float*, char[][GPS_SENTENCE_LENGTH]);
 
 #endif
