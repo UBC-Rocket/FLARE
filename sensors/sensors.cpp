@@ -22,7 +22,6 @@ LIS331 accelerometer;
 MS5803 barometer(ADDRESS_HIGH);
 TMP102 temp_sensor(TEMP_SENSOR_ADDRESS);
 MPU9250 IMU(Wire, IMU_ADDRESS);
-Venus638FLPx GPS(SerialGPS);
 
 /*Functions------------------------------------------------------------*/
 
@@ -121,7 +120,7 @@ void pollSensors(float acc_data[], float bar_data[],
                 float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_SENTENCE_LENGTH])
 {
     int16_t x, y, z;
-    bool gps_status = false;
+    char sentence[SENTENCE_SIZE];
 
     #ifdef TESTING
     SerialUSB.println("Polling accelerometer");
@@ -159,11 +158,10 @@ void pollSensors(float acc_data[], float bar_data[],
     #ifdef TESTING
     SerialUSB.println("Polling GPS");
     #endif
-    GPS.getGPS(&gps_status);
-    if (gps_status) {
-        GPS.getField(GPS_data[0], 2); //latitude
-        GPS.getField(GPS_data[1], 4); //longitude
-        GPS.getField(GPS_data[2], 9); //altitude
+    if (getGPSData(sentence)) {
+        getGPSField(sentence, GPS_data[0], 2); //latitude
+        getGPSField(sentence, GPS_data[1], 4); //longitude
+        getGPSField(sentence, GPS_data[2], 9); //altitude
     }
 }
 

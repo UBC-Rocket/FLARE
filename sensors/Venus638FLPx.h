@@ -3,21 +3,17 @@
 #ifndef Venus638FLPx_h
 #define Venus638FLPx_h
 
-#include <Arduino.h> //for elapsedMillis
+/*Includes------------------------------------------------------------*/
 #include <HardwareSerial.h>
 
-#define SENTENCE_SIZE 100
+/*Constants------------------------------------------------------------*/
+#define SENTENCE_SIZE   100
+#define GPS_TIMEOUT     100
 
-class Venus638FLPx {
-    public:
-        Venus638FLPx(HardwareSerial serial);
-        void getGPS(bool* status);
-        void getField(char* buffer, int index);
+/*Variables------------------------------------------------------------*/
 
-    private:
-        HardwareSerial _serial;
-        const int _sentenceSize = SENTENCE_SIZE;
-        char _sentence[SENTENCE_SIZE];
-};
+/*Functions------------------------------------------------------------*/
+bool getGPSData(char* sentence);
+void getGPSField(char* sentence, char* buffer, int index);
 
 #endif

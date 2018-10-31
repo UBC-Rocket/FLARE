@@ -53,22 +53,24 @@ void loop()
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE];
     char GPS_data[GPS_DATA_ARRAY_SIZE][GPS_SENTENCE_LENGTH];
 
-    radiolog.print("Received Message: ");
-    #ifdef TESTING
-    SerialUSB.print("Received Message: ");
-    #endif
-    while (SerialRadio.available()) {
-        char temp = SerialRadio.read();
-        if (temp == '\n') {
-            radiolog.println();
-            #ifdef TESTING
-            SerialUSB.println();
-            #endif
-        } else {
-            radiolog.print(temp);
-            #ifdef TESTING
-            SerialUSB.print(temp);
-            #endif
+    if (SerialUSB.available()) {
+        radiolog.print("Received Message: ");
+        #ifdef TESTING
+        SerialUSB.print("Received Message: ");
+        #endif
+        while (SerialRadio.available()) {
+            char temp = SerialRadio.read();
+            if (temp == '\n') {
+                radiolog.println();
+                #ifdef TESTING
+                SerialUSB.println();
+                #endif
+            } else {
+                radiolog.print(temp);
+                #ifdef TESTING
+                SerialUSB.print(temp);
+                #endif
+            }
         }
     }
 
