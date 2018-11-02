@@ -2,13 +2,12 @@
 
 /*Includes------------------------------------------------------------*/
 #include "sensors.h"
+#include "statemachine.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <i2c_t3.h>
 #include <SD.h>
-
-/*Constants------------------------------------------------------------*/
 
 /*Variables------------------------------------------------------------*/
 File radiolog;
@@ -21,7 +20,7 @@ void setup()
     /*init serial comms*/
     #ifdef TESTING
     SerialUSB.begin(9600);
-    while (!SerialUSB) {}
+    while (!SerialUSB) {} //TODO add print in while to see what happens
     SerialUSB.println("Initializing...");
     #endif
 
@@ -31,6 +30,9 @@ void setup()
 
     /*init sensors*/
     status = initSensors();
+
+    /*init interrupts*/
+    //attachInterrupt(digitalPinToInterrupt(LAUNCH_INTERRUPT_PIN), launchInterrupt, CHANGE)
 
     /*if something went wrong spin infinitely, otherwise indicate completion*/
     if (!status) {
@@ -49,34 +51,44 @@ void setup()
 
 void loop()
 {
+    unsigned long timestamp;
+    static unsigned long old_time = 0; //ms
+    static unsigned long new_time = 0; //ms
+    static uint16_t time_interval = 5000; //ms
     float acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE];
-    char GPS_data[GPS_DATA_ARRAY_SIZE][GPS_SENTENCE_LENGTH];
+    char GPS_data[GPS_DATA_ARRAY_SIZE][GPS_FIELD_LENGTH];
+    static float abs_accel, prev_altitude, altitude, delta_altitude;
 
-    if (SerialUSB.available()) {
+    if (SerialRadio.available()) {
         radiolog.print("Received Message: ");
         #ifdef TESTING
         SerialUSB.print("Received Message: ");
         #endif
         while (SerialRadio.available()) {
-            char temp = SerialRadio.read();
-            if (temp == '\n') {
+            char command = SerialRadio.read();
+            if (command == '\n') { // TODO test if this is even needed
                 radiolog.println();
                 #ifdef TESTING
                 SerialUSB.println();
                 #endif
             } else {
-                radiolog.print(temp);
+                radiolog.print(command);
                 #ifdef TESTING
-                SerialUSB.print(temp);
+                SerialUSB.print(command);
                 #endif
             }
         }
     }
 
-    pollSensors(acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
-    //algorithm
-    logData(acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
+    new_time = millis();
+    if ((new_time - old_time) > time_interval) {
+        old_time = new_time;
+        pollSensors(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
+        calculateValues(acc_data, bar_data, &abs_accel, &prev_altitude, &altitude, &delta_altitude);
+        stateMachine(abs_accel, altitude, delta_altitude);
+        logData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
+    }
 
     SerialRadio.print(bar_data[0]);
     radiolog.print("Sent Message: ");

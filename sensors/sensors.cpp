@@ -13,8 +13,6 @@
 #include <i2c_t3.h>
 #include <SD.h>
 
-/*Constants------------------------------------------------------------*/
-
 /*Variables------------------------------------------------------------*/
 File datalog;
 
@@ -48,7 +46,7 @@ bool initSensors(void)
             #endif
         } else {
             datalog.write("SENSOR LOG DATA\n");
-            datalog.write("Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
+            datalog.write("Time (ms),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
             "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
             "Temperature Sensor - Temperature (C),IMU - Acceleration X (g),IMU - Acceleration Y (g),"
             "IMU - Acceleration Z (g),IMU - Angular Velocity X (rad/s),IMU - Angular Velocity Y (rad/s),"
@@ -96,7 +94,7 @@ bool initSensors(void)
     SerialUSB.println("Initializing GPS");
     #endif
     SerialGPS.begin(9600);
-    while (!SerialGPS) {}
+    while (!SerialGPS) {}   //TODO this can hang if baud rate is different change to delay?
     SerialGPS.write(GPS_reset_defaults, sizeof(GPS_reset_defaults));
     SerialGPS.write(GPS_set_baud_rate, sizeof(GPS_set_baud_rate));
     SerialGPS.end();
@@ -116,11 +114,13 @@ bool initSensors(void)
 }
 
 /*poll all the sensors*/
-void pollSensors(float acc_data[], float bar_data[],
-                float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_SENTENCE_LENGTH])
+void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
+                float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH])
 {
     int16_t x, y, z;
     char sentence[SENTENCE_SIZE];
+
+    *timestamp = millis();
 
     #ifdef TESTING
     SerialUSB.println("Polling accelerometer");
@@ -166,13 +166,15 @@ void pollSensors(float acc_data[], float bar_data[],
 }
 
 /*log all the data*/
-void logData(float acc_data[], float bar_data[],
-            float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_SENTENCE_LENGTH])
+void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
+            float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH])
 {
     /*write data to SD card*/
     #ifdef TESTING
     SerialUSB.println("Writing to SD card");
     #endif
+    datalog.print(*timestamp);
+    datalog.print(",");
     for (unsigned int i = 0; i < ACC_DATA_ARRAY_SIZE; i++) {
        datalog.print(acc_data[i]);
        datalog.print(",");
@@ -196,6 +198,8 @@ void logData(float acc_data[], float bar_data[],
 
     /*output data to serial*/
     #ifdef TESTING
+    SerialUSB.print("Time (ms):                          ");
+    SerialUSB.println(*timestamp);
     SerialUSB.print("Accelerometer acceleration X (g):   ");
     SerialUSB.println(acc_data[0]);
     SerialUSB.print("Accelerometer acceleration Y (g):   ");
@@ -234,4 +238,13 @@ void logData(float acc_data[], float bar_data[],
     SerialUSB.println(GPS_data[2]);
     SerialUSB.println("");
     #endif
+}
+
+void calculateValues(float acc_data[], float bar_data[], float* abs_accel,
+                    float* prev_altitude, float* altitude, float* delta_altitude)
+{
+    // *abs_accel = sqrtf(powf(acc_data[0], 2) + powf(acc_data[1], 2) + powf(acc_data[2]), 2);
+    // *prev_altitude = *altitude;
+    // *altitude = 44330.0 * (1 - powf(bar_data[0] / BASELINE_PRESSURE, 1 / 5.255));
+    // *delta_altitude = altitude - prev_altitude;
 }

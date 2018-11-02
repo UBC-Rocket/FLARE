@@ -4,7 +4,7 @@
 #include "Venus638FLPx.h"
 #include "sensors.h"
 
-/*Constants------------------------------------------------------------*/
+#include <Arduino.h>
 
 /*Variables------------------------------------------------------------*/
 
@@ -18,7 +18,7 @@ bool getGPSData(char* sentence)
     elapsedMillis timeout;
 
     if (SerialGPS.available()) {
-        while (SerialGPS.available() && status == false && timeout < GPS_TIMEOUT) {
+        while (SerialGPS.available() && (status == false) && (timeout < GPS_TIMEOUT)) {
             char ch = SerialGPS.read();
             if (ch != '\n' && i < SENTENCE_SIZE) {
                 sentence[i] = ch;
