@@ -1,24 +1,23 @@
 /*State Machine Header*/
-#ifndef STATEMACHINE_H2
-#define STATEMACHINE_H2
+#ifndef STATEMACHINE2_H
+#define STATEMACHINE2_H
 
 /*Includes------------------------------------------------------------*/
 
 /*Constants------------------------------------------------------------*/
-#define MIN_CHECKS 5
-
-#define LAUNCH_THRESHOLD 12
-#define LAUNCH_INTERRUPT_PIN 0
-
-#define COAST_THRESHOLD 5
-#define FINAL_DESCENT_THRESHOLD 200 //meters
-#define LAND_HEIGHT_THRESHOLD 150 //meters
-#define LANDING_THRESHOLD_HIGH 1.06
-#define LANDING_THRESHOLD_LOW 0.94
-#define LAND_CHECKS     20
+#define LAUNCH_CHECKS 5
+#define MACH_CHECKS 2
 #define APOGEE_CHECKS   5
-#define COAST_CHECKS    10
+#define MACH_LOCK_CHECKS 10
 #define MAIN_CHECKS     10
+#define LAND_CHECKS     20
+
+#define LAUNCH_THRESHOLD 100 // in meters
+#define MACH_THRESHOLD 275 //in meters per second ??
+#define MACH_LOCK_THRESHOLD 250 //in meters per second??
+#define FINAL_DESCENT_THRESHOLD 200 //meters
+#define LAND_HEIGHT_THRESHOLD 50 //meters
+#define LAND_VELOCITY_THRESHOLD 1  //m/s
 
 #define BASELINE_PRESSURE 1012 //TODO: calibrate
 
@@ -34,8 +33,7 @@ enum FlightStates {
 };
 
 /*Functions------------------------------------------------------------*/
-void launchInterrupt();
 void switchState(FlightStates new_state);
-void stateMachine(float altitude, float delta_altitude);
+void stateMachine(float altitude, float delta_altitude, float base_altitude);
 
 #endif
