@@ -67,17 +67,10 @@ void loop()
         #endif
         while (SerialRadio.available()) {
             char command = SerialRadio.read();
-            if (command == '\n') { // TODO test if this is even needed
-                radiolog.println();
-                #ifdef TESTING
-                SerialUSB.println();
-                #endif
-            } else {
-                radiolog.print(command);
-                #ifdef TESTING
-                SerialUSB.print(command);
-                #endif
-            }
+            radiolog.print(command);
+            #ifdef TESTING
+            SerialUSB.print(command);
+            #endif
         }
     }
 
@@ -90,7 +83,7 @@ void loop()
         logData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
     }
 
-    SerialRadio.print(bar_data[0]);
+    SerialRadio.println(bar_data[0]);
     radiolog.print("Sent Message: ");
     radiolog.println(bar_data[0]);
     #ifdef TESTING
