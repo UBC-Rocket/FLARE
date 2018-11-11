@@ -9,52 +9,54 @@
 /*Variables------------------------------------------------------------*/
 File statelog;
 FlightStates state = STANDBY;
-volatile bool launch_interrupt_flag = false;
-
 
 /*Functions------------------------------------------------------------*/
 
-void launchInterrupt()
-{
-    launch_interrupt_flag = true;
-}
-
-void switchState(FlightStates new_state)
-{
+void switchState(FlightStates new_state){
     state = new_state;
 }
 
-void stateMachine(float abs_accel, float altitude, float delta_altitude)
-{
-    static int coast_count, main_count, land_count, apogee_count = 0;
+void stateMachine(float altitude, float delta_altitude, float base_altitude) { 
+    static int launch_count, armed_count, mach_count, mach_lock_count, apogee_count, main_count, land_count = 0;
 
     switch (state) {
         case STANDBY:
-            if (launch_interrupt_flag || (abs_accel > LAUNCH_THRESHOLD)) {
-                switchState(POWERED_ASCENT);
+            if (altitude > (base_altitude + LAUNCH_THRESHOLD)) {
+                launch_count++;
+                if (launch_count >= LAUNCH_CHECKS){
+                    switchState(ASCENT);
+                    launch_count = 0;
+                }
+            }
+            else{
+                launch_count = 0;
             }
             break;
 
         case ARMED:
-            if ((abs_accel > LAUNCH_THRESHOLD) || launch_interrupt_flag) {
-                //turn off launch interrupt
-                switchState(POWERED_ASCENT);
-            }
-            break;
-
-        case POWERED_ASCENT:
-            if (abs_accel < COAST_THRESHOLD) {
-                coast_count++;
-                if (coast_count >= COAST_CHECKS) {
-                    switchState(APOGEE_DETECT);
-                    coast_count = 0;
+            if (altitude > (base_altitude + LAUNCH_THRESHOLD)) {
+                armed_count++;
+                if (armed_count >= LAUNCH_CHECKS){
+                    switchState(ASCENT);
+                    armed_count = 0;
                 }
-            } else {
-                coast_count = 0;
+            }
+            else{
+                armed_count = 0;
             }
             break;
 
-        case APOGEE_DETECT:
+        case ASCENT:    // checks for Mach threshold + apogee 
+            if (delta_altitude > MACH_THRESHOLD) {
+                mach_count++;
+                if (mach_count >= MACH_CHECKS) {
+                    switchState(MACH_LOCK);
+                    mach_count = 0;
+                }
+            } 
+            else {
+                mach_count = 0;
+            }
             if (delta_altitude < 0) {
                 apogee_count ++;
                 if (apogee_count >= APOGEE_CHECKS) {
@@ -63,8 +65,22 @@ void stateMachine(float abs_accel, float altitude, float delta_altitude)
                     switchState(INITIAL_DESCENT);
                     apogee_count = 0;
                 }
-            } else {
+            } 
+            else {
                 apogee_count = 0;
+            }
+            break;
+
+        case MACH_LOCK: //checks for reduction in speed below mach threshold
+            if (delta_altitude < MACH_LOCK_THRESHOLD) {
+                mach_lock_count++;
+                if (mach_lock_count >= MACH_LOCK_CHECKS) {
+                    switchState(ASCENT);
+                    mach_lock_count = 0;
+                }
+            } 
+            else {
+                mach_lock_count = 0;
             }
             break;
 
@@ -74,20 +90,24 @@ void stateMachine(float abs_accel, float altitude, float delta_altitude)
                 if (main_count >= MAIN_CHECKS) {
                     //deploy main
                     switchState(FINAL_DESCENT);
+                    main_count = 0;
                 }
-            } else {
+            } 
+            else {
                 main_count = 0;
             }
             break;
 
         case FINAL_DESCENT:
-            if (abs_accel > LANDING_THRESHOLD_LOW && abs_accel < LANDING_THRESHOLD_HIGH && altitude < LAND_HEIGHT_THRESHOLD) {
+            if (altitude < (base_altitude + LAND_HEIGHT_THRESHOLD) && delta_altitude < LAND_VELOCITY_THRESHOLD) {
                 land_count++;
                 if (land_count >= LAND_CHECKS) {
                     //turn off sensors except GPS
                     switchState(LANDED);
+                    land_count = 0;
                 }
-            } else {
+            } 
+            else {
                 land_count = 0;
             }
             break;
