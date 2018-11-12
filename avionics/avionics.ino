@@ -11,6 +11,7 @@
 
 /*Variables------------------------------------------------------------*/
 File radiolog;
+// float baseline_pressure;
 
 /*Functions------------------------------------------------------------*/
 void setup()
@@ -47,18 +48,22 @@ void setup()
         SerialUSB.println("Initialization complete! :D");
         #endif
     }
+    // Only if static float cannot be initialized below:
+    // baseline_pressure = groundAlt_init()
+
 }
 
 void loop()
 {
     unsigned long timestamp;
+    static float baseline_pressure = groundAlt_init(barometer_data_init);  // IF YOU CAN'T DO THIS USE GLOBAL VAR
     static unsigned long old_time = 0; //ms
     static unsigned long new_time = 0; //ms
     static uint16_t time_interval = 5000; //ms
     float acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE];
     char GPS_data[GPS_DATA_ARRAY_SIZE][GPS_FIELD_LENGTH];
-    static float abs_accel, prev_altitude, altitude, delta_altitude;
+    static float abs_accel, prev_altitude, altitude, delta_altitude, ground_altitude;    //, baseline_pressure;
 
     if (SerialRadio.available()) {
         radiolog.print("Received Message: ");
@@ -78,8 +83,8 @@ void loop()
     if ((new_time - old_time) > time_interval) {
         old_time = new_time;
         pollSensors(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
-        calculateValues(acc_data, bar_data, &abs_accel, &prev_altitude, &altitude, &delta_altitude);
-        stateMachine(abs_accel, altitude, delta_altitude);
+        calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &baseline_pressure);
+        stateMachine(&altitude, &delta_altitude, bar_data, &baseline_pressure, &ground_altitude);
         logData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
     }
 

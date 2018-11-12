@@ -16,12 +16,12 @@ void switchState(FlightStates new_state){
     state = new_state;
 }
 
-void stateMachine(float altitude, float delta_altitude, float base_altitude) { 
+void stateMachine(float *altitude, float *delta_altitude, float bar_data[], float *baseline_pressure, float *ground_altitude) { 
     static int launch_count, armed_count, mach_count, mach_lock_count, apogee_count, main_count, land_count = 0;
 
     switch (state) {
         case STANDBY:
-            if (altitude > (base_altitude + LAUNCH_THRESHOLD)) {
+            if (*altitude > LAUNCH_THRESHOLD) {
                 launch_count++;
                 if (launch_count >= LAUNCH_CHECKS){
                     switchState(ASCENT);
@@ -30,11 +30,13 @@ void stateMachine(float altitude, float delta_altitude, float base_altitude) {
             }
             else{
                 launch_count = 0;
+                *baseline_pressure = groundAlt_update(bar_data[0]);
+                *ground_altitude = 44330.0 * (1 - powf(*baseline_pressure / SEA_PRESSURE, 1 / 5.255));
             }
             break;
 
         case ARMED:
-            if (altitude > (base_altitude + LAUNCH_THRESHOLD)) {
+            if (*altitude > LAUNCH_THRESHOLD) {
                 armed_count++;
                 if (armed_count >= LAUNCH_CHECKS){
                     switchState(ASCENT);
@@ -47,7 +49,7 @@ void stateMachine(float altitude, float delta_altitude, float base_altitude) {
             break;
 
         case ASCENT:    // checks for Mach threshold + apogee 
-            if (delta_altitude > MACH_THRESHOLD) {
+            if (*delta_altitude > MACH_THRESHOLD) {
                 mach_count++;
                 if (mach_count >= MACH_CHECKS) {
                     switchState(MACH_LOCK);
@@ -57,7 +59,7 @@ void stateMachine(float altitude, float delta_altitude, float base_altitude) {
             else {
                 mach_count = 0;
             }
-            if (delta_altitude < 0) {
+            if (*delta_altitude < 0) {
                 apogee_count ++;
                 if (apogee_count >= APOGEE_CHECKS) {
                     //deploy drogue and payload
@@ -72,7 +74,7 @@ void stateMachine(float altitude, float delta_altitude, float base_altitude) {
             break;
 
         case MACH_LOCK: //checks for reduction in speed below mach threshold
-            if (delta_altitude < MACH_LOCK_THRESHOLD) {
+            if (*delta_altitude < MACH_LOCK_THRESHOLD) {
                 mach_lock_count++;
                 if (mach_lock_count >= MACH_LOCK_CHECKS) {
                     switchState(ASCENT);
@@ -85,7 +87,7 @@ void stateMachine(float altitude, float delta_altitude, float base_altitude) {
             break;
 
         case INITIAL_DESCENT:
-            if (altitude < FINAL_DESCENT_THRESHOLD) {
+            if (*altitude < FINAL_DESCENT_THRESHOLD) {
                 main_count ++;
                 if (main_count >= MAIN_CHECKS) {
                     //deploy main
@@ -99,7 +101,7 @@ void stateMachine(float altitude, float delta_altitude, float base_altitude) {
             break;
 
         case FINAL_DESCENT:
-            if (altitude < (base_altitude + LAND_HEIGHT_THRESHOLD) && delta_altitude < LAND_VELOCITY_THRESHOLD) {
+            if (*altitude < LAND_HEIGHT_THRESHOLD && *delta_altitude < LAND_VELOCITY_THRESHOLD) {
                 land_count++;
                 if (land_count >= LAND_CHECKS) {
                     //turn off sensors except GPS
