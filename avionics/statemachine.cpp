@@ -8,23 +8,23 @@
 
 /*Variables------------------------------------------------------------*/
 File statelog;
-FlightStates state = STANDBY;
 
 /*Functions------------------------------------------------------------*/
 
-void switchState(FlightStates new_state){
-    state = new_state;
+void switchState(FlightStates &curr_state, FlightStates new_state){
+    curr_state = new_state;
 }
 
-void stateMachine(float *altitude, float *delta_altitude, float bar_data[], float *baseline_pressure, float *ground_altitude) { 
+void stateMachine(float *altitude, float *delta_altitude, float bar_data[], float *baseline_pressure, float *ground_altitude) {
     static int launch_count, armed_count, mach_count, mach_lock_count, apogee_count, main_count, land_count = 0;
+    static FlightStates state = STANDBY;
 
     switch (state) {
         case STANDBY:
             if (*altitude > LAUNCH_THRESHOLD) {
                 launch_count++;
                 if (launch_count >= LAUNCH_CHECKS){
-                    switchState(ASCENT);
+                    switchState(state, ASCENT);
                     launch_count = 0;
                 }
             }
@@ -39,7 +39,7 @@ void stateMachine(float *altitude, float *delta_altitude, float bar_data[], floa
             if (*altitude > LAUNCH_THRESHOLD) {
                 armed_count++;
                 if (armed_count >= LAUNCH_CHECKS){
-                    switchState(ASCENT);
+                    switchState(state, ASCENT);
                     armed_count = 0;
                 }
             }
@@ -48,14 +48,14 @@ void stateMachine(float *altitude, float *delta_altitude, float bar_data[], floa
             }
             break;
 
-        case ASCENT:    // checks for Mach threshold + apogee 
+        case ASCENT:    // checks for Mach threshold + apogee
             if (*delta_altitude > MACH_THRESHOLD) {
                 mach_count++;
                 if (mach_count >= MACH_CHECKS) {
-                    switchState(MACH_LOCK);
+                    switchState(state, MACH_LOCK);
                     mach_count = 0;
                 }
-            } 
+            }
             else {
                 mach_count = 0;
             }
@@ -64,10 +64,10 @@ void stateMachine(float *altitude, float *delta_altitude, float bar_data[], floa
                 if (apogee_count >= APOGEE_CHECKS) {
                     //deploy drogue and payload
                     //delay to avoid pressure spikes
-                    switchState(INITIAL_DESCENT);
+                    switchState(state, INITIAL_DESCENT);
                     apogee_count = 0;
                 }
-            } 
+            }
             else {
                 apogee_count = 0;
             }
@@ -77,10 +77,10 @@ void stateMachine(float *altitude, float *delta_altitude, float bar_data[], floa
             if (*delta_altitude < MACH_LOCK_THRESHOLD) {
                 mach_lock_count++;
                 if (mach_lock_count >= MACH_LOCK_CHECKS) {
-                    switchState(ASCENT);
+                    switchState(state, ASCENT);
                     mach_lock_count = 0;
                 }
-            } 
+            }
             else {
                 mach_lock_count = 0;
             }
@@ -91,10 +91,10 @@ void stateMachine(float *altitude, float *delta_altitude, float bar_data[], floa
                 main_count ++;
                 if (main_count >= MAIN_CHECKS) {
                     //deploy main
-                    switchState(FINAL_DESCENT);
+                    switchState(state, FINAL_DESCENT);
                     main_count = 0;
                 }
-            } 
+            }
             else {
                 main_count = 0;
             }
@@ -105,10 +105,10 @@ void stateMachine(float *altitude, float *delta_altitude, float bar_data[], floa
                 land_count++;
                 if (land_count >= LAND_CHECKS) {
                     //turn off sensors except GPS
-                    switchState(LANDED);
+                    switchState(state, LANDED);
                     land_count = 0;
                 }
-            } 
+            }
             else {
                 land_count = 0;
             }
