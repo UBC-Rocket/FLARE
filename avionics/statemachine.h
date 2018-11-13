@@ -16,10 +16,11 @@
 #define MACH_THRESHOLD 275 //in meters per second ??
 #define MACH_LOCK_THRESHOLD 250 //in meters per second??
 #define FINAL_DESCENT_THRESHOLD 200 //meters
+//#define FINAL_DESCENT_THRESHOLD 458 // ~ 1500 feet for final launch
 #define LAND_HEIGHT_THRESHOLD 50 //meters
 #define LAND_VELOCITY_THRESHOLD 1  //m/s
 
-#define SEA_PRESSURE 1013 //TODO: calibrate
+#define SEA_PRESSURE 1013.25
 
 /*Variables------------------------------------------------------------*/
 enum FlightStates {

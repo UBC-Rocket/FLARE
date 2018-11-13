@@ -6,9 +6,7 @@
 #include <stdint.h>
 
 /*Constants------------------------------------------------------------*/
-//#define ground_alt_delay 100  //in ms
 #define ground_alt_size 20  //array size for moving average
-//#define BASELINE_PRESSURE 1012 //TODO: calibrate
 
 /*Variables------------------------------------------------------------*/
 
