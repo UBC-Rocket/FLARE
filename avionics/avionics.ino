@@ -64,6 +64,7 @@ void loop()
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE];
     char GPS_data[GPS_DATA_ARRAY_SIZE][GPS_FIELD_LENGTH];
     static float abs_accel, prev_altitude, altitude, delta_altitude, ground_altitude;    //, baseline_pressure;
+    static FlightStates state = STANDBY;
 
     if (SerialRadio.available()) {
         radiolog.print("Received Message: ");

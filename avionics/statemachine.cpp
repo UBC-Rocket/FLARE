@@ -15,9 +15,8 @@ void switchState(FlightStates &curr_state, FlightStates new_state){
     curr_state = new_state;
 }
 
-void stateMachine(float *altitude, float *delta_altitude, float bar_data[], float *baseline_pressure, float *ground_altitude) {
+void stateMachine(float *altitude, float *delta_altitude, float bar_data[], float *baseline_pressure, float *ground_altitude, FlightStates &state) {
     static int launch_count, armed_count, mach_count, mach_lock_count, apogee_count, main_count, land_count = 0;
-    static FlightStates state = STANDBY;
 
     switch (state) {
         case STANDBY:
