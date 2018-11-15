@@ -34,7 +34,7 @@ enum FlightStates {
 };
 
 /*Functions------------------------------------------------------------*/
-void switchState(FlightStates &curr_state, FlightStates new_state);
-void stateMachine(float*, float*, float*, float*, float*, FlightStates &state);
+void switchState(FlightStates *curr_state, FlightStates new_state);
+void stateMachine(float*, float*, float*, float*, float*, FlightStates*);
 
 #endif

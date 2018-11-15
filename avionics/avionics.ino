@@ -87,7 +87,7 @@ void loop()
         old_time = new_time;
         pollSensors(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
         calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &baseline_pressure, &delta_time);
-        stateMachine(&altitude, &delta_altitude, bar_data, &baseline_pressure, &ground_altitude);
+        stateMachine(&altitude, &delta_altitude, bar_data, &baseline_pressure, &ground_altitude, &state);
         logData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
     }
 
