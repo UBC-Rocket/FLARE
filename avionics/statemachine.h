@@ -13,12 +13,12 @@
 #define LAND_CHECKS     20
 
 #define LAUNCH_THRESHOLD 150 // in meters
-#define MACH_THRESHOLD 275 //in meters per second ??
-#define MACH_LOCK_THRESHOLD 250 //in meters per second??
+#define MACH_THRESHOLD 275 //in meters per second
+#define MACH_LOCK_THRESHOLD 250 //in meters per second
 #define FINAL_DESCENT_THRESHOLD 200 //meters
 //#define FINAL_DESCENT_THRESHOLD 458 // ~ 1500 feet for final launch
 #define LAND_HEIGHT_THRESHOLD 50 //meters
-#define LAND_VELOCITY_THRESHOLD 1  //m/s
+#define LAND_VELOCITY_THRESHOLD 1  // meters per second
 
 #define SEA_PRESSURE 1013.25
 

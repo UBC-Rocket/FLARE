@@ -240,12 +240,12 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     #endif
 }
 
-// When the code timing is apparent, change delta_altitude to m/s 
+// delta altitude is normalized to meters per second
 void calculateValues(float acc_data[], float bar_data[],
-                    float* prev_altitude, float* altitude, float* delta_altitude, float* baseline_pressure)
+                    float* prev_altitude, float* altitude, float* delta_altitude, float* baseline_pressure, unsigned long *delta_time)
 {
     //*abs_accel = sqrtf(powf(acc_data[0], 2) + powf(acc_data[1], 2) + powf(acc_data[2]), 2);
     *prev_altitude = *altitude;
     *altitude = 44330.0 * (1 - powf(bar_data[0] / *baseline_pressure, 1 / 5.255));
-    *delta_altitude = altitude - prev_altitude;
+    *delta_altitude = (altitude - prev_altitude) * MILLISECONDS / *delta_time;
 }
