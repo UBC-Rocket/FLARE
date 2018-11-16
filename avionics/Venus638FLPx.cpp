@@ -23,10 +23,14 @@ bool getGPSData(char* sentence)
 		//gps sentence is 70 characters long, buffer can only hold 64 seemingly, only need upto ~40 for altitude 
 		while (SerialGPS.available() && timeout < GPS_TIMEOUT && i < 60) {
 			c = SerialGPS.read();
+
+			/*Uncomment for testing
 			Serial.print("the charcter is (drumrole): ");
 			Serial.println(c);
 			Serial.print("the position is: ");
 			Serial.println(i);
+			*/
+
 			//check to see if the first thing in the buffer is the start of the gps sentence
 			if (c == '$') {
 				sentence[i] = c; 
@@ -46,7 +50,6 @@ bool getGPSData(char* sentence)
 	//if all 60 characters are read we have a succesfull gps read 
 	if (i == 60) { 
 		status = true;
-		Serial.print("yo that shits true dawg");
 	}
 	sentence[i] = '\0';
 
