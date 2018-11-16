@@ -162,7 +162,10 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
         getGPSField(sentence, GPS_data[0], 2); //latitude
         getGPSField(sentence, GPS_data[1], 4); //longitude
         getGPSField(sentence, GPS_data[2], 9); //altitude
+		
+		
     }
+	
 }
 
 /*log all the data*/
