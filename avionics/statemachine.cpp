@@ -1,4 +1,16 @@
-/*State Machine Source*/
+/* @file    statemachine.cpp
+ * @author  UBC Rocket Avionics 2018/2019
+ * @description   Main state machine of the rocket's flight states.  
+ * Implements state switching and the rocket's state machine.
+ * 
+ * @section LICENSE
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ * 
+ * Distributed as-is; no warranty is given.
+ */
 
 /*Includes------------------------------------------------------------*/
 #include "statemachine.h"
@@ -10,12 +22,28 @@
 File statelog;
 
 /*Functions------------------------------------------------------------*/
-
+/* void switchState(FlightStates *, FlightStates){}
+ * @brief  Switches state machine state.
+ * @param  FlightStates *curr_state - Current state machine state.
+ * @param  FlightState new_state - State machine state to switch to.
+ * @return void.
+ */
 void switchState(FlightStates *curr_state, FlightStates new_state){
     *curr_state = new_state;
 }
 
-void stateMachine(float *altitude, float *delta_altitude, float bar_data[], float *baseline_pressure, float *ground_altitude, FlightStates *state) {
+/* void stateMachine(float*, float*, float*, float*, float*, float*, FlightStates *){}
+ * @brief  The state machine of the rocket.  Implements current activities and tracks the rocket's flight state.
+ * @param  float *altitude - Current altitude in meters/second
+ * @param  float *delta_altitude - Change in altitude from the current altitude update.
+ * @param  float *prev_delta_altitude - Previous change in altitude from the altitude update.
+ * @param  float bar_data[] - received barometer sensor data array 
+ * @param  float *baseline_pressure - the baseline pressure of the rocket (calculated ground altitude)
+ * @param  FlightState *state - State machine state.
+ * @return void.
+ */
+void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_altitude, float bar_data[], float *baseline_pressure, 
+    float *ground_altitude, FlightStates *state) {
     static int launch_count, armed_count, mach_count, mach_lock_count, apogee_count, main_count, land_count = 0;
 
     switch (state) {
@@ -58,7 +86,7 @@ void stateMachine(float *altitude, float *delta_altitude, float bar_data[], floa
             else {
                 mach_count = 0;
             }
-            if (*delta_altitude < 0) {
+            if (*delta_altitude <= 0) {
                 apogee_count ++;
                 if (apogee_count >= APOGEE_CHECKS) {
                     //deploy drogue and payload
@@ -73,7 +101,7 @@ void stateMachine(float *altitude, float *delta_altitude, float bar_data[], floa
             break;
 
         case MACH_LOCK: //checks for reduction in speed below mach threshold
-            if (*delta_altitude < MACH_LOCK_THRESHOLD) {
+            if ((*delta_altitude < MACH_LOCK_THRESHOLD) && (*delta_altitude < *prev_delta_altitude) ) {
                 mach_lock_count++;
                 if (mach_lock_count >= MACH_LOCK_CHECKS) {
                     switchState(state, ASCENT);

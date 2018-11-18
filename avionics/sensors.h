@@ -59,6 +59,6 @@ const char UID_time  = 't'; //Time
 bool initSensors(void);
 void pollSensors(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
 void logData(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
-void calculateValues(float*, float*, float*, float*, float*, float*, unsigned long*);
+void calculateValues(float*, float*, float*, float*, float*, float*, float*, unsigned long*);
 
 #endif

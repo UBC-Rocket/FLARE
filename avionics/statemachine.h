@@ -8,9 +8,9 @@
 #define LAUNCH_CHECKS 4
 #define MACH_CHECKS 3
 #define APOGEE_CHECKS   5
-#define MACH_LOCK_CHECKS 10
+#define MACH_LOCK_CHECKS 20
 #define MAIN_CHECKS     10
-#define LAND_CHECKS     20
+#define LAND_CHECKS     40
 
 #define LAUNCH_THRESHOLD 150 // in meters
 #define MACH_THRESHOLD 275 //in meters per second
@@ -35,6 +35,6 @@ enum FlightStates {
 
 /*Functions------------------------------------------------------------*/
 void switchState(FlightStates *curr_state, FlightStates new_state);
-void stateMachine(float*, float*, float*, float*, float*, FlightStates*);
+void stateMachine(float*, float*, float*, float*, float*, float*, FlightStates*);
 
 #endif

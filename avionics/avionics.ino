@@ -11,7 +11,6 @@
 
 /*Variables------------------------------------------------------------*/
 File radiolog;
-// float baseline_pressure;
 
 /*Functions------------------------------------------------------------*/
 void setup()
@@ -48,8 +47,6 @@ void setup()
         SerialUSB.println("Initialization complete! :D");
         #endif
     }
-    // Only if static float cannot be initialized below:
-    // baseline_pressure = groundAlt_init()
 
 }
 
@@ -64,7 +61,7 @@ void loop()
     float acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE];
     char GPS_data[GPS_DATA_ARRAY_SIZE][GPS_FIELD_LENGTH];
-    static float abs_accel, prev_altitude, altitude, delta_altitude, ground_altitude;    //, baseline_pressure;
+    static float abs_accel, prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
     static FlightStates state = STANDBY;
 
     if (SerialRadio.available()) {
@@ -86,8 +83,8 @@ void loop()
         delta_time = new_time - old_time;
         old_time = new_time;
         pollSensors(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
-        calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &baseline_pressure, &delta_time);
-        stateMachine(&altitude, &delta_altitude, bar_data, &baseline_pressure, &ground_altitude, &state);
+        calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &prev_delta_altitude, &baseline_pressure, &delta_time);
+        stateMachine(&altitude, &delta_altitude, &prev_altitude, bar_data, &baseline_pressure, &ground_altitude, &state);
         logData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
     }
 
