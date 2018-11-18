@@ -248,3 +248,53 @@ void calculateValues(float acc_data[], float bar_data[], float* abs_accel,
     // *altitude = 44330.0 * (1 - powf(bar_data[0] / BASELINE_PRESSURE, 1 / 5.255));
     // *delta_altitude = altitude - prev_altitude;
 }
+
+
+
+const char * processRadioData(unsigned long *timestamp, float acc_data[], float bar_data[],
+           float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH] ){
+
+                  String radio_data;
+               //   radio_data = "A";
+           // char radio_char_data[2];
+
+                 radio_data += String(UID_time) + String(*timestamp);
+
+                 radio_data += String(UID_acc_acc_x) + String(acc_data[0]);
+                 radio_data += String(UID_acc_acc_y) + String(acc_data[1]);
+                 radio_data += String(UID_acc_acc_z) + String(acc_data[2]);
+
+                 radio_data += String(UID_bar_pres) + String(bar_data[0]);
+                 radio_data += String(UID_bar_temp) + String(bar_data[1]);
+
+                 radio_data += String(UID_temp_temp) + String(*temp_sensor_data);
+
+                 radio_data += String(UID_IMU_acc_x) + String(IMU_data[0]);
+                 radio_data += String(UID_IMU_acc_y) + String(IMU_data[1]);
+                 radio_data += String(UID_IMU_acc_z) + String(IMU_data[2]);
+
+                 radio_data += String(UID_IMU_gyro_x) + String(IMU_data[3]);
+                 radio_data += String(UID_IMU_gyro_y) + String(IMU_data[4]);
+                 radio_data += String(UID_IMU_gyro_z) + String(IMU_data[5]);
+
+                 radio_data += String(UID_IMU_mag_x) + String(IMU_data[6]);
+                 radio_data += String(UID_IMU_mag_y) + String(IMU_data[7]);
+                 radio_data += String(UID_IMU_mag_z) + String(IMU_data[8]);
+
+                 radio_data += String(UID_GPS_lat) + String(GPS_data[0]);
+                 radio_data += String(UID_GPS_long) + String(GPS_data[1]);
+                 radio_data += String(UID_GPS_alt) + String(GPS_data[2]);
+
+
+
+                   
+                  const char *radio_char_data = radio_data.c_str();
+
+//    radio_char_data[0] = 'A';
+ //  radio_char_data[1] = '\0';
+
+                  return radio_char_data;
+
+
+
+           }

@@ -8,6 +8,7 @@
 #include <HardwareSerial.h>
 #include <i2c_t3.h>
 #include <SD.h>
+#include <string.h>
 
 /*Variables------------------------------------------------------------*/
 File radiolog;
@@ -39,7 +40,7 @@ void setup()
         #ifdef TESTING
         SerialUSB.println("Initialization failed! >:-{");
         #endif
-        while (1) {}
+        //while (1) {}
     } else {
         pinMode(LED_BUILTIN,OUTPUT);
         digitalWrite(LED_BUILTIN,HIGH);
@@ -54,11 +55,16 @@ void loop()
     unsigned long timestamp;
     static unsigned long old_time = 0; //ms
     static unsigned long new_time = 0; //ms
+    static unsigned long radio_old_time = 0;
+    static unsigned long radio_new_time = 0;
     static uint16_t time_interval = 5000; //ms
     float acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE];
     char GPS_data[GPS_DATA_ARRAY_SIZE][GPS_FIELD_LENGTH];
     static float abs_accel, prev_altitude, altitude, delta_altitude;
+
+    static uint16_t radio_time_interval = 500;
+    char *radio_data;
 
     if (SerialRadio.available()) {
         radiolog.print("Received Message: ");
@@ -83,13 +89,26 @@ void loop()
         logData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
     }
 
-    SerialRadio.println(bar_data[0]);
-    radiolog.print("Sent Message: ");
-    radiolog.println(bar_data[0]);
-    #ifdef TESTING
-    SerialUSB.print("Sent Message: ");
-    SerialUSB.println(bar_data[0]);
-    #endif
+    
+    radio_new_time = millis();
+        if ( (radio_new_time - radio_old_time) > radio_time_interval ){
+            radio_old_time = radio_new_time;
+        const char * this_data = processRadioData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
+        radio_data = strdup(this_data); 
+        for(int i = 0; i < strlen(radio_data); i++){
+            SerialRadio.write(radio_data[i]);
+        }
+           // SerialRadio.println();
+        }
+
+
+        // SerialRadio.println(bar_data[0]);
+        // radiolog.print("Sent Message: ");
+        // radiolog.println(bar_data[0]);
+    // #ifdef TESTING
+    // SerialUSB.print("Sent Message: ");
+    // SerialUSB.println(bar_data[0]);
+    // #endif
 
     #ifdef TESTING
     delay(1000);
