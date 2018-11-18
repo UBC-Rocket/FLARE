@@ -59,5 +59,6 @@ bool initSensors(void);
 void pollSensors(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
 void logData(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
 void calculateValues(float*, float*, float*, float*, float*, float*);
+const char * processRadioData(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
 
 #endif
