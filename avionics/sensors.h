@@ -13,6 +13,7 @@
 #define SerialRadio             Serial2
 
 #define EARTHS_GRAVITY          9.80665
+#define MILLISECONDS            1000
 
 #define ACCELEROMETER_ADDRESS   0x18
 #define TEMP_SENSOR_ADDRESS     0x48
@@ -58,6 +59,6 @@ const char UID_time  = 't'; //Time
 bool initSensors(void);
 void pollSensors(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
 void logData(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
-void calculateValues(float*, float*, float*, float*, float*, float*);
+void calculateValues(float*, float*, float*, float*, float*, float*, float*, unsigned long*);
 
 #endif
