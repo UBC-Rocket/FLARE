@@ -62,8 +62,8 @@ void getGPSField(char* sentence, char* buffer, int index)
     int sentencePos = 0;
     int fieldPos = 0;
     int commaCount = 0;
-	//only 70 characters in the sentence 
-    while (sentencePos < 70) {
+	//only 60 characters in the sentence 
+    while (sentencePos < 61) {
         if (sentence[sentencePos] == ',') {
             commaCount++;
             sentencePos++;
@@ -71,6 +71,10 @@ void getGPSField(char* sentence, char* buffer, int index)
         if (commaCount == index) {
             buffer[fieldPos] = sentence[sentencePos];
             fieldPos++;
+            //make sure it doesn't overwrite buffer
+            if(fieldPos > 20){
+            	break;
+            }
         }
         sentencePos++;
     }
