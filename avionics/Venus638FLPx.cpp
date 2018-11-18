@@ -47,8 +47,9 @@ bool getGPSData(char* sentence)
 			}
 		}
     }
-	//if all 60 characters are read we have a succesfull gps read 
-	if (i == 60) { 
+	//if all 60 characters are read we have a succesfull gps read
+	//The G in position 4 is a unique character to $GPGGA
+	if (i == 60 && sentence[4]=='G') { 
 		status = true;
 	}
 	sentence[i] = '\0';
