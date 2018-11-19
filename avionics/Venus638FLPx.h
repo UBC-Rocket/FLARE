@@ -7,7 +7,7 @@
 #include <HardwareSerial.h>
 
 /*Constants------------------------------------------------------------*/
-#define SENTENCE_SIZE   100
+#define SENTENCE_SIZE   60
 #define GPS_TIMEOUT     100
 
 /*Variables------------------------------------------------------------*/
