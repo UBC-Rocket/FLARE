@@ -113,6 +113,14 @@ bool initSensors(void)
     return status;
 }
 
+/* float barSensorInit(void){}
+ * @brief  Retrieves one pressure value from the barometer.
+ * @return float - pressure data point from the barometer.
+ */
+float barSensorInit(void){
+    return barometer.getPressure(ADC_4096);
+}
+
 /*poll all the sensors*/
 void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
                 float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH])
