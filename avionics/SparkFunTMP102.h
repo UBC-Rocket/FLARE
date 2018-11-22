@@ -78,6 +78,7 @@ class TMP102
 		int _address; // Address of Temperature sensor (0x48,0x49,0x4A,0x4B)
 		void openPointerRegister(byte pointerReg); // Changes the pointer register
 		byte readRegister(bool registerNumber);	// reads 1 byte of from register
+		bool _success = true; // error flag. true = GO  ,  false = NO GO (shit's fukt)
 };
 
 

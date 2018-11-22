@@ -44,7 +44,10 @@ void TMP102::openPointerRegister(byte pointerReg)
 { 
   Wire.beginTransmission(_address); // Connect to TMP102
   Wire.write(pointerReg); // Open specified register
-  Wire.endTransmission(); // Close communication with TMP102
+  // Close communication with TMP102
+  if (Wire.endTransmission()){
+    _success = false; // some error occurred 
+  }
 }
 
 
@@ -52,8 +55,14 @@ byte TMP102::readRegister(bool registerNumber){
   int registerByte[2];	// We'll store the data from the registers here
   
   // Read current configuration register value
-  Wire.requestFrom(_address, 2); 	// Read two bytes from TMP102
-  Wire.endTransmission();
+  // Read two bytes from TMP102 & check if correct # of bytes received
+  if (Wire.requestFrom(_address, 2) != 2){
+    _success = false; // did not receive correct amount of bytes
+  }
+
+  if (Wire.endTransmission()){
+    _success = false; // some error occurred 
+  }
   registerByte[0] = (Wire.read());	// Read first byte
   registerByte[1] = (Wire.read());	// Read second byte
   
@@ -96,6 +105,13 @@ float TMP102::readTempC(void)
       digitalTemp |= 0xF000;
     }
   }
+
+  // check for errors
+  if (!_success){
+    _success = true; // reset error flag
+    return -1000; // -1000 = error value
+  }
+
   // Convert digital reading to analog temperature (1-bit is equal to 0.0625 C)
   return digitalTemp*0.0625;
 }
