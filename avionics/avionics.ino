@@ -13,6 +13,11 @@
 File radiolog;
 
 /*Functions------------------------------------------------------------*/
+/**
+  * @brief  The Arduino setup function
+  * @param  None
+  * @return None
+  */
 void setup()
 {
     bool status = true;
@@ -50,6 +55,11 @@ void setup()
 
 }
 
+/**
+  * @brief  The Arduino loop function
+  * @param  None
+  * @return None
+  */
 void loop()
 {
     unsigned long timestamp;

@@ -22,8 +22,11 @@ TMP102 temp_sensor(TEMP_SENSOR_ADDRESS);
 MPU9250 IMU(Wire, IMU_ADDRESS);
 
 /*Functions------------------------------------------------------------*/
-
-/*initialize all the sensors*/
+/**
+  * @brief  Initializes all the sensors
+  * @param  None
+  * @return bool - Status (true for success, false for failure)
+  */
 bool initSensors(void)
 {
     bool status = true;
@@ -113,15 +116,24 @@ bool initSensors(void)
     return status;
 }
 
-/* float barSensorInit(void){}
- * @brief  Retrieves one pressure value from the barometer.
- * @return float - pressure data point from the barometer.
- */
+/**
+  * @brief  Retrieves one pressure value from the barometer.
+  * @return float - pressure data point from the barometer.
+  */
 float barSensorInit(void){
     return barometer.getPressure(ADC_4096);
 }
 
-/*poll all the sensors*/
+/**
+  * @brief  Polls all the sensors
+  * @param  unsigned long timestamp - pointer to store the timestamp value
+  * @param  float acc_data[] - array to store the accelerometer data
+  * @param  float bar_data[] - array to store the barometer data
+  * @param  float* temp_sensor_data - pointer to store the temperature sensor data
+  * @param  float IMU_data[] - array to store the IMU data
+  * @param  char GPS_data[][] - 2D array to store the GPS data
+  * @return None
+  */
 void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
                 float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH])
 {
@@ -173,7 +185,16 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
     }
 }
 
-/*log all the data*/
+/**
+  * @brief  Logs all the sensor data
+  * @param  unsigned long timestamp - pointer to store the timestamp value
+  * @param  float acc_data[] - array to store the accelerometer data
+  * @param  float bar_data[] - array to store the barometer data
+  * @param  float* temp_sensor_data - pointer to store the temperature sensor data
+  * @param  float IMU_data[] - array to store the IMU data
+  * @param  char GPS_data[][] - 2D array to store the GPS data
+  * @return None
+  */
 void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
             float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH])
 {
