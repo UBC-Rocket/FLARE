@@ -53,6 +53,7 @@ void setup()
 void loop()
 {
     unsigned long timestamp;
+    static float barometer_data_init = barSensorInit();
     static float baseline_pressure = groundAlt_init(barometer_data_init);  // IF YOU CAN'T DO THIS USE GLOBAL VAR
     static unsigned long old_time = 0; //ms
     static unsigned long new_time = 0; //ms

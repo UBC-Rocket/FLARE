@@ -15,6 +15,7 @@
 /*Includes------------------------------------------------------------*/
 #include "statemachine.h"
 
+#include <math.h>
 #include <Arduino.h>
 #include <SD.h>
 
