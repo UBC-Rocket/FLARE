@@ -117,6 +117,14 @@ bool initSensors(void)
 }
 
 /**
+  * @brief  Retrieves one pressure value from the barometer.
+  * @return float - pressure data point from the barometer.
+  */
+float barSensorInit(void){
+    return barometer.getPressure(ADC_4096);
+}
+
+/**
   * @brief  Polls all the sensors
   * @param  unsigned long timestamp - pointer to store the timestamp value
   * @param  float acc_data[] - array to store the accelerometer data
@@ -259,13 +267,4 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     SerialUSB.println(GPS_data[2]);
     SerialUSB.println("");
     #endif
-}
-
-void calculateValues(float acc_data[], float bar_data[], float* abs_accel,
-                    float* prev_altitude, float* altitude, float* delta_altitude)
-{
-    // *abs_accel = sqrtf(powf(acc_data[0], 2) + powf(acc_data[1], 2) + powf(acc_data[2]), 2);
-    // *prev_altitude = *altitude;
-    // *altitude = 44330.0 * (1 - powf(bar_data[0] / BASELINE_PRESSURE, 1 / 5.255));
-    // *delta_altitude = altitude - prev_altitude;
 }
