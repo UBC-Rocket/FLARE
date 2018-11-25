@@ -7,9 +7,11 @@
 #include "SparkFunTMP102.h"         //temp sensor
 #include "MPU9250.h"                //IMU
 #include "Venus638FLPx.h"           //GPS
+
 #include "Adafruit_BNO055.h"        //new IMU
 #include "utility/imumaths.h"
 #include <Adafruit_sensor.h>         //for the new IMU
+
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <i2c_t3.h>
@@ -91,6 +93,15 @@ bool initSensors(void)
         SerialUSB.println(error);
         #endif
     }
+    /*init new IMU*/
+    #ifdef TESTING
+    SerialUSE.println("Initializing new IMU");
+    #endif
+    boolean checkIMU = bno.begin();
+    delay(7); //the IMU needs 7 ms seconds to switch states. can be tested
+    if(!checkIMU){
+        SerialUSB.print("ERROR: NEW IMU initialization failed!!");
+    }
 
     /*init new IMU*/
     #ifdef TESTING
@@ -168,6 +179,13 @@ void pollSensors(unsigned long *timestamp, float acc_data[],float bar_data[],
     IMU_data[6] = IMU.getMagX_uT();
     IMU_data[7] = IMU.getMagY_uT();
     IMU_data[8] = IMU.getMagZ_uT();
+    #ifdef TESTING
+    serialUSB.println("Polling new IMU");
+    #endif
+    newIMU.getEvent(&event);
+    NIMU_data[0] = event.orientation.x;
+    NIMU_data[1] = event.orientation.y;
+    NIMU_data[2] = event.orientation.z;
 
     #ifdef TESTING
     SerialUSB.println("Polling new IMU");
@@ -257,6 +275,12 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     SerialUSB.print("IMU magnetism X (uT):               ");
     SerialUSB.println(IMU_data[7]);
     SerialUSB.print("IMU magnetism X (uT):               ");
+    SerialUSB.print("NEW IMU x                           ");
+    SerialUSB.print(NIMU_data[0]);
+    SerialUSB.print("NEW IMU y                           ");
+    SerialUSB.print(NIMU_data[1]);
+    SerialUSB.print("NEW IMU Z                          ");
+    SerialUSB.println(NIMU_data[2]);    
     SerialUSB.println(IMU_data[8]);
     SerialUSB.print("NEW IMU x                           ");
     // SerialUSB.print(NIMU_data[0]);
