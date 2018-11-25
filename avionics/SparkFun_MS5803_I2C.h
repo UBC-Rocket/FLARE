@@ -30,6 +30,7 @@ Distributed as-is; no warranty is given.
 #ifndef SparkFun_MS5803_I2C_h
 #define SparkFun_MS5803_I2C_h
 
+//#include <i2c_t3.h> 
 #include <Arduino.h>
 
 // Define units for conversions. 

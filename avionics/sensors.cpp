@@ -128,7 +128,7 @@ bool initSensors(void)
 }
 
 /*poll all the sensors*/
-void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
+void pollSensors(unsigned long *timestamp, float acc_data[],float bar_data[],
                 float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH],float NIMU_data[])
 {
     int16_t x, y, z;
@@ -144,11 +144,11 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
     acc_data[1] = accelerometer.convertToG(ACCELEROMETER_SCALE, y);
     acc_data[2] = accelerometer.convertToG(ACCELEROMETER_SCALE, z);
 
-    #ifdef TESTING
-    SerialUSB.println("Polling barometer");
-    #endif
-    bar_data[0] = barometer.getPressure(ADC_4096);
-    bar_data[1] = barometer.getTemperature(CELSIUS, ADC_512);
+    // #ifdef TESTING
+    // SerialUSB.println("Polling barometer");
+    // #endif
+    // bar_data[0] = barometer.getPressure(ADC_4096);
+    // bar_data[1] = barometer.getTemperature(CELSIUS, ADC_512);
 
     #ifdef TESTING
     SerialUSB.println("Polling temperature sensor");
@@ -191,7 +191,7 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
 
 /*log all the data*/
 void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
-            float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH])
+            float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH],float NIMU_data[])
 {
     /*write data to SD card*/
     #ifdef TESTING
@@ -218,7 +218,7 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
         datalog.print(",");
     }
     for (unsigned int i = 0; i< NEWIMU_DATA_ARRAY_SIZE; i++){
-        // datalog.print(NIMU_data[i]);
+     datalog.print(NIMU_data[i]);
         datalog.print(",");
     }
     datalog.print("\n");
@@ -275,7 +275,7 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     #endif
 }
 
-void calculateValues(float acc_data[], float bar_data[], float* abs_accel,
+void calculateValues(float acc_data[],float bar_data[], float* abs_accel,
                     float* prev_altitude, float* altitude, float* delta_altitude)
 {
     // *abs_accel = sqrtf(powf(acc_data[0], 2) + powf(acc_data[1], 2) + powf(acc_data[2]), 2);

@@ -4,6 +4,7 @@
 
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
+#include <Arduino.h>
 
 /*Constants------------------------------------------------------------*/
 #define TESTING //enable or disable debug output
@@ -58,8 +59,8 @@ const char UID_time  = 't'; //Time
 
 /*Functions------------------------------------------------------------*/
 bool initSensors(void);
-void pollSensors(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH], float*);
-void logData(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
-void calculateValues(float*, float*, float*, float*, float*, float*);
+void pollSensors(unsigned long*, float*, float*,  float*, float*,char[][GPS_FIELD_LENGTH], float*);
+void logData(unsigned long*, float*, float*, float*,float*, char[][GPS_FIELD_LENGTH],float*);
+void calculateValues(float*, float*, float*, float*, float*,float*);
 
 #endif

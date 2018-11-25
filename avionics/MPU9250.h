@@ -27,6 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Arduino.h"
 #include <i2c_t3.h>    // I2C library
 #include "SPI.h"     // SPI library
+#include <stddef.h>
 
 class MPU9250{
   public:
