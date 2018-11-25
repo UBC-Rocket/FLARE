@@ -25,7 +25,8 @@
  */
 
 #include "MS5803_01.h"
-#include <Wire.h>
+#include <i2c_t3.h>
+//#include <Wire.h>
 
 // For I2C, set the CSB Pin (pin 3) high for address 0x76, and pull low
 // for address 0x77. If you use 0x77, change the value on the line below:

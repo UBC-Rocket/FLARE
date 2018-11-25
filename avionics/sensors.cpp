@@ -3,7 +3,7 @@
 /*Includes------------------------------------------------------------*/
 #include "sensors.h"
 #include "SparkFun_LIS331.h"        //accelerometer
-#include "SparkFun_MS5803_I2C.h"    //barometer
+#include "MS5803_01.h"    //barometer
 #include "SparkFunTMP102.h"         //temp sensor
 #include "MPU9250.h"                //IMU
 #include "Venus638FLPx.h"           //GPS
