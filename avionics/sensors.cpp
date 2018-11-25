@@ -93,15 +93,6 @@ bool initSensors(void)
         SerialUSB.println(error);
         #endif
     }
-    /*init new IMU*/
-    #ifdef TESTING
-    SerialUSE.println("Initializing new IMU");
-    #endif
-    boolean checkIMU = bno.begin();
-    delay(7); //the IMU needs 7 ms seconds to switch states. can be tested
-    if(!checkIMU){
-        SerialUSB.print("ERROR: NEW IMU initialization failed!!");
-    }
 
     /*init new IMU*/
     #ifdef TESTING
@@ -155,11 +146,11 @@ void pollSensors(unsigned long *timestamp, float acc_data[],float bar_data[],
     acc_data[1] = accelerometer.convertToG(ACCELEROMETER_SCALE, y);
     acc_data[2] = accelerometer.convertToG(ACCELEROMETER_SCALE, z);
 
-    // #ifdef TESTING
-    // SerialUSB.println("Polling barometer");
-    // #endif
-    // bar_data[0] = barometer.getPressure(ADC_4096);
-    // bar_data[1] = barometer.getTemperature(CELSIUS, ADC_512);
+    #ifdef TESTING
+    SerialUSB.println("Polling barometer");
+    #endif
+    bar_data[0] = barometer.getPressure(ADC_4096);
+    bar_data[1] = barometer.getTemperature(CELSIUS, ADC_512);
 
     #ifdef TESTING
     SerialUSB.println("Polling temperature sensor");
@@ -180,14 +171,6 @@ void pollSensors(unsigned long *timestamp, float acc_data[],float bar_data[],
     IMU_data[7] = IMU.getMagY_uT();
     IMU_data[8] = IMU.getMagZ_uT();
     #ifdef TESTING
-    serialUSB.println("Polling new IMU");
-    #endif
-    newIMU.getEvent(&event);
-    NIMU_data[0] = event.orientation.x;
-    NIMU_data[1] = event.orientation.y;
-    NIMU_data[2] = event.orientation.z;
-
-    #ifdef TESTING
     SerialUSB.println("Polling new IMU");
     #endif
     sensors_event_t event; 
@@ -195,7 +178,6 @@ void pollSensors(unsigned long *timestamp, float acc_data[],float bar_data[],
     NIMU_data[0] = event.orientation.x;
     NIMU_data[1] = event.orientation.y;
     NIMU_data[2] = event.orientation.z;
-
 
     #ifdef TESTING
     SerialUSB.println("Polling GPS");
@@ -275,19 +257,13 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     SerialUSB.print("IMU magnetism X (uT):               ");
     SerialUSB.println(IMU_data[7]);
     SerialUSB.print("IMU magnetism X (uT):               ");
-    SerialUSB.print("NEW IMU x                           ");
-    SerialUSB.print(NIMU_data[0]);
-    SerialUSB.print("NEW IMU y                           ");
-    SerialUSB.print(NIMU_data[1]);
+    SerialUSB.println(IMU_data[8]);
+    SerialUSB.print("NEW IMU X                           ");
+    SerialUSB.println(NIMU_data[0]);
+    SerialUSB.print("NEW IMU Y                           ");
+    SerialUSB.println(NIMU_data[1]);
     SerialUSB.print("NEW IMU Z                          ");
     SerialUSB.println(NIMU_data[2]);    
-    SerialUSB.println(IMU_data[8]);
-    SerialUSB.print("NEW IMU x                           ");
-    // SerialUSB.print(NIMU_data[0]);
-    SerialUSB.print("NEW IMU y                           ");
-    // SerialUSB.print(NIMU_data[1]);
-    SerialUSB.print("NEW IMU Z                          ");
-    // SerialUSB.println(NIMU_data[2]);
     SerialUSB.print("GPS latitude:                       ");
     SerialUSB.println(GPS_data[0]);
     SerialUSB.print("GPS longitude:                      ");

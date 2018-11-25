@@ -16,6 +16,6 @@
 
 /*Functions------------------------------------------------------------*/
 void groundAlt_init(float*, float*, float*, float*,float*);
-void groundAlt_update(float*, float*, float*, float*, float*)
+void groundAlt_update(float*, float*, float*, float*, float*);
 
 #endif

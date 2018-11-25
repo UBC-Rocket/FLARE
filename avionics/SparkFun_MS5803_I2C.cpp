@@ -26,8 +26,8 @@ local pub, and you've found our code helpful, please buy us a round!
 
 Distributed as-is; no warranty is given.
 ******************************************************************************/
-#include<Wire.h>
-// #include <i2c_t3.h> // Wire library is used for I2C
+//#include<Wire.h>
+#include <i2c_t3.h> // Wire library is used for I2C
 #include "SparkFun_MS5803_I2C.h"
 
 MS5803::MS5803(ms5803_addr address)

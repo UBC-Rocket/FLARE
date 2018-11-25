@@ -8,7 +8,7 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <i2c_t3.h>
-/*#include <SD.h>
+#include <SD.h>
 
 /*Variables------------------------------------------------------------*/
 File radiolog;
