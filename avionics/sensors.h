@@ -18,12 +18,14 @@
 #define TEMP_SENSOR_ADDRESS     0x48
 #define IMU_ADDRESS             0x68
 #define ACCELEROMETER_SCALE     6
+#define NEWIMU_ADDRESS          55
 
 #define ACC_DATA_ARRAY_SIZE     3
 #define BAR_DATA_ARRAY_SIZE     2
 #define IMU_DATA_ARRAY_SIZE     9
 #define GPS_DATA_ARRAY_SIZE     3
 #define GPS_FIELD_LENGTH        20
+#define NEWIMU_DATA_ARRAY_SIZE  3
 
 /*Variables------------------------------------------------------------*/
 
@@ -56,7 +58,7 @@ const char UID_time  = 't'; //Time
 
 /*Functions------------------------------------------------------------*/
 bool initSensors(void);
-void pollSensors(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
+void pollSensors(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH], float*);
 void logData(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
 void calculateValues(float*, float*, float*, float*, float*, float*);
 
