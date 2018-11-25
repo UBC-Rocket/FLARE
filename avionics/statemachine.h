@@ -3,6 +3,7 @@
 #define STATEMACHINE_H
 
 /*Includes------------------------------------------------------------*/
+#include "groundaltitude.h"
 
 /*Constants------------------------------------------------------------*/
 #define LAUNCH_CHECKS 4
