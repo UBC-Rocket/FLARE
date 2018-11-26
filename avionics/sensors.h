@@ -4,6 +4,7 @@
 
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
+#include "statemachine.h"
 
 /*Constants------------------------------------------------------------*/
 #define TESTING //enable or disable debug output
@@ -58,6 +59,6 @@ const char UID_time  = 't'; //Time
 bool initSensors(void);
 float barSensorInit(void);
 void pollSensors(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
-void logData(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
+void logData(unsigned long *, float*, float*, float*, float*, char [][GPS_FIELD_LENGTH], FlightStates, float, float);
 
 #endif
