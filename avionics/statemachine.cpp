@@ -1,14 +1,14 @@
 /* @file    statemachine.cpp
  * @author  UBC Rocket Avionics 2018/2019
- * @description   Main state machine of the rocket's flight states.  
+ * @description   Main state machine of the rocket's flight states.
  * Implements state switching and the rocket's state machine.
- * 
+ *
  * @section LICENSE
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 2 of
  * the License, or (at your option) any later version.
- * 
+ *
  * Distributed as-is; no warranty is given.
  */
 
@@ -38,16 +38,16 @@ void switchState(FlightStates *curr_state, FlightStates new_state){
  * @param  float *altitude - Current altitude in meters/second
  * @param  float *delta_altitude - Change in altitude from the current altitude update.
  * @param  float *prev_delta_altitude - Previous change in altitude from the altitude update.
- * @param  float bar_data[] - received barometer sensor data array 
+ * @param  float bar_data[] - received barometer sensor data array
  * @param  float *baseline_pressure - the baseline pressure of the rocket (calculated ground altitude)
  * @param  FlightState *state - State machine state.
  * @return void.
  */
-void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_altitude, float bar_data[], float *baseline_pressure, 
+void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_altitude, float bar_data[], float *baseline_pressure,
     float *ground_altitude, FlightStates *state) {
     static int launch_count, armed_count, mach_count, mach_lock_count, apogee_count, main_count, land_count = 0;
 
-    switch (state) {
+    switch (*state) {
         case STANDBY:
             if (*altitude > LAUNCH_THRESHOLD) {
                 launch_count++;
@@ -58,7 +58,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             }
             else{
                 launch_count = 0;
-                *baseline_pressure = groundAlt_update(bar_data[0]);
+                *baseline_pressure = groundAlt_update(&bar_data[0]);
                 *ground_altitude = 44330.0 * (1 - powf(*baseline_pressure / SEA_PRESSURE, 1 / 5.255));
             }
             break;
