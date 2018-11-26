@@ -1,4 +1,3 @@
-
 /*Main Arduino Sketch*/
 
 /*Includes------------------------------------------------------------*/
@@ -57,7 +56,7 @@ void loop()
     static unsigned long new_time = 0; //ms
     static uint16_t time_interval = 5000; //ms
     float acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
-        temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE], NIMU_data[NEWIMU_DATA_ARRAY_SIZE];
+        temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE];
     char GPS_data[GPS_DATA_ARRAY_SIZE][GPS_FIELD_LENGTH];
     static float abs_accel, prev_altitude, altitude, delta_altitude;
 
@@ -78,10 +77,10 @@ void loop()
     new_time = millis();
     if ((new_time - old_time) > time_interval) {
         old_time = new_time;
-        pollSensors(&timestamp, acc_data,bar_data, &temp_sensor_data, IMU_data, GPS_data, NIMU_data);
-        calculateValues(acc_data,bar_data, &abs_accel, &prev_altitude, &altitude, &delta_altitude);
+        pollSensors(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
+        calculateValues(acc_data, bar_data, &abs_accel, &prev_altitude, &altitude, &delta_altitude);
         stateMachine(abs_accel, altitude, delta_altitude);
-        logData(&timestamp, acc_data,bar_data, &temp_sensor_data, IMU_data, GPS_data,NIMU_data);
+        logData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
     }
 
     SerialRadio.println(bar_data[0]);

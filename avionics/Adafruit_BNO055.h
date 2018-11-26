@@ -21,20 +21,19 @@
 #define __ADAFRUIT_BNO055_H__
 
 #if (ARDUINO >= 100)
- #include <Arduino.h>
+ #include "Arduino.h"
 #else
  #include "WProgram.h"
 #endif
 
-// #ifdef __AVR_ATtiny85__
-//  #include <TinyWireM.h>
-//  #define Wire TinyWireM
-// #else
-//  #include <Wire.h>
-// #endif
-#include <i2c_t3.h>
+#ifdef __AVR_ATtiny85__
+ #include <TinyWireM.h>
+ #define Wire TinyWireM
+#else
+ #include <i2c_t3.h>
+#endif
 
-#include <Adafruit_Sensor.h> 
+#include "utility/Adafruit_Sensor.h"
 #include "utility/imumaths.h"
 
 #define BNO055_ADDRESS_A (0x28)
@@ -45,7 +44,6 @@
 
 typedef struct
 {
-  
     int16_t accel_offset_x;
     int16_t accel_offset_y;
     int16_t accel_offset_z;
@@ -281,8 +279,6 @@ class Adafruit_BNO055 : public Adafruit_Sensor
       VECTOR_GRAVITY       = BNO055_GRAVITY_DATA_X_LSB_ADDR
     } adafruit_vector_type_t;
 
-    adafruit_bno055_opmode_t _mode;
-
 #if defined (ARDUINO_SAMD_ZERO) && ! (ARDUINO_SAMD_FEATHER_M0)
 #error "On an arduino Zero, BNO055's ADR pin must be high. Fix that, then delete this line."
     Adafruit_BNO055 ( int32_t sensorID = -1, uint8_t address = BNO055_ADDRESS_B );
@@ -324,7 +320,7 @@ class Adafruit_BNO055 : public Adafruit_Sensor
 
     uint8_t _address;
     int32_t _sensorID;
- 
+    adafruit_bno055_opmode_t _mode;
 };
 
 #endif
