@@ -293,19 +293,19 @@ unsigned long MS_5803::MS_5803_ADC(char commandADC) {
     switch (commandADC & 0x0F)
     {
         case CMD_ADC_256 :
-            delay(1); // 1 ms
+            delayMicroseconds(650); // 1 ms
             break;
         case CMD_ADC_512 :
-            delay(3); // 3 ms
+            delayMicroseconds(1220); // 3 ms
             break;
         case CMD_ADC_1024:
-            delay(4);
+            delayMicroseconds(2330);
             break;
         case CMD_ADC_2048:
-            delay(6);
+            delayMicroseconds(4590);
             break;
         case CMD_ADC_4096:
-            delay(10);
+            delayMicroseconds(9090);
             break;
     }
     // Now send the read command to the MS5803
