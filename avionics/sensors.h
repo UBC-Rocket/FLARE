@@ -4,7 +4,6 @@
 
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
-#include <Arduino.h>
 
 /*Constants------------------------------------------------------------*/
 #define TESTING //enable or disable debug output

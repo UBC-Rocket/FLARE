@@ -8,9 +8,6 @@
 #include "Adafruit_BNO055.h"        //IMU
 #include "Venus638FLPx.h"           //GPS
 
-// #include "utility/imumaths.h"
-// #include "utility/Adafruit_Sensor.h"         //for the new IMU
-
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <i2c_t3.h>

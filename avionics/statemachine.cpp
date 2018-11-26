@@ -16,7 +16,7 @@ void switchState(FlightStates new_state){
     state = new_state;
 }
 
-void stateMachine(float altitude, float delta_altitude, float base_altitude) { 
+void stateMachine(float altitude, float delta_altitude, float base_altitude) {
     static int launch_count, armed_count, mach_count, mach_lock_count, apogee_count, main_count, land_count = 0;
 
     switch (state) {
@@ -46,14 +46,14 @@ void stateMachine(float altitude, float delta_altitude, float base_altitude) {
             }
             break;
 
-        case ASCENT:    // checks for Mach threshold + apogee 
+        case ASCENT:    // checks for Mach threshold + apogee
             if (delta_altitude > MACH_THRESHOLD) {
                 mach_count++;
                 if (mach_count >= MACH_CHECKS) {
                     switchState(MACH_LOCK);
                     mach_count = 0;
                 }
-            } 
+            }
             else {
                 mach_count = 0;
             }
@@ -65,7 +65,7 @@ void stateMachine(float altitude, float delta_altitude, float base_altitude) {
                     switchState(INITIAL_DESCENT);
                     apogee_count = 0;
                 }
-            } 
+            }
             else {
                 apogee_count = 0;
             }
@@ -78,7 +78,7 @@ void stateMachine(float altitude, float delta_altitude, float base_altitude) {
                     switchState(ASCENT);
                     mach_lock_count = 0;
                 }
-            } 
+            }
             else {
                 mach_lock_count = 0;
             }
@@ -92,7 +92,7 @@ void stateMachine(float altitude, float delta_altitude, float base_altitude) {
                     switchState(FINAL_DESCENT);
                     main_count = 0;
                 }
-            } 
+            }
             else {
                 main_count = 0;
             }
@@ -106,7 +106,7 @@ void stateMachine(float altitude, float delta_altitude, float base_altitude) {
                     switchState(LANDED);
                     land_count = 0;
                 }
-            } 
+            }
             else {
                 land_count = 0;
             }
