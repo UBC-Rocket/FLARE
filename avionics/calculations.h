@@ -6,7 +6,6 @@
 #include <stdint.h>
 
 /*Constants------------------------------------------------------------*/
-#define TESTING //enable or disable debug output
 
 #define MILLISECONDS            1000
 
