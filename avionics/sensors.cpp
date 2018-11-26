@@ -3,7 +3,7 @@
 /*Includes------------------------------------------------------------*/
 #include "sensors.h"
 #include "SparkFun_LIS331.h"        //accelerometer
-#include "SparkFun_MS5803_I2C.h"    //barometer
+#include "MS5803_01.h"    //barometer
 #include "SparkFunTMP102.h"         //temp sensor
 #include "MPU9250.h"                //IMU
 #include "Venus638FLPx.h"           //GPS
@@ -17,13 +17,16 @@
 File datalog;
 
 LIS331 accelerometer;
-MS5803 barometer(ADDRESS_HIGH);
+MS_5803 barometer(1024);
 TMP102 temp_sensor(TEMP_SENSOR_ADDRESS);
 MPU9250 IMU(Wire, IMU_ADDRESS);
 
 /*Functions------------------------------------------------------------*/
-
-/*initialize all the sensors*/
+/**
+  * @brief  Initializes all the sensors
+  * @param  None
+  * @return bool - Status (true for success, false for failure)
+  */
 bool initSensors(void)
 {
     bool status = true;
@@ -66,8 +69,10 @@ bool initSensors(void)
     #ifdef TESTING
     SerialUSB.println("Initializing barometer");
     #endif
-    barometer.reset();
-    barometer.begin();
+    //barometer.reset();
+    //barometer.begin();
+    barometer.initializeMS_5803(false); //true if Serial Print Everything
+
 
     /*init temp sensor*/
     #ifdef TESTING
@@ -113,7 +118,25 @@ bool initSensors(void)
     return status;
 }
 
-/*poll all the sensors*/
+/**
+  * @brief  Retrieves one pressure value from the barometer.
+  * @return float - pressure data point from the barometer.
+  */
+float barSensorInit(void){
+    barometer.readSensor();
+    return barometer.pressure();
+}
+
+/**
+  * @brief  Polls all the sensors
+  * @param  unsigned long timestamp - pointer to store the timestamp value
+  * @param  float acc_data[] - array to store the accelerometer data
+  * @param  float bar_data[] - array to store the barometer data
+  * @param  float* temp_sensor_data - pointer to store the temperature sensor data
+  * @param  float IMU_data[] - array to store the IMU data
+  * @param  char GPS_data[][] - 2D array to store the GPS data
+  * @return None
+  */
 void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
                 float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH])
 {
@@ -133,8 +156,12 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
     #ifdef TESTING
     SerialUSB.println("Polling barometer");
     #endif
-    bar_data[0] = barometer.getPressure(ADC_4096);
-    bar_data[1] = barometer.getTemperature(CELSIUS, ADC_512);
+    barometer.readSensor();
+    //bar_data[0] = barometer.getPressure(ADC_4096);
+    //bar_data[1] = barometer.getTemperature(CELSIUS, ADC_512);
+    bar_data[0] = barometer.pressure();
+    bar_data[1] = barometer.temperature();
+
 
     #ifdef TESTING
     SerialUSB.println("Polling temperature sensor");
@@ -165,7 +192,16 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
     }
 }
 
-/*log all the data*/
+/**
+  * @brief  Logs all the sensor data
+  * @param  unsigned long timestamp - pointer to store the timestamp value
+  * @param  float acc_data[] - array to store the accelerometer data
+  * @param  float bar_data[] - array to store the barometer data
+  * @param  float* temp_sensor_data - pointer to store the temperature sensor data
+  * @param  float IMU_data[] - array to store the IMU data
+  * @param  char GPS_data[][] - 2D array to store the GPS data
+  * @return None
+  */
 void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
             float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH])
 {
@@ -238,13 +274,4 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     SerialUSB.println(GPS_data[2]);
     SerialUSB.println("");
     #endif
-}
-
-void calculateValues(float acc_data[], float bar_data[], float* abs_accel,
-                    float* prev_altitude, float* altitude, float* delta_altitude)
-{
-    // *abs_accel = sqrtf(powf(acc_data[0], 2) + powf(acc_data[1], 2) + powf(acc_data[2]), 2);
-    // *prev_altitude = *altitude;
-    // *altitude = 44330.0 * (1 - powf(bar_data[0] / BASELINE_PRESSURE, 1 / 5.255));
-    // *delta_altitude = altitude - prev_altitude;
 }
