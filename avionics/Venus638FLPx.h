@@ -4,7 +4,6 @@
 #define Venus638FLPx_h
 
 /*Includes------------------------------------------------------------*/
-#include <HardwareSerial.h>
 
 /*Constants------------------------------------------------------------*/
 #define SENTENCE_SIZE   100
@@ -13,7 +12,7 @@
 /*Variables------------------------------------------------------------*/
 
 /*Functions------------------------------------------------------------*/
-bool getGPSData(char* sentence);
-void getGPSField(char* sentence, char* buffer, int index);
+bool updateGPS(void);
+void getGPS(float*);
 
 #endif

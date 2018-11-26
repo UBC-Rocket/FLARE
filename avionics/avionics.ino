@@ -58,6 +58,7 @@ void loop()
     float acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE];
     char GPS_data[GPS_DATA_ARRAY_SIZE][GPS_FIELD_LENGTH];
+        temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE], GPS_data[GPS_DATA_ARRAY_SIZE];
     static float abs_accel, prev_altitude, altitude, delta_altitude;
 
     if (SerialRadio.available()) {
