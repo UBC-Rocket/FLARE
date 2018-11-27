@@ -56,8 +56,8 @@ const char UID_time  = 't'; //Time
 
 /*Functions------------------------------------------------------------*/
 bool initSensors(void);
+float barSensorInit(void);
 void pollSensors(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
 void logData(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
-void calculateValues(float*, float*, float*, float*, float*, float*);
 
 #endif

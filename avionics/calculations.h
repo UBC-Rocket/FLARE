@@ -1,19 +1,18 @@
-/*GPS Venus638FLPx Driver Header*/
-
-#ifndef Venus638FLPx_h
-#define Venus638FLPx_h
+/*Sensors Header*/
+#ifndef CALCULATIONS_H
+#define CALCULATIONS_H
 
 /*Includes------------------------------------------------------------*/
-#include <HardwareSerial.h>
+#include <stdint.h>
 
 /*Constants------------------------------------------------------------*/
-#define SENTENCE_SIZE   60
-#define GPS_TIMEOUT     100
+
+#define MILLISECONDS            1000
 
 /*Variables------------------------------------------------------------*/
 
 /*Functions------------------------------------------------------------*/
-bool getGPSData(char* sentence);
-void getGPSField(char* sentence, char* buffer, int index);
+
+void calculateValues(float*, float*, float*, float*, float*, float*, float*, unsigned long*);
 
 #endif
