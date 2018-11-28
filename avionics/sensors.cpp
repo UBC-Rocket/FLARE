@@ -71,8 +71,15 @@ bool initSensors(void)
     #endif
     //barometer.reset();
     //barometer.begin();
-    barometer.initializeMS_5803(false); //true if Serial Print Everything
-
+    #ifdef TESTING
+    if (!barometer.initializeMS_5803(true)) {
+        return false;
+    }
+    #else
+    if (!barometer.initializeMS_5803(false)) {
+        return false;
+    }
+    #endif
 
     /*init temp sensor*/
     #ifdef TESTING
