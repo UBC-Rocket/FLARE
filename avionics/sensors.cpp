@@ -163,7 +163,12 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
     #ifdef TESTING
     SerialUSB.println("Polling barometer");
     #endif
-    barometer.readSensor();
+    bool bar_flag = barometer.readSensor();
+
+    #ifdef TESTING
+    if(!bar_flag)
+        SerialUSB.println("BAROMETER FAILED READING");
+    #endif
     //bar_data[0] = barometer.getPressure(ADC_4096);
     //bar_data[1] = barometer.getTemperature(CELSIUS, ADC_512);
     bar_data[0] = barometer.pressure();

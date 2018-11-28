@@ -41,7 +41,7 @@ public:
     // Reset the sensor
     bool resetSensor();
     // Read the sensor
-    void readSensor();
+    bool readSensor();
     //*********************************************************************
     // Additional methods to extract temperature, pressure (mbar), and the
     // D1,D2 values after readSensor() has been called
@@ -69,6 +69,8 @@ private:
 
     float mbar; // Store pressure in mbar.
     float tempC; // Store temperature in degrees Celsius
+
+    bool _transmitSuccess; //true normally, false if transmission failed at some point
 //    float tempF; // Store temperature in degrees Fahrenheit
 //    float psiAbs; // Store pressure in pounds per square inch, absolute
 //    float psiGauge; // Store gauge pressure in pounds per square inch (psi)

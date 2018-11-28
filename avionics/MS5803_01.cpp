@@ -144,10 +144,17 @@ boolean MS_5803::initializeMS_5803(boolean Verbose) {
 }
 
 //------------------------------------------------------------------
-void MS_5803::readSensor() {
+/*
+ * @brief Reads the sensor and stores the values.
+ * @return Returns true if successfully read, false otherwise. Note that
+ *      reading the temperature and pressure is still possible after this function
+ *      fails; those values will simply not be updated.
+ * */
+bool MS_5803::readSensor() {
 	// Choose from CMD_ADC_256, 512, 1024, 2048, 4096 for mbar resolutions
 	// of 1, 0.6, 0.4, 0.3, 0.2 respectively. Higher resolutions take longer
 	// to read.
+    _transmitSuccess = true;
 	if (_Resolution == 256){
 		D1 = MS_5803_ADC(CMD_ADC_D1 + CMD_ADC_256); // read raw pressure
 		D2 = MS_5803_ADC(CMD_ADC_D2 + CMD_ADC_256); // read raw temperature
@@ -164,6 +171,9 @@ void MS_5803::readSensor() {
 		D1 = MS_5803_ADC(CMD_ADC_D1 + CMD_ADC_4096); // read raw pressure
 		D2 = MS_5803_ADC(CMD_ADC_D2 + CMD_ADC_4096); // read raw temperature
 	}
+
+    if (!_transmitSuccess)
+        return false;
     // Calculate 1st order temperature, dT is a long signed integer
 	// D2 is originally cast as an uint32_t, but can fit in a int32_t, so we'll
 	// cast both parts of the equation below as signed values so that we can
@@ -245,6 +255,7 @@ void MS_5803::readSensor() {
 //    // Convert temperature to Fahrenheit
 //    tempF = (tempC * 1.8) + 32;
 
+    return true;
 }
 
 //------------------------------------------------------------------
@@ -319,9 +330,15 @@ unsigned long MS_5803::MS_5803_ADC(char commandADC) {
     // Now send the read command to the MS5803
     Wire.beginTransmission(MS5803_I2C_ADDRESS);
     Wire.write((byte)CMD_ADC_READ);
-    Wire.endTransmission();
+    if(Wire.endTransmission())
+        _transmitSuccess = false;
     // Then request the results. This should be a 24-bit result (3 bytes)
-    Wire.requestFrom(MS5803_I2C_ADDRESS, 3);
+    if(Wire.requestFrom(MS5803_I2C_ADDRESS, 3) != 3)
+        _transmitSuccess = false;
+
+    if(Wire.available() < 3)
+        _transmitSuccess = false;
+
     while(Wire.available()) {
     	HighByte = Wire.read();
     	MidByte = Wire.read();
@@ -333,8 +350,10 @@ unsigned long MS_5803::MS_5803_ADC(char commandADC) {
 }
 
 //----------------------------------------------------------------
-// @ brief Resets the semnsor
-// @ return boolean - true if suceeded, false if otherwise
+/*
+ * @ brief Resets the semnsor
+ * @ return boolean - true if suceeded, false if otherwise
+ */
 bool MS_5803::resetSensor() {
     	Wire.beginTransmission(MS5803_I2C_ADDRESS);
         Wire.write(CMD_RESET);
