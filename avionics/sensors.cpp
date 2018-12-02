@@ -13,6 +13,7 @@
 #include <i2c_t3.h>
 #include <SD.h>
 
+
 /*Variables------------------------------------------------------------*/
 File datalog;
 
@@ -20,6 +21,7 @@ LIS331 accelerometer;
 MS5803 barometer(ADDRESS_HIGH);
 TMP102 temp_sensor(TEMP_SENSOR_ADDRESS);
 MPU9250 IMU(Wire, IMU_ADDRESS);
+//TinyGPS gps;
 
 /*Functions------------------------------------------------------------*/
 
@@ -251,50 +253,76 @@ void calculateValues(float acc_data[], float bar_data[], float* abs_accel,
 
 
 
-const char * processRadioData(unsigned long *timestamp, float acc_data[], float bar_data[],
-           float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH] ){
+void processRadioData(unsigned long *timestamp, float acc_data[], float bar_data[],
+    float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH] ){
 
-                  String radio_data;
-               //   radio_data = "A";
-           // char radio_char_data[2];
+   float time = *timestamp;
+    sendRadioData(time, 't');
 
-                 radio_data += String(UID_time) + String(*timestamp);
+    sendRadioData(acc_data[0], UID_acc_acc_x);
+    sendRadioData(acc_data[1], UID_acc_acc_y);
+    sendRadioData(acc_data[2], UID_acc_acc_z);
 
-                 radio_data += String(UID_acc_acc_x) + String(acc_data[0]);
-                 radio_data += String(UID_acc_acc_y) + String(acc_data[1]);
-                 radio_data += String(UID_acc_acc_z) + String(acc_data[2]);
+    sendRadioData(bar_data[0], UID_bar_pres);
+    sendRadioData(bar_data[1], UID_bar_temp);
 
-                 radio_data += String(UID_bar_pres) + String(bar_data[0]);
-                 radio_data += String(UID_bar_temp) + String(bar_data[1]);
+    sendRadioData(IMU_data[0], UID_IMU_acc_x);
+    sendRadioData(IMU_data[1], UID_IMU_acc_y);
+    sendRadioData(IMU_data[2], UID_IMU_acc_z);
+    sendRadioData(IMU_data[3], UID_IMU_gyro_x);
+    sendRadioData(IMU_data[4], UID_IMU_gyro_y);
+    sendRadioData(IMU_data[5], UID_IMU_gyro_z);
+    sendRadioData(IMU_data[6], UID_IMU_mag_x);
+    sendRadioData(IMU_data[7], UID_IMU_mag_y);
+    sendRadioData(IMU_data[8], UID_IMU_mag_z);
 
-                 radio_data += String(UID_temp_temp) + String(*temp_sensor_data);
 
-                 radio_data += String(UID_IMU_acc_x) + String(IMU_data[0]);
-                 radio_data += String(UID_IMU_acc_y) + String(IMU_data[1]);
-                 radio_data += String(UID_IMU_acc_z) + String(IMU_data[2]);
+    /*
+    radio_data += String(UID_acc_acc_x) + floatToString(acc_data[0]);
+    radio_data += String(UID_acc_acc_y) + floatToString(acc_data[1]);
+    radio_data += String(UID_acc_acc_z) + floatToString(acc_data[2]);
 
-                 radio_data += String(UID_IMU_gyro_x) + String(IMU_data[3]);
-                 radio_data += String(UID_IMU_gyro_y) + String(IMU_data[4]);
-                 radio_data += String(UID_IMU_gyro_z) + String(IMU_data[5]);
+    radio_data += String(UID_bar_pres) + floatToString(bar_data[0]);
+    radio_data += String(UID_bar_temp) +floatToString(bar_data[1]);
 
-                 radio_data += String(UID_IMU_mag_x) + String(IMU_data[6]);
-                 radio_data += String(UID_IMU_mag_y) + String(IMU_data[7]);
-                 radio_data += String(UID_IMU_mag_z) + String(IMU_data[8]);
+    radio_data += String(UID_temp_temp) + floatToString(*temp_sensor_data);
 
-                 radio_data += String(UID_GPS_lat) + String(GPS_data[0]);
-                 radio_data += String(UID_GPS_long) + String(GPS_data[1]);
-                 radio_data += String(UID_GPS_alt) + String(GPS_data[2]);
+    radio_data += String(UID_IMU_acc_x) + floatToString(IMU_data[0]);
+    radio_data += String(UID_IMU_acc_y) + floatToString(IMU_data[1]);
+    radio_data += String(UID_IMU_acc_z) + floatToString(IMU_data[2]);
+
+    radio_data += String(UID_IMU_gyro_x) +floatToString(IMU_data[3]);
+    radio_data += String(UID_IMU_gyro_y) + floatToString(IMU_data[4]);
+    radio_data += String(UID_IMU_gyro_z) + floatToString(IMU_data[5]);
+
+    radio_data += String(UID_IMU_mag_x) + floatToString(IMU_data[6]);
+    radio_data += String(UID_IMU_mag_y) +floatToString(IMU_data[7]);
+    radio_data += String(UID_IMU_mag_z) + floatToString(IMU_data[8]);
+    */
+
+                //  radio_data += String(UID_GPS_lat) + floatToString(GPS_data[0]);
+                //  radio_data += String(UID_GPS_long) + floatToString(GPS_data[1]);
+                //  radio_data += String(UID_GPS_alt) + floatToString(GPS_data[2]);
 
 
 
                    
-                  const char *radio_char_data = radio_data.c_str();
+   // const char *radio_char_data = radio_data.c_str();
 
 //    radio_char_data[0] = 'A';
  //  radio_char_data[1] = '\0';
 
-                  return radio_char_data;
+            
+}
 
+void sendRadioData(float data, char id){
+    //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly 
+     u_int8_t b[4];
+      *(float*) b = data;
+      SerialRadio.write(id);
+      for(int i=0; i<4; i++)
+      {
+          SerialRadio.write(b[i]);
+      }
+}
 
-
-           }
