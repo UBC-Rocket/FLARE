@@ -82,7 +82,7 @@ void loop()
     static FlightStates state = STANDBY;
 
     static uint16_t radio_time_interval = 500;
-    char *radio_data;
+   // char *radio_data;
 
     if (SerialRadio.available()) {
         radiolog.print("Received Message: ");

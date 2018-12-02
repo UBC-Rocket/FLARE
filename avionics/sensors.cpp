@@ -316,9 +316,11 @@ void processRadioData(unsigned long *timestamp, float acc_data[], float bar_data
     sendRadioData(IMU_data[7], UID_IMU_mag_y);
     sendRadioData(IMU_data[8], UID_IMU_mag_z);
 
-    sendRadioData(ToFloat(GPS_data[0]), UID_GPS_lat);
-    sendRadioData(ToFloat(GPS_data[1]), UID_GPS_long); 
-    sendRadioData(ToFloat(GPS_data[2]), UID_GPS_alt);
+
+    // to float doesnt work fack
+    // sendRadioData(toFloat(GPS_data[0]), UID_GPS_lat);
+    // sendRadioData(toFloat(GPS_data[1]), UID_GPS_long); 
+    // sendRadioData(toFloat(GPS_data[2]), UID_GPS_alt);
     
 
 
