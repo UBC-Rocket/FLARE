@@ -3,6 +3,7 @@
 /*Includes------------------------------------------------------------*/
 #include "sensors.h"
 #include "statemachine.h"
+#include "calculations.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -14,6 +15,11 @@
 File radiolog;
 
 /*Functions------------------------------------------------------------*/
+/**
+  * @brief  The Arduino setup function
+  * @param  None
+  * @return None
+  */
 void setup()
 {
     bool status = true;
@@ -50,18 +56,30 @@ void setup()
     }
 }
 
+/**
+  * @brief  The Arduino loop function
+  * @param  None
+  * @return None
+  */
 void loop()
 {
     unsigned long timestamp;
+    static float barometer_data_init = barSensorInit();
+    static float baseline_pressure = groundAlt_init(&barometer_data_init);  // IF YOU CAN'T DO THIS USE GLOBAL VAR
     static unsigned long old_time = 0; //ms
     static unsigned long new_time = 0; //ms
+
     static unsigned long radio_old_time = 0;
     static unsigned long radio_new_time = 0;
-    static uint16_t time_interval = 5000; //ms
+
+    unsigned long delta_time;
+    static uint16_t time_interval = 500; //ms
+
     float acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE];
     char GPS_data[GPS_DATA_ARRAY_SIZE][GPS_FIELD_LENGTH];
-    static float abs_accel, prev_altitude, altitude, delta_altitude;
+    static float abs_accel, prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
+    static FlightStates state = STANDBY;
 
     static uint16_t radio_time_interval = 500;
     char *radio_data;
@@ -82,11 +100,12 @@ void loop()
 
     new_time = millis();
     if ((new_time - old_time) > time_interval) {
+        delta_time = new_time - old_time;
         old_time = new_time;
         pollSensors(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
-        calculateValues(acc_data, bar_data, &abs_accel, &prev_altitude, &altitude, &delta_altitude);
-        stateMachine(abs_accel, altitude, delta_altitude);
-        logData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
+        calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &prev_delta_altitude, &baseline_pressure, &delta_time);
+        stateMachine(&altitude, &delta_altitude, &prev_altitude, bar_data, &baseline_pressure, &ground_altitude, &state);
+        logData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure);
     }
 
     

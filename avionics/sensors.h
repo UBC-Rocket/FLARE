@@ -4,7 +4,11 @@
 
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
+<<<<<<< HEAD
 #include <string>
+=======
+#include "statemachine.h"
+>>>>>>> dev
 
 /*Constants------------------------------------------------------------*/
 #define TESTING //enable or disable debug output
@@ -17,12 +21,12 @@
 
 #define ACCELEROMETER_ADDRESS   0x18
 #define TEMP_SENSOR_ADDRESS     0x48
-#define IMU_ADDRESS             0x68
+#define IMU_ADDRESS             0x37
 #define ACCELEROMETER_SCALE     6
 
 #define ACC_DATA_ARRAY_SIZE     3
 #define BAR_DATA_ARRAY_SIZE     2
-#define IMU_DATA_ARRAY_SIZE     9
+#define IMU_DATA_ARRAY_SIZE     3
 #define GPS_DATA_ARRAY_SIZE     3
 #define GPS_FIELD_LENGTH        20
 
@@ -57,10 +61,13 @@ const char UID_time  = 't'; //Time
 
 /*Functions------------------------------------------------------------*/
 bool initSensors(void);
+float barSensorInit(void);
 void pollSensors(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
-void logData(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
+
 void calculateValues(float*, float*, float*, float*, float*, float*);
 void processRadioData(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
 void sendRadioData(float data, char id);
+void logData(unsigned long *, float*, float*, float*, float*, char [][GPS_FIELD_LENGTH], FlightStates, float, float);
+
 
 #endif

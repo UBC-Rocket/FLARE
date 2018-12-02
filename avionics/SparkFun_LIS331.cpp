@@ -47,8 +47,8 @@ void LIS331::setPowerMode(power_mode pmode)
   uint8_t data;
   LIS331_read(CTRL_REG1, &data, 1);
 
-  // The power mode is the high three bits of CTRL_REG1. The mode 
-  //  constants are the appropriate bit values left shifted by five, so we 
+  // The power mode is the high three bits of CTRL_REG1. The mode
+  //  constants are the appropriate bit values left shifted by five, so we
   //  need to right shift them to make them work. We also want to mask off the
   //  top three bits to zero, and leave the others untouched, so we *only*
   //  affect the power mode bits.
@@ -136,7 +136,7 @@ void LIS331::enableHPF(bool enable)
 
 void LIS331::HPFOnIntPin(bool enable, uint8_t pin)
 {
-  // Enable the hpf on signal to int pins 
+  // Enable the hpf on signal to int pins
   uint8_t data;
   LIS331_read(CTRL_REG2, &data, 1);
   if (enable)
@@ -201,7 +201,7 @@ void LIS331::latchInterrupt(bool enable, uint8_t intSource)
 {
   // Latch mode for interrupt. When enabled, you must read the INTx_SRC reg
   //  to clear the interrupt and make way for another.
-  uint8_t data; 
+  uint8_t data;
   LIS331_read(CTRL_REG3, &data, 1);
   // Enable latching by setting the appropriate bit.
   if (enable)
@@ -232,7 +232,7 @@ void LIS331::latchInterrupt(bool enable, uint8_t intSource)
 void LIS331::intSrcConfig(int_sig_src src, uint8_t pin)
 {
 
-  uint8_t data; 
+  uint8_t data;
   LIS331_read(CTRL_REG3, &data, 1);
   // Enable latching by setting the appropriate bit.
   if (pin == 1)
@@ -250,7 +250,7 @@ void LIS331::intSrcConfig(int_sig_src src, uint8_t pin)
 
 void LIS331::setFullScale(fs_range range)
 {
-  uint8_t data; 
+  uint8_t data;
   LIS331_read(CTRL_REG4, &data, 1);
   data &= ~0xcf;
   data |= range<<5;
@@ -302,7 +302,7 @@ bool LIS331::newZData()
 void LIS331::enableInterrupt(int_axis axis, trig_on_level trigLevel,
                      uint8_t interrupt, bool enable)
 {
-  uint8_t data, reg, mask; 
+  uint8_t data, reg, mask;
   mask = 0;
   if (interrupt == 1)
   {
