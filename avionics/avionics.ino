@@ -91,24 +91,11 @@ void loop()
 
     
     radio_new_time = millis();
-        if ( (radio_new_time - radio_old_time) > radio_time_interval ){
-            radio_old_time = radio_new_time;
-        const char * this_data = processRadioData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
-        radio_data = strdup(this_data); 
-        for(int i = 0; i < strlen(radio_data); i++){
-            SerialRadio.write(radio_data[i]);
-        }
-           // SerialRadio.println();
-        }
+    if ( (radio_new_time - radio_old_time) > radio_time_interval ){
+        radio_old_time = radio_new_time;
+        processRadioData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
+    }
 
-
-        // SerialRadio.println(bar_data[0]);
-        // radiolog.print("Sent Message: ");
-        // radiolog.println(bar_data[0]);
-    // #ifdef TESTING
-    // SerialUSB.print("Sent Message: ");
-    // SerialUSB.println(bar_data[0]);
-    // #endif
 
     #ifdef TESTING
     delay(1000);
