@@ -68,7 +68,7 @@ void loop()
     static unsigned long old_time = 0; //ms
     static unsigned long new_time = 0; //ms
     unsigned long delta_time;
-    static uint16_t time_interval = 5000; //ms
+    static uint16_t time_interval = 500; //ms
     float acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE];
     char GPS_data[GPS_DATA_ARRAY_SIZE][GPS_FIELD_LENGTH];

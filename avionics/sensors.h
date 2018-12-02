@@ -21,7 +21,7 @@
 
 #define ACC_DATA_ARRAY_SIZE     3
 #define BAR_DATA_ARRAY_SIZE     2
-#define IMU_DATA_ARRAY_SIZE     9
+#define IMU_DATA_ARRAY_SIZE     3
 #define GPS_DATA_ARRAY_SIZE     3
 #define GPS_FIELD_LENGTH        20
 
