@@ -103,7 +103,9 @@ bool initSensors(void)
     SerialGPS.begin(4800);
     while (!SerialGPS) {}
     SerialGPS.write(GPS_reset_defaults, sizeof(GPS_reset_defaults));
+    // SerialGPS.write(GPS_set_baud_rate, sizeof(GPS_set_baud_rate));
     SerialGPS.write(GPS_set_NMEA_message, sizeof(GPS_set_NMEA_message));
+    SerialGPS.write(GPS_set_update_rate, sizeof(GPS_set_update_rate));
 
     /*init radio*/
     #ifdef TESTING
