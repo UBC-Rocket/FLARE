@@ -58,6 +58,8 @@ const char UID_GPS_lat  = 'L'; //GPS - Latitude
 const char UID_GPS_long  = 'l'; //GPS - Longitude
 const char UID_GPS_alt  = 'A'; //GPS - Altitude
 const char UID_time  = 't'; //Time
+const char UID_altitude = 'a'; //calculated altitude
+const char UID_state = 's'; //state machine state
 
 /*Functions------------------------------------------------------------*/
 bool initSensors(void);
@@ -65,7 +67,7 @@ float barSensorInit(void);
 void pollSensors(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
 
 void calculateValues(float*, float*, float*, float*, float*, float*);
-void processRadioData(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH]);
+void processRadioData(unsigned long*, float*, float*, float*, float*, char[][GPS_FIELD_LENGTH], FlightStates state, float altitude);
 void sendRadioData(float data, char id);
 void logData(unsigned long *, float*, float*, float*, float*, char [][GPS_FIELD_LENGTH], FlightStates, float, float);
 

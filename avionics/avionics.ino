@@ -112,7 +112,7 @@ void loop()
     radio_new_time = millis();
     if ( (radio_new_time - radio_old_time) > radio_time_interval ){
         radio_old_time = radio_new_time;
-        processRadioData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
+        processRadioData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude);
     }
 
 

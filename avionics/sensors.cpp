@@ -294,7 +294,7 @@ void calculateValues(float acc_data[], float bar_data[], float* abs_accel,
 
 
 void processRadioData(unsigned long *timestamp, float acc_data[], float bar_data[],
-    float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH] ){
+    float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH], FlightStates state, float altitude){
 
    float time = *timestamp;
     sendRadioData(time, 't');
@@ -315,50 +315,14 @@ void processRadioData(unsigned long *timestamp, float acc_data[], float bar_data
     sendRadioData(IMU_data[6], UID_IMU_mag_x);
     sendRadioData(IMU_data[7], UID_IMU_mag_y);
     sendRadioData(IMU_data[8], UID_IMU_mag_z);
+    sendRadioData( altitude, UID_altitude);
+    sendRadioData((float) state, UID_state);
 
 
     // to float doesnt work fack
     // sendRadioData(toFloat(GPS_data[0]), UID_GPS_lat);
     // sendRadioData(toFloat(GPS_data[1]), UID_GPS_long); 
     // sendRadioData(toFloat(GPS_data[2]), UID_GPS_alt);
-    
-
-
-    /*
-    radio_data += String(UID_acc_acc_x) + floatToString(acc_data[0]);
-    radio_data += String(UID_acc_acc_y) + floatToString(acc_data[1]);
-    radio_data += String(UID_acc_acc_z) + floatToString(acc_data[2]);
-
-    radio_data += String(UID_bar_pres) + floatToString(bar_data[0]);
-    radio_data += String(UID_bar_temp) +floatToString(bar_data[1]);
-
-    radio_data += String(UID_temp_temp) + floatToString(*temp_sensor_data);
-
-    radio_data += String(UID_IMU_acc_x) + floatToString(IMU_data[0]);
-    radio_data += String(UID_IMU_acc_y) + floatToString(IMU_data[1]);
-    radio_data += String(UID_IMU_acc_z) + floatToString(IMU_data[2]);
-
-    radio_data += String(UID_IMU_gyro_x) +floatToString(IMU_data[3]);
-    radio_data += String(UID_IMU_gyro_y) + floatToString(IMU_data[4]);
-    radio_data += String(UID_IMU_gyro_z) + floatToString(IMU_data[5]);
-
-    radio_data += String(UID_IMU_mag_x) + floatToString(IMU_data[6]);
-    radio_data += String(UID_IMU_mag_y) +floatToString(IMU_data[7]);
-    radio_data += String(UID_IMU_mag_z) + floatToString(IMU_data[8]);
-    */
-
-                //  radio_data += String(UID_GPS_lat) + floatToString(GPS_data[0]);
-                //  radio_data += String(UID_GPS_long) + floatToString(GPS_data[1]);
-                //  radio_data += String(UID_GPS_alt) + floatToString(GPS_data[2]);
-
-
-
-                   
-   // const char *radio_char_data = radio_data.c_str();
-
-//    radio_char_data[0] = 'A';
- //  radio_char_data[1] = '\0';
-
             
 }
 
