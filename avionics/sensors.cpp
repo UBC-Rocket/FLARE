@@ -49,10 +49,10 @@ bool initSensors(void)
             #endif
         } else {
             datalog.write("SENSOR LOG DATA\n");
-            datalog.write("Time (ms),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
+            datalog.write("Time (ms), State, Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
             "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
-            "Temperature Sensor - Temperature (C),IMU - Heading (o),IMU - Pitch (o),"
-            "IMU - Roll (o) \n");
+            "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
+            "IMU - Heading (o),IMU - Pitch (o),IMU - Rol (o),GPS - latitude,GPS - longitude,GPS - altitude\n");
         }
     }
 
@@ -205,13 +205,16 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
   * @return None
   */
 void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
-            float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH])
+            float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH],
+            FlightStates state, float altitude, float baseline_pressure)
 {
     /*write data to SD card*/
     #ifdef TESTING
     SerialUSB.println("Writing to SD card");
     #endif
     datalog.print(*timestamp);
+    datalog.print(",");
+    datalog.print(state);
     datalog.print(",");
     for (unsigned int i = 0; i < ACC_DATA_ARRAY_SIZE; i++) {
        datalog.print(acc_data[i]);
@@ -221,6 +224,10 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
         datalog.print(bar_data[i]);
         datalog.print(",");
     }
+    datalog.print(baseline_pressure);
+    datalog.print(",");
+    datalog.print(altitude);
+    datalog.print(",");
     datalog.print(*temp_sensor_data);
     datalog.print(",");
     for (unsigned int i = 0; i < IMU_DATA_ARRAY_SIZE; i++) {
@@ -238,6 +245,8 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     #ifdef TESTING
     SerialUSB.print("Time (ms):                          ");
     SerialUSB.println(*timestamp);
+    SerialUSB.print("State:                          ");
+    SerialUSB.println(state);
     SerialUSB.print("Accelerometer acceleration X (g):   ");
     SerialUSB.println(acc_data[0]);
     SerialUSB.print("Accelerometer acceleration Y (g):   ");
@@ -248,6 +257,10 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     SerialUSB.println(bar_data[0]);
     SerialUSB.print("Barometer temperature (C):          ");
     SerialUSB.println(bar_data[1]);
+    SerialUSB.print("Baseline Pressure (mbar):          ");
+    SerialUSB.println(baseline_pressure);
+    SerialUSB.print("Altitude (m):          ");
+    SerialUSB.println(altitude);
     SerialUSB.print("Temperature sensor temperature (C): ");
     SerialUSB.println(*temp_sensor_data);
     SerialUSB.print("IMU X                               "); //TODO this isn't actually x, y, z
