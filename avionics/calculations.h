@@ -1,18 +1,18 @@
-/*Ground Altitude Calculation Header*/
-#ifndef GROUNDALTITUDE_H
-#define GROUNDALTITUDE_H
+/*Sensors Header*/
+#ifndef CALCULATIONS_H
+#define CALCULATIONS_H
 
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
 
 /*Constants------------------------------------------------------------*/
-#define ground_alt_size 20  //array size for moving average
+
+#define MILLISECONDS            1000
 
 /*Variables------------------------------------------------------------*/
 
 /*Functions------------------------------------------------------------*/
-float groundAlt_init(float*);
-float groundAlt_arr_sum();
-float groundAlt_update(float*);
+
+void calculateValues(float*, float*, float*, float*, float*, float*, float*, unsigned long*);
 
 #endif

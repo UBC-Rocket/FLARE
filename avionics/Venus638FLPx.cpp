@@ -19,7 +19,6 @@ bool updateGPS(void)
         if (gps.encode(c)) {
             return true;
         }
-    }
 
     return false;
 }
