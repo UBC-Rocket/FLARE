@@ -102,13 +102,10 @@ bool initSensors(void)
     #ifdef TESTING
     SerialUSB.println("Initializing GPS");
     #endif
-    SerialGPS.begin(9600);
-    while (!SerialGPS) {}   //TODO this can hang if baud rate is different change to delay?
-    SerialGPS.write(GPS_reset_defaults, sizeof(GPS_reset_defaults));
-    SerialGPS.write(GPS_set_baud_rate, sizeof(GPS_set_baud_rate));
-    SerialGPS.end();
-    SerialGPS.begin(115200);
+    SerialGPS.begin(4800);
     while (!SerialGPS) {}
+    SerialGPS.write(GPS_reset_defaults, sizeof(GPS_reset_defaults));
+    // SerialGPS.write(GPS_set_baud_rate, sizeof(GPS_set_baud_rate));
     SerialGPS.write(GPS_set_NMEA_message, sizeof(GPS_set_NMEA_message));
     SerialGPS.write(GPS_set_update_rate, sizeof(GPS_set_update_rate));
 
@@ -142,10 +139,9 @@ float barSensorInit(void){
   * @return None
   */
 void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
-                float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH])
+                float *temp_sensor_data, float IMU_data[], float GPS_data[])
 {
     int16_t x, y, z;
-    char sentence[SENTENCE_SIZE];
 
     *timestamp = millis();
 
@@ -189,10 +185,8 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
     #ifdef TESTING
     SerialUSB.println("Polling GPS");
     #endif
-    if (getGPSData(sentence)) {
-        getGPSField(sentence, GPS_data[0], 2); //latitude
-        getGPSField(sentence, GPS_data[1], 4); //longitude
-        getGPSField(sentence, GPS_data[2], 9); //altitude
+    if (updateGPS()) {
+        getGPS(GPS_data);
     }
 }
 
@@ -207,7 +201,7 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
   * @return None
   */
 void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
-            float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH],
+            float *temp_sensor_data, float IMU_data[], float GPS_data[],
             FlightStates state, float altitude, float baseline_pressure)
 {
     /*write data to SD card*/
