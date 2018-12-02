@@ -44,8 +44,9 @@ void setup()
     if (!status) {
         #ifdef TESTING
         SerialUSB.println("Initialization failed! >:-{");
-        #endif
+        #else
         while (1) {}
+        #endif
     } else {
         pinMode(LED_BUILTIN,OUTPUT);
         digitalWrite(LED_BUILTIN,HIGH);
@@ -68,12 +69,11 @@ void loop()
     static unsigned long old_time = 0; //ms
     static unsigned long new_time = 0; //ms
     unsigned long delta_time;
-    static uint16_t time_interval = 500; //ms
+    static uint16_t time_interval = 50; //ms
     float acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
-        temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE];
-    char GPS_data[GPS_DATA_ARRAY_SIZE][GPS_FIELD_LENGTH];
+        temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE], GPS_data[GPS_DATA_ARRAY_SIZE];
     static float abs_accel, prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
-    static FlightStates state = STANDBY;
+    static FlightStates state = ARMED;
 
     if (SerialRadio.available()) {
         radiolog.print("Received Message: ");
