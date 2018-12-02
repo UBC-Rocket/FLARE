@@ -4,11 +4,11 @@
 
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
-<<<<<<< HEAD
+
 #include <string>
-=======
+
 #include "statemachine.h"
->>>>>>> dev
+
 
 /*Constants------------------------------------------------------------*/
 #define TESTING //enable or disable debug output
