@@ -13,7 +13,6 @@
 #include <i2c_t3.h>
 #include <SD.h>
 
-
 /*Variables------------------------------------------------------------*/
 File datalog;
 
@@ -279,7 +278,6 @@ void processRadioData(unsigned long *timestamp, float acc_data[], float bar_data
     sendRadioData(ToFloat(GPS_data[0]), UID_GPS_lat);
     sendRadioData(ToFloat(GPS_data[1]), UID_GPS_long); 
     sendRadioData(ToFloat(GPS_data[2]), UID_GPS_alt);
-
     
 
 

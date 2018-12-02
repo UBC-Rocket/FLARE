@@ -40,7 +40,7 @@ void setup()
         #ifdef TESTING
         SerialUSB.println("Initialization failed! >:-{");
         #endif
-        //while (1) {}
+        while (1) {}
     } else {
         pinMode(LED_BUILTIN,OUTPUT);
         digitalWrite(LED_BUILTIN,HIGH);
