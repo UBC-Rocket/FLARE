@@ -3,9 +3,9 @@
 /*Includes------------------------------------------------------------*/
 #include "sensors.h"
 #include "SparkFun_LIS331.h"        //accelerometer
-#include "MS5803_01.h"    //barometer
+#include "MS5803_01.h"              //barometer
 #include "SparkFunTMP102.h"         //temp sensor
-#include "MPU9250.h"                //IMU
+#include "Adafruit_BNO055.h"        //IMU
 #include "Venus638FLPx.h"           //GPS
 
 #include <Arduino.h>
@@ -19,7 +19,7 @@ File datalog;
 LIS331 accelerometer;
 MS_5803 barometer(1024);
 TMP102 temp_sensor(TEMP_SENSOR_ADDRESS);
-MPU9250 IMU(Wire, IMU_ADDRESS);
+Adafruit_BNO055 IMU(IMU_ADDRESS);
 
 /*Functions------------------------------------------------------------*/
 /**
@@ -51,10 +51,8 @@ bool initSensors(void)
             datalog.write("SENSOR LOG DATA\n");
             datalog.write("Time (ms),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
             "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
-            "Temperature Sensor - Temperature (C),IMU - Acceleration X (g),IMU - Acceleration Y (g),"
-            "IMU - Acceleration Z (g),IMU - Angular Velocity X (rad/s),IMU - Angular Velocity Y (rad/s),"
-            "IMU - Angular Velocity Z (rad/s),IMU - Magnetism X (uT),IMU - Magnetism Y (uT),"
-            "IMU - Magnetism Z (uT),GPS - Latitude (DDM),GPS - Longitude (DDM),GPS - Altitude (m)\n");
+            "Temperature Sensor - Temperature (C),IMU - Heading (o),IMU - Pitch (o),"
+            "IMU - Roll (o) \n");
         }
     }
 
@@ -91,15 +89,12 @@ bool initSensors(void)
     #ifdef TESTING
     SerialUSB.println("Initializing IMU");
     #endif
-    int error = 0;
-    error = IMU.begin();
-    if (error < 0) {
-        status = false;
-        #ifdef TESTING
-        SerialUSB.print("ERROR: IMU initialization failed! Error code ");
-        SerialUSB.println(error);
-        #endif
+    bool status_IMU = IMU.begin();
+    delay(7); //TODO investigate this
+    if(!status_IMU){
+        SerialUSB.print("ERROR: IMU initialization failed!");
     }
+    IMU.setExtCrystalUse(true);
 
     /*init GPS*/
     #ifdef TESTING
@@ -183,16 +178,11 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
     #ifdef TESTING
     SerialUSB.println("Polling IMU");
     #endif
-    IMU.readSensor();
-    IMU_data[0] = IMU.getAccelX_mss() / EARTHS_GRAVITY; //convert to g
-    IMU_data[1] = IMU.getAccelY_mss() / EARTHS_GRAVITY; //convert to g
-    IMU_data[2] = IMU.getAccelZ_mss() / EARTHS_GRAVITY; //convert to g
-    IMU_data[3] = IMU.getGyroX_rads();
-    IMU_data[4] = IMU.getGyroY_rads();
-    IMU_data[5] = IMU.getGyroZ_rads();
-    IMU_data[6] = IMU.getMagX_uT();
-    IMU_data[7] = IMU.getMagY_uT();
-    IMU_data[8] = IMU.getMagZ_uT();
+    sensors_event_t event; //TODO what is this
+    IMU.getEvent(&event);
+    IMU_data[0] = event.orientation.x;
+    IMU_data[1] = event.orientation.y;
+    IMU_data[2] = event.orientation.z;
 
     #ifdef TESTING
     SerialUSB.println("Polling GPS");
@@ -260,24 +250,12 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     SerialUSB.println(bar_data[1]);
     SerialUSB.print("Temperature sensor temperature (C): ");
     SerialUSB.println(*temp_sensor_data);
-    SerialUSB.print("IMU acceleration X (g):             ");
+    SerialUSB.print("IMU X                               "); //TODO this isn't actually x, y, z
     SerialUSB.println(IMU_data[0]);
-    SerialUSB.print("IMU acceleration Y (g):             ");
+    SerialUSB.print("IMU Y                               ");
     SerialUSB.println(IMU_data[1]);
-    SerialUSB.print("IMU acceleration Z (g):             ");
+    SerialUSB.print("IMU Z                               ");
     SerialUSB.println(IMU_data[2]);
-    SerialUSB.print("IMU angular velocity X (rad/s):     ");
-    SerialUSB.println(IMU_data[3]);
-    SerialUSB.print("IMU angular velocity Y (rad/s):     ");
-    SerialUSB.println(IMU_data[4]);
-    SerialUSB.print("IMU angular velocity Z (rad/s):     ");
-    SerialUSB.println(IMU_data[5]);
-    SerialUSB.print("IMU magnetism X (uT):               ");
-    SerialUSB.println(IMU_data[6]);
-    SerialUSB.print("IMU magnetism X (uT):               ");
-    SerialUSB.println(IMU_data[7]);
-    SerialUSB.print("IMU magnetism X (uT):               ");
-    SerialUSB.println(IMU_data[8]);
     SerialUSB.print("GPS latitude:                       ");
     SerialUSB.println(GPS_data[0]);
     SerialUSB.print("GPS longitude:                      ");
