@@ -14,5 +14,6 @@
 /*Functions------------------------------------------------------------*/
 
 void calculateValues(float*, float*, float*, float*, float*, float*, float*, unsigned long*);
+float calculatePressureAverage(float*);
 
 #endif

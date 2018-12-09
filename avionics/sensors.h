@@ -25,6 +25,7 @@
 #define IMU_DATA_ARRAY_SIZE     3
 #define GPS_DATA_ARRAY_SIZE     3
 #define GPS_FIELD_LENGTH        20
+#define PRESSURE_AVG_SET_SIZE   15
 
 /*Variables------------------------------------------------------------*/
 
@@ -60,5 +61,6 @@ bool initSensors(void);
 float barSensorInit(void);
 void pollSensors(unsigned long*, float*, float*, float*, float*, float*);
 void logData(unsigned long *, float*, float*, float*, float*, float*, FlightStates, float, float);
+void addToPressureSet(float*, float); 
 
 #endif

@@ -42,3 +42,11 @@ void calculateValues(float acc_data[], float bar_data[],
     *altitude = 44330.0 * (1 - powf(bar_data[0] / *baseline_pressure, 1 / 5.255));
     *delta_altitude = (*altitude - *prev_altitude) * MILLISECONDS / *delta_time;
 }
+
+float calculatePressureAverage(float* average_set){
+    float sum = 0;
+    for(int i = 0; i < PRESSURE_AVG_SET_SIZE; i++){
+        sum = sum + average_set[i];
+    }
+    return sum / PRESSURE_AVG_SET_SIZE; 
+}

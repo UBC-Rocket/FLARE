@@ -272,3 +272,10 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     SerialUSB.println("");
     #endif
 }
+
+void addToPressureSet(float* average_set, float data){
+    for(int i = PRESSURE_AVG_SET_SIZE-1; i > 0; i--){
+        average_set[i] = average_set[i-1];
+    }
+    average_set[0] = data;
+}
