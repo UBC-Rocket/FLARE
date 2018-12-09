@@ -288,7 +288,7 @@ void calculateValues(float acc_data[], float bar_data[], float* abs_accel,
 
 
 void processRadioData(unsigned long *timestamp, float acc_data[], float bar_data[],
-    float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH], FlightStates state, float altitude){
+    float *temp_sensor_data, float IMU_data[], float* GPS_data, FlightStates state, float altitude){
 
    float time = *timestamp;
     sendRadioData(time, 't');
@@ -313,10 +313,10 @@ void processRadioData(unsigned long *timestamp, float acc_data[], float bar_data
     sendRadioData((float) state, UID_state);
 
 
-    // to float doesnt work fack
-    // sendRadioData(toFloat(GPS_data[0]), UID_GPS_lat);
-    // sendRadioData(toFloat(GPS_data[1]), UID_GPS_long); 
-    // sendRadioData(toFloat(GPS_data[2]), UID_GPS_alt);
+    // gps_data is already float?
+    sendRadioData(GPS_data[0], UID_GPS_lat);
+    sendRadioData(GPS_data[1], UID_GPS_long); 
+    sendRadioData(GPS_data[2], UID_GPS_alt);
             
 }
 
