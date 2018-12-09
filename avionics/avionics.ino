@@ -19,6 +19,8 @@ File radiolog;
   * @param  None
   * @return None
   */
+
+
 void setup()
 {
     bool status = true;
@@ -97,9 +99,7 @@ void loop()
         pollSensors(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
         addToPressureSet(pressure_set, bar_data[0]);
         average_pressure = calculatePressureAverage(pressure_set);
-        SerialUSB.print("Floating average  :: ");
-        SerialUSB.println(average_pressure);
-        calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &prev_delta_altitude, &baseline_pressure, &delta_time);
+        calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &prev_delta_altitude, &baseline_pressure, &delta_time, average_pressure);
         stateMachine(&altitude, &delta_altitude, &prev_altitude, bar_data, &baseline_pressure, &ground_altitude, &state);
         logData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure);
     }

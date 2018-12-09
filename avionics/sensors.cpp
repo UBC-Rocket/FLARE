@@ -276,6 +276,9 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
 void addToPressureSet(float* average_set, float data){
     for(int i = PRESSURE_AVG_SET_SIZE-1; i > 0; i--){
         average_set[i] = average_set[i-1];
+        //so it isn't totally wrong for the first couple values
+        if(average_set[i-1] == 0)
+            average_set[i] = data; 
     }
     average_set[0] = data;
 }

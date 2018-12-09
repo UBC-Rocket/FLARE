@@ -34,12 +34,12 @@
  * @return void.
  */
 void calculateValues(float acc_data[], float bar_data[],
-                    float* prev_altitude, float* altitude, float* delta_altitude, float*prev_delta_altitude, float* baseline_pressure, unsigned long *delta_time)
+                    float* prev_altitude, float* altitude, float* delta_altitude, float*prev_delta_altitude, float* baseline_pressure, unsigned long *delta_time, float average_pressure)
 {
     //*abs_accel = sqrtf(powf(acc_data[0], 2) + powf(acc_data[1], 2) + powf(acc_data[2]), 2);
     *prev_altitude = *altitude;
     *prev_delta_altitude = *delta_altitude;
-    *altitude = 44330.0 * (1 - powf(bar_data[0] / *baseline_pressure, 1 / 5.255));
+    *altitude = 44330.0 * (1 - powf(average_pressure / *baseline_pressure, 1 / 5.255));
     *delta_altitude = (*altitude - *prev_altitude) * MILLISECONDS / *delta_time;
 }
 

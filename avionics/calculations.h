@@ -4,6 +4,7 @@
 
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
+#include "sensors.h"
 
 /*Constants------------------------------------------------------------*/
 
@@ -13,7 +14,7 @@
 
 /*Functions------------------------------------------------------------*/
 
-void calculateValues(float*, float*, float*, float*, float*, float*, float*, unsigned long*);
+void calculateValues(float*, float*, float*, float*, float*, float*, float*, unsigned long*, float);
 float calculatePressureAverage(float*);
 
 #endif
