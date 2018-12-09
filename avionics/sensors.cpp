@@ -3,9 +3,9 @@
 /*Includes------------------------------------------------------------*/
 #include "sensors.h"
 #include "SparkFun_LIS331.h"        //accelerometer
-#include "MS5803_01.h"    //barometer
+#include "MS5803_01.h"              //barometer
 #include "SparkFunTMP102.h"         //temp sensor
-#include "MPU9250.h"                //IMU
+#include "Adafruit_BNO055.h"        //IMU
 #include "Venus638FLPx.h"           //GPS
 
 #include <Arduino.h>
@@ -19,7 +19,7 @@ File datalog;
 LIS331 accelerometer;
 MS_5803 barometer(1024);
 TMP102 temp_sensor(TEMP_SENSOR_ADDRESS);
-MPU9250 IMU(Wire, IMU_ADDRESS);
+Adafruit_BNO055 IMU(IMU_ADDRESS);
 
 /*Functions------------------------------------------------------------*/
 /**
@@ -49,12 +49,10 @@ bool initSensors(void)
             #endif
         } else {
             datalog.write("SENSOR LOG DATA\n");
-            datalog.write("Time (ms),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
+            datalog.write("Time (ms), State, Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
             "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
-            "Temperature Sensor - Temperature (C),IMU - Acceleration X (g),IMU - Acceleration Y (g),"
-            "IMU - Acceleration Z (g),IMU - Angular Velocity X (rad/s),IMU - Angular Velocity Y (rad/s),"
-            "IMU - Angular Velocity Z (rad/s),IMU - Magnetism X (uT),IMU - Magnetism Y (uT),"
-            "IMU - Magnetism Z (uT),GPS - Latitude (DDM),GPS - Longitude (DDM),GPS - Altitude (m)\n");
+            "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
+            "IMU - Heading (o),IMU - Pitch (o),IMU - Rol (o),GPS - latitude,GPS - longitude,GPS - altitude\n");
         }
     }
 
@@ -71,8 +69,15 @@ bool initSensors(void)
     #endif
     //barometer.reset();
     //barometer.begin();
-    barometer.initializeMS_5803(false); //true if Serial Print Everything
-
+    #ifdef TESTING
+    if (!barometer.initializeMS_5803(true)) {
+        return false;
+    }
+    #else
+    if (!barometer.initializeMS_5803(false)) {
+        return false;
+    }
+    #endif
 
     /*init temp sensor*/
     #ifdef TESTING
@@ -84,27 +89,21 @@ bool initSensors(void)
     #ifdef TESTING
     SerialUSB.println("Initializing IMU");
     #endif
-    int error = 0;
-    error = IMU.begin();
-    if (error < 0) {
-        status = false;
-        #ifdef TESTING
-        SerialUSB.print("ERROR: IMU initialization failed! Error code ");
-        SerialUSB.println(error);
-        #endif
+    bool status_IMU = IMU.begin();
+    delay(7); //TODO investigate this
+    if(!status_IMU){
+        SerialUSB.print("ERROR: IMU initialization failed!");
     }
+    IMU.setExtCrystalUse(true);
 
     /*init GPS*/
     #ifdef TESTING
     SerialUSB.println("Initializing GPS");
     #endif
-    SerialGPS.begin(9600);
-    while (!SerialGPS) {}   //TODO this can hang if baud rate is different change to delay?
-    SerialGPS.write(GPS_reset_defaults, sizeof(GPS_reset_defaults));
-    SerialGPS.write(GPS_set_baud_rate, sizeof(GPS_set_baud_rate));
-    SerialGPS.end();
-    SerialGPS.begin(115200);
+    SerialGPS.begin(4800);
     while (!SerialGPS) {}
+    SerialGPS.write(GPS_reset_defaults, sizeof(GPS_reset_defaults));
+    // SerialGPS.write(GPS_set_baud_rate, sizeof(GPS_set_baud_rate));
     SerialGPS.write(GPS_set_NMEA_message, sizeof(GPS_set_NMEA_message));
     SerialGPS.write(GPS_set_update_rate, sizeof(GPS_set_update_rate));
 
@@ -138,10 +137,9 @@ float barSensorInit(void){
   * @return None
   */
 void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
-                float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH])
+                float *temp_sensor_data, float IMU_data[], float GPS_data[])
 {
     int16_t x, y, z;
-    char sentence[SENTENCE_SIZE];
 
     *timestamp = millis();
 
@@ -156,7 +154,12 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
     #ifdef TESTING
     SerialUSB.println("Polling barometer");
     #endif
-    barometer.readSensor();
+    bool bar_flag = barometer.readSensor();
+
+    #ifdef TESTING
+    if(!bar_flag)
+        SerialUSB.println("BAROMETER FAILED READING");
+    #endif
     //bar_data[0] = barometer.getPressure(ADC_4096);
     //bar_data[1] = barometer.getTemperature(CELSIUS, ADC_512);
     bar_data[0] = barometer.pressure();
@@ -171,24 +174,17 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
     #ifdef TESTING
     SerialUSB.println("Polling IMU");
     #endif
-    IMU.readSensor();
-    IMU_data[0] = IMU.getAccelX_mss() / EARTHS_GRAVITY; //convert to g
-    IMU_data[1] = IMU.getAccelY_mss() / EARTHS_GRAVITY; //convert to g
-    IMU_data[2] = IMU.getAccelZ_mss() / EARTHS_GRAVITY; //convert to g
-    IMU_data[3] = IMU.getGyroX_rads();
-    IMU_data[4] = IMU.getGyroY_rads();
-    IMU_data[5] = IMU.getGyroZ_rads();
-    IMU_data[6] = IMU.getMagX_uT();
-    IMU_data[7] = IMU.getMagY_uT();
-    IMU_data[8] = IMU.getMagZ_uT();
+    sensors_event_t event; //TODO what is this
+    IMU.getEvent(&event);
+    IMU_data[0] = event.orientation.x;
+    IMU_data[1] = event.orientation.y;
+    IMU_data[2] = event.orientation.z;
 
     #ifdef TESTING
     SerialUSB.println("Polling GPS");
     #endif
-    if (getGPSData(sentence)) {
-        getGPSField(sentence, GPS_data[0], 2); //latitude
-        getGPSField(sentence, GPS_data[1], 4); //longitude
-        getGPSField(sentence, GPS_data[2], 9); //altitude
+    if (updateGPS()) {
+        getGPS(GPS_data);
     }
 }
 
@@ -203,13 +199,16 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
   * @return None
   */
 void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
-            float *temp_sensor_data, float IMU_data[], char GPS_data[][GPS_FIELD_LENGTH])
+            float *temp_sensor_data, float IMU_data[], float GPS_data[],
+            FlightStates state, float altitude, float baseline_pressure)
 {
     /*write data to SD card*/
     #ifdef TESTING
     SerialUSB.println("Writing to SD card");
     #endif
     datalog.print(*timestamp);
+    datalog.print(",");
+    datalog.print(state);
     datalog.print(",");
     for (unsigned int i = 0; i < ACC_DATA_ARRAY_SIZE; i++) {
        datalog.print(acc_data[i]);
@@ -219,6 +218,10 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
         datalog.print(bar_data[i]);
         datalog.print(",");
     }
+    datalog.print(baseline_pressure);
+    datalog.print(",");
+    datalog.print(altitude);
+    datalog.print(",");
     datalog.print(*temp_sensor_data);
     datalog.print(",");
     for (unsigned int i = 0; i < IMU_DATA_ARRAY_SIZE; i++) {
@@ -236,6 +239,8 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     #ifdef TESTING
     SerialUSB.print("Time (ms):                          ");
     SerialUSB.println(*timestamp);
+    SerialUSB.print("State:                          ");
+    SerialUSB.println(state);
     SerialUSB.print("Accelerometer acceleration X (g):   ");
     SerialUSB.println(acc_data[0]);
     SerialUSB.print("Accelerometer acceleration Y (g):   ");
@@ -246,26 +251,18 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     SerialUSB.println(bar_data[0]);
     SerialUSB.print("Barometer temperature (C):          ");
     SerialUSB.println(bar_data[1]);
+    SerialUSB.print("Baseline Pressure (mbar):          ");
+    SerialUSB.println(baseline_pressure);
+    SerialUSB.print("Altitude (m):          ");
+    SerialUSB.println(altitude);
     SerialUSB.print("Temperature sensor temperature (C): ");
     SerialUSB.println(*temp_sensor_data);
-    SerialUSB.print("IMU acceleration X (g):             ");
+    SerialUSB.print("IMU X                               "); //TODO this isn't actually x, y, z
     SerialUSB.println(IMU_data[0]);
-    SerialUSB.print("IMU acceleration Y (g):             ");
+    SerialUSB.print("IMU Y                               ");
     SerialUSB.println(IMU_data[1]);
-    SerialUSB.print("IMU acceleration Z (g):             ");
+    SerialUSB.print("IMU Z                               ");
     SerialUSB.println(IMU_data[2]);
-    SerialUSB.print("IMU angular velocity X (rad/s):     ");
-    SerialUSB.println(IMU_data[3]);
-    SerialUSB.print("IMU angular velocity Y (rad/s):     ");
-    SerialUSB.println(IMU_data[4]);
-    SerialUSB.print("IMU angular velocity Z (rad/s):     ");
-    SerialUSB.println(IMU_data[5]);
-    SerialUSB.print("IMU magnetism X (uT):               ");
-    SerialUSB.println(IMU_data[6]);
-    SerialUSB.print("IMU magnetism X (uT):               ");
-    SerialUSB.println(IMU_data[7]);
-    SerialUSB.print("IMU magnetism X (uT):               ");
-    SerialUSB.println(IMU_data[8]);
     SerialUSB.print("GPS latitude:                       ");
     SerialUSB.println(GPS_data[0]);
     SerialUSB.print("GPS longitude:                      ");
