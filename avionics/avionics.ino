@@ -97,7 +97,7 @@ void loop()
         delta_time = new_time - old_time;
         old_time = new_time;
         pollSensors(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
-        addToPressureSet(pressure_set, bar_data[0]);
+        addToPressureSet(pressure_set, bar_data[0]); 
         average_pressure = calculatePressureAverage(pressure_set);
         calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &prev_delta_altitude, &baseline_pressure, &delta_time, average_pressure);
         stateMachine(&altitude, &delta_altitude, &prev_altitude, bar_data, &baseline_pressure, &ground_altitude, &state);

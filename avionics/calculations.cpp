@@ -43,6 +43,11 @@ void calculateValues(float acc_data[], float bar_data[],
     *delta_altitude = (*altitude - *prev_altitude) * MILLISECONDS / *delta_time;
 }
 
+/*
+* @brief Calculates average pressure
+* @param float* average_set - the array of pressure data actively being used
+* @return float - the average of average set
+*/
 float calculatePressureAverage(float* average_set){
     float sum = 0;
     for(int i = 0; i < PRESSURE_AVG_SET_SIZE; i++){
