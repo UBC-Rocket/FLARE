@@ -7,14 +7,24 @@ LIS331::LIS331(void)
 {
 }
 
-void LIS331::begin(comm_mode mode)
+/*
+ * returns true if suceeded, false otherwise
+*/
+bool LIS331::begin(comm_mode mode)
 {
+  error = false;
   this->mode = mode;
   setPowerMode(NORMAL);
   axesEnable(true);
   uint8_t data = 0;
   for (int i = 0x21; i < 0x25; i++) LIS331_write(i,&data,1);
   for (int i = 0x30; i < 0x37; i++) LIS331_write(i,&data,1);
+  if(error)
+  {
+    error = false;
+    return false;
+  }
+  return true;
 }
 
 void LIS331::setI2CAddr(uint8_t address)
@@ -72,7 +82,10 @@ void LIS331::setODR(data_rate drate)
   LIS331_write(CTRL_REG1, &data, 1); // write the new value to CTRL_REG1
 }
 
-void LIS331::readAxes(int16_t &x, int16_t &y, int16_t &z)
+/*
+* Returns true if success, false otherwise
+*/
+bool LIS331::readAxes(int16_t &x, int16_t &y, int16_t &z)
 {
   uint8_t data[6]; // create a buffer for our incoming data
   LIS331_read(OUT_X_L, &data[0], 1);
@@ -91,6 +104,12 @@ void LIS331::readAxes(int16_t &x, int16_t &y, int16_t &z)
   x = x >> 4;
   y = y >> 4;
   z = z >> 4;
+  if(error)
+  {
+    error = false;
+    return false;
+  }
+  return true;
 }
 
 uint8_t LIS331::readReg(uint8_t reg_address)
@@ -369,7 +388,8 @@ void LIS331::LIS331_write(uint8_t reg_address, uint8_t *data, uint8_t len)
     {
       Wire.write(data[i]);
     }
-    Wire.endTransmission();
+    if(Wire.endTransmission())
+      error = true;
   }
   else
   {
@@ -391,8 +411,10 @@ void LIS331::LIS331_read(uint8_t reg_address, uint8_t *data, uint8_t len)
     // I2C read handling code
     Wire.beginTransmission(address);
     Wire.write(reg_address);
-    Wire.endTransmission();
-    Wire.requestFrom(address, len);
+    if(Wire.endTransmission())
+      error = true;
+    if(Wire.requestFrom(address, len) < len)
+      error = true;
     for (int i = 0; i<len; i++)
     {
       data[i] = Wire.read();

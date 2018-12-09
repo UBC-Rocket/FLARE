@@ -43,13 +43,13 @@ class LIS331
 
   // public functions
   LIS331();   // Constructor. Defers all functionality to .begin()
-  void begin(comm_mode mode);
+  bool begin(comm_mode mode);
   void setI2CAddr(uint8_t address);
   void setSPICSPin(uint8_t pin);
   void axesEnable(bool enable);
   void setPowerMode(power_mode pmode);
   void setODR(data_rate drate);
-  void readAxes(int16_t &x, int16_t &y, int16_t &z);
+  bool readAxes(int16_t &x, int16_t &y, int16_t &z);
   uint8_t readReg(uint8_t reg_address);
   float convertToG(int maxScale, int reading);
   void setHighPassCoeff(high_pass_cutoff_freq_cfg hpcoeff);
@@ -70,6 +70,7 @@ class LIS331
 
   private:
 
+  bool error;        //true if there's an error, false otherwise
   comm_mode mode;    // comms mode, I2C or SPI
   uint8_t address;   // I2C address
   uint8_t CSPin;

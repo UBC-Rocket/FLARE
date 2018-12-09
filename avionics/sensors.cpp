@@ -61,8 +61,13 @@ bool initSensors(void)
     SerialUSB.println("Initializing accelerometer");
     #endif
     accelerometer.setI2CAddr(ACCELEROMETER_ADDRESS);
-    accelerometer.begin(LIS331::USE_I2C);
-
+    if(!accelerometer.begin(LIS331::USE_I2C))
+    {
+        status = false;
+        #ifdef TESTING
+        SerialUSB.println("ERROR: Accelerometer initialization fail!");
+        #endif
+    }
     /*init barometer*/
     #ifdef TESTING
     SerialUSB.println("Initializing barometer");
@@ -146,7 +151,12 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
     #ifdef TESTING
     SerialUSB.println("Polling accelerometer");
     #endif
-    accelerometer.readAxes(x, y, z);
+    bool accel_flag = accelerometer.readAxes(x, y, z);
+    #ifdef TESTING
+    if(!accel_flag)
+        SerialUSB.println("ACCELEROMETER FAILED READING");
+    #endif
+
     acc_data[0] = accelerometer.convertToG(ACCELEROMETER_SCALE, x);
     acc_data[1] = accelerometer.convertToG(ACCELEROMETER_SCALE, y);
     acc_data[2] = accelerometer.convertToG(ACCELEROMETER_SCALE, z);
