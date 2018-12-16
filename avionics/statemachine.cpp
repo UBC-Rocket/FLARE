@@ -77,6 +77,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case ASCENT:    // checks for Mach threshold + apogee
+            digitalWrite(LED_BUILTIN,LOW);
             if (*delta_altitude > MACH_THRESHOLD) {
                 mach_count++;
                 if (mach_count >= MACH_CHECKS) {
@@ -92,6 +93,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 if (apogee_count >= APOGEE_CHECKS) {
                     //deploy drogue and payload
                     //delay to avoid pressure spikes
+                    digitalWrite(LED_BUILTIN,HIGH);
                     switchState(state, INITIAL_DESCENT);
                     apogee_count = 0;
                 }
@@ -119,6 +121,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 main_count ++;
                 if (main_count >= MAIN_CHECKS) {
                     //deploy main
+                    digitalWrite(LED_BUILTIN,LOW);
                     switchState(state, FINAL_DESCENT);
                     main_count = 0;
                 }
