@@ -1,6 +1,6 @@
 #include "commands.h"
-//#include <Arduino.h>
-#include "sensors.h"
+#include <Arduino.h>
+
 
 void doCommand(char command, FlightStates &state){
     switch (command){

@@ -3,7 +3,7 @@
 #define COMMANDS_H
 
 /*Includes------------------------------------------------------------*/
-#include "statemachine.h"
+#include "sensors.h"
 
 /*Constants------------------------------------------------------------*/
 
@@ -22,7 +22,7 @@
 
 
 /*Functions------------------------------------------------------------*/
-void doCommand(char command,FlightStates* state );
+void doCommand(char command,FlightStates& state );
 void sendRadioResponse(const char* response);
 
 

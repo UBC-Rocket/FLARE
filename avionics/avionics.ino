@@ -9,7 +9,7 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <i2c_t3.h>
-#include <SD.h>
+#include <SD.h> 
 #include <string.h>
 
 /*Variables------------------------------------------------------------*/
@@ -105,7 +105,7 @@ void loop()
                 sendRadioResponse(goodResponse);
                 #ifdef TESTING
                 SerialUSB.print(command);
-                doCommand(command[0],&state); 
+                //doCommand(command[0], &state); 
                 #endif
             }
             else{
