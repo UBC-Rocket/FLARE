@@ -4,6 +4,7 @@
 #include "sensors.h"
 #include "statemachine.h"
 #include "calculations.h"
+#include "commands.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -83,7 +84,10 @@ void loop()
     static FlightStates state = ARMED;
 
     static uint16_t radio_time_interval = 100;
-   // char *radio_data;
+    char command[RADIO_DATA_ARRAY_SIZE];
+    char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
+    const char goodResponse[] = {'G','x','x','x','x'};
+    const char badResponse[] = {'B','B','B','B','B'};
 
     if (SerialRadio.available()) {
         radiolog.print("Received Message: ");
@@ -91,11 +95,24 @@ void loop()
         SerialUSB.print("Received Message: ");
         #endif
         while (SerialRadio.available()) {
-            char command = SerialRadio.read();
+            for(int i = 0; i< RADIO_DATA_ARRAY_SIZE; i++){
+                command[i] = SerialRadio.read();
+            }
+            bool correctCommand = check(command);
+
+            if(correctCommand){
+                radiolog.print(goodResponse);
+                sendRadioResponse(goodResponse);
+                #ifdef TESTING
+                SerialUSB.print(command);
+                doCommand(command[0],&state); 
+                #endif
+            }
+            else{
+                radiolog.print(badResponse);
+                sendRadioResponse(badResponse);
+            } 
             radiolog.print(command);
-            #ifdef TESTING
-            SerialUSB.print(command);
-            #endif
         }
     }
 
@@ -117,7 +134,23 @@ void loop()
     }
 
 
+
+
+
     #ifdef TESTING
     delay(1000);
     #endif
+}
+
+//checks if all indexes are equal for radion commands 
+bool check(char *radioCommand)
+ {   
+    const char a0 = radioCommand[0];
+
+    for (int i = 1; i < 5; i++)      
+    {         
+        if (radioCommand[i] != a0)
+            return false;
+    }
+    return true;
 }

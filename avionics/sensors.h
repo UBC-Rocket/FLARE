@@ -30,6 +30,8 @@
 #define GPS_DATA_ARRAY_SIZE     3
 #define GPS_FIELD_LENGTH        20
 
+#define RADIO_DATA_ARRAY_SIZE   5
+
 /*Variables------------------------------------------------------------*/
 
 /*GPS initialization commands*/
