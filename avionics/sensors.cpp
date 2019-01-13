@@ -257,7 +257,7 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     SerialUSB.println(altitude);
     SerialUSB.print("Temperature sensor temperature (C): ");
     SerialUSB.println(*temp_sensor_data);
-    SerialUSB.print("IMU - Yaw:                          "); //TODO this isn't actually x, y, z
+    SerialUSB.print("IMU - Yaw:                          ");
     SerialUSB.println(IMU_data[0]);
     SerialUSB.print("IMU - Roll:                         ");
     SerialUSB.println(IMU_data[1]);
