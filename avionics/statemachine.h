@@ -23,12 +23,15 @@
 
 #define SEA_PRESSURE 1013.25
 
+#define APOGEE_DELAY 3000
+
 /*Variables------------------------------------------------------------*/
 enum FlightStates {
   STANDBY,
   ARMED,
   ASCENT,
   MACH_LOCK,
+  PRESSURE_DELAY,
   INITIAL_DESCENT,
   FINAL_DESCENT,
   LANDED
