@@ -105,7 +105,7 @@ void loop()
                 sendRadioResponse(goodResponse);
                 #ifdef TESTING
                 SerialUSB.print(command);
-                //doCommand(command[0], &state); 
+                doCommand(command[0], &state); 
                 #endif
             }
             else{
@@ -142,7 +142,7 @@ void loop()
     #endif
 }
 
-//checks if all indexes are equal for radion commands 
+//checks if all indexes are equal for radio commands 
 bool check(char *radioCommand)
  {   
     const char a0 = radioCommand[0];
