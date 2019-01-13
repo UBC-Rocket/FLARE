@@ -52,7 +52,7 @@ bool initSensors(void)
             datalog.write("Time (ms), State, Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
             "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
             "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
-            "IMU - Heading (o),IMU - Pitch (o),IMU - Rol (o),GPS - latitude,GPS - longitude,GPS - altitude\n");
+            "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude\n");
         }
     }
 
@@ -251,17 +251,17 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     SerialUSB.println(bar_data[0]);
     SerialUSB.print("Barometer temperature (C):          ");
     SerialUSB.println(bar_data[1]);
-    SerialUSB.print("Baseline Pressure (mbar):          ");
+    SerialUSB.print("Baseline Pressure (mbar):           ");
     SerialUSB.println(baseline_pressure);
-    SerialUSB.print("Altitude (m):          ");
+    SerialUSB.print("Altitude (m):                       ");
     SerialUSB.println(altitude);
     SerialUSB.print("Temperature sensor temperature (C): ");
     SerialUSB.println(*temp_sensor_data);
-    SerialUSB.print("IMU X                               "); //TODO this isn't actually x, y, z
+    SerialUSB.print("IMU - Yaw:                          ");
     SerialUSB.println(IMU_data[0]);
-    SerialUSB.print("IMU Y                               ");
+    SerialUSB.print("IMU - Roll:                         ");
     SerialUSB.println(IMU_data[1]);
-    SerialUSB.print("IMU Z                               ");
+    SerialUSB.print("IMU - Pitch:                        ");
     SerialUSB.println(IMU_data[2]);
     SerialUSB.print("GPS latitude:                       ");
     SerialUSB.println(GPS_data[0]);
