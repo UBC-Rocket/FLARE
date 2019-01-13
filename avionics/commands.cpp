@@ -35,7 +35,7 @@ void doCommand(char command, FlightStates &state){
 void sendRadioResponse(const char* response){
     //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly 
     
-      for(int i=0; i<4; i++)
+      for(int i=0; i<5; i++)
       {
           SerialRadio.write(response[i]);
       }
