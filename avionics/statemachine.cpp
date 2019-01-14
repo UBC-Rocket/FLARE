@@ -44,7 +44,7 @@ void switchState(FlightStates *curr_state, FlightStates new_state){
  * @return void.
  */
 void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_altitude, float bar_data[], float *baseline_pressure,
-    float *ground_altitude, FlightStates *state) {
+    float *ground_altitude, float ground_alt_arr[], FlightStates *state) {
     static int launch_count, armed_count, mach_count, mach_lock_count, apogee_count, main_count, land_count = 0;
 
     switch (*state) {
@@ -58,7 +58,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             }
             else{
                 launch_count = 0;
-                *baseline_pressure = groundAlt_update(&bar_data[0]);
+                *baseline_pressure = groundAlt_update(&bar_data[0], ground_alt_arr);
                 *ground_altitude = 44330.0 * (1 - powf(*baseline_pressure / SEA_PRESSURE, 1 / 5.255));
             }
             break;

@@ -65,9 +65,9 @@ void setup()
   */
 void loop()
 {
+    static bool loop_except_that_its_setup = false;
+
     unsigned long timestamp;
-    static float barometer_data_init = barSensorInit();
-    static float baseline_pressure = groundAlt_init(&barometer_data_init);  // IF YOU CAN'T DO THIS USE GLOBAL VAR
     static unsigned long old_time = 0; //ms
     static unsigned long new_time = 0; //ms
     unsigned long delta_time;
@@ -76,7 +76,30 @@ void loop()
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE], GPS_data[GPS_DATA_ARRAY_SIZE];
     static float abs_accel, prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude, average_pressure;
     static FlightStates state = ARMED;
-    static float pressure_set[PRESSURE_AVG_SET_SIZE] = {};//set of pressure values for a floating average
+    static float pressure_set[PRESSURE_AVG_SET_SIZE]; //set of pressure values for a floating average
+    static float ground_alt_arr[GROUND_ALT_SIZE];
+    static float baseline_pressure = barSensorInit();
+
+
+    if(!loop_except_that_its_setup) //loop setup
+    {
+        // static float baseline_pressure = barSensorInit();
+        //static float baseline_pressure = groundAlt_init(&barometer_data_init);  // IF YOU CAN'T DO THIS USE GLOBAL VAR
+
+        //initialize arrays
+        int i;
+        for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++)
+        {
+            pressure_set[i] = baseline_pressure;
+        }
+        for(i = 0; i < GROUND_ALT_SIZE; i++)
+        {
+            ground_alt_arr[i] = baseline_pressure;
+        }
+        loop_except_that_its_setup = true;
+    }
+
+
 
     if (SerialRadio.available()) {
         radiolog.print("Received Message: ");
@@ -97,10 +120,10 @@ void loop()
         delta_time = new_time - old_time;
         old_time = new_time;
         pollSensors(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
-        addToPressureSet(pressure_set, bar_data[0]); 
+        addToPressureSet(pressure_set, bar_data[0]);
         average_pressure = calculatePressureAverage(pressure_set);
-        calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &prev_delta_altitude, &baseline_pressure, &delta_time, average_pressure);
-        stateMachine(&altitude, &delta_altitude, &prev_altitude, bar_data, &baseline_pressure, &ground_altitude, &state);
+        calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &prev_delta_altitude, &baseline_pressure, &delta_time, &average_pressure);
+        stateMachine(&altitude, &delta_altitude, &prev_altitude, bar_data, &baseline_pressure, &ground_altitude, ground_alt_arr, &state);
         logData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure);
     }
 
