@@ -276,17 +276,24 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
 
 /*
 * @brief replaces oldest value in the average pressure set with a new peice of pressure data
-*  if values are 0 it replaces them with data. This allows for the average to be non jank imediatly 
-* @param float* average_set - the working array of pressure data used to calculate the average pressure. This is mutated by replacing the lodest value with data
+*  if values are 0 it replaces them with data. This allows for the average to be non jank imediatly
+* @param float* average_set - the working array of pressure data used to calculate the average pressure. This is mutated by replacing the lowest value with data
 * @param float data - the new data to add to the set
 * @return void
 */
 void addToPressureSet(float* average_set, float data){
-    for(int i = PRESSURE_AVG_SET_SIZE-1; i > 0; i--){
-        average_set[i] = average_set[i-1];
-        //so it isn't totally wrong for the first couple values
-        if(average_set[i-1] == 0)
-            average_set[i] = data; 
-    }
-    average_set[0] = data;
+    static int i = 0;
+    average_set[i] = data;
+    if(i >= PRESSURE_AVG_SET_SIZE - 1)
+        i = 0;
+    else
+        i++;
+
+    // for(int i = PRESSURE_AVG_SET_SIZE-1; i > 0; i--){
+    //     average_set[i] = average_set[i-1];
+    //     //so it isn't totally wrong for the first couple values
+    //     if(average_set[i-1] == 0)
+    //         average_set[i] = data;
+    // }
+    // average_set[0] = data;
 }

@@ -20,7 +20,7 @@
 #include <Arduino.h>
 
 /*Variables------------------------------------------------------------*/
-float GLOBAL_ground_alt_arr[ground_alt_size];
+//float GLOBAL_ground_alt_arr[ground_alt_size];
 //float prev_bar_data;
 
 /*Functions------------------------------------------------------------*/
@@ -29,28 +29,28 @@ float GLOBAL_ground_alt_arr[ground_alt_size];
  * @param  float *barometer_data_init - Sensor data from the barometer in millibars, read at startup.
  * @return float baseline_pressure_init - The moving average of the now initialized ground altitude array, in millibars.
  */
-float groundAlt_init(float *barometer_data_init){
-    int i = 0;
-    float baseline_pressure_init, sum_arr;
-    for (i = 0; i < ground_alt_size; i ++){
-        GLOBAL_ground_alt_arr[i] = *barometer_data_init;
-    }
-    sum_arr = groundAlt_arr_sum();
-//  prev_bar_data = *barometer_data_init;
-    baseline_pressure_init = (sum_arr / ground_alt_size);
-    return baseline_pressure_init;
-}
+// float groundAlt_init(float *barometer_data_init){
+//     int i = 0;
+//     float baseline_pressure_init, sum_arr;
+//     for (i = 0; i < ground_alt_size; i ++){
+//         GLOBAL_ground_alt_arr[i] = *barometer_data_init;
+//     }
+//     sum_arr = groundAlt_arr_sum();
+// //  prev_bar_data = *barometer_data_init;
+//     baseline_pressure_init = (sum_arr / ground_alt_size);
+//     return baseline_pressure_init;
+// }
 
 /* float groundAlt_arr_sum(){}
  * @brief  Sums the ground altitude array.
  * @param  GLOBAL_ground_alt_arr - Global ground altitude array, of size ground_alt_size.
  * @return float sum - The sum of the global ground altitude array.
  */
-float groundAlt_arr_sum(){
+float groundAlt_arr_sum(float ground_alt_arr[]){
     float sum = 0;
     int j;
-    for (j = 0; j < ground_alt_size; j++){
-        sum += GLOBAL_ground_alt_arr[j];
+    for (j = 0; j < GROUND_ALT_SIZE; j++){
+        sum += ground_alt_arr[j];
     }
     return sum;
 }
@@ -61,19 +61,19 @@ float groundAlt_arr_sum(){
  * @param  *bar_data - Sensor data from the barometer in millibars.
  * @return float baseline_pressure_update - The updated moving average of the ground altitude array, in millibars.
  */
-float groundAlt_update(float *bar_data){
-    static float prev_bar_data = GLOBAL_ground_alt_arr[ground_alt_size-1];  // Can you even do this??
+float groundAlt_update(float *bar_data, float ground_alt_arr[]){
+    static float prev_bar_data = ground_alt_arr[GROUND_ALT_SIZE-1];  // Can you even do this??
     // otherwise comment in code above to make it a global var if not possible
     static int k = 0;
     float sum_arr_update, baseline_pressure_update;
 
-    if (k >= ground_alt_size){
+    if (k >= GROUND_ALT_SIZE){
         k = 0;
     }
-    GLOBAL_ground_alt_arr[k] = prev_bar_data;
+    ground_alt_arr[k] = prev_bar_data;
     prev_bar_data = *bar_data;
-    sum_arr_update = groundAlt_arr_sum();
-    baseline_pressure_update = (sum_arr_update / ground_alt_size);
+    sum_arr_update = groundAlt_arr_sum(ground_alt_arr);
+    baseline_pressure_update = (sum_arr_update / GROUND_ALT_SIZE);
     k++;
     return baseline_pressure_update;
 }
