@@ -62,6 +62,6 @@ float barSensorInit(void);
 void pollSensors(unsigned long*, float*, float*, float*, float*, float*);
 void logData(unsigned long *, float*, float*, float*, float*, float*, FlightStates, float, float);
 void addToPressureSet(float*, float);
-void
+
 
 #endif
