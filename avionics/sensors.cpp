@@ -75,12 +75,16 @@ bool initSensors(void)
     //barometer.reset();
     //barometer.begin();
 
+    #ifdef TESTING
     if (!barometer.initializeMS_5803(true)) {
-        status = false;
-        #ifdef TESTING
+        return false;
         SerialUSB.println("ERROR: Barometer initialization fail!");
-        #endif
     }
+    #else
+    if (!barometer.initializeMS_5803(false)) {
+        return false;
+    }
+    #endif
 
 
     /*init temp sensor*/
