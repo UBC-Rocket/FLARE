@@ -92,7 +92,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 if (apogee_count >= APOGEE_CHECKS) {
                     //deploy drogue and payload
                     //delay to avoid pressure spikes
-                    switchState(state, INITIAL_DESCENT);
+                    switchState(state, PRESSURE_DELAY);
                     apogee_count = 0;
                 }
             }
@@ -114,6 +114,14 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             }
             break;
 
+        case PRESSURE_DELAY:
+            static unsigned long delay_start = millis();
+            if((millis() - delay_start) >= APOGEE_DELAY)
+            {
+                switchState(state, INITIAL_DESCENT);
+            }
+            break;
+                
         case INITIAL_DESCENT:
             if (*altitude < FINAL_DESCENT_THRESHOLD) {
                 main_count ++;

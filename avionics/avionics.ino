@@ -80,7 +80,7 @@ void loop()
 
     float acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE], GPS_data[GPS_DATA_ARRAY_SIZE];
-    static float abs_accel, prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
+    static float prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
     static FlightStates state = ARMED;
 
     static uint16_t radio_time_interval = 100;
@@ -124,7 +124,7 @@ void loop()
     }
 
     new_time = millis();
-    if ((new_time - old_time) > time_interval) {
+    if ((new_time - old_time) >= time_interval) {
         delta_time = new_time - old_time;
         old_time = new_time;
         pollSensors(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
