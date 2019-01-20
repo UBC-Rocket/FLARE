@@ -243,35 +243,35 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     SerialUSB.println(*timestamp);
     SerialUSB.print("State:                          ");
     SerialUSB.println(state);
-    SerialUSB.print("Accelerometer acceleration X (g):   ");
-    SerialUSB.println(acc_data[0]);
-    SerialUSB.print("Accelerometer acceleration Y (g):   ");
-    SerialUSB.println(acc_data[1]);
-    SerialUSB.print("Accelerometer acceleration Z (g):   ");
-    SerialUSB.println(acc_data[2]);
-    SerialUSB.print("Barometer pressure (mbar):          ");
-    SerialUSB.println(bar_data[0]);
-    SerialUSB.print("Barometer temperature (C):          ");
-    SerialUSB.println(bar_data[1]);
-    SerialUSB.print("Baseline Pressure (mbar):          ");
-    SerialUSB.println(baseline_pressure);
-    SerialUSB.print("Altitude (m):          ");
-    SerialUSB.println(altitude);
-    SerialUSB.print("Temperature sensor temperature (C): ");
-    SerialUSB.println(*temp_sensor_data);
-    SerialUSB.print("IMU X                               "); //TODO this isn't actually x, y, z
-    SerialUSB.println(IMU_data[0]);
-    SerialUSB.print("IMU Y                               ");
-    SerialUSB.println(IMU_data[1]);
-    SerialUSB.print("IMU Z                               ");
-    SerialUSB.println(IMU_data[2]);
-    SerialUSB.print("GPS latitude:                       ");
-    SerialUSB.println(GPS_data[0]);
-    SerialUSB.print("GPS longitude:                      ");
-    SerialUSB.println(GPS_data[1]);
-    SerialUSB.print("GPS altitude:                       ");
-    SerialUSB.println(GPS_data[2]);
-    SerialUSB.println("");
+    // SerialUSB.print("Accelerometer acceleration X (g):   ");
+    // SerialUSB.println(acc_data[0]);
+    // SerialUSB.print("Accelerometer acceleration Y (g):   ");
+    // SerialUSB.println(acc_data[1]);
+    // SerialUSB.print("Accelerometer acceleration Z (g):   ");
+    // SerialUSB.println(acc_data[2]);
+    // SerialUSB.print("Barometer pressure (mbar):          ");
+    // SerialUSB.println(bar_data[0]);
+    // SerialUSB.print("Barometer temperature (C):          ");
+    // SerialUSB.println(bar_data[1]);
+    // SerialUSB.print("Baseline Pressure (mbar):          ");
+    // SerialUSB.println(baseline_pressure);
+    // SerialUSB.print("Altitude (m):          ");
+    // SerialUSB.println(altitude);
+    // SerialUSB.print("Temperature sensor temperature (C): ");
+    // SerialUSB.println(*temp_sensor_data);
+    // SerialUSB.print("IMU X                               "); //TODO this isn't actually x, y, z
+    // SerialUSB.println(IMU_data[0]);
+    // SerialUSB.print("IMU Y                               ");
+    // SerialUSB.println(IMU_data[1]);
+    // SerialUSB.print("IMU Z                               ");
+    // SerialUSB.println(IMU_data[2]);
+    // SerialUSB.print("GPS latitude:                       ");
+    // SerialUSB.println(GPS_data[0]);
+    // SerialUSB.print("GPS longitude:                      ");
+    // SerialUSB.println(GPS_data[1]);
+    // SerialUSB.print("GPS altitude:                       ");
+    // SerialUSB.println(GPS_data[2]);
+    // SerialUSB.println("");
     #endif
 }
 
@@ -290,34 +290,34 @@ void calculateValues(float acc_data[], float bar_data[], float* abs_accel,
 void processRadioData(unsigned long *timestamp, float acc_data[], float bar_data[],
     float *temp_sensor_data, float IMU_data[], float* GPS_data, FlightStates state, float altitude){
 
-   float time = *timestamp;
-    sendRadioData(time, 't');
+//    float time = *timestamp;
+//     sendRadioData(time, 't');
 
-    sendRadioData(acc_data[0], UID_acc_acc_x);
-    sendRadioData(acc_data[1], UID_acc_acc_y);
-    sendRadioData(acc_data[2], UID_acc_acc_z);
+//     sendRadioData(acc_data[0], UID_acc_acc_x);
+//     sendRadioData(acc_data[1], UID_acc_acc_y);
+//     sendRadioData(acc_data[2], UID_acc_acc_z);
 
-    sendRadioData(bar_data[0], UID_bar_pres);
-    sendRadioData(bar_data[1], UID_bar_temp);
+//     sendRadioData(bar_data[0], UID_bar_pres);
+//     sendRadioData(bar_data[1], UID_bar_temp);
 
-    sendRadioData(IMU_data[0], UID_IMU_acc_x);
-    sendRadioData(IMU_data[1], UID_IMU_acc_y);
-    sendRadioData(IMU_data[2], UID_IMU_acc_z);
-    sendRadioData(IMU_data[3], UID_IMU_gyro_x);
-    sendRadioData(IMU_data[4], UID_IMU_gyro_y);
-    sendRadioData(IMU_data[5], UID_IMU_gyro_z);
-    sendRadioData(IMU_data[6], UID_IMU_mag_x);
-    sendRadioData(IMU_data[7], UID_IMU_mag_y);
-    sendRadioData(IMU_data[8], UID_IMU_mag_z);
-    sendRadioData( altitude, UID_altitude);
-    sendRadioData((float) state, UID_state);
+//     sendRadioData(IMU_data[0], UID_IMU_acc_x);
+//     sendRadioData(IMU_data[1], UID_IMU_acc_y);
+//     sendRadioData(IMU_data[2], UID_IMU_acc_z);
+//     sendRadioData(IMU_data[3], UID_IMU_gyro_x);
+//     sendRadioData(IMU_data[4], UID_IMU_gyro_y);
+//     sendRadioData(IMU_data[5], UID_IMU_gyro_z);
+//     sendRadioData(IMU_data[6], UID_IMU_mag_x);
+//     sendRadioData(IMU_data[7], UID_IMU_mag_y);
+//     sendRadioData(IMU_data[8], UID_IMU_mag_z);
+//     sendRadioData( altitude, UID_altitude);
+//     sendRadioData((float) state, UID_state);
     
 
 
-    // gps_data is already float?
-    sendRadioData(GPS_data[0], UID_GPS_lat);
-    sendRadioData(GPS_data[1], UID_GPS_long); 
-    sendRadioData(GPS_data[2], UID_GPS_alt);
+//     // gps_data is already float?
+//     sendRadioData(GPS_data[0], UID_GPS_lat);
+//     sendRadioData(GPS_data[1], UID_GPS_long); 
+//     sendRadioData(GPS_data[2], UID_GPS_alt);
             
 }
 

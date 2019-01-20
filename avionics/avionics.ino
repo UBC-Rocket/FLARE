@@ -86,11 +86,11 @@ void loop()
     static uint16_t radio_time_interval = 100;
     char command[RADIO_DATA_ARRAY_SIZE];
     char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
-    const char goodResponse[] = {'G','x','x','x','x'};
+    char goodResponse[] = {'G','x','x','x','x'};
     const char badResponse[] = {'B','B','B','B','B'};
 
     if (SerialRadio.available()) {
-        radiolog.print("Received Message: ");
+        //radiolog.print("Received Message: ");
         #ifdef TESTING
         SerialUSB.print("Received Message: ");
         #endif
@@ -101,18 +101,25 @@ void loop()
             bool correctCommand = check(command);
 
             if(correctCommand){
-                radiolog.print(goodResponse);
-                sendRadioResponse(goodResponse);
+               // radiolog.print(goodResponse);
+               for(int i =1; i<5; i++)
+               {
+                   goodResponse[i] = command[0];
+               }
                 #ifdef TESTING
-                SerialUSB.print(command);
+                SerialUSB.println(command);
                 doCommand(command[0], &state); 
                 #endif
+
+                sendRadioResponse(goodResponse);
+                SerialUSB.println(goodResponse);
             }
             else{
-                radiolog.print(badResponse);
+                //radiolog.print(badResponse);
+                SerialUSB.println(command);
+                SerialUSB.println(goodResponse);
                 sendRadioResponse(badResponse);
             } 
-            radiolog.print(command);
         }
     }
 

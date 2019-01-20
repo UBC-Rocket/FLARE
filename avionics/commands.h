@@ -22,7 +22,7 @@
 
 
 /*Functions------------------------------------------------------------*/
-void doCommand(char command,FlightStates& state );
+void doCommand(char command,FlightStates * state );
 void sendRadioResponse(const char* response);
 
 
