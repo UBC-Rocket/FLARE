@@ -9,7 +9,7 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <i2c_t3.h>
-#include <SD.h> 
+#include <SD.h>
 #include <string.h>
 
 /*Variables------------------------------------------------------------*/
@@ -108,7 +108,7 @@ void loop()
                }
                 #ifdef TESTING
                 SerialUSB.println(command);
-                doCommand(command[0], &state); 
+                doCommand(command[0], &state);
                 #endif
 
                 sendRadioResponse(goodResponse);
@@ -119,7 +119,7 @@ void loop()
                 SerialUSB.println(command);
                 SerialUSB.println(goodResponse);
                 sendRadioResponse(badResponse);
-            } 
+            }
         }
     }
 
@@ -133,7 +133,7 @@ void loop()
         logData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure);
     }
 
-    
+
     radio_new_time = millis();
     if ( (radio_new_time - radio_old_time) > radio_time_interval ){
         radio_old_time = radio_new_time;
@@ -149,13 +149,13 @@ void loop()
     #endif
 }
 
-//checks if all indexes are equal for radio commands 
+//checks if all indexes are equal for radio commands
 bool check(char *radioCommand)
- {   
+ {
     const char a0 = radioCommand[0];
 
-    for (int i = 1; i < 5; i++)      
-    {         
+    for (int i = 1; i < 5; i++)
+    {
         if (radioCommand[i] != a0)
             return false;
     }
