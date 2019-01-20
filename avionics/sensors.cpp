@@ -6,7 +6,7 @@
 #include "MS5803_01.h"              //barometer
 #include "SparkFunTMP102.h"         //temp sensor
 #include "Adafruit_BNO055.h"        //IMU
-#include "Venus638FLPx.h"           //GPS
+#include "Venus638FLPx.h"              //GPS
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -52,7 +52,7 @@ bool initSensors(void)
             datalog.write("Time (ms), State, Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
             "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
             "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
-            "IMU - Heading (o),IMU - Pitch (o),IMU - Rol (o),GPS - latitude,GPS - longitude,GPS - altitude\n");
+            "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude\n");
         }
     }
 
@@ -74,15 +74,14 @@ bool initSensors(void)
     #endif
     //barometer.reset();
     //barometer.begin();
-    #ifdef TESTING
+
     if (!barometer.initializeMS_5803(true)) {
-        return false;
+        status = false;
+        #ifdef TESTING
+        SerialUSB.println("ERROR: Barometer initialization fail!");
+        #endif
     }
-    #else
-    if (!barometer.initializeMS_5803(false)) {
-        return false;
-    }
-    #endif
+
 
     /*init temp sensor*/
     #ifdef TESTING
@@ -151,7 +150,7 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
     #ifdef TESTING
     SerialUSB.println("Polling accelerometer");
     #endif
-    bool accel_flag = accelerometer.readAxes(x, y, z);
+    bool accel_flag = accelerometer.readAxes(x, y, z); //true if success
     #ifdef TESTING
     if(!accel_flag)
         SerialUSB.println("ACCELEROMETER FAILED READING");
@@ -249,7 +248,7 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     #ifdef TESTING
     SerialUSB.print("Time (ms):                          ");
     SerialUSB.println(*timestamp);
-    SerialUSB.print("State:                          ");
+    SerialUSB.print("State:                              ");
     SerialUSB.println(state);
     SerialUSB.print("Accelerometer acceleration X (g):   ");
     SerialUSB.println(acc_data[0]);
@@ -261,17 +260,17 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     SerialUSB.println(bar_data[0]);
     SerialUSB.print("Barometer temperature (C):          ");
     SerialUSB.println(bar_data[1]);
-    SerialUSB.print("Baseline Pressure (mbar):          ");
+    SerialUSB.print("Baseline Pressure (mbar):           ");
     SerialUSB.println(baseline_pressure);
-    SerialUSB.print("Altitude (m):          ");
+    SerialUSB.print("Altitude (m):                       ");
     SerialUSB.println(altitude);
     SerialUSB.print("Temperature sensor temperature (C): ");
     SerialUSB.println(*temp_sensor_data);
-    SerialUSB.print("IMU X                               "); //TODO this isn't actually x, y, z
+    SerialUSB.print("IMU - Yaw:                          ");
     SerialUSB.println(IMU_data[0]);
-    SerialUSB.print("IMU Y                               ");
+    SerialUSB.print("IMU - Roll:                         ");
     SerialUSB.println(IMU_data[1]);
-    SerialUSB.print("IMU Z                               ");
+    SerialUSB.print("IMU - Pitch:                        ");
     SerialUSB.println(IMU_data[2]);
     SerialUSB.print("GPS latitude:                       ");
     SerialUSB.println(GPS_data[0]);
