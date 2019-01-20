@@ -7,7 +7,7 @@
 #include "statemachine.h"
 
 /*Constants------------------------------------------------------------*/
-// #define TESTING //enable or disable debug output
+ #define TESTING //enable or disable debug output
 
 #define SerialUSB               Serial
 #define SerialGPS               Serial1

@@ -124,6 +124,7 @@ boolean MS_5803::initializeMS_5803(boolean Verbose) {
     }
     // The last 4 bits of the 7th coefficient form a CRC error checking code.
     unsigned char p_crc = sensorCoeffs[7];
+    p_crc = p_crc & 0x0F;
     // Use a function to calculate the CRC value
     unsigned char n_crc = MS_5803_CRC(sensorCoeffs);
 
@@ -135,11 +136,10 @@ boolean MS_5803::initializeMS_5803(boolean Verbose) {
     }
     // If the CRC value doesn't match the sensor's CRC value, then the
     // connection can't be trusted. Check your wiring.
-    // CURRENTLY FAILING
-    // if (p_crc != n_crc) {
-    //     return false;
-    // }
-    // Otherwise, return true when everything checks out OK.
+    if (p_crc != n_crc) {
+        return false;
+    }
+    //Otherwise, return true when everything checks out OK.
     return true;
 }
 
@@ -265,7 +265,7 @@ bool MS_5803::readSensor() {
 // http://www.meas-spec.com/downloads/C-Code_Example_for_MS56xx,_MS57xx_%28except_analog_sensor%29_and_MS58xx_Series_Pressure_Sensors.pdf
 unsigned char MS_5803::MS_5803_CRC(unsigned int n_prom[]) {
     int cnt;				// simple counter
-    unsigned int n_rem;		// crc reminder
+    unsigned int n_rem;		// crc remainder
     unsigned int crc_read;	// original value of the CRC
     unsigned char  n_bit;
     n_rem = 0x00;
