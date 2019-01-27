@@ -1,5 +1,44 @@
 /*Main Arduino Sketch*/
 
+/*
+VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!
+
+                 uuuuuuu
+             uu$$$$$$$$$$$uu
+          uu$$$$$$$$$$$$$$$$$uu
+         u$$$$$$$$$$$$$$$$$$$$$u
+        u$$$$$$$$$$$$$$$$$$$$$$$u
+       u$$$$$$$$$$$$$$$$$$$$$$$$$u
+       u$$$$$$$$$$$$$$$$$$$$$$$$$u
+       u$$$$$$"   "$$$"   "$$$$$$u
+       "$$$$"      u$u       $$$$"
+        $$$u       u$u       u$$$
+        $$$u      u$$$u      u$$$
+         "$$$$uu$$$   $$$uu$$$$"
+          "$$$$$$$"   "$$$$$$$"
+            u$$$$$$$u$$$$$$$u
+             u$"$"$"$"$"$"$u
+  uuu        $$u$ $ $ $ $u$$       uuu
+ u$$$$        $$$$$u$u$u$$$       u$$$$
+  $$$$$uu      "$$$$$$$$$"     uu$$$$$$
+u$$$$$$$$$$$uu    """""    uuuu$$$$$$$$$$
+$$$$"""$$$$$$$$$$uuu   uu$$$$$$$$$"""$$$"
+ """      ""$$$$$$$$$$$uu ""$"""
+           uuuu ""$$$$$$$$$$uuu
+  u$$$uuu$$$$$$$$$uu ""$$$$$$$$$$$uuu$$$
+  $$$$$$$$$$""""           ""$$$$$$$$$$$"
+   "$$$$$"                      ""$$$$""
+     $$$"                         $$$$"
+
+In order to successfully poll the GPS, the serial RX buffer size must be increased. This needs
+to be done on the computer used for compilation. This can be done by navigating to the following
+path in the Arduino contents folder: ‎⁨Contents⁩/⁨Java⁩/⁨hardware⁩/⁨teensy⁩/⁨avr⁩/⁨cores⁩/⁨teensy3⁩/serial1.c.
+On line 43 increase SERIAL1_RX_BUFFER_SIZE from 64 to 128.
+THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
+
+VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!
+*/
+
 /*Includes------------------------------------------------------------*/
 #include "sensors.h"
 #include "statemachine.h"
@@ -9,7 +48,7 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <i2c_t3.h>
-#include <SD.h> 
+#include <SD.h>
 #include <string.h>
 
 /*Variables------------------------------------------------------------*/
@@ -108,7 +147,7 @@ void loop()
                }
                 #ifdef TESTING
                 SerialUSB.println(command);
-                doCommand(command[0], &state); 
+                doCommand(command[0], &state);
                 #endif
 
                 sendRadioResponse(goodResponse);
@@ -119,7 +158,7 @@ void loop()
                 SerialUSB.println(command);
                 SerialUSB.println(goodResponse);
                 sendRadioResponse(badResponse);
-            } 
+            }
         }
     }
 
@@ -133,7 +172,7 @@ void loop()
         logData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure);
     }
 
-    
+
     radio_new_time = millis();
     if ( (radio_new_time - radio_old_time) > radio_time_interval ){
         radio_old_time = radio_new_time;
@@ -149,13 +188,13 @@ void loop()
     #endif
 }
 
-//checks if all indexes are equal for radio commands 
+//checks if all indexes are equal for radio commands
 bool check(char *radioCommand)
- {   
+ {
     const char a0 = radioCommand[0];
 
-    for (int i = 1; i < 5; i++)      
-    {         
+    for (int i = 1; i < 5; i++)
+    {
         if (radioCommand[i] != a0)
             return false;
     }
