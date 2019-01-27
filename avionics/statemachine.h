@@ -27,14 +27,14 @@
 
 /*Variables------------------------------------------------------------*/
 enum FlightStates {
-  STANDBY,
-  ARMED,
-  ASCENT,
-  MACH_LOCK,
-  PRESSURE_DELAY,
-  INITIAL_DESCENT,
-  FINAL_DESCENT,
-  LANDED
+  STANDBY, // 0
+  ARMED,   // 1
+  ASCENT,   //2
+  MACH_LOCK,  //3
+  PRESSURE_DELAY, //4
+  INITIAL_DESCENT,  //5
+  FINAL_DESCENT,    //6
+  LANDED          //7
 };
 
 /*Functions------------------------------------------------------------*/
