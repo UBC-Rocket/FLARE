@@ -27,7 +27,9 @@ void power_cameras(); //a toggle switch
 void start_record();
 void stop_record();
 //void check_status(); //crc stuff
-static uint8_t crc_high_first(uint8_t *ptr, uint8_t len);
+//uint8_t crc_high_first(uint8_t *ptr, uint8_t len);
 
 
 #endif
+
+

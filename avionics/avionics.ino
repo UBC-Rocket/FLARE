@@ -5,6 +5,7 @@
 #include "statemachine.h"
 #include "calculations.h"
 #include "commands.h"
+#include "cameras.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -30,7 +31,12 @@ void setup()
     SerialUSB.begin(9600);
     while (!SerialUSB) {} //TODO add print in while to see what happens
     SerialUSB.println("Initializing...");
+    /*camera Testing*/
+    SerialCamera1.begin(9600);
     #endif
+
+    
+
 
     /*init I2C bus*/
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400); //400kHz
@@ -47,7 +53,7 @@ void setup()
         #ifdef TESTING
         SerialUSB.println("Initialization failed! >:-{");
         #else
-        while (1) {}
+        // while (1) {}
         #endif
     } else {
         pinMode(LED_BUILTIN,OUTPUT);
@@ -88,7 +94,16 @@ void loop()
     char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
     const char goodResponse[] = {'G','x','x','x','x'};
     const char badResponse[] = {'B','B','B','B','B'};
-
+    while(1){
+        power_cameras();
+        delay(10000);
+        start_record();
+        delay(10000);
+        stop_record();
+        delay(1000);
+        power_cameras();
+        delay(1000);
+    }
     if (SerialRadio.available()) {
         radiolog.print("Received Message: ");
         #ifdef TESTING
@@ -105,7 +120,7 @@ void loop()
                 sendRadioResponse(goodResponse);
                 #ifdef TESTING
                 SerialUSB.print(command);
-                doCommand(command[0], &state); 
+                //doCommand(command[0], &state); 
                 #endif
             }
             else{
