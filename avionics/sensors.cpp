@@ -2,6 +2,7 @@
 
 /*Includes------------------------------------------------------------*/
 #include "sensors.h"
+#include "battery.h"
 #include "SparkFun_LIS331.h"        //accelerometer
 #include "MS5803_01.h"              //barometer
 #include "SparkFunTMP102.h"         //temp sensor
@@ -16,10 +17,10 @@
 /*Variables------------------------------------------------------------*/
 File datalog;
 
+Battery powerbattery(BATTERY_SENSOR_PIN);
 LIS331 accelerometer;
 MS_5803 barometer(1024);
 TMP102 temp_sensor(TEMP_SENSOR_ADDRESS);
-
 Adafruit_BNO055 IMU(IMU_ADDRESS);
 
 
@@ -32,6 +33,23 @@ Adafruit_BNO055 IMU(IMU_ADDRESS);
 bool initSensors(void)
 {
     bool status = true;
+
+    /*init battery*/
+    #ifdef TESTING
+    SerialUSB.println("Initializing battery");
+    #endif
+    if(powerbattery.getVoltage() <= MINIMUM_BATTERY_VOLTAGE)
+    {
+        status = false;
+        #ifdef TESTING
+        SerialUSB.println("WARNING: Battery at low voltage!");
+        #endif
+    }
+    #ifdef TESTING
+    SerialUSB.print("Read voltage (V): ");
+    SerialUSB.println(powerbattery.getVoltage());
+    #endif
+
 
     /*init SD card*/
     #ifdef TESTING
@@ -311,18 +329,18 @@ void processRadioData(unsigned long *timestamp, float acc_data[], float bar_data
     sendRadioData(IMU_data[8], UID_IMU_mag_z);
     sendRadioData( altitude, UID_altitude);
     sendRadioData((float) state, UID_state);
-    
+
 
 
     // gps_data is already float?
     sendRadioData(GPS_data[0], UID_GPS_lat);
-    sendRadioData(GPS_data[1], UID_GPS_long); 
+    sendRadioData(GPS_data[1], UID_GPS_long);
     sendRadioData(GPS_data[2], UID_GPS_alt);
-            
+
 }
 
 void sendRadioData(float data, char id){
-    //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly 
+    //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly
      u_int8_t b[4];
       *(float*) b = data;
       SerialRadio.write(id);
