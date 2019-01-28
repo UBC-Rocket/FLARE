@@ -69,7 +69,7 @@ bool initSensors(void);
 float barSensorInit(void);
 void processRadioData(unsigned long*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
 void sendRadioData(float data, char id);
-void pollSensors(unsigned long*, float*, float*, float*, float*, float*);
-void logData(unsigned long *, float*, float*, float*, float*, float*, FlightStates, float, float);
+void pollSensors(unsigned long*, float*, float*, float*, float*, float*, float*);
+void logData(unsigned long *, float*, float*, float*, float*, float*, float*, FlightStates, float, float);
 
 #endif
