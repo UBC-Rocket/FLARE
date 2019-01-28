@@ -69,7 +69,7 @@ bool initSensors(void)
             #endif
         } else {
             datalog.write("SENSOR LOG DATA\n");
-            datalog.write("Time (ms), State, Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
+            datalog.write("Time (ms), State, Battery Voltage (V),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
             "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
             "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
             "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude\n");
@@ -156,12 +156,17 @@ float barSensorInit(void){
   * @param  char GPS_data[][] - 2D array to store the GPS data
   * @return None
   */
-void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
+void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_data[], float bar_data[],
                 float *temp_sensor_data, float IMU_data[], float GPS_data[])
 {
     int16_t x, y, z;
 
     *timestamp = millis();
+
+    #ifdef TESTING
+    SerialUSB.println("Measuring battery voltage");
+    #endif
+    *battery_voltage = powerbattery.getVoltage();
 
     #ifdef TESTING
     SerialUSB.println("Polling accelerometer");
@@ -218,7 +223,7 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
   * @param  char GPS_data[][] - 2D array to store the GPS data
   * @return None
   */
-void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
+void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[], float bar_data[],
             float *temp_sensor_data, float IMU_data[], float GPS_data[],
             FlightStates state, float altitude, float baseline_pressure)
 {
@@ -229,6 +234,8 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     datalog.print(*timestamp);
     datalog.print(",");
     datalog.print(state);
+    datalog.print(",");
+    datalog.print(*battery_voltage);
     datalog.print(",");
     for (unsigned int i = 0; i < ACC_DATA_ARRAY_SIZE; i++) {
        datalog.print(acc_data[i]);
@@ -259,8 +266,10 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     #ifdef TESTING
     SerialUSB.print("Time (ms):                          ");
     SerialUSB.println(*timestamp);
-    SerialUSB.print("State:                          ");
+    SerialUSB.print("State:                              ");
     SerialUSB.println(state);
+    SerialUSB.print("Battery voltage (V):                ");
+    SerialUSB.println(*battery_voltage);
     SerialUSB.print("Accelerometer acceleration X (g):   ");
     SerialUSB.println(acc_data[0]);
     SerialUSB.print("Accelerometer acceleration Y (g):   ");

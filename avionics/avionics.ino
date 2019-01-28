@@ -9,7 +9,7 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <i2c_t3.h>
-#include <SD.h> 
+#include <SD.h>
 #include <string.h>
 
 /*Variables------------------------------------------------------------*/
@@ -78,7 +78,7 @@ void loop()
 
     static uint16_t time_interval = 50; //ms
 
-    float acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
+    float battery_voltage, acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE], GPS_data[GPS_DATA_ARRAY_SIZE];
     static float prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
     static FlightStates state = ARMED;
@@ -108,7 +108,7 @@ void loop()
                }
                 #ifdef TESTING
                 SerialUSB.println(command);
-                doCommand(command[0], &state); 
+                doCommand(command[0], &state);
                 #endif
 
                 sendRadioResponse(goodResponse);
@@ -119,7 +119,7 @@ void loop()
                 SerialUSB.println(command);
                 SerialUSB.println(goodResponse);
                 sendRadioResponse(badResponse);
-            } 
+            }
         }
     }
 
@@ -127,13 +127,13 @@ void loop()
     if ((new_time - old_time) >= time_interval) {
         delta_time = new_time - old_time;
         old_time = new_time;
-        pollSensors(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
+        pollSensors(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
         calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &prev_delta_altitude, &baseline_pressure, &delta_time);
         stateMachine(&altitude, &delta_altitude, &prev_altitude, bar_data, &baseline_pressure, &ground_altitude, &state);
-        logData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure);
+        logData(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure);
     }
 
-    
+
     radio_new_time = millis();
     if ( (radio_new_time - radio_old_time) > radio_time_interval ){
         radio_old_time = radio_new_time;
@@ -149,13 +149,13 @@ void loop()
     #endif
 }
 
-//checks if all indexes are equal for radio commands 
+//checks if all indexes are equal for radio commands
 bool check(char *radioCommand)
- {   
+ {
     const char a0 = radioCommand[0];
 
-    for (int i = 1; i < 5; i++)      
-    {         
+    for (int i = 1; i < 5; i++)
+    {
         if (radioCommand[i] != a0)
             return false;
     }
