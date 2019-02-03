@@ -314,11 +314,12 @@ void calculateValues(float acc_data[], float bar_data[], float* abs_accel,
 
 
 
-void processRadioData(unsigned long *timestamp, float acc_data[], float bar_data[],
+void processRadioData(unsigned long *timestamp, float* battery_voltage, float acc_data[], float bar_data[],
     float *temp_sensor_data, float IMU_data[], float* GPS_data, FlightStates state, float altitude){
 
-   float time = *timestamp;
+    float time = *timestamp;
     sendRadioData(time, 't');
+    sendRadioData(*battery_voltage, UID_batt);
 
     sendRadioData(acc_data[0], UID_acc_acc_x);
     sendRadioData(acc_data[1], UID_acc_acc_y);
@@ -326,6 +327,8 @@ void processRadioData(unsigned long *timestamp, float acc_data[], float bar_data
 
     sendRadioData(bar_data[0], UID_bar_pres);
     sendRadioData(bar_data[1], UID_bar_temp);
+
+    sendRadioData(*temp_sensor_data, UID_temp_temp);
 
     sendRadioData(IMU_data[0], UID_IMU_acc_x);
     sendRadioData(IMU_data[1], UID_IMU_acc_y);

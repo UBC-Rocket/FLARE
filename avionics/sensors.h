@@ -5,7 +5,7 @@
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
 
-#include <string>
+//#include <string.h>
 
 #include "statemachine.h"
 
@@ -63,11 +63,12 @@ const char UID_GPS_alt  = 'A'; //GPS - Altitude
 const char UID_time  = 't'; //Time
 const char UID_altitude = 'a'; //calculated altitude
 const char UID_state = 's'; //state machine state
+const char UID_batt = 'B';  //Battery voltage
 
 /*Functions------------------------------------------------------------*/
 bool initSensors(void);
 float barSensorInit(void);
-void processRadioData(unsigned long*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
+void processRadioData(unsigned long*, float*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
 void sendRadioData(float data, char id);
 void pollSensors(unsigned long*, float*, float*, float*, float*, float*, float*);
 void logData(unsigned long *, float*, float*, float*, float*, float*, float*, FlightStates, float, float);
