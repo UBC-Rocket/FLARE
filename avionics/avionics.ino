@@ -96,13 +96,13 @@ void loop()
     const char badResponse[] = {'B','B','B','B','B'};
     while(1){
         power_cameras();
-        delay(10000);
-        start_record();
-        delay(10000);
-        stop_record();
-        delay(1000);
+        delay(5000);
+        // start_record();
+        // delay(10000);
+        // stop_record();
+        // delay(1000);
         power_cameras();
-        delay(1000);
+        delay(5000);
     }
     if (SerialRadio.available()) {
         radiolog.print("Received Message: ");
