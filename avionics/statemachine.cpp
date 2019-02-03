@@ -162,6 +162,9 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
         case LANDED:
             break;
 
+        case SAFED_STATE:
+            break;
+
         default:
             break;
     }

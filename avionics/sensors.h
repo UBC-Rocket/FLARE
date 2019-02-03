@@ -11,7 +11,7 @@
 
 
 /*Constants------------------------------------------------------------*/
- #define TESTING //enable or disable debug output
+#define TESTING //enable or disable debug output
 
 #define SerialUSB               Serial
 #define SerialGPS               Serial1
@@ -33,6 +33,13 @@
 #define RADIO_DATA_ARRAY_SIZE   5
 
 /*Variables------------------------------------------------------------*/
+
+/*Error codes for initialization*/
+enum ErrorCode {
+    NOMINAL,
+    NONCRITICAL_FAILURE,
+    CRITICAL_FAILURE
+}
 
 /*GPS initialization commands*/
 const uint8_t GPS_reset_defaults[] = {0xA0, 0xA1, 0x00, 0x02, 0x04, 0x00, 0x04, 0x0D, 0x0A};
