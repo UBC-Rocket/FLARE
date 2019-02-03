@@ -291,7 +291,7 @@ void processRadioData(unsigned long *timestamp, float acc_data[], float bar_data
     float *temp_sensor_data, float IMU_data[], float* GPS_data, FlightStates state, float altitude){
 
    float time = *timestamp;
-    sendRadioData(time, 't');
+    sendRadioData(time, UID_time);
 
     sendRadioData(acc_data[0], UID_acc_acc_x);
     sendRadioData(acc_data[1], UID_acc_acc_y);
@@ -311,18 +311,18 @@ void processRadioData(unsigned long *timestamp, float acc_data[], float bar_data
     sendRadioData(IMU_data[8], UID_IMU_mag_z);
     sendRadioData( altitude, UID_altitude);
     sendRadioData((float) state, UID_state);
-    
+
 
 
     // gps_data is already float?
     sendRadioData(GPS_data[0], UID_GPS_lat);
-    sendRadioData(GPS_data[1], UID_GPS_long); 
+    sendRadioData(GPS_data[1], UID_GPS_long);
     sendRadioData(GPS_data[2], UID_GPS_alt);
-            
+
 }
 
 void sendRadioData(float data, char id){
-    //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly 
+    //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly
      u_int8_t b[4];
       *(float*) b = data;
       SerialRadio.write(id);
@@ -330,5 +330,11 @@ void sendRadioData(float data, char id){
       {
           SerialRadio.write(b[i]);
       }
+      if(id == 't'){
+          SerialUSB.print(id);
+         SerialUSB.print(": ");
+         SerialUSB.println(data);
+      }
+
 }
 
