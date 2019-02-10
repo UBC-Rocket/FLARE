@@ -5,7 +5,6 @@
 #include "statemachine.h"
 #include "calculations.h"
 #include "commands.h"
-#include "cameras.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -31,12 +30,7 @@ void setup()
     SerialUSB.begin(9600);
     while (!SerialUSB) {} //TODO add print in while to see what happens
     SerialUSB.println("Initializing...");
-    /*camera Testing*/
-    SerialCamera1.begin(9600);
     #endif
-
-
-
 
     /*init I2C bus*/
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400); //400kHz
@@ -53,7 +47,7 @@ void setup()
         #ifdef TESTING
         SerialUSB.println("Initialization failed! >:-{");
         #else
-        // while (1) {}
+        while (1) {}
         #endif
     } else {
         pinMode(LED_BUILTIN,OUTPUT);
@@ -91,14 +85,12 @@ void loop()
 
     static uint16_t radio_time_interval = 100;
 
-
     if(SerialRadio.available()){
-        communicateThroughSerial(SerialRadio,&state);
-
+        communicateThroughSerial(SerialRadio, &state);
     }
 
     else if(SerialSatCom.available()){
-        communicateThroughSerial(SerialSatCom,&state);
+        communicateThroughSerial(SerialSatCom, &state);
     }
 
     new_time = millis();
