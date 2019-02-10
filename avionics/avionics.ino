@@ -10,7 +10,7 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <i2c_t3.h>
-#include <SD.h> 
+#include <SD.h>
 #include <string.h>
 
 /*Variables------------------------------------------------------------*/
@@ -35,7 +35,7 @@ void setup()
     SerialCamera1.begin(9600);
     #endif
 
-    
+
 
 
     /*init I2C bus*/
@@ -92,20 +92,20 @@ void loop()
     static uint16_t radio_time_interval = 100;
     char command[RADIO_DATA_ARRAY_SIZE];
     char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
-    const char goodResponse[] = {'G','x','x','x','x'};
+    char goodResponse[] = {'G','x','x','x','x'};
     const char badResponse[] = {'B','B','B','B','B'};
-    while(1){
-        power_cameras();
-        delay(5000);
-        // start_record();
-        // delay(10000);
-        // stop_record();
-        // delay(1000);
-        power_cameras();
-        delay(5000);
-    }
+    // while(1){
+    //     power_cameras();
+    //     delay(5000);
+    //     // start_record();
+    //     // delay(10000);
+    //     // stop_record();
+    //     // delay(1000);
+    //     power_cameras();
+    //     delay(5000);
+    // }
     if (SerialRadio.available()) {
-        radiolog.print("Received Message: ");
+        //radiolog.print("Received Message: ");
         #ifdef TESTING
         SerialUSB.print("Received Message: ");
         #endif
@@ -116,18 +116,27 @@ void loop()
             bool correctCommand = check(command);
 
             if(correctCommand){
-                radiolog.print(goodResponse);
-                sendRadioResponse(goodResponse);
+               // radiolog.print(goodResponse);
+               for(int i =1; i<5; i++)
+               {
+                   goodResponse[i] = command[0];
+               }
                 #ifdef TESTING
-                SerialUSB.print(command);
-                //doCommand(command[0], &state); 
+
+                SerialUSB.println(command);
+                doCommand(command[0], &state);
+
                 #endif
+
+                sendRadioResponse(goodResponse);
+                SerialUSB.println(goodResponse);
             }
             else{
-                radiolog.print(badResponse);
+                //radiolog.print(badResponse);
+                SerialUSB.println(command);
+                SerialUSB.println(goodResponse);
                 sendRadioResponse(badResponse);
-            } 
-            radiolog.print(command);
+            }
         }
     }
 
@@ -141,7 +150,7 @@ void loop()
         logData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure);
     }
 
-    
+
     radio_new_time = millis();
     if ( (radio_new_time - radio_old_time) > radio_time_interval ){
         radio_old_time = radio_new_time;
@@ -157,13 +166,13 @@ void loop()
     #endif
 }
 
-//checks if all indexes are equal for radio commands 
+//checks if all indexes are equal for radio commands
 bool check(char *radioCommand)
- {   
+ {
     const char a0 = radioCommand[0];
 
-    for (int i = 1; i < 5; i++)      
-    {         
+    for (int i = 1; i < 5; i++)
+    {
         if (radioCommand[i] != a0)
             return false;
     }
