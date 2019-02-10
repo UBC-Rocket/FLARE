@@ -90,54 +90,15 @@ void loop()
     static FlightStates state = ARMED;
 
     static uint16_t radio_time_interval = 100;
-    char command[RADIO_DATA_ARRAY_SIZE];
-    char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
-    char goodResponse[] = {'G','x','x','x','x'};
-    const char badResponse[] = {'B','B','B','B','B'};
-    // while(1){
-    //     power_cameras();
-    //     delay(5000);
-    //     // start_record();
-    //     // delay(10000);
-    //     // stop_record();
-    //     // delay(1000);
-    //     power_cameras();
-    //     delay(5000);
-    // }
-    if (SerialRadio.available()) {
-        //radiolog.print("Received Message: ");
-        #ifdef TESTING
-        SerialUSB.print("Received Message: ");
-        #endif
-        while (SerialRadio.available()) {
-            for(int i = 0; i< RADIO_DATA_ARRAY_SIZE; i++){
-                command[i] = SerialRadio.read();
-            }
-            bool correctCommand = check(command);
 
-            if(correctCommand){
-               // radiolog.print(goodResponse);
-               for(int i =1; i<5; i++)
-               {
-                   goodResponse[i] = command[0];
-               }
-                #ifdef TESTING
 
-                SerialUSB.println(command);
-                doCommand(command[0], &state);
+    if(SerialRadio.available()){
+        communicateThroughSerial(SerialRadio,&state);
 
-                #endif
+    }
 
-                sendRadioResponse(goodResponse);
-                SerialUSB.println(goodResponse);
-            }
-            else{
-                //radiolog.print(badResponse);
-                SerialUSB.println(command);
-                SerialUSB.println(goodResponse);
-                sendRadioResponse(badResponse);
-            }
-        }
+    else if(SerialSatCom.available()){
+        communicateThroughSerial(SerialSatCom,&state);
     }
 
     new_time = millis();
@@ -166,15 +127,4 @@ void loop()
     #endif
 }
 
-//checks if all indexes are equal for radio commands
-bool check(char *radioCommand)
- {
-    const char a0 = radioCommand[0];
 
-    for (int i = 1; i < 5; i++)
-    {
-        if (radioCommand[i] != a0)
-            return false;
-    }
-    return true;
-}

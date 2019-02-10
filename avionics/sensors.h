@@ -16,6 +16,7 @@
 #define SerialUSB               Serial
 #define SerialGPS               Serial1
 #define SerialRadio             Serial2
+#define SerialSatCom            Serial5
 
 #define EARTHS_GRAVITY          9.80665
 
