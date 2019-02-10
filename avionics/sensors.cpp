@@ -2,6 +2,7 @@
 
 /*Includes------------------------------------------------------------*/
 #include "sensors.h"
+#include "battery.h"
 #include "SparkFun_LIS331.h"        //accelerometer
 #include "MS5803_01.h"              //barometer
 #include "SparkFunTMP102.h"         //temp sensor
@@ -16,10 +17,10 @@
 /*Variables------------------------------------------------------------*/
 File datalog;
 
+Battery powerbattery(BATTERY_SENSOR_PIN);
 LIS331 accelerometer;
 MS_5803 barometer(1024);
 TMP102 temp_sensor(TEMP_SENSOR_ADDRESS);
-
 Adafruit_BNO055 IMU(IMU_ADDRESS);
 
 
@@ -32,6 +33,23 @@ Adafruit_BNO055 IMU(IMU_ADDRESS);
 bool initSensors(void)
 {
     bool status = true;
+
+    /*init battery*/
+    #ifdef TESTING
+    SerialUSB.println("Initializing battery");
+    #endif
+    if(powerbattery.getVoltage() <= MINIMUM_BATTERY_VOLTAGE)
+    {
+        status = false;
+        #ifdef TESTING
+        SerialUSB.println("WARNING: Battery at low voltage!");
+        #endif
+    }
+    #ifdef TESTING
+    SerialUSB.print("Read voltage (V): ");
+    SerialUSB.println(powerbattery.getVoltage());
+    #endif
+
 
     /*init SD card*/
     #ifdef TESTING
@@ -51,7 +69,7 @@ bool initSensors(void)
             #endif
         } else {
             datalog.write("SENSOR LOG DATA\n");
-            datalog.write("Time (ms), State, Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
+            datalog.write("Time (ms), State, Battery Voltage (V),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
             "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
             "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
             "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude\n");
@@ -138,12 +156,17 @@ float barSensorInit(void){
   * @param  char GPS_data[][] - 2D array to store the GPS data
   * @return None
   */
-void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
+void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_data[], float bar_data[],
                 float *temp_sensor_data, float IMU_data[], float GPS_data[])
 {
     int16_t x, y, z;
 
     *timestamp = millis();
+
+    #ifdef TESTING
+    SerialUSB.println("Measuring battery voltage");
+    #endif
+    *battery_voltage = powerbattery.getVoltage();
 
     #ifdef TESTING
     SerialUSB.println("Polling accelerometer");
@@ -200,7 +223,7 @@ void pollSensors(unsigned long *timestamp, float acc_data[], float bar_data[],
   * @param  char GPS_data[][] - 2D array to store the GPS data
   * @return None
   */
-void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
+void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[], float bar_data[],
             float *temp_sensor_data, float IMU_data[], float GPS_data[],
             FlightStates state, float altitude, float baseline_pressure)
 {
@@ -211,6 +234,8 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     datalog.print(*timestamp);
     datalog.print(",");
     datalog.print(state);
+    datalog.print(",");
+    datalog.print(*battery_voltage);
     datalog.print(",");
     for (unsigned int i = 0; i < ACC_DATA_ARRAY_SIZE; i++) {
        datalog.print(acc_data[i]);
@@ -241,8 +266,10 @@ void logData(unsigned long *timestamp, float acc_data[], float bar_data[],
     #ifdef TESTING
     SerialUSB.print("Time (ms):                          ");
     SerialUSB.println(*timestamp);
-    SerialUSB.print("State:                          ");
+    SerialUSB.print("State:                              ");
     SerialUSB.println(state);
+    SerialUSB.print("Battery voltage (V):                ");
+    SerialUSB.println(*battery_voltage);
     SerialUSB.print("Accelerometer acceleration X (g):   ");
     SerialUSB.println(acc_data[0]);
     SerialUSB.print("Accelerometer acceleration Y (g):   ");
@@ -311,11 +338,12 @@ void calculateValues(float acc_data[], float bar_data[], float* abs_accel,
 
 
 
-void processRadioData(unsigned long *timestamp, float acc_data[], float bar_data[],
+void processRadioData(unsigned long *timestamp, float* battery_voltage, float acc_data[], float bar_data[],
     float *temp_sensor_data, float IMU_data[], float* GPS_data, FlightStates state, float altitude){
 
-   float time = *timestamp;
+    float time = *timestamp;
     sendRadioData(time, 't');
+    sendRadioData(*battery_voltage, UID_batt);
 
     sendRadioData(acc_data[0], UID_acc_acc_x);
     sendRadioData(acc_data[1], UID_acc_acc_y);
@@ -323,6 +351,8 @@ void processRadioData(unsigned long *timestamp, float acc_data[], float bar_data
 
     sendRadioData(bar_data[0], UID_bar_pres);
     sendRadioData(bar_data[1], UID_bar_temp);
+
+    sendRadioData(*temp_sensor_data, UID_temp_temp);
 
     sendRadioData(IMU_data[0], UID_IMU_acc_x);
     sendRadioData(IMU_data[1], UID_IMU_acc_y);

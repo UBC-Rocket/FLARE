@@ -1,5 +1,44 @@
 /*Main Arduino Sketch*/
 
+/*
+VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!
+
+                 uuuuuuu
+             uu$$$$$$$$$$$uu
+          uu$$$$$$$$$$$$$$$$$uu
+         u$$$$$$$$$$$$$$$$$$$$$u
+        u$$$$$$$$$$$$$$$$$$$$$$$u
+       u$$$$$$$$$$$$$$$$$$$$$$$$$u
+       u$$$$$$$$$$$$$$$$$$$$$$$$$u
+       u$$$$$$"   "$$$"   "$$$$$$u
+       "$$$$"      u$u       $$$$"
+        $$$u       u$u       u$$$
+        $$$u      u$$$u      u$$$
+         "$$$$uu$$$   $$$uu$$$$"
+          "$$$$$$$"   "$$$$$$$"
+            u$$$$$$$u$$$$$$$u
+             u$"$"$"$"$"$"$u
+  uuu        $$u$ $ $ $ $u$$       uuu
+ u$$$$        $$$$$u$u$u$$$       u$$$$
+  $$$$$uu      "$$$$$$$$$"     uu$$$$$$
+u$$$$$$$$$$$uu    """""    uuuu$$$$$$$$$$
+$$$$"""$$$$$$$$$$uuu   uu$$$$$$$$$"""$$$"
+ """      ""$$$$$$$$$$$uu ""$"""
+           uuuu ""$$$$$$$$$$uuu
+  u$$$uuu$$$$$$$$$uu ""$$$$$$$$$$$uuu$$$
+  $$$$$$$$$$""""           ""$$$$$$$$$$$"
+   "$$$$$"                      ""$$$$""
+     $$$"                         $$$$"
+
+In order to successfully poll the GPS, the serial RX buffer size must be increased. This needs
+to be done on the computer used for compilation. This can be done by navigating to the following
+path in the Arduino contents folder: ‎⁨Contents⁩/⁨Java⁩/⁨hardware⁩/⁨teensy⁩/⁨avr⁩/⁨cores⁩/⁨teensy3⁩/serial1.c.
+On line 43 increase SERIAL1_RX_BUFFER_SIZE from 64 to 128.
+THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
+
+VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!
+*/
+
 /*Includes------------------------------------------------------------*/
 #include "sensors.h"
 #include "statemachine.h"
@@ -80,7 +119,7 @@ void loop()
 
     static uint16_t time_interval = 50; //ms
 
-    float acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
+    float battery_voltage, acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE], GPS_data[GPS_DATA_ARRAY_SIZE];
 
     static float abs_accel, prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude, average_pressure;
@@ -167,7 +206,7 @@ void loop()
     radio_new_time = millis();
     if ( (radio_new_time - radio_old_time) > radio_time_interval ){
         radio_old_time = radio_new_time;
-        processRadioData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude);
+        processRadioData(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude);
     }
 
 

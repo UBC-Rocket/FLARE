@@ -7,24 +7,24 @@ void doCommand(char command, FlightStates * state){
         case ARM:
         //switchState(*state, ARMED);
         case CAMERAS_ON:
-        //turn on the cameras 
+        //turn on the cameras
         case CAMERAS_OFF:
         //turn off the cameras
         case HALO:
         //play HALO
-        case SATCOM: 
+        case SATCOM:
         //switch to SATCOM
         case RESET:
         //not sure
         case MAIN:
         //testing purposes
-        digitalWrite(LED_BUILTIN, HIGH); 
+        digitalWrite(LED_BUILTIN, HIGH);
         // delay(400);
         // digitalWrite(LED_BUILTIN,LOW);
         break;
-        case DROGUE: 
-        //testing purposes  
-        // digitalWrite(LED_BUILTIN, HIGH); 
+        case DROGUE:
+        //testing purposes
+        // digitalWrite(LED_BUILTIN, HIGH);
         // delay(400);
         digitalWrite(LED_BUILTIN,LOW);
         break;
@@ -33,8 +33,8 @@ void doCommand(char command, FlightStates * state){
 }
 
 void sendRadioResponse(const char* response){
-    //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly 
-    
+    //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly
+
       for(int i=0; i<5; i++)
       {
           SerialRadio.write(response[i]);
