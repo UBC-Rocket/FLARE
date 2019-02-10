@@ -5,7 +5,7 @@
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
 
-#include <string>
+#include <string.h>
 
 #include "statemachine.h"
 
@@ -39,7 +39,7 @@ enum ErrorCode {
     NOMINAL,
     NONCRITICAL_FAILURE,
     CRITICAL_FAILURE
-}
+};
 
 /*GPS initialization commands*/
 const uint8_t GPS_reset_defaults[] = {0xA0, 0xA1, 0x00, 0x02, 0x04, 0x00, 0x04, 0x0D, 0x0A};
@@ -71,7 +71,7 @@ const char UID_altitude = 'a'; //calculated altitude
 const char UID_state = 's'; //state machine state
 
 /*Functions------------------------------------------------------------*/
-bool initSensors(void);
+ErrorCode initSensors(void);
 float barSensorInit(void);
 void processRadioData(unsigned long*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
 void sendRadioData(float data, char id);

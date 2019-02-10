@@ -29,23 +29,27 @@ Adafruit_BNO055 IMU(IMU_ADDRESS);
   * @param  None
   * @return bool - Status (true for success, false for failure)
   */
-bool initSensors(void)
+ErrorCode initSensors(void)
 {
-    bool status = true;
+    ErrorCode status = NOMINAL;
 
     /*init SD card*/
     #ifdef TESTING
     SerialUSB.println("Initializing SD card");
     #endif
     if (!SD.begin(BUILTIN_SDCARD)) {
-        status = false;
+        if(status < NONCRITICAL_FAILURE)
+            status = NONCRITICAL_FAILURE;
+
         #ifdef TESTING
         SerialUSB.println("ERROR: SD card initialization failed!");
         #endif
     } else {
         datalog = SD.open("datalog.txt", FILE_WRITE);
         if (!datalog) {
-            status = false;
+            if(status < NONCRITICAL_FAILURE)
+                status = NONCRITICAL_FAILURE;
+
             #ifdef TESTING
             SerialUSB.println("ERROR: Opening file failed!");
             #endif
@@ -72,12 +76,12 @@ bool initSensors(void)
     //barometer.reset();
     //barometer.begin();
     #ifdef TESTING
-    if (!barometer.initializeMS_5803(true)) {
-        return false;
+    if (!barometer.initializeMS_5803(true)) { //because one is verbose
+        status = CRITICAL_FAILURE;
     }
     #else
     if (!barometer.initializeMS_5803(false)) {
-        return false;
+        status = CRITICAL_FAILURE;
     }
     #endif
 
@@ -91,10 +95,15 @@ bool initSensors(void)
     #ifdef TESTING
     SerialUSB.println("Initializing IMU");
     #endif
-    bool status_IMU = IMU.begin();
+
     delay(7); //TODO investigate this
-    if(!status_IMU){
+    if(!IMU.begin()){
+        if(status < NONCRITICAL_FAILURE)
+            status = NONCRITICAL_FAILURE;
+
+        #ifdef TESTING
         SerialUSB.print("ERROR: IMU initialization failed!");
+        #endif
     }
     IMU.setExtCrystalUse(true);
 
@@ -311,18 +320,18 @@ void processRadioData(unsigned long *timestamp, float acc_data[], float bar_data
     sendRadioData(IMU_data[8], UID_IMU_mag_z);
     sendRadioData( altitude, UID_altitude);
     sendRadioData((float) state, UID_state);
-    
+
 
 
     // gps_data is already float?
     sendRadioData(GPS_data[0], UID_GPS_lat);
-    sendRadioData(GPS_data[1], UID_GPS_long); 
+    sendRadioData(GPS_data[1], UID_GPS_long);
     sendRadioData(GPS_data[2], UID_GPS_alt);
-            
+
 }
 
 void sendRadioData(float data, char id){
-    //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly 
+    //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly
      u_int8_t b[4];
       *(float*) b = data;
       SerialRadio.write(id);
