@@ -30,6 +30,7 @@
  * @param  float *delta_altitude - Change in altitude from the current altitude update in meters/second
  * @param  float *prev_delta_altitude - Previous change in altitude from the altitude update in meters/second
  * @param  float *baseline_pressure - the baseline pressure of the rocket (calculated ground altitude) in millibars
+ * @param  float *average_pressure - Average pressure over the past PRESSURE_AVG_SET_SIZE readings.
  * @param  unsigned long *delta_time - time between data polling
  * @return void.
  */
