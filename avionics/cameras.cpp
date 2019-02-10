@@ -1,5 +1,6 @@
 /*Includes------------------------------------------------------------*/
 #include "cameras.h"
+#include "sensors.h"
 #include <Arduino.h>
 // #include <HardwareSerial.h>
 // #include <i2c_t3.h>
@@ -19,6 +20,7 @@ void power_cameras(){
     uint8_t power_command[] = {0xCC,0x01,0x01,0x0};
     uint8_t crc = crc_high_first(power_command,3); //hypothetically only looks at the first three indexes
     power_command[3] = crc;
+    //SerialUSB.println("the power command is %u", power_command[3]);
     SerialCamera1.write(power_command,sizeof(power_command));
     //SerialCamera2.write(power_command,sizeof(power_command));
 }
@@ -68,11 +70,28 @@ uint8_t crc_high_first(uint8_t *ptr, uint8_t len)
     }
     return (crc); 
 }
-
-// static uint16_t crc_high_first(const uint8_t *data, uint8_t len) {
-//    uint16_t crc = 0;
-//    for (unsigned i = 0; i < len; i++) {
-//        crc = (crc << 8) ^ (crcTable[((uint8_t)(crc >> 8) ^ *data++) & 0xFF]);
+// uint8_t crc8_dvb_s2(uint8_t crc, unsigned char a)
+// {
+//    crc ^= a;
+//    for (int ii = 0; ii < 8; ++ii) {
+//        if (crc & 0x80) {
+//            crc = (crc << 1) ^ 0xD5;
+//        } else {
+//            crc = crc << 1;
+//        }
 //    }
 //    return crc;
 // }
+
+// uint8_t crc8_dvb_s2_sbuf_append(uint8_t *buffer, uint8_t *start)
+// {
+//     uint8_t crc = 0;
+//     const uint8_t* const end = buffer;
+//     for (const uint8_t *ptr = start; ptr < end; ++ptr) {
+//         crc = crc8_dvb_s2(crc, *ptr);
+//     }
+//     return crc
+// }
+
+
+
