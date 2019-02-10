@@ -4,7 +4,11 @@
 
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
+
+#include <string>
+
 #include "statemachine.h"
+
 
 /*Constants------------------------------------------------------------*/
 #define TESTING //enable or disable debug output
@@ -26,6 +30,8 @@
 #define GPS_DATA_ARRAY_SIZE     3
 #define GPS_FIELD_LENGTH        20
 #define PRESSURE_AVG_SET_SIZE   15
+
+#define RADIO_DATA_ARRAY_SIZE   5
 
 /*Variables------------------------------------------------------------*/
 
@@ -55,10 +61,14 @@ const char UID_GPS_lat  = 'L'; //GPS - Latitude
 const char UID_GPS_long  = 'l'; //GPS - Longitude
 const char UID_GPS_alt  = 'A'; //GPS - Altitude
 const char UID_time  = 't'; //Time
+const char UID_altitude = 'a'; //calculated altitude
+const char UID_state = 's'; //state machine state
 
 /*Functions------------------------------------------------------------*/
 bool initSensors(void);
 float barSensorInit(void);
+void processRadioData(unsigned long*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
+void sendRadioData(float data, char id);
 void pollSensors(unsigned long*, float*, float*, float*, float*, float*);
 void logData(unsigned long *, float*, float*, float*, float*, float*, FlightStates, float, float);
 void addToPressureSet(float*, float);

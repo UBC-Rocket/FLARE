@@ -46,6 +46,8 @@ void switchState(FlightStates *curr_state, FlightStates new_state){
 void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_altitude, float bar_data[], float *baseline_pressure,
     float *ground_altitude, float ground_alt_arr[], FlightStates *state) {
     static int launch_count, armed_count, mach_count, mach_lock_count, apogee_count, main_count, land_count = 0;
+    static uint32_t old_time_landed; //initialize on switching state
+    static float old_altitude_landed; //initialize on switching state
 
     switch (*state) {
         case STANDBY:
@@ -124,13 +126,14 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 switchState(state, INITIAL_DESCENT);
             }
             break;
-                
+
         case INITIAL_DESCENT:
             if (*altitude < FINAL_DESCENT_THRESHOLD) {
                 main_count ++;
                 if (main_count >= MAIN_CHECKS) {
                     //deploy main
-                    digitalWrite(LED_BUILTIN,LOW);
+                    old_time_landed = millis();
+                    old_altitude_landed = *altitude;
                     switchState(state, FINAL_DESCENT);
                     main_count = 0;
                 }
@@ -141,16 +144,21 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case FINAL_DESCENT:
-            if (*altitude < LAND_HEIGHT_THRESHOLD && *delta_altitude < LAND_VELOCITY_THRESHOLD) {
-                land_count++;
-                if (land_count >= LAND_CHECKS) {
-                    //turn off sensors except GPS
-                    switchState(state, LANDED);
+            if(millis() - old_time_landed >= LANDING_TIME_INTERVAL) {
+                float delta_altitude_landed = *altitude - old_altitude_landed;
+                if (*altitude < LAND_HEIGHT_THRESHOLD && delta_altitude_landed <= LAND_VELOCITY_THRESHOLD) {
+                    land_count++;
+                    if (land_count >= LAND_CHECKS) {
+                        //turn off sensors except GPS
+                        switchState(state, LANDED);
+                        land_count = 0;
+                    }
+                }
+                else {
                     land_count = 0;
                 }
-            }
-            else {
-                land_count = 0;
+                old_time_landed = millis();
+                old_altitude_landed = *altitude;
             }
             break;
 
