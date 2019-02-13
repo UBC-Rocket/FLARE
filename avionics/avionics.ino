@@ -165,17 +165,17 @@ void loop()
         SerialUSB.print("Received Message: ");
         #endif
         while (SerialRadio.available()) {
-            for(int i = 0; i< RADIO_DATA_ARRAY_SIZE; i++){
+            for(int i = 0; i < RADIO_DATA_ARRAY_SIZE; i++){
                 command[i] = SerialRadio.read();
             }
             bool correctCommand = check(command);
 
             if(correctCommand){
-               // radiolog.print(goodResponse);
-               for(int i =1; i<5; i++)
-               {
+                // radiolog.print(goodResponse);
+                for(int i = 1; i < 5; i++)
+                {
                    goodResponse[i] = command[0];
-               }
+                }
                 #ifdef TESTING
                 SerialUSB.println(command);
                 doCommand(command[0], &state);
@@ -199,9 +199,9 @@ void loop()
         old_time = new_time;
 
         pollSensors(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
-        addToPressureSet(pressure_set, bar_data[0]);
-        average_pressure = calculatePressureAverage(pressure_set);
-        calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &prev_delta_altitude, &baseline_pressure, &delta_time, &average_pressure);
+        // addToPressureSet(pressure_set, bar_data[0]); now moved to calculateValues
+        // average_pressure = calculatePressureAverage(pressure_set);
+        calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &prev_delta_altitude, &baseline_pressure, &delta_time, pressure_set);
         stateMachine(&altitude, &delta_altitude, &prev_altitude, bar_data, &baseline_pressure, &ground_altitude, ground_alt_arr, &state);
         logData(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure);
     }

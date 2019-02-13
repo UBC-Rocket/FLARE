@@ -15,6 +15,7 @@
 /*Functions------------------------------------------------------------*/
 
 void calculateValues(float*, float*, float*, float*, float*, float*, float*, unsigned long*, float*);
+void addToPressureSet(float*, float);
 float calculatePressureAverage(float*);
 
 #endif

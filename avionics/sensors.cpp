@@ -304,23 +304,6 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
 }
 
 
-/*
-* @brief replaces oldest value in the average pressure set with a new peice of pressure data
-*  if values are 0 it replaces them with data. This allows for the average to be non jank imediatly
-* @param float* average_set - the working array of pressure data used to calculate the average pressure. This is mutated by replacing the oldest data as new readings come in.
-* @param float data - the new data to add to the set
-* @return void
-*/
-void addToPressureSet(float* average_set, float data){
-    static int i = 0;
-    average_set[i] = data;
-    if(i >= PRESSURE_AVG_SET_SIZE - 1)
-        i = 0;
-    else
-        i++;
-
-}
-
 void processRadioData(unsigned long *timestamp, float* battery_voltage, float acc_data[], float bar_data[],
     float *temp_sensor_data, float IMU_data[], float* GPS_data, FlightStates state, float altitude){
 

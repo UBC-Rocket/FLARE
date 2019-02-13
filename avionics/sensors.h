@@ -71,7 +71,6 @@ bool initSensors(void);
 float barSensorInit(void);
 void pollSensors(unsigned long*, float*, float*, float*, float*, float*, float*);
 void logData(unsigned long *, float*, float*, float*, float*, float*, float*, FlightStates, float, float);
-void addToPressureSet(float*, float);
 void processRadioData(unsigned long*, float*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
 void sendRadioData(float data, char id);
 
