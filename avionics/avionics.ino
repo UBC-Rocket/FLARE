@@ -121,7 +121,7 @@ void loop()
                }
                 #ifdef TESTING
                 SerialUSB.println(command);
-                doCommand(command[0], &state);
+                doCommand(command[0], &state, &s_statusOfInit);
                 #endif
 
                 sendRadioResponse(goodResponse);
@@ -157,7 +157,7 @@ void loop()
     {
         init_status_new_time = millis();
         if ( (init_status_new_time - init_status_old_time) > init_status_time_interval ){
-            init_status_new_time = init_status_old_time;
+            init_status_old_time = init_status_new_time;
             init_status_indicator++;
 
             if(init_status_indicator % 2 == 1)

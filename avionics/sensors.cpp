@@ -46,10 +46,10 @@ void initSensors(InitStatus *status)
     SerialUSB.println("Initializing SD card");
     #endif
     if (!SD.begin(BUILTIN_SDCARD)) {
-        if(status->overview < NONCRITICAL_FAILURE){
+        if(status->overview < NONCRITICAL_FAILURE)
             status->overview = NONCRITICAL_FAILURE;
-            status->sensorNominal[FILE_STATUS_POSITION] = false;
-        }
+        status->sensorNominal[FILE_STATUS_POSITION] = false;
+
 
         #ifdef TESTING
         SerialUSB.println("ERROR: SD card initialization failed!");
@@ -57,10 +57,9 @@ void initSensors(InitStatus *status)
     } else {
         datalog = SD.open("datalog.txt", FILE_WRITE);
         if (!datalog) {
-            if(status->overview < NONCRITICAL_FAILURE){
+            if(status->overview < NONCRITICAL_FAILURE)
                 status->overview = NONCRITICAL_FAILURE;
-                status->sensorNominal[FILE_STATUS_POSITION] = false;
-            }
+            status->sensorNominal[FILE_STATUS_POSITION] = false;
 
             #ifdef TESTING
             SerialUSB.println("ERROR: Opening file failed!");
@@ -112,10 +111,9 @@ void initSensors(InitStatus *status)
 
     delay(7); //TODO investigate this
     if(!IMU.begin()){
-        if(status->overview < NONCRITICAL_FAILURE){
+        if(status->overview < NONCRITICAL_FAILURE)
             status->overview = NONCRITICAL_FAILURE;
-            status->sensorNominal[IMU_STATUS_POSITION] = false;
-        }
+        status->sensorNominal[IMU_STATUS_POSITION] = false;
 
         #ifdef TESTING
         SerialUSB.print("ERROR: IMU initialization failed!");
@@ -140,6 +138,34 @@ void initSensors(InitStatus *status)
     #endif
     SerialRadio.begin(921600);
     while (!SerialRadio) {}
+
+    /* log initialization status for each sensor */
+    // 'X' for N/A, 'G' for good, 'B' for bad
+    datalog.write("X,X,"); //time, state;
+    if(status->sensorNominal[ACCELEROMETER_STATUS_POSITION])
+        datalog.write("G,G,G,");
+    else
+        datalog.write("B,B,B,");
+
+    if(status->sensorNominal[BAROMETER_STATUS_POSITION]) //barom pressure & temperature
+        datalog.write("G,G,");
+    else
+        datalog.write("B,B,");
+
+    datalog.write("X,X,"); //Baseline pressure & altitude
+
+    if(status->sensorNominal[TEMPERATURE_STATUS_POSITION])
+        datalog.write("G,");
+    else
+        datalog.write("B,");
+
+    if(status->sensorNominal[IMU_STATUS_POSITION]) //Yaw, roll, pitch
+        datalog.write("G,G,G,");
+    else
+        datalog.write("B,B,B,");
+
+    datalog.write("X, X, X\n"); //GPS - as of time of writing, no capability to test success
+
 
     /* transmit sensor report */
         // Key for receiver:
