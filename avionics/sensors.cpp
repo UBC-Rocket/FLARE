@@ -21,7 +21,6 @@ File datalog;
 LIS331 accelerometer;
 MS_5803 barometer(1024);
 TMP102 temp_sensor(TEMP_SENSOR_ADDRESS);
-
 Adafruit_BNO055 IMU(IMU_ADDRESS);
 
 

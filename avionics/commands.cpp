@@ -2,32 +2,46 @@
 #include <Arduino.h>
 
 
-void doCommand(char command, FlightStates * state){
+void doCommand(char command, FlightStates *state, InitStatus *status){
     switch (command){
         case ARM:
-        //switchState(*state, ARMED);
+            //switchState(*state, ARMED);
         case CAMERAS_ON:
-        //turn on the cameras
+            //turn on the cameras
         case CAMERAS_OFF:
-        //turn off the cameras
+            //turn off the cameras
         case HALO:
-        //play HALO
+            //play HALO
         case SATCOM:
-        //switch to SATCOM
+            //switch to SATCOM
         case RESET:
-        //not sure
+            //not sure
         case MAIN:
-        //testing purposes
-        digitalWrite(LED_BUILTIN, HIGH);
-        // delay(400);
-        // digitalWrite(LED_BUILTIN,LOW);
-        break;
+            //testing purposes
+            digitalWrite(LED_BUILTIN, HIGH);
+            // delay(400);
+            // digitalWrite(LED_BUILTIN,LOW);
+            break;
         case DROGUE:
-        //testing purposes
-        // digitalWrite(LED_BUILTIN, HIGH);
-        // delay(400);
-        digitalWrite(LED_BUILTIN,LOW);
-        break;
+            //testing purposes
+            // digitalWrite(LED_BUILTIN, HIGH);
+            // delay(400);
+            digitalWrite(LED_BUILTIN,LOW);
+            break;
+
+        case STATUS:
+            char statusReport1[RADIO_DATA_ARRAY_SIZE];
+            char statusReport2[RADIO_DATA_ARRAY_SIZE];
+            generateStatusReport(status, statusReport1, statusReport2);
+            sendRadioResponse(statusReport1);
+            sendRadioResponse(statusReport2);
+            break;
+        default:
+            #ifdef TESTING
+            SerialUSB.println("ERROR: COMMAND NOT RECOGNIZED");
+            #endif
+            break;
+
     }
 
 }

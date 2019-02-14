@@ -16,13 +16,14 @@
 #define PING 'p'
 #define MAIN 'm'
 #define DROGUE 'd'
+#define STATUS 's'
 
 
 /*Variables------------------------------------------------------------*/
 
 
 /*Functions------------------------------------------------------------*/
-void doCommand(char command,FlightStates * state );
+void doCommand(char command,FlightStates * state, InitStatus *status);
 void sendRadioResponse(const char* response);
 
 
