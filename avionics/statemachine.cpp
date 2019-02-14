@@ -30,7 +30,8 @@ File statelog;
  * @return void.
  */
 void switchState(FlightStates *curr_state, FlightStates new_state){
-    *curr_state = new_state;
+    if(*curr_state != SAFED_STATE) //don't want to switch out of SAFED_STATE accidentally
+        *curr_state = new_state;
 }
 
 /* void stateMachine(float*, float*, float*, float*, float*, float*, FlightStates *){}
