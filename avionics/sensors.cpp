@@ -110,7 +110,7 @@ bool initSensors(void)
     SerialUSB.println("Initializing IMU");
     #endif
     bool status_IMU = IMU.begin();
-    delay(7); //TODO investigate this
+    delay(7); //Waiting for IMU to change mode
     if(!status_IMU){
         SerialUSB.print("ERROR: IMU initialization failed!");
     }
@@ -199,7 +199,7 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
     #ifdef TESTING
     SerialUSB.println("Polling IMU");
     #endif
-    sensors_event_t event; //TODO what is this
+    sensors_event_t event; //we don't know what this is but it works so 
     IMU.getEvent(&event);
     IMU_data[0] = event.orientation.x;
     IMU_data[1] = event.orientation.y;
