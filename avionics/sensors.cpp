@@ -8,6 +8,8 @@
 #include "Adafruit_BNO055.h"        //IMU
 #include "Venus638FLPx.h"           //GPS
 
+#include "commands.h"               //for sendRadioResponse(const char* response);
+
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <i2c_t3.h>
@@ -140,6 +142,45 @@ void initSensors(InitStatus *status)
     SerialRadio.begin(921600);
     while (!SerialRadio) {}
 
+    /* transmit sensor report */
+        // Key for receiver:
+        // S-#-G/B - G/B - G/B
+        // S is UID for status, # is digit indicating which part is being sent. G/B is status of a sensor
+        // (good/bad), X indicates no sensor for that value yet.
+        // Refer to sensors.h definitions to find what order data comes in at.
+        // e.g. if all things succeeded except accelerometer, code sends:
+        // "S-1-G-B-G", "S-2-G-G-X"
+    char statusReport1[RADIO_DATA_ARRAY_SIZE] = {UID_status, '1'};
+    if(status->sensorNominal[FILE_STATUS_POSITION])
+        statusReport1[2] = 'G';
+    else
+        statusReport1[2] = 'B';
+
+    if(status->sensorNominal[ACCELEROMETER_STATUS_POSITION])
+        statusReport1[3] = 'G';
+    else
+        statusReport1[3] = 'B';
+
+    if(status->sensorNominal[BAROMETER_STATUS_POSITION])
+        statusReport1[4] = 'G';
+    else
+        statusReport1[4] = 'B';
+
+    char statusReport2[RADIO_DATA_ARRAY_SIZE] = {UID_status, '2'};
+    if(status->sensorNominal[TEMPERATURE_STATUS_POSITION])
+        statusReport2[2] = 'G';
+    else
+        statusReport2[2] = 'B';
+
+    if(status->sensorNominal[IMU_STATUS_POSITION])
+        statusReport2[3] = 'G';
+    else
+        statusReport2[3] = 'B';
+
+    statusReport1[4] = 'X';
+
+    sendRadioResponse(statusReport1);
+    sendRadioResponse(statusReport2);
     return;
 }
 
@@ -347,12 +388,12 @@ void processRadioData(unsigned long *timestamp, float acc_data[], float bar_data
 
 void sendRadioData(float data, char id){
     //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly
-     u_int8_t b[4];
-      *(float*) b = data;
-      SerialRadio.write(id);
-      for(int i=0; i<4; i++)
-      {
-          SerialRadio.write(b[i]);
-      }
+    u_int8_t b[4];
+    *(float*) b = data;
+    SerialRadio.write(id);
+    for(int i=0; i<4; i++)
+    {
+        SerialRadio.write(b[i]);
+    }
 }
 
