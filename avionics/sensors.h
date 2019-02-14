@@ -32,13 +32,25 @@
 
 #define RADIO_DATA_ARRAY_SIZE   5
 
+#define NUM_SENSORS 5
+#define FILE_STATUS_POSITION 0
+#define ACCELEROMETER_STATUS_POSITION 1
+#define BAROMETER_STATUS_POSITION 2
+#define TEMPERATURE_STATUS_POSITION 3
+#define IMU_STATUS_POSITION 4
+
 /*Variables------------------------------------------------------------*/
 
 /*Error codes for initialization*/
-enum ErrorCode {
+enum OverallError {
     NOMINAL,
     NONCRITICAL_FAILURE,
     CRITICAL_FAILURE
+};
+
+struct InitStatus {
+    OverallError overview;
+    bool sensorNominal[NUM_SENSORS];
 };
 
 /*GPS initialization commands*/
@@ -69,9 +81,10 @@ const char UID_GPS_alt  = 'A'; //GPS - Altitude
 const char UID_time  = 't'; //Time
 const char UID_altitude = 'a'; //calculated altitude
 const char UID_state = 's'; //state machine state
+const char UID_status = 'S'; //Status identifier - followed by single digit to indicate which position
 
 /*Functions------------------------------------------------------------*/
-ErrorCode initSensors(void);
+void initSensors(InitStatus* status);
 float barSensorInit(void);
 void processRadioData(unsigned long*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
 void sendRadioData(float data, char id);

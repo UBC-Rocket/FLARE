@@ -26,20 +26,29 @@ Adafruit_BNO055 IMU(IMU_ADDRESS);
 /*Functions------------------------------------------------------------*/
 /**
   * @brief  Initializes all the sensors
-  * @param  None
-  * @return bool - Status (true for success, false for failure)
+  * @param  InitStatus *status - Status variable containing information on status.
+  *                         Note: All values in *status will be overwritten; status
+  *                         values can be then extracted.
+  * @return void
   */
-ErrorCode initSensors(void)
+
+void initSensors(InitStatus *status)
 {
-    ErrorCode status = NOMINAL;
+    status->overview = NOMINAL;
+    int i;
+    for(i = 0; i < NUM_SENSORS; i++){
+        status->sensorNominal[i] = true;
+    }
 
     /*init SD card*/
     #ifdef TESTING
     SerialUSB.println("Initializing SD card");
     #endif
     if (!SD.begin(BUILTIN_SDCARD)) {
-        if(status < NONCRITICAL_FAILURE)
-            status = NONCRITICAL_FAILURE;
+        if(status->overview < NONCRITICAL_FAILURE){
+            status->overview = NONCRITICAL_FAILURE;
+            status->sensorNominal[FILE_STATUS_POSITION] = false;
+        }
 
         #ifdef TESTING
         SerialUSB.println("ERROR: SD card initialization failed!");
@@ -47,8 +56,10 @@ ErrorCode initSensors(void)
     } else {
         datalog = SD.open("datalog.txt", FILE_WRITE);
         if (!datalog) {
-            if(status < NONCRITICAL_FAILURE)
-                status = NONCRITICAL_FAILURE;
+            if(status->overview < NONCRITICAL_FAILURE){
+                status->overview = NONCRITICAL_FAILURE;
+                status->sensorNominal[FILE_STATUS_POSITION] = false;
+            }
 
             #ifdef TESTING
             SerialUSB.println("ERROR: Opening file failed!");
@@ -77,11 +88,13 @@ ErrorCode initSensors(void)
     //barometer.begin();
     #ifdef TESTING
     if (!barometer.initializeMS_5803(true)) { //because one is verbose
-        status = CRITICAL_FAILURE;
+        status->overview = CRITICAL_FAILURE;
+        status->sensorNominal[BAROMETER_STATUS_POSITION] = false;
     }
     #else
     if (!barometer.initializeMS_5803(false)) {
-        status = CRITICAL_FAILURE;
+        status->overview = CRITICAL_FAILURE;
+        status->sensorNominal[BAROMETER_STATUS_POSITION] = false;
     }
     #endif
 
@@ -98,8 +111,10 @@ ErrorCode initSensors(void)
 
     delay(7); //TODO investigate this
     if(!IMU.begin()){
-        if(status < NONCRITICAL_FAILURE)
-            status = NONCRITICAL_FAILURE;
+        if(status->overview < NONCRITICAL_FAILURE){
+            status->overview = NONCRITICAL_FAILURE;
+            status->sensorNominal[IMU_STATUS_POSITION] = false;
+        }
 
         #ifdef TESTING
         SerialUSB.print("ERROR: IMU initialization failed!");
@@ -125,7 +140,7 @@ ErrorCode initSensors(void)
     SerialRadio.begin(921600);
     while (!SerialRadio) {}
 
-    return status;
+    return;
 }
 
 /**

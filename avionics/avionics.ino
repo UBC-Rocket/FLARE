@@ -14,7 +14,8 @@
 
 /*Variables------------------------------------------------------------*/
 File radiolog;
-ErrorCode GLOBAL_statusOfTheRocketInitialization_4319cfa404374b98ae8d858724f83424490167151de475d30bf8b83519a84f89 = NOMINAL;
+static InitStatus s_statusOfInit;
+
 /*Functions------------------------------------------------------------*/
 /**
   * @brief  The Arduino setup function
@@ -35,23 +36,23 @@ void setup()
     Wire.setDefaultTimeout(100000); //100ms
 
     /*init sensors*/
-    GLOBAL_statusOfTheRocketInitialization_4319cfa404374b98ae8d858724f83424490167151de475d30bf8b83519a84f89 = initSensors();
+    initSensors(&s_statusOfInit);
 
     /*init interrupts*/
     //attachInterrupt(digitalPinToInterrupt(LAUNCH_INTERRUPT_PIN), launchInterrupt, CHANGE)
 
     /*if something went wrong spin infinitely, otherwise indicate completion*/
-    if (GLOBAL_statusOfTheRocketInitialization_4319cfa404374b98ae8d858724f83424490167151de475d30bf8b83519a84f89 == CRITICAL_FAILURE) {
+    if (s_statusOfInit.overview == CRITICAL_FAILURE) {
         #ifdef TESTING
         SerialUSB.println("Critical failure! >:-{");
         #endif
-        SerialRadio.write("INIT CRITFAIL");
+
     }
-    else if (GLOBAL_statusOfTheRocketInitialization_4319cfa404374b98ae8d858724f83424490167151de475d30bf8b83519a84f89 == NONCRITICAL_FAILURE){
+    else if (s_statusOfInit.overview == NONCRITICAL_FAILURE){
         #ifdef TESTING
         SerialUSB.println("Noncritical failure! :(");
         #endif
-        SerialRadio.write("INIT NONCRTFAIL");
+
         pinMode(LED_BUILTIN, OUTPUT);
     }
     else {
@@ -60,7 +61,7 @@ void setup()
         #ifdef TESTING
         SerialUSB.println("Initialization complete! :D");
         #endif
-        SerialRadio.write("INIT SUCCESS");
+
     }
 }
 
@@ -93,7 +94,7 @@ void loop()
     static float prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
 
     static FlightStates state = ARMED;
-    if(GLOBAL_statusOfTheRocketInitialization_4319cfa404374b98ae8d858724f83424490167151de475d30bf8b83519a84f89 == CRITICAL_FAILURE)
+    if(s_statusOfInit.overview == CRITICAL_FAILURE)
         state = SAFED_STATE;
 
     char command[RADIO_DATA_ARRAY_SIZE];
@@ -152,7 +153,7 @@ void loop()
         processRadioData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude);
     }
 
-    if (GLOBAL_statusOfTheRocketInitialization_4319cfa404374b98ae8d858724f83424490167151de475d30bf8b83519a84f89 == NONCRITICAL_FAILURE)
+    if (s_statusOfInit.overview == NONCRITICAL_FAILURE)
     {
         init_status_new_time = millis();
         if ( (init_status_new_time - init_status_old_time) > init_status_time_interval ){
@@ -165,9 +166,6 @@ void loop()
                 digitalWrite(LED_BUILTIN, LOW);
         }
     }
-
-
-
 
 
     #ifdef TESTING
