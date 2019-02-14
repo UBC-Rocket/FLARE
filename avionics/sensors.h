@@ -5,7 +5,7 @@
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
 
-#include <string.h>
+//#include <string.h>
 
 #include "statemachine.h"
 
@@ -23,6 +23,7 @@
 #define TEMP_SENSOR_ADDRESS     0x48
 #define IMU_ADDRESS             0x37
 #define ACCELEROMETER_SCALE     6
+#define BATTERY_SENSOR_PIN      9
 
 #define ACC_DATA_ARRAY_SIZE     3
 #define BAR_DATA_ARRAY_SIZE     2
@@ -82,14 +83,15 @@ const char UID_time  = 't'; //Time
 const char UID_altitude = 'a'; //calculated altitude
 const char UID_state = 's'; //state machine state
 const char UID_status = 'S'; //Status identifier - followed by single digit to indicate which position
+const char UID_batt = 'B';  //Battery voltage
 
 /*Functions------------------------------------------------------------*/
 void initSensors(InitStatus* status);
 float barSensorInit(void);
-void processRadioData(unsigned long*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
+void processRadioData(unsigned long*, float*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
 void sendRadioData(float data, char id);
-void pollSensors(unsigned long*, float*, float*, float*, float*, float*);
-void logData(unsigned long *, float*, float*, float*, float*, float*, FlightStates, float, float);
 void generateStatusReport(InitStatus *status, char *statusReport1, char *statusReport2);
+void pollSensors(unsigned long*, float*, float*, float*, float*, float*, float*);
+void logData(unsigned long *, float*, float*, float*, float*, float*, float*, FlightStates, float, float);
 
 #endif
