@@ -90,5 +90,6 @@ void processRadioData(unsigned long*, float*, float*, float*, float*, float*, Fl
 void sendRadioData(float data, char id);
 void pollSensors(unsigned long*, float*, float*, float*, float*, float*);
 void logData(unsigned long *, float*, float*, float*, float*, float*, FlightStates, float, float);
+void generateStatusReport(InitStatus *status, char *statusReport1, char *statusReport2);
 
 #endif

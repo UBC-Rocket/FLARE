@@ -150,7 +150,28 @@ void initSensors(InitStatus *status)
         // Refer to sensors.h definitions to find what order data comes in at.
         // e.g. if all things succeeded except accelerometer, code sends:
         // "S-1-G-B-G", "S-2-G-G-X"
-    char statusReport1[RADIO_DATA_ARRAY_SIZE] = {UID_status, '1'};
+
+    char statusReport1[RADIO_DATA_ARRAY_SIZE];
+    char statusReport2[RADIO_DATA_ARRAY_SIZE];
+
+    generateStatusReport(status, statusReport1, statusReport2);
+    sendRadioResponse(statusReport1);
+    sendRadioResponse(statusReport2);
+    return;
+}
+
+/*
+ * @brief  Generates status report for initialization.
+ * @param  InitStatus status - status of initialization.
+ * @param  char* statusReport1 - char array to hold radio data
+ * @param  char* statusReport2 - same as statusReport2 but it's the 2nd half
+ * @return void
+ */
+void generateStatusReport(InitStatus *status, char *statusReport1, char *statusReport2)
+{
+    statusReport1[0] = UID_status;
+    statusReport1[1] = '1';
+
     if(status->sensorNominal[FILE_STATUS_POSITION])
         statusReport1[2] = 'G';
     else
@@ -166,7 +187,9 @@ void initSensors(InitStatus *status)
     else
         statusReport1[4] = 'B';
 
-    char statusReport2[RADIO_DATA_ARRAY_SIZE] = {UID_status, '2'};
+    statusReport2[0] = UID_status;
+    statusReport2[1] = '2';
+
     if(status->sensorNominal[TEMPERATURE_STATUS_POSITION])
         statusReport2[2] = 'G';
     else
@@ -178,10 +201,6 @@ void initSensors(InitStatus *status)
         statusReport2[3] = 'B';
 
     statusReport1[4] = 'X';
-
-    sendRadioResponse(statusReport1);
-    sendRadioResponse(statusReport2);
-    return;
 }
 
 /**
