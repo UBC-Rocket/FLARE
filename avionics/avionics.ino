@@ -1,5 +1,4 @@
 /*Main Arduino Sketch*/
-
 /*
 VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!
 
@@ -38,6 +37,20 @@ THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
 
 VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!
 */
+
+/* @file    avionics.ino
+ * @author  UBC Rocket Avionics 2018/2019
+ * @description The main arduino sketch that controls the flow
+ *     of our 30K sensors team code.
+ *
+ * @section LICENSE
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * Distributed as-is; no warranty is given.
+ */
 
 /*Includes------------------------------------------------------------*/
 #include "sensors.h"
