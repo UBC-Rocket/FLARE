@@ -36,7 +36,7 @@ enum FlightStates {
   INITIAL_DESCENT,  //5
   FINAL_DESCENT,    //6
   LANDED,          //7
-  SAFED_STATE //8 //For datalogging only
+  WINTER_CONTINGENCY //8 //For datalogging only
 };
 
 /*Functions------------------------------------------------------------*/

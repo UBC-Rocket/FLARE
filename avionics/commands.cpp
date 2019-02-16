@@ -5,7 +5,8 @@
 void doCommand(char command, FlightStates *state, InitStatus *status){
     switch (command){
         case ARM:
-            //switchState(*state, ARMED);
+            //if(*state == STANDBY) //Don't want to switch out of drogue deploy or something into Armed
+            //  switchState(*state, ARMED);
         case CAMERAS_ON:
             //turn on the cameras
         case CAMERAS_OFF:

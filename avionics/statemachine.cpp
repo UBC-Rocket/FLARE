@@ -30,7 +30,7 @@ File statelog;
  * @return void.
  */
 void switchState(FlightStates *curr_state, FlightStates new_state){
-    if(*curr_state != SAFED_STATE) //don't want to switch out of SAFED_STATE accidentally
+    if(*curr_state != WINTER_CONTINGENCY) //don't want to switch out of WINTER_CONTINGENCY accidentally
         *curr_state = new_state;
 }
 
@@ -163,7 +163,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
         case LANDED:
             break;
 
-        case SAFED_STATE:
+        case WINTER_CONTINGENCY:
             break;
 
         default:
