@@ -44,6 +44,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "statemachine.h"
 #include "calculations.h"
 #include "commands.h"
+#include "gpio.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -62,6 +63,8 @@ File radiolog;
   */
 void setup()
 {
+    initPins();
+
     bool status = true;
 
     /*init serial comms*/
