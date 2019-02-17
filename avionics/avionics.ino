@@ -67,6 +67,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 
 /*Variables------------------------------------------------------------*/
 File radiolog;
+static InitStatus s_statusOfInit;
 
 /*Functions------------------------------------------------------------*/
 /**
@@ -76,11 +77,9 @@ File radiolog;
   */
 void setup()
 {
-    initPins();
-
-    bool status = true;
-
     /*init serial comms*/
+    initPins();
+    
     #ifdef TESTING
     SerialUSB.begin(9600);
     while (!SerialUSB) {} //TODO add print in while to see what happens
@@ -92,21 +91,28 @@ void setup()
     Wire.setDefaultTimeout(100000); //100ms
 
     /*init sensors*/
-    status = initSensors();
+    initSensors(&s_statusOfInit);
 
     /*if something went wrong spin infinitely, otherwise indicate completion*/
-    if (!status) {
+    if (s_statusOfInit.overview == CRITICAL_FAILURE) {
         #ifdef TESTING
-        SerialUSB.println("Initialization failed! >:-{");
-        #else
-        while (1) {}
+        SerialUSB.println("Critical failure! >:-{");
         #endif
-    } else {
+    }
+    else if (s_statusOfInit.overview == NONCRITICAL_FAILURE){
+        #ifdef TESTING
+        SerialUSB.println("Noncritical failure! :(");
+        #endif
+
+        pinMode(LED_BUILTIN, OUTPUT);
+    }
+    else {
         pinMode(LED_BUILTIN,OUTPUT);
         digitalWrite(LED_BUILTIN,HIGH);
         #ifdef TESTING
         SerialUSB.println("Initialization complete! :D");
         #endif
+
     }
 }
 
@@ -122,26 +128,33 @@ void loop()
     static float baseline_pressure = groundAlt_init(&barometer_data_init);  // IF YOU CAN'T DO THIS USE GLOBAL VAR
     static unsigned long old_time = 0; //ms
     static unsigned long new_time = 0; //ms
+    unsigned long delta_time;
+    static uint16_t time_interval = 50; //ms
 
     static unsigned long radio_old_time = 0;
     static unsigned long radio_new_time = 0;
+    static uint16_t radio_time_interval = 300;
 
-    unsigned long delta_time;
-
-    static uint16_t time_interval = 50; //ms
+    static unsigned long init_status_old_time = 0;
+    static unsigned long init_status_new_time = 0;
+    static const uint16_t init_status_time_interval = 500;
+    static uint16_t init_status_indicator = 0;
 
     static float battery_voltage, acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE], GPS_data[GPS_DATA_ARRAY_SIZE];
     static float prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
+
     static FlightStates state = ARMED;
 
-    static uint16_t radio_time_interval = 300;
     char command[RADIO_DATA_ARRAY_SIZE];
     char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
     char goodResponse[] = {'G','x','x','x','x'};
     const char badResponse[] = {'B','B','B','B','B'};
 
-    if (SerialRadio.available() == 5) {
+    if(s_statusOfInit.overview == CRITICAL_FAILURE)
+        state = WINTER_CONTINGENCY; //makes sure that even if it does somehow get accidentally changed, it gets reverted
+
+    if (SerialRadio.available() >= 5) {
 
         #ifdef TESTING
         SerialUSB.print("Received Message: ");
@@ -150,7 +163,6 @@ void loop()
         for(int i = 0; i< RADIO_DATA_ARRAY_SIZE; i++){
             command[i] = SerialRadio.read();
         }
-
 
         bool correctCommand = check(command);
 
@@ -165,7 +177,7 @@ void loop()
             SerialUSB.println(command);
             #endif
 
-            doCommand(command[0], &state);
+            doCommand(command[0], &state, &s_statusOfInit);
             sendRadioResponse(goodResponse);
         }
         else{
@@ -195,8 +207,19 @@ void loop()
         processRadioData(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude);
     }
 
+    if (s_statusOfInit.overview == NONCRITICAL_FAILURE)
+    {
+        init_status_new_time = millis();
+        if ( (init_status_new_time - init_status_old_time) > init_status_time_interval ){
+            init_status_old_time = init_status_new_time;
+            init_status_indicator++;
 
-
+            if(init_status_indicator % 2 == 1)
+                digitalWrite(LED_BUILTIN, HIGH);
+            else
+                digitalWrite(LED_BUILTIN, LOW);
+        }
+    }
 
 
     #ifdef TESTING

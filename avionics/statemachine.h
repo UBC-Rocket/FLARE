@@ -35,7 +35,8 @@ enum FlightStates {
   PRESSURE_DELAY, //4
   INITIAL_DESCENT,  //5
   FINAL_DESCENT,    //6
-  LANDED          //7
+  LANDED,          //7
+  WINTER_CONTINGENCY //8 //For datalogging only
 };
 
 /*Functions------------------------------------------------------------*/
