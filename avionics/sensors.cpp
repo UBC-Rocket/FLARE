@@ -65,6 +65,7 @@ void initSensors(InitStatus *status)
         //     #endif
         // }
     }
+    
     #ifdef TESTING
     SerialUSB.print("Read voltage (V): ");
     SerialUSB.println(powerbattery.getVoltage());

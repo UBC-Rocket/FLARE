@@ -1,5 +1,4 @@
 /*Main Arduino Sketch*/
-
 /*
 VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!
 
@@ -39,11 +38,26 @@ THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
 VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!
 */
 
+/* @file    avionics.ino
+ * @author  UBC Rocket Avionics 2018/2019
+ * @description The main arduino sketch that controls the flow
+ *     of our 30K sensors team code.
+ *
+ * @section LICENSE
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * Distributed as-is; no warranty is given.
+ */
+
 /*Includes------------------------------------------------------------*/
 #include "sensors.h"
 #include "statemachine.h"
 #include "calculations.h"
 #include "commands.h"
+#include "gpio.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -77,9 +91,6 @@ void setup()
     /*init sensors*/
     initSensors(&s_statusOfInit);
 
-    /*init interrupts*/
-    //attachInterrupt(digitalPinToInterrupt(LAUNCH_INTERRUPT_PIN), launchInterrupt, CHANGE)
-
     /*if something went wrong spin infinitely, otherwise indicate completion*/
     if (s_statusOfInit.overview == CRITICAL_FAILURE) {
         #ifdef TESTING
@@ -110,7 +121,7 @@ void setup()
   */
 void loop()
 {
-    unsigned long timestamp;
+    static unsigned long timestamp;
     static float barometer_data_init = barSensorInit();
     static float baseline_pressure = groundAlt_init(&barometer_data_init);  // IF YOU CAN'T DO THIS USE GLOBAL VAR
     static unsigned long old_time = 0; //ms
@@ -120,57 +131,60 @@ void loop()
 
     static unsigned long radio_old_time = 0;
     static unsigned long radio_new_time = 0;
-    static uint16_t radio_time_interval = 100;
+    static uint16_t radio_time_interval = 300;
 
     static unsigned long init_status_old_time = 0;
     static unsigned long init_status_new_time = 0;
     static const uint16_t init_status_time_interval = 500;
     static uint16_t init_status_indicator = 0;
 
-    float battery_voltage, acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
+    static float battery_voltage, acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE], GPS_data[GPS_DATA_ARRAY_SIZE];
     static float prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
 
     static FlightStates state = ARMED;
-    if(s_statusOfInit.overview == CRITICAL_FAILURE)
-        state = WINTER_CONTINGENCY;
 
     char command[RADIO_DATA_ARRAY_SIZE];
     char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
     char goodResponse[] = {'G','x','x','x','x'};
     const char badResponse[] = {'B','B','B','B','B'};
 
-    if (SerialRadio.available()) {
-        //radiolog.print("Received Message: ");
+    if(s_statusOfInit.overview == CRITICAL_FAILURE)
+        state = WINTER_CONTINGENCY; //makes sure that even if it does somehow get accidentally changed, it gets reverted
+
+    if (SerialRadio.available() >= 5) {
+
         #ifdef TESTING
         SerialUSB.print("Received Message: ");
         #endif
-        while (SerialRadio.available()) {
-            for(int i = 0; i< RADIO_DATA_ARRAY_SIZE; i++){
-                command[i] = SerialRadio.read();
-            }
-            bool correctCommand = check(command);
 
-            if(correctCommand){
-               // radiolog.print(goodResponse);
-               for(int i =1; i<5; i++)
-               {
-                   goodResponse[i] = command[0];
-               }
-                #ifdef TESTING
-                SerialUSB.println(command);
-                doCommand(command[0], &state, &s_statusOfInit);
-                #endif
+        for(int i = 0; i< RADIO_DATA_ARRAY_SIZE; i++){
+            command[i] = SerialRadio.read();
+        }
 
-                sendRadioResponse(goodResponse);
-                SerialUSB.println(goodResponse);
+        bool correctCommand = check(command);
+
+        if(correctCommand){
+            for(int i =1; i<5; i++)
+            {
+                goodResponse[i] = command[0];
             }
-            else{
-                //radiolog.print(badResponse);
-                SerialUSB.println(command);
-                SerialUSB.println(goodResponse);
-                sendRadioResponse(badResponse);
-            }
+
+            #ifdef TESTING
+            SerialUSB.print("Good command: ");
+            SerialUSB.println(command);
+            #endif
+
+            doCommand(command[0], &state, &s_statusOfInit);
+            sendRadioResponse(goodResponse);
+        }
+        else{
+            #ifdef TESTING
+            SerialUSB.print("Bad command: ");
+            SerialUSB.println(command);
+            #endif
+
+            sendRadioResponse(badResponse);
         }
     }
 
