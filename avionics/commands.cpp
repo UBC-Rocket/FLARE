@@ -1,4 +1,20 @@
+/* @file    commands.cpp
+ * @author  UBC Rocket Avionics 2018/2019
+ * @description  Instructs the system to respond to the relevant
+ *  radio commands.  Also sends a response through the radio.
+ *
+ * @section LICENSE
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * Distributed as-is; no warranty is given.
+ */
+
 #include "commands.h"
+#include "gpio.h"
+#include "sensors.h"
 #include <Arduino.h>
 
 
@@ -17,16 +33,17 @@ void doCommand(char command, FlightStates * state){
         case RESET:
         //not sure
         case MAIN:
-        //testing purposes
-        digitalWrite(LED_BUILTIN, HIGH);
-        // delay(400);
-        // digitalWrite(LED_BUILTIN,LOW);
+            #ifdef GROUND_TEST  // Ground radio testing purposes
+            digitalWrite(LED_BUILTIN, HIGH);
+            deployMain();
+            #endif
         break;
         case DROGUE:
-        //testing purposes
-        // digitalWrite(LED_BUILTIN, HIGH);
-        // delay(400);
-        digitalWrite(LED_BUILTIN,LOW);
+            #ifdef GROUND_TEST
+            //testing purposes!
+            digitalWrite(LED_BUILTIN,LOW);
+            deployDrogue();
+            #endif
         break;
     }
 
