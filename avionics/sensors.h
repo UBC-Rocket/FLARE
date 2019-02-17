@@ -11,7 +11,8 @@
 
 
 /*Constants------------------------------------------------------------*/
-// #define TESTING //enable or disable debug output
+#define TESTING //enable or disable debug output
+#define GROUND_TEST
 
 #define SerialUSB               Serial
 #define SerialGPS               Serial1
