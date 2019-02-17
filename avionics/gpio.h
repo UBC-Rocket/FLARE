@@ -14,11 +14,12 @@
 #define INIT_SERVO_POS  60
 #define FINAL_SERVO_POS 160
 
-#define IGNITOR_DELAY 10
+#define IGNITOR_DELAY 10    // in milliseconds
 #define SERVO_DELAY 1000
-#define CONTINUITY_CHECK_DELAY 100// in microseconds!
+#define CONTINUITY_CHECK_DELAY 30 // in microseconds!
 
-#define DISCONTINUOUS_THRESHOLD 310 // threshold for a discontinuous ematch -> read voltage / 3.3 * 1023
+// tested at 11.1V with a 2.2k/470 divider (606)
+#define DISCONTINUOUS_THRESHOLD 500 // threshold for a discontinuous ematch -> read voltage / 3.3 * 1023
 
 /*Variables------------------------------------------------------------*/
 

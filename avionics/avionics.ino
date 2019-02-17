@@ -93,11 +93,6 @@ void setup()
 
     /*init sensors*/
     status = initSensors();
-    //need to add a futher check here
-    initPins();
-
-    /*init interrupts*/
-    //attachInterrupt(digitalPinToInterrupt(LAUNCH_INTERRUPT_PIN), launchInterrupt, CHANGE)
 
     /*if something went wrong spin infinitely, otherwise indicate completion*/
     if (!status) {
