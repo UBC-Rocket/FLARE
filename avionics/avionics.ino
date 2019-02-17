@@ -85,7 +85,6 @@ void setup()
         #ifdef TESTING
         SerialUSB.println("Critical failure! >:-{");
         #endif
-
     }
     else if (s_statusOfInit.overview == NONCRITICAL_FAILURE){
         #ifdef TESTING
@@ -134,7 +133,7 @@ void loop()
 
     static FlightStates state = ARMED;
     if(s_statusOfInit.overview == CRITICAL_FAILURE)
-        state = SAFED_STATE;
+        state = WINTER_CONTINGENCY;
 
     char command[RADIO_DATA_ARRAY_SIZE];
     char recognitionRadio[RADIO_DATA_ARRAY_SIZE];

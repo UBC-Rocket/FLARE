@@ -47,12 +47,23 @@ void initSensors(InitStatus *status)
     #ifdef TESTING
     SerialUSB.println("Initializing battery");
     #endif
-    if(powerbattery.getVoltage() <= MINIMUM_BATTERY_VOLTAGE)
-    {
-        status = false;
-        #ifdef TESTING
-        SerialUSB.println("WARNING: Battery at low voltage!");
-        #endif
+    if(powerbattery.getVoltage() <= LOW_BATTERY_VOLTAGE)
+    { //TODO: Uncomment once the battery sensor is implemented
+        //status->sensorNominal[BATTERY_STATUS_POSITION] = false;
+        // if(powerbattery.getVoltage() <= MINIMUM_BATTERY_VOLTAGE){
+        //     status->overview = CRITICAL_FAILURE;
+        //     #ifdef TESTING
+        //     SerialUSB.println("DANGER: BATTERY AT UNACCEPTABLY LOW VOLTAGE!");
+        //     #endif
+        // }
+        // else{
+        //     if(status->overview < NONCRITICAL_FAILURE){
+        //         status->overview = NONCRITICAL_FAILURE;
+        //     }
+        //     #ifdef TESTING
+        //     SerialUSB.println("WARNING: Battery at low voltage!");
+        //     #endif
+        // }
     }
     #ifdef TESTING
     SerialUSB.print("Read voltage (V): ");
@@ -161,6 +172,12 @@ void initSensors(InitStatus *status)
     /* log initialization status for each sensor */
     // 'X' for N/A, 'G' for good, 'B' for bad
     datalog.write("X,X,"); //time, state;
+
+    if(status->sensorNominal[BATTERY_STATUS_POSITION])
+        datalog.write("G,");
+    else
+        datalog.write("B,");
+
     if(status->sensorNominal[ACCELEROMETER_STATUS_POSITION])
         datalog.write("G,G,G,");
     else
@@ -221,30 +238,34 @@ void generateStatusReport(InitStatus *status, char *statusReport1, char *statusR
     else
         statusReport1[2] = 'B';
 
-    if(status->sensorNominal[ACCELEROMETER_STATUS_POSITION])
+    if(status->sensorNominal[BATTERY_STATUS_POSITION])
         statusReport1[3] = 'G';
     else
         statusReport1[3] = 'B';
 
-    if(status->sensorNominal[BAROMETER_STATUS_POSITION])
+    if(status->sensorNominal[ACCELEROMETER_STATUS_POSITION])
         statusReport1[4] = 'G';
     else
         statusReport1[4] = 'B';
 
+
     statusReport2[0] = UID_status;
     statusReport2[1] = '2';
 
-    if(status->sensorNominal[TEMPERATURE_STATUS_POSITION])
+    if(status->sensorNominal[BAROMETER_STATUS_POSITION])
         statusReport2[2] = 'G';
     else
         statusReport2[2] = 'B';
 
-    if(status->sensorNominal[IMU_STATUS_POSITION])
+    if(status->sensorNominal[TEMPERATURE_STATUS_POSITION])
         statusReport2[3] = 'G';
     else
         statusReport2[3] = 'B';
 
-    statusReport1[4] = 'X';
+    if(status->sensorNominal[IMU_STATUS_POSITION])
+        statusReport2[4] = 'G';
+    else
+        statusReport2[4] = 'B';
 }
 
 /**

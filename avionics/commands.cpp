@@ -1,5 +1,6 @@
 #include "commands.h"
 #include <Arduino.h>
+#include "sensors.h"
 
 
 void doCommand(char command, FlightStates *state, InitStatus *status){
