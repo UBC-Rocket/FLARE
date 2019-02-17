@@ -78,6 +78,8 @@ static InitStatus s_statusOfInit;
 void setup()
 {
     /*init serial comms*/
+    initPins();
+    
     #ifdef TESTING
     SerialUSB.begin(9600);
     while (!SerialUSB) {} //TODO add print in while to see what happens
