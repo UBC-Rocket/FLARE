@@ -41,8 +41,8 @@ void initPins(void)
     #endif
 
     /*init ematch continuity check pins */
-    pinMode(CONTINUITY_CHECK_PIN, OUTPUT);
-    digitalWrite(CONTINUITY_CHECK_PIN, LOW);
+    // pinMode(CONTINUITY_CHECK_PIN, OUTPUT);
+    // digitalWrite(CONTINUITY_CHECK_PIN, LOW);
     // the ADC read pin does not need to be initialized !!
 
     #ifdef TESTING

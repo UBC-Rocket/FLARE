@@ -15,7 +15,7 @@
 #define FINAL_SERVO_POS 160
 
 #define IGNITOR_DELAY 10
-#define SERVO_DELAY 2000
+#define SERVO_DELAY 1000
 #define CONTINUITY_CHECK_DELAY 100// in microseconds!
 
 #define DISCONTINUOUS_THRESHOLD 310 // threshold for a discontinuous ematch -> read voltage / 3.3 * 1023

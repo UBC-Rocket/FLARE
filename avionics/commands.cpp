@@ -1,4 +1,5 @@
 #include "commands.h"
+#include "gpio.h"
 #include <Arduino.h>
 
 
@@ -19,14 +20,12 @@ void doCommand(char command, FlightStates * state){
         case MAIN:
         //testing purposes
         digitalWrite(LED_BUILTIN, HIGH);
-        // delay(400);
-        // digitalWrite(LED_BUILTIN,LOW);
+        deployMain();
         break;
         case DROGUE:
         //testing purposes
-        // digitalWrite(LED_BUILTIN, HIGH);
-        // delay(400);
         digitalWrite(LED_BUILTIN,LOW);
+        deployDrogue();
         break;
     }
 

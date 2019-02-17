@@ -93,6 +93,8 @@ void setup()
 
     /*init sensors*/
     status = initSensors();
+    //need to add a futher check here
+    initPins();
 
     /*init interrupts*/
     //attachInterrupt(digitalPinToInterrupt(LAUNCH_INTERRUPT_PIN), launchInterrupt, CHANGE)
@@ -120,7 +122,7 @@ void setup()
   */
 void loop()
 {
-    unsigned long timestamp;
+    static unsigned long timestamp;
     static float barometer_data_init = barSensorInit();
     static float baseline_pressure = groundAlt_init(&barometer_data_init);  // IF YOU CAN'T DO THIS USE GLOBAL VAR
     static unsigned long old_time = 0; //ms
@@ -133,48 +135,51 @@ void loop()
 
     static uint16_t time_interval = 50; //ms
 
-    float battery_voltage, acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
+    static float battery_voltage, acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE], GPS_data[GPS_DATA_ARRAY_SIZE];
     static float prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
     static FlightStates state = ARMED;
 
-    static uint16_t radio_time_interval = 100;
+    static uint16_t radio_time_interval = 300;
     char command[RADIO_DATA_ARRAY_SIZE];
     char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
     char goodResponse[] = {'G','x','x','x','x'};
     const char badResponse[] = {'B','B','B','B','B'};
 
-    if (SerialRadio.available()) {
-        //radiolog.print("Received Message: ");
+    if (SerialRadio.available() == 5) {
+
         #ifdef TESTING
         SerialUSB.print("Received Message: ");
         #endif
-        while (SerialRadio.available()) {
-            for(int i = 0; i< RADIO_DATA_ARRAY_SIZE; i++){
-                command[i] = SerialRadio.read();
-            }
-            bool correctCommand = check(command);
 
-            if(correctCommand){
-               // radiolog.print(goodResponse);
-               for(int i =1; i<5; i++)
-               {
-                   goodResponse[i] = command[0];
-               }
-                #ifdef TESTING
-                SerialUSB.println(command);
-                doCommand(command[0], &state);
-                #endif
+        for(int i = 0; i< RADIO_DATA_ARRAY_SIZE; i++){
+            command[i] = SerialRadio.read();
+        }
 
-                sendRadioResponse(goodResponse);
-                SerialUSB.println(goodResponse);
+
+        bool correctCommand = check(command);
+
+        if(correctCommand){
+            for(int i =1; i<5; i++)
+            {
+                goodResponse[i] = command[0];
             }
-            else{
-                //radiolog.print(badResponse);
-                SerialUSB.println(command);
-                SerialUSB.println(goodResponse);
-                sendRadioResponse(badResponse);
-            }
+
+            #ifdef TESTING
+            SerialUSB.print("Good command: ");
+            SerialUSB.println(command);
+            #endif
+
+            doCommand(command[0], &state);
+            sendRadioResponse(goodResponse);
+        }
+        else{
+            #ifdef TESTING
+            SerialUSB.print("Bad command: ");
+            SerialUSB.println(command);
+            #endif
+
+            sendRadioResponse(badResponse);
         }
     }
 
