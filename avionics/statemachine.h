@@ -6,14 +6,15 @@
 #include "groundaltitude.h"
 
 /*Constants------------------------------------------------------------*/
-#define LAUNCH_CHECKS 4
+#define STANDBY_LAUNCH_CHECKS 4
+#define ARMED_LAUNCH_CHECKS 4
 #define MACH_CHECKS 3
 #define APOGEE_CHECKS   5
 #define MACH_LOCK_CHECKS 20
 #define MAIN_CHECKS     10
 #define LAND_CHECKS     6
 
-#define LAUNCH_THRESHOLD 10 //150 // in meters
+#define LAUNCH_THRESHOLD 25 //150 // in meters
 #define MACH_THRESHOLD 275 //in meters per second
 #define MACH_LOCK_THRESHOLD 250 //in meters per second
 #define FINAL_DESCENT_THRESHOLD 14 //meters
@@ -25,6 +26,10 @@
 
 #define APOGEE_DELAY 3000 //ms
 #define LANDING_TIME_INTERVAL 10000 //ms
+
+#define STANDBY_TIME_INTERVAL 500 //ms
+#define LANDED_TIME_INTERVAL 2000 //ms
+#define NOMINAL_TIME_INTERVAL 50  //ms
 
 /*Variables------------------------------------------------------------*/
 enum FlightStates {
@@ -41,6 +46,7 @@ enum FlightStates {
 
 /*Functions------------------------------------------------------------*/
 void switchState(FlightStates *curr_state, FlightStates new_state);
-void stateMachine(float*, float*, float*, float*, float*, float*, FlightStates*);
+void stateMachine(float*, float*, float*, float*, float*, float*, float*, FlightStates*);
+
 
 #endif

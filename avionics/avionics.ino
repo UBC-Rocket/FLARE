@@ -31,7 +31,10 @@ $$$$"""$$$$$$$$$$uuu   uu$$$$$$$$$"""$$$"
 
 In order to successfully poll the GPS, the serial RX buffer size must be increased. This needs
 to be done on the computer used for compilation. This can be done by navigating to the following
-path in the Arduino contents folder: ‎⁨Contents⁩/⁨Java⁩/⁨hardware⁩/⁨teensy⁩/⁨avr⁩/⁨cores⁩/⁨teensy3⁩/serial1.c.
+path in the Arduino contents folder:
+On Mac: ‎⁨Contents⁩/⁨Java⁩/⁨hardware⁩/⁨teensy⁩/⁨avr⁩/⁨cores⁩/⁨teensy3⁩/serial1.c
+On Windows: [user_drive]\Program Files (x86)\Arduino\hardware\teensy\avr\cores\teensy3\serial1.c
+
 On line 43 increase SERIAL1_RX_BUFFER_SIZE from 64 to 128.
 THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
 
@@ -58,6 +61,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "calculations.h"
 #include "commands.h"
 #include "gpio.h"
+#include "groundaltitude.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -68,6 +72,9 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 /*Variables------------------------------------------------------------*/
 File radiolog;
 static InitStatus s_statusOfInit;
+static float pressure_set[PRESSURE_AVG_SET_SIZE]; //set of pressure values for a floating average
+static float baseline_pressure;
+static float ground_alt_arr[GROUND_ALT_SIZE]; //values for the baseline pressure calculation
 
 /*Functions------------------------------------------------------------*/
 /**
@@ -77,9 +84,11 @@ static InitStatus s_statusOfInit;
   */
 void setup()
 {
-    /*init serial comms*/
+    int i;
+
     initPins();
-    
+
+    /*init serial comms*/
     #ifdef TESTING
     SerialUSB.begin(9600);
     while (!SerialUSB) {} //TODO add print in while to see what happens
@@ -114,6 +123,18 @@ void setup()
         #endif
 
     }
+
+    /* init various arrays */
+    baseline_pressure = barSensorInit(); /* for baseline pressure calculation */
+    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) // for moving average
+    {
+        pressure_set[i] = baseline_pressure;
+    }
+
+    for(i = 0; i < GROUND_ALT_SIZE; i++)
+    {
+        ground_alt_arr[i] = baseline_pressure;
+    }
 }
 
 /**
@@ -124,12 +145,10 @@ void setup()
 void loop()
 {
     static unsigned long timestamp;
-    static float barometer_data_init = barSensorInit();
-    static float baseline_pressure = groundAlt_init(&barometer_data_init);  // IF YOU CAN'T DO THIS USE GLOBAL VAR
     static unsigned long old_time = 0; //ms
     static unsigned long new_time = 0; //ms
     unsigned long delta_time;
-    static uint16_t time_interval = 50; //ms
+    static uint16_t time_interval = NOMINAL_TIME_INTERVAL; //ms
 
     static unsigned long radio_old_time = 0;
     static unsigned long radio_new_time = 0;
@@ -142,6 +161,7 @@ void loop()
 
     static float battery_voltage, acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE], GPS_data[GPS_DATA_ARRAY_SIZE];
+
     static float prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
 
     static FlightStates state = ARMED;
@@ -190,13 +210,21 @@ void loop()
         }
     }
 
+    if(state == STANDBY)
+        time_interval = STANDBY_TIME_INTERVAL;
+    else if (state == LANDED)
+        time_interval = LANDED_TIME_INTERVAL;
+    else
+        time_interval = NOMINAL_TIME_INTERVAL;
+
     new_time = millis();
     if ((new_time - old_time) >= time_interval) {
         delta_time = new_time - old_time;
         old_time = new_time;
+
         pollSensors(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
-        calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &prev_delta_altitude, &baseline_pressure, &delta_time);
-        stateMachine(&altitude, &delta_altitude, &prev_altitude, bar_data, &baseline_pressure, &ground_altitude, &state);
+        calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &prev_delta_altitude, &baseline_pressure, &delta_time, pressure_set);
+        stateMachine(&altitude, &delta_altitude, &prev_altitude, bar_data, &baseline_pressure, &ground_altitude, ground_alt_arr, &state);
         logData(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure);
     }
 

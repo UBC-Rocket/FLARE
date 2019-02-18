@@ -9,9 +9,8 @@
 
 #include "statemachine.h"
 
-
 /*Constants------------------------------------------------------------*/
-//#define TESTING //enable or disable debug output
+#define TESTING //enable or disable debug output
 #define GROUND_TEST
 
 #define SerialUSB               Serial
@@ -95,5 +94,8 @@ void sendRadioData(float data, char id);
 void generateStatusReport(InitStatus *status, char *statusReport1, char *statusReport2);
 void pollSensors(unsigned long*, float*, float*, float*, float*, float*, float*);
 void logData(unsigned long *, float*, float*, float*, float*, float*, float*, FlightStates, float, float);
+void processRadioData(unsigned long*, float*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
+void sendRadioData(float data, char id);
+
 
 #endif
