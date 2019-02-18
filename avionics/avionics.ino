@@ -82,8 +82,6 @@ static float ground_alt_arr[GROUND_ALT_SIZE]; //values for the baseline pressure
   * @param  None
   * @return None
   */
-
-
 void setup()
 {
     int i;
@@ -150,7 +148,7 @@ void loop()
     static unsigned long old_time = 0; //ms
     static unsigned long new_time = 0; //ms
     unsigned long delta_time;
-    static uint16_t time_interval = 50; //ms
+    static uint16_t time_interval = NOMINAL_TIME_INTERVAL; //ms
 
     static unsigned long radio_old_time = 0;
     static unsigned long radio_new_time = 0;
@@ -211,6 +209,13 @@ void loop()
             sendRadioResponse(badResponse);
         }
     }
+
+    if(state == STANDBY)
+        time_interval = STANDBY_TIME_INTERVAL;
+    else if (state == LANDED)
+        time_interval = LANDED_TIME_INTERVAL;
+    else
+        time_interval = NOMINAL_TIME_INTERVAL;
 
     new_time = millis();
     if ((new_time - old_time) >= time_interval) {

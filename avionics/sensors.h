@@ -9,7 +9,6 @@
 
 #include "statemachine.h"
 
-
 /*Constants------------------------------------------------------------*/
 #define TESTING //enable or disable debug output
 #define GROUND_TEST

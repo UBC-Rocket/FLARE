@@ -54,7 +54,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
         case STANDBY:
             if (*altitude > LAUNCH_THRESHOLD) {
                 launch_count++;
-                if (launch_count >= LAUNCH_CHECKS){
+                if (launch_count >= STANDBY_LAUNCH_CHECKS){
                     switchState(state, ASCENT);
                     launch_count = 0;
                 }
@@ -69,7 +69,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
         case ARMED:
             if (*altitude > LAUNCH_THRESHOLD) {
                 armed_count++;
-                if (armed_count >= LAUNCH_CHECKS){
+                if (armed_count >= ARMED_LAUNCH_CHECKS){
                     switchState(state, ASCENT);
                     armed_count = 0;
                 }

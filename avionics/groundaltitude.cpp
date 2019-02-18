@@ -20,26 +20,8 @@
 #include <Arduino.h>
 
 /*Variables------------------------------------------------------------*/
-//float GLOBAL_ground_alt_arr[ground_alt_size];
-//float prev_bar_data;
 
 /*Functions------------------------------------------------------------*/
-/* float groundAlt_init(float*){}
- * @brief  Initializes the ground altitude array.
- * @param  float *barometer_data_init - Sensor data from the barometer in millibars, read at startup.
- * @return float baseline_pressure_init - The moving average of the now initialized ground altitude array, in millibars.
- */
-// float groundAlt_init(float *barometer_data_init){
-//     int i = 0;
-//     float baseline_pressure_init, sum_arr;
-//     for (i = 0; i < ground_alt_size; i ++){
-//         GLOBAL_ground_alt_arr[i] = *barometer_data_init;
-//     }
-//     sum_arr = groundAlt_arr_sum();
-// //  prev_bar_data = *barometer_data_init;
-//     baseline_pressure_init = (sum_arr / ground_alt_size);
-//     return baseline_pressure_init;
-// }
 
 /* float groundAlt_arr_sum(){}
  * @brief  Sums the ground altitude array.
@@ -75,5 +57,11 @@ float groundAlt_update(float *bar_data, float ground_alt_arr[]){
     sum_arr_update = groundAlt_arr_sum(ground_alt_arr);
     baseline_pressure_update = (sum_arr_update / GROUND_ALT_SIZE);
     k++;
+
+    #ifdef TESTING
+    SerialUSB.print("GROUND PRESSURE UPDATE: ");
+    SerialUSB.println(baseline_pressure_update);
+    #endif
+
     return baseline_pressure_update;
 }
