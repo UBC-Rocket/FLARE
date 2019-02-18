@@ -314,51 +314,5 @@ void calculateValues(float acc_data[], float bar_data[], float* abs_accel,
 
 
 
-void processRadioData(unsigned long *timestamp, float* battery_voltage, float acc_data[], float bar_data[],
-    float *temp_sensor_data, float IMU_data[], float* GPS_data, FlightStates state, float altitude){
 
-    float time = *timestamp;
-    sendRadioData(time, 't');
-    sendRadioData(*battery_voltage, UID_batt);
-
-    sendRadioData(acc_data[0], UID_acc_acc_x);
-    sendRadioData(acc_data[1], UID_acc_acc_y);
-    sendRadioData(acc_data[2], UID_acc_acc_z);
-
-    sendRadioData(bar_data[0], UID_bar_pres);
-    sendRadioData(bar_data[1], UID_bar_temp);
-
-    sendRadioData(*temp_sensor_data, UID_temp_temp);
-
-    sendRadioData(IMU_data[0], UID_IMU_acc_x);
-    sendRadioData(IMU_data[1], UID_IMU_acc_y);
-    sendRadioData(IMU_data[2], UID_IMU_acc_z);
-    sendRadioData(IMU_data[3], UID_IMU_gyro_x);
-    sendRadioData(IMU_data[4], UID_IMU_gyro_y);
-    sendRadioData(IMU_data[5], UID_IMU_gyro_z);
-    sendRadioData(IMU_data[6], UID_IMU_mag_x);
-    sendRadioData(IMU_data[7], UID_IMU_mag_y);
-    sendRadioData(IMU_data[8], UID_IMU_mag_z);
-    sendRadioData( altitude, UID_altitude);
-    sendRadioData((float) state, UID_state);
-
-
-
-    // gps_data is already float?
-    sendRadioData(GPS_data[0], UID_GPS_lat);
-    sendRadioData(GPS_data[1], UID_GPS_long);
-    sendRadioData(GPS_data[2], UID_GPS_alt);
-
-}
-
-void sendRadioData(float data, char id){
-    //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly
-     u_int8_t b[4];
-      *(float*) b = data;
-      SerialRadio.write(id);
-      for(int i=0; i<4; i++)
-      {
-          SerialRadio.write(b[i]);
-      }
-}
 

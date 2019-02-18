@@ -58,6 +58,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "calculations.h"
 #include "commands.h"
 #include "gpio.h"
+#include "radio.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -123,8 +124,9 @@ void loop()
     static unsigned long old_time = 0; //ms
     static unsigned long new_time = 0; //ms
 
-    static unsigned long radio_old_time = 0;
-    static unsigned long radio_new_time = 0;
+    static unsigned long tier_one_old_time = 0;
+    static unsigned long tier_two_old_time = 0;
+    static unsigned long tier_three_old_time = 0;
 
     unsigned long delta_time;
 
@@ -135,7 +137,10 @@ void loop()
     static float prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
     static FlightStates state = ARMED;
 
-    static uint16_t radio_time_interval = 300;
+    static uint16_t tier_one_interval = 200;
+    static uint16_t tier_two_interval = 1000;
+    static uint16_t tier_three_interval = 10000;
+
     char command[RADIO_DATA_ARRAY_SIZE];
     char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
     char goodResponse[] = {'G','x','x','x','x'};
@@ -188,11 +193,19 @@ void loop()
         logData(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure);
     }
 
+    if((new_time - tier_one_old_time) >= tier_one_interval) {
+        sendTierOne(&timestamp, GPS_data, bar_data, state, altitude);
+        tier_one_old_time = new_time;
+    }
 
-    radio_new_time = millis();
-    if ( (radio_new_time - radio_old_time) > radio_time_interval ){
-        radio_old_time = radio_new_time;
-        processRadioData(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude);
+    if ( (new_time - tier_two_old_time) >= tier_two_interval ){
+        sendTierTwo(acc_data, bar_data, &temp_sensor_data, IMU_data);
+        tier_two_old_time = new_time;
+    }
+
+     if ( (new_time - tier_three_old_time) >= tier_three_interval ){
+        sendTierThree(&battery_voltage, &ground_altitude);
+        tier_three_old_time = new_time;
     }
 
 
