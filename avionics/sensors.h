@@ -12,6 +12,7 @@
 
 /*Constants------------------------------------------------------------*/
 #define TESTING //enable or disable debug output
+#define GROUND_TEST
 
 #define SerialUSB               Serial
 #define SerialGPS               Serial1
@@ -33,7 +34,27 @@
 
 #define RADIO_DATA_ARRAY_SIZE   5
 
+#define NUM_SENSORS 6
+#define FILE_STATUS_POSITION 0
+#define BATTERY_STATUS_POSITION 1
+#define ACCELEROMETER_STATUS_POSITION 2
+#define BAROMETER_STATUS_POSITION 3
+#define TEMPERATURE_STATUS_POSITION 4
+#define IMU_STATUS_POSITION 5
+
 /*Variables------------------------------------------------------------*/
+
+/*Error codes for initialization*/
+enum OverallError {
+    NOMINAL,
+    NONCRITICAL_FAILURE,
+    CRITICAL_FAILURE
+};
+
+struct InitStatus {
+    OverallError overview;
+    bool sensorNominal[NUM_SENSORS];
+};
 
 /*GPS initialization commands*/
 const uint8_t GPS_reset_defaults[] = {0xA0, 0xA1, 0x00, 0x02, 0x04, 0x00, 0x04, 0x0D, 0x0A};
@@ -63,11 +84,15 @@ const char UID_GPS_alt  = 'A'; //GPS - Altitude
 const char UID_time  = 't'; //Time
 const char UID_altitude = 'a'; //calculated altitude
 const char UID_state = 's'; //state machine state
+const char UID_status = 'S'; //Status identifier - followed by single digit to indicate which position
 const char UID_batt = 'B';  //Battery voltage
 
 /*Functions------------------------------------------------------------*/
-bool initSensors(void);
+void initSensors(InitStatus* status);
 float barSensorInit(void);
+void processRadioData(unsigned long*, float*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
+void sendRadioData(float data, char id);
+void generateStatusReport(InitStatus *status, char *statusReport1, char *statusReport2);
 void pollSensors(unsigned long*, float*, float*, float*, float*, float*, float*);
 void logData(unsigned long *, float*, float*, float*, float*, float*, float*, FlightStates, float, float);
 void processRadioData(unsigned long*, float*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
