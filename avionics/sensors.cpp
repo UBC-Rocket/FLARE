@@ -8,6 +8,7 @@
 #include "SparkFunTMP102.h"         //temp sensor
 #include "Adafruit_BNO055.h"        //IMU
 #include "Venus638FLPx.h"           //GPS
+#include "gpio.h"                   //GPIO
 
 #include "commands.h"               //for sendRadioResponse(const char* response);
 
@@ -39,7 +40,7 @@ void initSensors(InitStatus *status)
 {
     status->overview = NOMINAL;
     int i;
-    for(i = 0; i < NUM_SENSORS; i++){
+    for(i = 0; i < NUM_SENSORS; i++){       // + 1 for ematch continuity
         status->sensorNominal[i] = true;
     }
 
@@ -71,6 +72,19 @@ void initSensors(InitStatus *status)
     SerialUSB.println(powerbattery.getVoltage());
     #endif
 
+    /* check ematch continuity */
+    #ifdef TESTING
+    SerialUSB.println("Checking ematch continuity");
+    #endif
+
+    if (!continuityCheck()){
+        status->overview = CRITICAL_FAILURE;
+        status->sensorNominal[EMATCH_STATUS_POSITION] = false;
+
+        #ifdef TESTING
+        SerialUSB.println("ERROR: ematch continuity");
+        #endif
+    }
 
     /*init SD card*/
     #ifdef TESTING
@@ -100,7 +114,7 @@ void initSensors(InitStatus *status)
             datalog.write("Time (ms), State, Battery Voltage (V),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
             "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
             "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
-            "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude\n");
+            "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude,ematch\n");
         }
     }
 
@@ -201,7 +215,12 @@ void initSensors(InitStatus *status)
     else
         datalog.write("B,B,B,");
 
-    datalog.write("X, X, X\n"); //GPS - as of time of writing, no capability to test success
+    datalog.write("X, X, X,");   //\n"); //GPS - as of time of writing, no capability to test success
+
+    if(status->sensorNominal[EMATCH_STATUS_POSITION])
+        datalog.write("G\n");
+    else
+        datalog.write("B\n");
 
 
     /* transmit sensor report */
