@@ -63,9 +63,11 @@ void doCommand(char command, FlightStates *state, InitStatus *status){
         case STATUS:
             char statusReport1[RADIO_DATA_ARRAY_SIZE];
             char statusReport2[RADIO_DATA_ARRAY_SIZE];
-            generateStatusReport(status, statusReport1, statusReport2);
+            char statusReport3[RADIO_DATA_ARRAY_SIZE];
+            generateStatusReport(status, statusReport1, statusReport2, statusReport3);
             sendRadioResponse(statusReport1);
             sendRadioResponse(statusReport2);
+            sendRadioResponse(statusReport3);
             break;
 
         default:

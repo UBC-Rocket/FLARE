@@ -230,25 +230,27 @@ void initSensors(InitStatus *status)
         // (good/bad), X indicates no sensor for that value yet.
         // Refer to sensors.h definitions to find what order data comes in at.
         // e.g. if all things succeeded except accelerometer, code sends:
-        // "S-1-G-B-G", "S-2-G-G-X"
+        // "S-1-G-B-G", "S-2-G-G-G", "S-3-G-X-X"
 
     char statusReport1[RADIO_DATA_ARRAY_SIZE];
     char statusReport2[RADIO_DATA_ARRAY_SIZE];
+    char statusReport3[RADIO_DATA_ARRAY_SIZE];
 
-    generateStatusReport(status, statusReport1, statusReport2);
+    generateStatusReport(status, statusReport1, statusReport2, statusReport3);
     sendRadioResponse(statusReport1);
     sendRadioResponse(statusReport2);
+    sendRadioResponse(statusReport3);
     return;
 }
 
 /*
- * @brief  Generates status report for initialization.
+ * @brief  Generates status report for initialization. 'G' for good, 'B' for bad, 'X' for Not applicable
  * @param  InitStatus status - status of initialization.
  * @param  char* statusReport1 - char array to hold radio data
  * @param  char* statusReport2 - same as statusReport2 but it's the 2nd half
  * @return void
  */
-void generateStatusReport(InitStatus *status, char *statusReport1, char *statusReport2)
+void generateStatusReport(InitStatus *status, char *statusReport1, char *statusReport2, char *statusReport3)
 {
     statusReport1[0] = UID_status;
     statusReport1[1] = '1';
@@ -286,6 +288,18 @@ void generateStatusReport(InitStatus *status, char *statusReport1, char *statusR
         statusReport2[4] = 'G';
     else
         statusReport2[4] = 'B';
+
+
+    statusReport3[0] = UID_status;
+    statusReport3[1] = '3';
+
+    if(status->sensorNominal[EMATCH_STATUS_POSITION])
+        statusReport3[2] = 'G';
+    else
+        statusReport3[2] = 'B';
+
+    statusReport3[3] = 'X';
+    statusReport3[4] = 'X';
 }
 
 /**
