@@ -215,9 +215,9 @@ void initSensors(InitStatus *status)
     else
         datalog.write("B,B,B,");
 
-    datalog.write("X, X, X,");   //\n"); //GPS - as of time of writing, no capability to test success
+    datalog.write("X, X, X,");   //GPS - as of time of writing, no capability to test success
 
-    if(status->sensorNominal[EMATCH_STATUS_POSITION])
+    if(status->sensorNominal[EMATCH_STATUS_POSITION])   //ematch continuity
         datalog.write("G\n");
     else
         datalog.write("B\n");
