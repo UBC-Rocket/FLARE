@@ -9,7 +9,7 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <i2c_t3.h>
-#include <SD.h> 
+#include <SD.h>
 #include <string.h>
 
 /*Variables------------------------------------------------------------*/
@@ -89,6 +89,18 @@ void loop()
     const char goodResponse[] = {'G','x','x','x','x'};
     const char badResponse[] = {'B','B','B','B','B'};
 
+    //TESTING THE CAMERA
+       while(1){
+        power_cameras();
+        delay(5000);
+        // start_record();
+        // delay(10000);
+        // stop_record();
+        // delay(1000);
+        power_cameras();
+        delay(5000);
+    }
+
     if (SerialRadio.available()) {
         radiolog.print("Received Message: ");
         #ifdef TESTING
@@ -105,13 +117,13 @@ void loop()
                 sendRadioResponse(goodResponse);
                 #ifdef TESTING
                 SerialUSB.print(command);
-                doCommand(command[0], &state); 
+                doCommand(command[0], &state);
                 #endif
             }
             else{
                 radiolog.print(badResponse);
                 sendRadioResponse(badResponse);
-            } 
+            }
             radiolog.print(command);
         }
     }
@@ -126,7 +138,7 @@ void loop()
         logData(&timestamp, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure);
     }
 
-    
+
     radio_new_time = millis();
     if ( (radio_new_time - radio_old_time) > radio_time_interval ){
         radio_old_time = radio_new_time;
@@ -142,13 +154,13 @@ void loop()
     #endif
 }
 
-//checks if all indexes are equal for radio commands 
+//checks if all indexes are equal for radio commands
 bool check(char *radioCommand)
- {   
+ {
     const char a0 = radioCommand[0];
 
-    for (int i = 1; i < 5; i++)      
-    {         
+    for (int i = 1; i < 5; i++)
+    {
         if (radioCommand[i] != a0)
             return false;
     }
