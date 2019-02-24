@@ -1,4 +1,4 @@
-/*Sensors Header*/
+/*Commands Header*/
 #ifndef COMMANDS_H
 #define COMMANDS_H
 

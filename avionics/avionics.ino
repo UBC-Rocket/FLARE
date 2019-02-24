@@ -211,11 +211,11 @@ void loop()
     }
 
     if(state == STANDBY)
-        time_interval = STANDBY_TIME_INTERVAL;
+        time_interval = STANDBY_POLLING_TIME_INTERVAL;
     else if (state == LANDED)
-        time_interval = LANDED_TIME_INTERVAL;
+        time_interval = LANDED_POLLING_TIME_INTERVAL;
     else
-        time_interval = NOMINAL_TIME_INTERVAL;
+        time_interval = NOMINAL_POLLING_TIME_INTERVAL;
 
     new_time = millis();
     if ((new_time - old_time) >= time_interval) {

@@ -11,7 +11,6 @@
  * Distributed as-is; no warranty is given.
  */
 
-
 /*Includes------------------------------------------------------------*/
 #include "calculations.h"
 #include <math.h>
