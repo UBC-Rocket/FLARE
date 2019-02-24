@@ -33,13 +33,14 @@
 
 #define RADIO_DATA_ARRAY_SIZE   5
 
-#define NUM_SENSORS 6
+#define NUM_SENSORS 7       // + 1 = 7 for ematch checking
 #define FILE_STATUS_POSITION 0
 #define BATTERY_STATUS_POSITION 1
 #define ACCELEROMETER_STATUS_POSITION 2
 #define BAROMETER_STATUS_POSITION 3
 #define TEMPERATURE_STATUS_POSITION 4
 #define IMU_STATUS_POSITION 5
+#define EMATCH_STATUS_POSITION 6
 
 /*Variables------------------------------------------------------------*/
 
@@ -91,7 +92,7 @@ void initSensors(InitStatus* status);
 float barSensorInit(void);
 void processRadioData(unsigned long*, float*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
 void sendRadioData(float data, char id);
-void generateStatusReport(InitStatus *status, char *statusReport1, char *statusReport2);
+void generateStatusReport(InitStatus *status, char *statusReport1, char *statusReport2, char *statusReport3);
 void pollSensors(unsigned long*, float*, float*, float*, float*, float*, float*);
 void logData(unsigned long *, float*, float*, float*, float*, float*, float*, FlightStates, float, float);
 void processRadioData(unsigned long*, float*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
