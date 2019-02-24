@@ -195,16 +195,19 @@ void loop()
 
     if((new_time - tier_one_old_time) >= tier_one_interval) {
         sendTierOne(&timestamp, GPS_data, bar_data, state, altitude);
+        //bodyTierOne(bar_data, state, altitude, &timestamp);
+       // noseconeTierOne(&timestamp, GPS_data);
         tier_one_old_time = new_time;
     }
 
     if ( (new_time - tier_two_old_time) >= tier_two_interval ){
         sendTierTwo(acc_data, bar_data, &temp_sensor_data, IMU_data);
+        //noseconeTierTwo(bar_data, acc_data, &temp_sensor_data, IMU_data);
         tier_two_old_time = new_time;
     }
 
-     if ( (new_time - tier_three_old_time) >= tier_three_interval ){
-        sendTierThree(&battery_voltage, &ground_altitude);
+    if ( (new_time - tier_three_old_time) >= tier_three_interval ){
+       sendTierThree(&battery_voltage, &ground_altitude);
         tier_three_old_time = new_time;
     }
 
