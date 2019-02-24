@@ -148,7 +148,7 @@ void loop()
     static unsigned long old_time = 0; //ms
     static unsigned long new_time = 0; //ms
     unsigned long delta_time;
-    static uint16_t time_interval = NOMINAL_TIME_INTERVAL; //ms
+    static uint16_t time_interval = NOMINAL_POLLING_TIME_INTERVAL; //ms
 
     static unsigned long radio_old_time = 0;
     static unsigned long radio_new_time = 0;
