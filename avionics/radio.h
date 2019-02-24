@@ -11,16 +11,16 @@ const char UID_acc_acc_z  = 'Z'; //Accelerometer - Acceleration Z
 const char UID_bar_pres  = 'P'; //Barometer - Pressure
 const char UID_bar_temp  = '~'; //Barometer - Temperature
 const char UID_temp_temp  = 'T'; //Temperature Sensor - Temperature
-const char UID_IMU_yaw  = '@'; //IMU - Angular Velocity X
-const char UID_IMU_roll  = '#'; //IMU - Angular Velocity Y
-const char UID_IMU_pitch  = '$'; //IMU - Angular Velocity Z
+const char UID_IMU_yaw  = '@'; //IMU - Yaw
+const char UID_IMU_roll  = '#'; //IMU - Roll
+const char UID_IMU_pitch  = '$'; //IMU - Pitch
 const char UID_GPS_lat  = 'L'; //GPS - Latitude
 const char UID_GPS_long  = 'l'; //GPS - Longitude
 const char UID_GPS_alt  = 'A'; //GPS - Altitude
 const char UID_time  = 't'; //Time
 const char UID_altitude = 'a'; //calculated altitude
 const char UID_state = 's'; //state machine state
-const char UID_batt = 'B';  //Battery voltage
+const char UID_batt = 'b';  //Battery voltage
 const char UID_ground_altitude = 'g';//Ground Altitude
 
 void sendRadioData(float data, char id);

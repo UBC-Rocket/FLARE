@@ -40,7 +40,7 @@ bool initSensors(void)
     #endif
     if(powerbattery.getVoltage() <= MINIMUM_BATTERY_VOLTAGE)
     {
-       status = false;
+       //status = false;
         #ifdef TESTING
         SerialUSB.println("WARNING: Battery at low voltage!");
         #endif

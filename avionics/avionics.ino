@@ -137,9 +137,9 @@ void loop()
     static float prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
     static FlightStates state = ARMED;
 
-    static uint16_t tier_one_interval = 200;
-    static uint16_t tier_two_interval = 1000;
-    static uint16_t tier_three_interval = 10000;
+    static uint16_t tier_one_interval = 400;
+    static uint16_t tier_two_interval = 2000;
+    static uint16_t tier_three_interval = 20000;
 
     char command[RADIO_DATA_ARRAY_SIZE];
     char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
