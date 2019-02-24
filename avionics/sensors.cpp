@@ -197,6 +197,12 @@ void initSensors(InitStatus *status)
     SerialRadio.begin(921600);
     while (!SerialRadio) {}
 
+    /*init satcom*/
+
+    // if (!SatComSetup())
+    //     status = false;
+
+
     /* log initialization status for each sensor */
     // 'X' for N/A, 'G' for good, 'B' for bad
     datalog.write("X,X,"); //time, state;
