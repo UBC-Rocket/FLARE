@@ -1,3 +1,4 @@
+/*Battery Sensor Header*/
 #ifndef __battery_sensor__
 #define __battery_sensor__
 
@@ -9,6 +10,7 @@
 #define R1 44170  //Nominal: 44200. Higher is larger range.
 #define R2 15150  //Nominal: 16000. Lower is larger range.
 //Maximum voltage = 3.3*(R1+R2)/R2
+
 class Battery
 {
     public:  // public functions

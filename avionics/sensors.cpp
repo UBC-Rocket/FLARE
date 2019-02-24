@@ -1,4 +1,17 @@
-/*Sensors Source*/
+/* @file    sensors.cpp
+ * @author  UBC Rocket Avionics 2018/2019
+ * @description   Main sensor initialization and polling file.
+ * Implements sensor initialization and error checking as well as
+ * sensor polling, sensor logging, and sending data over the radio.
+ *
+ * @section LICENSE
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * Distributed as-is; no warranty is given.
+ */
 
 /*Includes------------------------------------------------------------*/
 #include "sensors.h"
@@ -468,7 +481,19 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
     #endif
 }
 
-
+/*
+* @brief Processes data to send over the radio
+* @param unsigned long *timestamp - current system timestamp
+* @param float *battery_voltage - battery meter
+* @param float acc_data[] - x,y,z accelerometer reading
+* @param float bar_data[] - barometer data array
+* @param float *temp_sensor_data - temperature sensor reading
+* @param float IMU_data[] - pitch, roll, yaw IMU data
+* @param float* GPS_data[] - lat, long, altitude GPS array
+* @param FlightStates state - current statemachine flight state
+* @param float altitude -   calculated altitude
+* @return void
+*/
 void processRadioData(unsigned long *timestamp, float* battery_voltage, float acc_data[], float bar_data[],
     float *temp_sensor_data, float IMU_data[], float* GPS_data, FlightStates state, float altitude){
 
@@ -506,6 +531,12 @@ void processRadioData(unsigned long *timestamp, float* battery_voltage, float ac
 
 }
 
+/**
+  * @brief  Takes a 4 byte float and sends each byte sequentially over the radio
+  * @param  float data - one float worth of data to be sent via radio
+  * @param  char id - data identifier
+  * @return void
+  */
 void sendRadioData(float data, char id){
     //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly
     u_int8_t b[4];

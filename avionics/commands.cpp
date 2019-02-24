@@ -18,7 +18,13 @@
 #include <Arduino.h>
 #include "sensors.h"
 
-
+/** void doCommand(char, FlightStates *state, InitStatus *status)
+  * @brief  Takes a radio command input and executes the command
+  * @param  char command - radio command input
+  * @param  FlightStates *state - current flight state
+  * @param  InitStatus *status - Sensor status structure
+  * @return void
+  */
 void doCommand(char command, FlightStates *state, InitStatus *status){
     switch (command){
         case ARM:
@@ -79,6 +85,11 @@ void doCommand(char command, FlightStates *state, InitStatus *status){
 
 }
 
+/**
+  * @brief  Takes a 5 byte char and sequentially sends it over the radio
+  * @param  const char* response - 5 bytes worth of data to be sent via radio
+  * @return void
+  */
 void sendRadioResponse(const char* response){
     //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly
 

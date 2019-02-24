@@ -148,7 +148,7 @@ void loop()
     static unsigned long old_time = 0; //ms
     static unsigned long new_time = 0; //ms
     unsigned long delta_time;
-    static uint16_t time_interval = NOMINAL_TIME_INTERVAL; //ms
+    static uint16_t time_interval = NOMINAL_POLLING_TIME_INTERVAL; //ms
 
     static unsigned long radio_old_time = 0;
     static unsigned long radio_new_time = 0;
@@ -211,11 +211,11 @@ void loop()
     }
 
     if(state == STANDBY)
-        time_interval = STANDBY_TIME_INTERVAL;
+        time_interval = STANDBY_POLLING_TIME_INTERVAL;
     else if (state == LANDED)
-        time_interval = LANDED_TIME_INTERVAL;
+        time_interval = LANDED_POLLING_TIME_INTERVAL;
     else
-        time_interval = NOMINAL_TIME_INTERVAL;
+        time_interval = NOMINAL_POLLING_TIME_INTERVAL;
 
     new_time = millis();
     if ((new_time - old_time) >= time_interval) {
