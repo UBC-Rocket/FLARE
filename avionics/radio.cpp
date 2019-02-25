@@ -1,3 +1,18 @@
+/* @file    radio.cpp
+ * @author  UBC Rocket Avionics 2018/2019
+ * @description  Implements radio send functions and prioritizing
+ * sensor data to send over the radio
+ *
+ * @section LICENSE
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * Distributed as-is; no warranty is given.
+ */
+
+/*Includes------------------------------------------------------------*/
 #include "radio.h"
 
 #include "sensors.h"
@@ -10,11 +25,6 @@
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
-#include <i2c_t3.h>
-#include <SD.h>
-
-
-
 
 //send pressure, gps, state, and altitude over radio
 void sendTierOne(unsigned long *timestamp, float* GPS_data, float bar_data[], FlightStates state, float altitude){
@@ -73,7 +83,12 @@ void noseconeTierTwo(float bar_data[], float acc_data[], float *temp_sensor_data
     sendRadioData(acc_data[2], UID_acc_acc_z);
 }
 
-
+/**
+  * @brief  Takes a 4 byte float and sends each byte sequentially over the radio
+  * @param  float data - one float worth of data to be sent via radio
+  * @param  char id - data identifier
+  * @return void
+  */
 void sendRadioData(float data, char id){
     //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly
      u_int8_t b[4];

@@ -1,14 +1,14 @@
+/*Radio Header*/
 #ifndef __RADIO_H__
 #define __RADIO_H__
 
-
+/*Includes------------------------------------------------------------*/
+#include <Arduino.h>
 #include <stdint.h>
-
-
 
 #include "statemachine.h"
 
-
+/*Constants------------------------------------------------------------*/
 /*radio data unique identifiers*/
 const char UID_acc_acc_x  = 'X'; //Accelerometer - Acceleration X
 const char UID_acc_acc_y  = 'Y'; //Accelerometer - Acceleration Y
@@ -29,6 +29,7 @@ const char UID_batt = 'b';  //Battery voltage
 const char UID_ground_altitude = 'g';//Ground Altitude
 const char UID_status = 'S';  //Status
 
+/*Functions------------------------------------------------------------*/
 void sendRadioData(float data, char id);
 void sendTierOne(unsigned long*, float*, float*, FlightStates state, float altitude);
 void sendTierTwo(float*, float*, float*, float*);
