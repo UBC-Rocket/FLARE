@@ -6,11 +6,12 @@
 #include <stdint.h>
 
 //#include <string.h>
-
+#include "radio.h"
 #include "statemachine.h"
 
+
 /*Constants------------------------------------------------------------*/
-#define TESTING //enable or disable debug output
+//#define TESTING //enable or disable debug output
 #define GROUND_TEST
 
 #define SerialUSB               Serial
@@ -61,35 +62,14 @@ const uint8_t GPS_reset_defaults[] = {0xA0, 0xA1, 0x00, 0x02, 0x04, 0x00, 0x04, 
 const uint8_t GPS_set_baud_rate[] = {0xA0, 0xA1, 0x00, 0x04, 0x05, 0x00, 0x00, 0x00, 0x05, 0x0D, 0x0A}; //4800
 const uint8_t GPS_set_NMEA_message[] = {0xA0, 0xA1, 0x00, 0x09, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x0D, 0x0A}; //GPGGA
 const uint8_t GPS_set_update_rate[] = {0xA0, 0xA1, 0x00, 0x03, 0x0E, 0x01, 0x00, 0x0F, 0x0D, 0x0A}; //1 Hz
+//const char UID_status = 'S';
 
-/*radio data unique identifiers*/
-const char UID_acc_acc_x  = 'X'; //Accelerometer - Acceleration X
-const char UID_acc_acc_y  = 'Y'; //Accelerometer - Acceleration Y
-const char UID_acc_acc_z  = 'Z'; //Accelerometer - Acceleration Z
-const char UID_bar_pres  = 'P'; //Barometer - Pressure
-const char UID_bar_temp  = '~'; //Barometer - Temperature
-const char UID_temp_temp  = 'T'; //Temperature Sensor - Temperature
-const char UID_IMU_acc_x  = 'x'; //IMU - Acceleration X
-const char UID_IMU_acc_y = 'y'; //IMU - Acceleration Y
-const char UID_IMU_acc_z  = 'z'; //IMU - Acceleration Z
-const char UID_IMU_gyro_x  = '@'; //IMU - Angular Velocity X
-const char UID_IMU_gyro_y  = '#'; //IMU - Angular Velocity Y
-const char UID_IMU_gyro_z  = '$'; //IMU - Angular Velocity Z
-const char UID_IMU_mag_x  = '%'; //IMU - Magnetism X
-const char UID_IMU_mag_y  = '^'; //IMU - Magnetism Y
-const char UID_IMU_mag_z  = '&'; //IMU - Magnetism Z
-const char UID_GPS_lat  = 'L'; //GPS - Latitude
-const char UID_GPS_long  = 'l'; //GPS - Longitude
-const char UID_GPS_alt  = 'A'; //GPS - Altitude
-const char UID_time  = 't'; //Time
-const char UID_altitude = 'a'; //calculated altitude
-const char UID_state = 's'; //state machine state
-const char UID_status = 'S'; //Status identifier - followed by single digit to indicate which position
-const char UID_batt = 'B';  //Battery voltage
+
 
 /*Functions------------------------------------------------------------*/
 void initSensors(InitStatus* status);
 float barSensorInit(void);
+
 void processRadioData(unsigned long*, float*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
 void sendRadioData(float data, char id);
 void generateStatusReport(InitStatus *status, char *statusReport1, char *statusReport2, char *statusReport3);
