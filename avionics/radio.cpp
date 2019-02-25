@@ -15,10 +15,7 @@
 
 
 
-void processRadioData(unsigned long *timestamp, float* battery_voltage, float acc_data[], float bar_data[],
-    float *temp_sensor_data, float IMU_data[], float* GPS_data, FlightStates state, float altitude){
 
-}
 //send pressure, gps, state, and altitude over radio
 void sendTierOne(unsigned long *timestamp, float* GPS_data, float bar_data[], FlightStates state, float altitude){
     float time = *timestamp;

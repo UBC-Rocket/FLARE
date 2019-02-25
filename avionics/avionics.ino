@@ -31,7 +31,10 @@ $$$$"""$$$$$$$$$$uuu   uu$$$$$$$$$"""$$$"
 
 In order to successfully poll the GPS, the serial RX buffer size must be increased. This needs
 to be done on the computer used for compilation. This can be done by navigating to the following
-path in the Arduino contents folder: ‎⁨Contents⁩/⁨Java⁩/⁨hardware⁩/⁨teensy⁩/⁨avr⁩/⁨cores⁩/⁨teensy3⁩/serial1.c.
+path in the Arduino contents folder:
+On Mac: ‎⁨Contents⁩/⁨Java⁩/⁨hardware⁩/⁨teensy⁩/⁨avr⁩/⁨cores⁩/⁨teensy3⁩/serial1.c
+On Windows: [user_drive]\Program Files (x86)\Arduino\hardware\teensy\avr\cores\teensy3\serial1.c
+
 On line 43 increase SERIAL1_RX_BUFFER_SIZE from 64 to 128.
 THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
 
@@ -59,7 +62,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "commands.h"
 #include "gpio.h"
 #include "radio.h"
-
+#include "groundaltitude.h"
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <i2c_t3.h>
@@ -68,6 +71,10 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 
 /*Variables------------------------------------------------------------*/
 File radiolog;
+static InitStatus s_statusOfInit;
+static float pressure_set[PRESSURE_AVG_SET_SIZE]; //set of pressure values for a floating average
+static float baseline_pressure;
+static float ground_alt_arr[GROUND_ALT_SIZE]; //values for the baseline pressure calculation
 
 /*Functions------------------------------------------------------------*/
 /**
@@ -77,9 +84,9 @@ File radiolog;
   */
 void setup()
 {
-    initPins();
+    int i;
 
-    bool status = true;
+    initPins();
 
     /*init serial comms*/
     #ifdef TESTING
@@ -93,21 +100,40 @@ void setup()
     Wire.setDefaultTimeout(100000); //100ms
 
     /*init sensors*/
-    status = initSensors();
+    initSensors(&s_statusOfInit);
 
     /*if something went wrong spin infinitely, otherwise indicate completion*/
-    if (!status) {
+    if (s_statusOfInit.overview == CRITICAL_FAILURE) {
         #ifdef TESTING
-        SerialUSB.println("Initialization failed! >:-{");
-        #else
-        while (1) {}
+        SerialUSB.println("Critical failure! >:-{");
         #endif
-    } else {
+    }
+    else if (s_statusOfInit.overview == NONCRITICAL_FAILURE){
+        #ifdef TESTING
+        SerialUSB.println("Noncritical failure! :(");
+        #endif
+
+        pinMode(LED_BUILTIN, OUTPUT);
+    }
+    else {
         pinMode(LED_BUILTIN,OUTPUT);
         digitalWrite(LED_BUILTIN,HIGH);
         #ifdef TESTING
         SerialUSB.println("Initialization complete! :D");
         #endif
+
+    }
+
+    /* init various arrays */
+    baseline_pressure = barSensorInit(); /* for baseline pressure calculation */
+    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) // for moving average
+    {
+        pressure_set[i] = baseline_pressure;
+    }
+
+    for(i = 0; i < GROUND_ALT_SIZE; i++)
+    {
+        ground_alt_arr[i] = baseline_pressure;
     }
 }
 
@@ -119,34 +145,44 @@ void setup()
 void loop()
 {
     static unsigned long timestamp;
-    static float barometer_data_init = barSensorInit();
-    static float baseline_pressure = groundAlt_init(&barometer_data_init);  // IF YOU CAN'T DO THIS USE GLOBAL VAR
     static unsigned long old_time = 0; //ms
     static unsigned long new_time = 0; //ms
+    unsigned long delta_time;
+    static uint16_t time_interval = NOMINAL_POLLING_TIME_INTERVAL; //ms
+
 
     static unsigned long tier_one_old_time = 0;
     static unsigned long tier_two_old_time = 0;
     static unsigned long tier_three_old_time = 0;
 
-    unsigned long delta_time;
 
-    static uint16_t time_interval = 50; //ms
+    static unsigned long init_status_old_time = 0;
+    static unsigned long init_status_new_time = 0;
+    static const uint16_t init_status_time_interval = 500;
+    static uint16_t init_status_indicator = 0;
 
     static float battery_voltage, acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
         temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE], GPS_data[GPS_DATA_ARRAY_SIZE];
+
     static float prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
+
     static FlightStates state = ARMED;
+
 
     static uint16_t tier_one_interval = 400;
     static uint16_t tier_two_interval = 2000;
     static uint16_t tier_three_interval = 20000;
+
 
     char command[RADIO_DATA_ARRAY_SIZE];
     char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
     char goodResponse[] = {'G','x','x','x','x'};
     const char badResponse[] = {'B','B','B','B','B'};
 
-    if (SerialRadio.available() == 5) {
+    if(s_statusOfInit.overview == CRITICAL_FAILURE)
+        state = WINTER_CONTINGENCY; //makes sure that even if it does somehow get accidentally changed, it gets reverted
+
+    if (SerialRadio.available() >= 5) {
 
         #ifdef TESTING
         SerialUSB.print("Received Message: ");
@@ -155,7 +191,6 @@ void loop()
         for(int i = 0; i< RADIO_DATA_ARRAY_SIZE; i++){
             command[i] = SerialRadio.read();
         }
-
 
         bool correctCommand = check(command);
 
@@ -170,7 +205,7 @@ void loop()
             SerialUSB.println(command);
             #endif
 
-            doCommand(command[0], &state);
+            doCommand(command[0], &state, &s_statusOfInit);
             sendRadioResponse(goodResponse);
         }
         else{
@@ -183,13 +218,21 @@ void loop()
         }
     }
 
+    if(state == STANDBY)
+        time_interval = STANDBY_POLLING_TIME_INTERVAL;
+    else if (state == LANDED)
+        time_interval = LANDED_POLLING_TIME_INTERVAL;
+    else
+        time_interval = NOMINAL_POLLING_TIME_INTERVAL;
+
     new_time = millis();
     if ((new_time - old_time) >= time_interval) {
         delta_time = new_time - old_time;
         old_time = new_time;
+
         pollSensors(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data);
-        calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &prev_delta_altitude, &baseline_pressure, &delta_time);
-        stateMachine(&altitude, &delta_altitude, &prev_altitude, bar_data, &baseline_pressure, &ground_altitude, &state);
+        calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &prev_delta_altitude, &baseline_pressure, &delta_time, pressure_set);
+        stateMachine(&altitude, &delta_altitude, &prev_altitude, bar_data, &baseline_pressure, &ground_altitude, ground_alt_arr, &state);
         logData(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure);
     }
 
@@ -211,8 +254,19 @@ void loop()
         tier_three_old_time = new_time;
     }
 
+    if (s_statusOfInit.overview == NONCRITICAL_FAILURE)
+    {
+        init_status_new_time = millis();
+        if ( (init_status_new_time - init_status_old_time) > init_status_time_interval ){
+            init_status_old_time = init_status_new_time;
+            init_status_indicator++;
 
-
+            if(init_status_indicator % 2 == 1)
+                digitalWrite(LED_BUILTIN, HIGH);
+            else
+                digitalWrite(LED_BUILTIN, LOW);
+        }
+    }
 
 
     #ifdef TESTING

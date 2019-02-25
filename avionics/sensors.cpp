@@ -1,4 +1,17 @@
-/*Sensors Source*/
+/* @file    sensors.cpp
+ * @author  UBC Rocket Avionics 2018/2019
+ * @description   Main sensor initialization and polling file.
+ * Implements sensor initialization and error checking as well as
+ * sensor polling, sensor logging, and sending data over the radio.
+ *
+ * @section LICENSE
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * Distributed as-is; no warranty is given.
+ */
 
 /*Includes------------------------------------------------------------*/
 #include "sensors.h"
@@ -8,6 +21,9 @@
 #include "SparkFunTMP102.h"         //temp sensor
 #include "Adafruit_BNO055.h"        //IMU
 #include "Venus638FLPx.h"           //GPS
+#include "gpio.h"                   //GPIO
+
+#include "commands.h"               //for sendRadioResponse(const char* response);
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -27,43 +43,84 @@ Adafruit_BNO055 IMU(IMU_ADDRESS);
 /*Functions------------------------------------------------------------*/
 /**
   * @brief  Initializes all the sensors
-  * @param  None
-  * @return bool - Status (true for success, false for failure)
+  * @param  InitStatus *status - Status variable containing information on status.
+  *                         Note: All values in *status will be overwritten; status
+  *                         values can be then extracted.
+  * @return void
   */
-bool initSensors(void)
+
+void initSensors(InitStatus *status)
 {
-    bool status = true;
+    status->overview = NOMINAL;
+    int i;
+    for(i = 0; i < NUM_SENSORS; i++){       // + 1 for ematch continuity
+        status->sensorNominal[i] = true;
+    }
 
     /*init battery*/
     #ifdef TESTING
     SerialUSB.println("Initializing battery");
     #endif
-    if(powerbattery.getVoltage() <= MINIMUM_BATTERY_VOLTAGE)
-    {
-       //status = false;
-        #ifdef TESTING
-        SerialUSB.println("WARNING: Battery at low voltage!");
-        #endif
+
+    if(powerbattery.getVoltage() <= LOW_BATTERY_VOLTAGE)
+    { //TODO: Uncomment once the battery sensor is implemented
+        //status->sensorNominal[BATTERY_STATUS_POSITION] = false;
+        // if(powerbattery.getVoltage() <= MINIMUM_BATTERY_VOLTAGE){
+        //     status->overview = CRITICAL_FAILURE;
+        //     #ifdef TESTING
+        //     SerialUSB.println("DANGER: BATTERY AT UNACCEPTABLY LOW VOLTAGE!");
+        //     #endif
+        // }
+        // else{
+        //     if(status->overview < NONCRITICAL_FAILURE){
+        //         status->overview = NONCRITICAL_FAILURE;
+        //     }
+        //     #ifdef TESTING
+        //     SerialUSB.println("WARNING: Battery at low voltage!");
+        //     #endif
+        // }
+
     }
+
     #ifdef TESTING
     SerialUSB.print("Read voltage (V): ");
     SerialUSB.println(powerbattery.getVoltage());
     #endif
 
+    /* check ematch continuity */
+    #ifdef TESTING
+    SerialUSB.println("Checking ematch continuity");
+    #endif
+
+    // if (!continuityCheck()){
+    //     status->overview = CRITICAL_FAILURE;
+    //     status->sensorNominal[EMATCH_STATUS_POSITION] = false;
+
+    //     #ifdef TESTING
+    //     SerialUSB.println("ERROR: ematch continuity");
+    //     #endif
+    // }
 
     /*init SD card*/
     #ifdef TESTING
     SerialUSB.println("Initializing SD card");
     #endif
     if (!SD.begin(BUILTIN_SDCARD)) {
-        status = false;
+        if(status->overview < NONCRITICAL_FAILURE)
+            status->overview = NONCRITICAL_FAILURE;
+        status->sensorNominal[FILE_STATUS_POSITION] = false;
+
+
         #ifdef TESTING
         SerialUSB.println("ERROR: SD card initialization failed!");
         #endif
     } else {
         datalog = SD.open("datalog.txt", FILE_WRITE);
         if (!datalog) {
-            status = false;
+            if(status->overview < NONCRITICAL_FAILURE)
+                status->overview = NONCRITICAL_FAILURE;
+            status->sensorNominal[FILE_STATUS_POSITION] = false;
+
             #ifdef TESTING
             SerialUSB.println("ERROR: Opening file failed!");
             #endif
@@ -72,7 +129,7 @@ bool initSensors(void)
             datalog.write("Time (ms), State, Battery Voltage (V),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
             "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
             "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
-            "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude\n");
+            "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude,ematch\n");
         }
     }
 
@@ -90,12 +147,14 @@ bool initSensors(void)
     //barometer.reset();
     //barometer.begin();
     #ifdef TESTING
-    if (!barometer.initializeMS_5803(true)) {
-        return false;
+    if (!barometer.initializeMS_5803(true)) { //because one is verbose
+        status->overview = CRITICAL_FAILURE;
+        status->sensorNominal[BAROMETER_STATUS_POSITION] = false;
     }
     #else
     if (!barometer.initializeMS_5803(false)) {
-        return false;
+        status->overview = CRITICAL_FAILURE;
+        status->sensorNominal[BAROMETER_STATUS_POSITION] = false;
     }
     #endif
 
@@ -109,10 +168,16 @@ bool initSensors(void)
     #ifdef TESTING
     SerialUSB.println("Initializing IMU");
     #endif
-    bool status_IMU = IMU.begin();
+
     delay(7); //TODO investigate this
-    if(!status_IMU){
+    if(!IMU.begin()){
+        if(status->overview < NONCRITICAL_FAILURE)
+            status->overview = NONCRITICAL_FAILURE;
+        status->sensorNominal[IMU_STATUS_POSITION] = false;
+
+        #ifdef TESTING
         SerialUSB.print("ERROR: IMU initialization failed!");
+        #endif
     }
     IMU.setExtCrystalUse(true);
 
@@ -134,7 +199,122 @@ bool initSensors(void)
     SerialRadio.begin(921600);
     while (!SerialRadio) {}
 
-    return status;
+    /* log initialization status for each sensor */
+    // 'X' for N/A, 'G' for good, 'B' for bad
+    datalog.write("X,X,"); //time, state;
+
+    if(status->sensorNominal[BATTERY_STATUS_POSITION])
+        datalog.write("G,");
+    else
+        datalog.write("B,");
+
+    if(status->sensorNominal[ACCELEROMETER_STATUS_POSITION])
+        datalog.write("G,G,G,");
+    else
+        datalog.write("B,B,B,");
+
+    if(status->sensorNominal[BAROMETER_STATUS_POSITION]) //barom pressure & temperature
+        datalog.write("G,G,");
+    else
+        datalog.write("B,B,");
+
+    datalog.write("X,X,"); //Baseline pressure & altitude
+
+    if(status->sensorNominal[TEMPERATURE_STATUS_POSITION])
+        datalog.write("G,");
+    else
+        datalog.write("B,");
+
+    if(status->sensorNominal[IMU_STATUS_POSITION]) //Yaw, roll, pitch
+        datalog.write("G,G,G,");
+    else
+        datalog.write("B,B,B,");
+
+    datalog.write("X, X, X,");   //GPS - as of time of writing, no capability to test success
+
+    if(status->sensorNominal[EMATCH_STATUS_POSITION])   //ematch continuity
+        datalog.write("G\n");
+    else
+        datalog.write("B\n");
+
+
+    /* transmit sensor report */
+        // Key for receiver:
+        // S-#-G/B - G/B - G/B
+        // S is UID for status, # is digit indicating which part is being sent. G/B is status of a sensor
+        // (good/bad), X indicates no sensor for that value yet.
+        // Refer to sensors.h definitions to find what order data comes in at.
+        // e.g. if all things succeeded except accelerometer, code sends:
+        // "S-1-G-B-G", "S-2-G-G-G", "S-3-G-X-X"
+
+    char statusReport1[RADIO_DATA_ARRAY_SIZE];
+    char statusReport2[RADIO_DATA_ARRAY_SIZE];
+    char statusReport3[RADIO_DATA_ARRAY_SIZE];
+
+    generateStatusReport(status, statusReport1, statusReport2, statusReport3);
+    sendRadioResponse(statusReport1);
+    sendRadioResponse(statusReport2);
+    sendRadioResponse(statusReport3);
+    return;
+}
+
+/*
+ * @brief  Generates status report for initialization. 'G' for good, 'B' for bad, 'X' for Not applicable
+ * @param  InitStatus status - status of initialization.
+ * @param  char* statusReport1 - char array to hold radio data
+ * @param  char* statusReport2 - same as statusReport2 but it's the 2nd half
+ * @return void
+ */
+void generateStatusReport(InitStatus *status, char *statusReport1, char *statusReport2, char *statusReport3)
+{
+    statusReport1[0] = UID_status;
+    statusReport1[1] = '1';
+
+    if(status->sensorNominal[FILE_STATUS_POSITION])
+        statusReport1[2] = 'G';
+    else
+        statusReport1[2] = 'B';
+
+    if(status->sensorNominal[BATTERY_STATUS_POSITION])
+        statusReport1[3] = 'G';
+    else
+        statusReport1[3] = 'B';
+
+    if(status->sensorNominal[ACCELEROMETER_STATUS_POSITION])
+        statusReport1[4] = 'G';
+    else
+        statusReport1[4] = 'B';
+
+
+    statusReport2[0] = UID_status;
+    statusReport2[1] = '2';
+
+    if(status->sensorNominal[BAROMETER_STATUS_POSITION])
+        statusReport2[2] = 'G';
+    else
+        statusReport2[2] = 'B';
+
+    if(status->sensorNominal[TEMPERATURE_STATUS_POSITION])
+        statusReport2[3] = 'G';
+    else
+        statusReport2[3] = 'B';
+
+    if(status->sensorNominal[IMU_STATUS_POSITION])
+        statusReport2[4] = 'G';
+    else
+        statusReport2[4] = 'B';
+
+
+    statusReport3[0] = UID_status;
+    statusReport3[1] = '3';
+
+    if(status->sensorNominal[EMATCH_STATUS_POSITION])
+        statusReport3[2] = 'G';
+    else
+        statusReport3[2] = 'B';
+
+    statusReport3[3] = 'X';
+    statusReport3[4] = 'X';
 }
 
 /**
@@ -199,7 +379,7 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
     #ifdef TESTING
     SerialUSB.println("Polling IMU");
     #endif
-    sensors_event_t event; //TODO what is this
+    sensors_event_t event; //we don't know what this is but it works so
     IMU.getEvent(&event);
     IMU_data[0] = event.orientation.x;
     IMU_data[1] = event.orientation.y;
@@ -216,6 +396,7 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
 /**
   * @brief  Logs all the sensor data
   * @param  unsigned long timestamp - pointer to store the timestamp value
+  * @param  battery_voltage - pointer to store the voltage of the battery
   * @param  float acc_data[] - array to store the accelerometer data
   * @param  float bar_data[] - array to store the barometer data
   * @param  float* temp_sensor_data - pointer to store the temperature sensor data
@@ -301,18 +482,6 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
     SerialUSB.println("");
     #endif
 }
-
-
-void calculateValues(float acc_data[], float bar_data[], float* abs_accel,
-                    float* prev_altitude, float* altitude, float* delta_altitude)
-{
-    // *abs_accel = sqrtf(powf(acc_data[0], 2) + powf(acc_data[1], 2) + powf(acc_data[2]), 2);
-    // *prev_altitude = *altitude;
-    // *altitude = 44330.0 * (1 - powf(bar_data[0] / BASELINE_PRESSURE, 1 / 5.255));
-    // *delta_altitude = altitude - prev_altitude;
-}
-
-
 
 
 

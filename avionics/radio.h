@@ -1,8 +1,13 @@
+#ifndef __RADIO_H__
+#define __RADIO_H__
+
+
 #include <stdint.h>
 
 
 
 #include "statemachine.h"
+
 
 /*radio data unique identifiers*/
 const char UID_acc_acc_x  = 'X'; //Accelerometer - Acceleration X
@@ -22,9 +27,9 @@ const char UID_altitude = 'a'; //calculated altitude
 const char UID_state = 's'; //state machine state
 const char UID_batt = 'b';  //Battery voltage
 const char UID_ground_altitude = 'g';//Ground Altitude
+const char UID_status = 'S';  //Status
 
 void sendRadioData(float data, char id);
-void processRadioData( float*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
 void sendTierOne(unsigned long*, float*, float*, FlightStates state, float altitude);
 void sendTierTwo(float*, float*, float*, float*);
 void sendTierThree(float*, float*);
@@ -32,3 +37,5 @@ void bodyTierOne(float*, FlightStates state, float altitude, unsigned long*);
 //void bodyTierTwo(float*); not needed
 void noseconeTierOne(unsigned long*, float*);
 void noseconeTierTwo(float*, float*, float*, float*);
+
+#endif

@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 //#include <string.h>
-
+#include "radio.h"
 #include "statemachine.h"
 
 
@@ -34,20 +34,49 @@
 
 #define RADIO_DATA_ARRAY_SIZE   5
 
+#define NUM_SENSORS 7       // + 1 = 7 for ematch checking
+#define FILE_STATUS_POSITION 0
+#define BATTERY_STATUS_POSITION 1
+#define ACCELEROMETER_STATUS_POSITION 2
+#define BAROMETER_STATUS_POSITION 3
+#define TEMPERATURE_STATUS_POSITION 4
+#define IMU_STATUS_POSITION 5
+#define EMATCH_STATUS_POSITION 6
+
 /*Variables------------------------------------------------------------*/
+
+/*Error codes for initialization*/
+enum OverallError {
+    NOMINAL,
+    NONCRITICAL_FAILURE,
+    CRITICAL_FAILURE
+};
+
+struct InitStatus {
+    OverallError overview;
+    bool sensorNominal[NUM_SENSORS];
+};
 
 /*GPS initialization commands*/
 const uint8_t GPS_reset_defaults[] = {0xA0, 0xA1, 0x00, 0x02, 0x04, 0x00, 0x04, 0x0D, 0x0A};
 const uint8_t GPS_set_baud_rate[] = {0xA0, 0xA1, 0x00, 0x04, 0x05, 0x00, 0x00, 0x00, 0x05, 0x0D, 0x0A}; //4800
 const uint8_t GPS_set_NMEA_message[] = {0xA0, 0xA1, 0x00, 0x09, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x0D, 0x0A}; //GPGGA
 const uint8_t GPS_set_update_rate[] = {0xA0, 0xA1, 0x00, 0x03, 0x0E, 0x01, 0x00, 0x0F, 0x0D, 0x0A}; //1 Hz
+//const char UID_status = 'S';
 
 
 
 /*Functions------------------------------------------------------------*/
-bool initSensors(void);
+void initSensors(InitStatus* status);
 float barSensorInit(void);
+
+void processRadioData(unsigned long*, float*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
+void sendRadioData(float data, char id);
+void generateStatusReport(InitStatus *status, char *statusReport1, char *statusReport2, char *statusReport3);
 void pollSensors(unsigned long*, float*, float*, float*, float*, float*, float*);
 void logData(unsigned long *, float*, float*, float*, float*, float*, float*, FlightStates, float, float);
+void processRadioData(unsigned long*, float*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
+void sendRadioData(float data, char id);
+
 
 #endif

@@ -30,7 +30,8 @@ File statelog;
  * @return void.
  */
 void switchState(FlightStates *curr_state, FlightStates new_state){
-    *curr_state = new_state;
+    if(*curr_state != WINTER_CONTINGENCY) //don't want to switch out of WINTER_CONTINGENCY accidentally
+        *curr_state = new_state;
 }
 
 /* void stateMachine(float*, float*, float*, float*, float*, float*, FlightStates *){}
@@ -44,7 +45,7 @@ void switchState(FlightStates *curr_state, FlightStates new_state){
  * @return void.
  */
 void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_altitude, float bar_data[], float *baseline_pressure,
-    float *ground_altitude, FlightStates *state) {
+    float *ground_altitude, float ground_alt_arr[], FlightStates *state) {
     static int launch_count, armed_count, mach_count, mach_lock_count, apogee_count, main_count, land_count = 0;
     static uint32_t old_time_landed; //initialize on switching state
     static float old_altitude_landed; //initialize on switching state
@@ -53,14 +54,14 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
         case STANDBY:
             if (*altitude > LAUNCH_THRESHOLD) {
                 launch_count++;
-                if (launch_count >= LAUNCH_CHECKS){
+                if (launch_count >= STANDBY_LAUNCH_CHECKS){
                     switchState(state, ASCENT);
                     launch_count = 0;
                 }
             }
             else{
                 launch_count = 0;
-                *baseline_pressure = groundAlt_update(&bar_data[0]);
+                *baseline_pressure = groundAlt_update(&bar_data[0], ground_alt_arr);
                 *ground_altitude = 44330.0 * (1 - powf(*baseline_pressure / SEA_PRESSURE, 1 / 5.255));
             }
             break;
@@ -68,7 +69,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
         case ARMED:
             if (*altitude > LAUNCH_THRESHOLD) {
                 armed_count++;
-                if (armed_count >= LAUNCH_CHECKS){
+                if (armed_count >= ARMED_LAUNCH_CHECKS){
                     switchState(state, ASCENT);
                     armed_count = 0;
                 }
@@ -79,6 +80,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case ASCENT:    // checks for Mach threshold + apogee
+            digitalWrite(LED_BUILTIN,LOW);
             if (*delta_altitude > MACH_THRESHOLD) {
                 mach_count++;
                 if (mach_count >= MACH_CHECKS) {
@@ -94,6 +96,8 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 if (apogee_count >= APOGEE_CHECKS) {
                     //deploy drogue and payload
                     //delay to avoid pressure spikes
+
+                    digitalWrite(LED_BUILTIN,HIGH);
                     switchState(state, PRESSURE_DELAY);
                     apogee_count = 0;
                 }
@@ -143,7 +147,8 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
         case FINAL_DESCENT:
             if(millis() - old_time_landed >= LANDING_TIME_INTERVAL) {
                 float delta_altitude_landed = *altitude - old_altitude_landed;
-                if (*altitude < LAND_HEIGHT_THRESHOLD && delta_altitude_landed <= LAND_VELOCITY_THRESHOLD) {
+                // if (*altitude < LAND_HEIGHT_THRESHOLD && delta_altitude_landed <= LAND_VELOCITY_THRESHOLD) {
+                if (delta_altitude_landed <= LAND_VELOCITY_THRESHOLD) { // Landed threshold based on velocity alone
                     land_count++;
                     if (land_count >= LAND_CHECKS) {
                         //turn off sensors except GPS
@@ -160,6 +165,9 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case LANDED:
+            break;
+
+        case WINTER_CONTINGENCY:
             break;
 
         default:

@@ -16,45 +16,86 @@
 #include "gpio.h"
 #include "sensors.h"
 #include <Arduino.h>
+#include "sensors.h"
 
-
-void doCommand(char command, FlightStates * state){
+/** void doCommand(char, FlightStates *state, InitStatus *status)
+  * @brief  Takes a radio command input and executes the command
+  * @param  char command - radio command input
+  * @param  FlightStates *state - current flight state
+  * @param  InitStatus *status - Sensor status structure
+  * @return void
+  */
+void doCommand(char command, FlightStates *state, InitStatus *status){
     switch (command){
         case ARM:
-        //switchState(*state, ARMED);
+            //if(*state == STANDBY) //Don't want to switch out of drogue deploy or something into Armed
+            //  switchState(*state, ARMED);
+            break;
+
         case CAMERAS_ON:
-        //turn on the cameras
+            //turn on the cameras
+            break;
+
         case CAMERAS_OFF:
-        //turn off the cameras
+            //turn off the cameras
+            break;
+
         case HALO:
-        //play HALO
+            //play HALO
+            break;
+
         case SATCOM:
-        //switch to SATCOM
+            //switch to SATCOM
+            break;
+
         case RESET:
-        //not sure
+            //not sure
+            break;
+
         case MAIN:
             #ifdef GROUND_TEST  // Ground radio testing purposes
             digitalWrite(LED_BUILTIN, HIGH);
             deployMain();
             #endif
-        break;
+            break;
+
         case DROGUE:
             #ifdef GROUND_TEST
             //testing purposes!
             digitalWrite(LED_BUILTIN,LOW);
             deployDrogue();
             #endif
-        break;
+
+        case STATUS:
+            char statusReport1[RADIO_DATA_ARRAY_SIZE];
+            char statusReport2[RADIO_DATA_ARRAY_SIZE];
+            char statusReport3[RADIO_DATA_ARRAY_SIZE];
+            generateStatusReport(status, statusReport1, statusReport2, statusReport3);
+            sendRadioResponse(statusReport1);
+            sendRadioResponse(statusReport2);
+            sendRadioResponse(statusReport3);
+            break;
+
+        default:
+            #ifdef TESTING
+            SerialUSB.println("ERROR: COMMAND NOT RECOGNIZED");
+            #endif
+            break;
     }
 
 }
 
+/**
+  * @brief  Takes a 5 byte char and sequentially sends it over the radio
+  * @param  const char* response - 5 bytes worth of data to be sent via radio
+  * @return void
+  */
 void sendRadioResponse(const char* response){
     //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly
 
-      for(int i=0; i<5; i++)
-      {
-          SerialRadio.write(response[i]);
-      }
+    for(int i=0; i<5; i++)
+    {
+        SerialRadio.write(response[i]);
+    }
 }
 
