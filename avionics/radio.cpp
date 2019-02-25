@@ -27,6 +27,7 @@
 #include <HardwareSerial.h>
 
 //send pressure, gps, state, and altitude over radio
+//FILLER FUNCTIONS
 void sendTierOne(unsigned long *timestamp, float* GPS_data, float bar_data[], FlightStates state, float altitude){
     float time = *timestamp;
     sendRadioData(time, 't');
@@ -39,6 +40,7 @@ void sendTierOne(unsigned long *timestamp, float* GPS_data, float bar_data[], Fl
 }
 
 //Send Acceleration, IMU data, and temperature
+//FILLER FUNCTION
 void sendTierTwo(float acc_data[], float bar_data[], float *temp_sensor_data, float IMU_data[]){
     sendRadioData(bar_data[1], UID_bar_temp);
     sendRadioData(*temp_sensor_data, UID_temp_temp);
@@ -50,13 +52,19 @@ void sendTierTwo(float acc_data[], float bar_data[], float *temp_sensor_data, fl
     sendRadioData(acc_data[2], UID_acc_acc_z);
 }
 //Send data that only needs to be sent once, battery voltage, Ground Altitude
+//FILLER FUNCTION
 void sendTierThree(float* battery_voltage, float* ground_altitude){
     sendRadioData(*ground_altitude, UID_ground_altitude);
     sendRadioData(*battery_voltage, UID_batt);
-
-
 }
-//send timestamp either with the nosecone or body, NOT BOTH FOR REAL
+/**
+  * @brief  Send more essential data from the body over radio, pressure, state, altitude, timestamp
+  * @param  float bar_data - baramoeter data array
+  * @param  FlightStates state - current state
+  * @param  float altitude - current calculated altitude
+  * @param  unsigned long *timestamp - address for the timestamp
+  * @return void
+  */
 void bodyTierOne(float bar_data[], FlightStates state, float altitude, unsigned long *timestamp){
     float time = *timestamp;
     sendRadioData(time, 't');
@@ -64,7 +72,12 @@ void bodyTierOne(float bar_data[], FlightStates state, float altitude, unsigned 
     sendRadioData( altitude, UID_altitude);
     sendRadioData((float) state, UID_state);
 }
-//remove timestamp later?
+/**
+  * @brief  Sends more essential data over radio from the nosecone, timestamp(WHICH SHOULD BE REMOVED) and GPS data
+  * @param  float GPS_data - gps data array
+  * @param  unsigned long *timestamp - address for the timestamp
+  * @return void
+  */
 void noseconeTierOne(unsigned long *timestamp, float* GPS_data){
     float time = *timestamp;
     sendRadioData(time, 't');
@@ -72,6 +85,15 @@ void noseconeTierOne(unsigned long *timestamp, float* GPS_data){
     sendRadioData(GPS_data[1], UID_GPS_long);
     sendRadioData(GPS_data[2], UID_GPS_alt);
 }
+/**
+  * @brief  Function to send the less essential data from the nosecone over radio,
+  * barameter temperature, accelerometer, tmeperature, and IMU data
+  * @param  float bar_data - barmoeter data array for temperature
+  * @param  float acc_data - accelerometer data array
+  * @param  float *temp_sensor_data - pointer for the temperature data
+  * @param  float IMU_data - IMU data array
+  * @return void
+  */
 void noseconeTierTwo(float bar_data[], float acc_data[], float *temp_sensor_data, float IMU_data[]){
     sendRadioData(bar_data[1], UID_bar_temp);
     sendRadioData(*temp_sensor_data, UID_temp_temp);
