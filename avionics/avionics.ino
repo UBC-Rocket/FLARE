@@ -5,6 +5,7 @@
 #include "statemachine.h"
 #include "calculations.h"
 #include "commands.h"
+#include "cameras.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -28,6 +29,7 @@ void setup()
     /*init serial comms*/
     #ifdef TESTING
     SerialUSB.begin(9600);
+    SerialCamera1.begin(115200);
     while (!SerialUSB) {} //TODO add print in while to see what happens
     SerialUSB.println("Initializing...");
     #endif
@@ -47,7 +49,7 @@ void setup()
         #ifdef TESTING
         SerialUSB.println("Initialization failed! >:-{");
         #else
-        while (1) {}
+       // while (1) {}
         #endif
     } else {
         pinMode(LED_BUILTIN,OUTPUT);
@@ -92,41 +94,41 @@ void loop()
     //TESTING THE CAMERA
        while(1){
         power_cameras();
-        delay(5000);
+        delay(10000);
         // start_record();
         // delay(10000);
         // stop_record();
         // delay(1000);
         power_cameras();
-        delay(5000);
+        delay(10000);
     }
 
-    if (SerialRadio.available()) {
-        radiolog.print("Received Message: ");
-        #ifdef TESTING
-        SerialUSB.print("Received Message: ");
-        #endif
-        while (SerialRadio.available()) {
-            for(int i = 0; i< RADIO_DATA_ARRAY_SIZE; i++){
-                command[i] = SerialRadio.read();
-            }
-            bool correctCommand = check(command);
+    // if (SerialRadio.available()) {
+    //     radiolog.print("Received Message: ");
+    //     #ifdef TESTING
+    //     SerialUSB.print("Received Message: ");
+    //     #endif
+    //     while (SerialRadio.available()) {
+    //         for(int i = 0; i< RADIO_DATA_ARRAY_SIZE; i++){
+    //             command[i] = SerialRadio.read();
+    //         }
+    //         bool correctCommand = check(command);
 
-            if(correctCommand){
-                radiolog.print(goodResponse);
-                sendRadioResponse(goodResponse);
-                #ifdef TESTING
-                SerialUSB.print(command);
-                doCommand(command[0], &state);
-                #endif
-            }
-            else{
-                radiolog.print(badResponse);
-                sendRadioResponse(badResponse);
-            }
-            radiolog.print(command);
-        }
-    }
+    //         if(correctCommand){
+    //             radiolog.print(goodResponse);
+    //             sendRadioResponse(goodResponse);
+    //             #ifdef TESTING
+    //             SerialUSB.print(command);
+    //             doCommand(command[0], &state);
+    //             #endif
+    //         }
+    //         else{
+    //             radiolog.print(badResponse);
+    //             sendRadioResponse(badResponse);
+    //         }
+    //         radiolog.print(command);
+    //     }
+    // }
 
     new_time = millis();
     if ((new_time - old_time) > time_interval) {
