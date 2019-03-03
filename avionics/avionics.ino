@@ -62,6 +62,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "commands.h"
 #include "gpio.h"
 #include "groundaltitude.h"
+#include "satcom.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -170,6 +171,7 @@ void loop()
     char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
     char goodResponse[] = {'G','x','x','x','x'};
     const char badResponse[] = {'B','B','B','B','B'};
+    char satComCommandArray[SAT_COM_DATA_ARRAY_SIZE];
 
     if(s_statusOfInit.overview == CRITICAL_FAILURE)
         state = WINTER_CONTINGENCY; //makes sure that even if it does somehow get accidentally changed, it gets reverted
@@ -207,6 +209,30 @@ void loop()
             #endif
 
             sendRadioResponse(badResponse);
+        }
+    }
+
+    //SatCom receive check
+    if (SatComReceive(satComCommandArray))
+    {
+        if(check(satComCommandArray)) // this check array will move and be renamed
+        {
+            #ifdef TESTING
+            SerialUSB.print("Good Command: ");
+            SerialUSB.println(satComCommandArray);
+            #endif
+
+            doCommand(satComCommandArray[0], &state, &s_statusOfInit);
+            // send sat com command back through sat com
+        }
+        else
+        {
+            #ifdef TESTING
+            SerialUSB.print("Bad Command: ");
+            SerialUSB.println(satComCommandArray);
+            #endif
+
+            // send sat com error back through sat com
         }
     }
 

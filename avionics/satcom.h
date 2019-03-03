@@ -9,6 +9,7 @@
 
 /*Constants------------------------------------------------------------*/
 #define IridiumSerial Serial3
+#define SAT_COM_DATA_ARRAY_SIZE 10
 // #define DIAGNOSTICS // testing
 #define BUFSIZE 100
 
@@ -18,5 +19,6 @@
 bool SatComSetup(void);
 int SatComQuality(void);
 void SatComSend(unsigned long*, float*);
+bool SatComReceive(char*);
 
 #endif

@@ -173,6 +173,50 @@ void SatComSend(unsigned long *timestamp, float GPS_data[])
     }
 }
 
+/* void SatComReceive(null) {}
+ * @brief Receives message from satellite via SatCom module
+ * @param satComCommandArray[] buffer for message to be received (size 100)
+ * @return void
+ */
+bool SatComReceive(char satComCommandArray[])
+{
+  int err;
+  // char buffer[100];
+  size_t bufferSize = sizeof(satComCommandArray);
+
+  // Check to see if there are remaining messages not retrieved
+  if (modem.getWaitingMessageCount() > 0)
+  {
+    err = modem.sendReceiveSBDText(NULL, satComCommandArray, bufferSize);
+
+    if (err != ISBD_SUCCESS)
+    {
+      #ifdef TESTING
+      SerialUSB.print("sendReceiveSBD* failed: error ");
+      SerialUSB.println(err);
+      if (err == ISBD_SENDRECEIVE_TIMEOUT)
+        SerialUSB.println("Try again with a better view of the sky.");
+      #endif
+      return FALSE;
+    }
+
+    else
+    {
+      #ifdef TESTING
+      SerialUSB.print("Inbound buffer size is: ");
+      SerialUSB.println(bufferSize);
+
+      for (int i = 0; i < bufferSize; i++)
+      {
+        SerialUSB.write(buffer[i]);
+      }
+      SerialUSB.println();
+      #endif
+      return TRUE;
+    }
+  return FALSE;
+}
+
 // I don't think we need this
 #ifdef DIAGNOSTICS
 void ISBDConsoleCallback(IridiumSBD *device, char c)
