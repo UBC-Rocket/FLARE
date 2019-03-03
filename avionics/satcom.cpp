@@ -181,13 +181,15 @@ void SatComSend(unsigned long *timestamp, float GPS_data[])
 bool SatComReceive(char satComCommandArray[])
 {
   int err;
-  // char buffer[100];
-  size_t bufferSize = sizeof(satComCommandArray);
+  uint8_t buffer[SAT_COM_DATA_ARRAY_SIZE];
+  // size_t bufferSize = sizeof(satComCommandArray);
+  size_t bufferSize = sizeof(buffer);
 
   // Check to see if there are remaining messages not retrieved
   if (modem.getWaitingMessageCount() > 0)
   {
-    err = modem.sendReceiveSBDText(NULL, satComCommandArray, bufferSize);
+    //err = modem.sendReceiveSBDText(NULL, satComCommandArray, bufferSize);
+    err = modem.sendReceiveSBDText(NULL, buffer, bufferSize);
 
     if (err != ISBD_SUCCESS)
     {
@@ -197,7 +199,7 @@ bool SatComReceive(char satComCommandArray[])
       if (err == ISBD_SENDRECEIVE_TIMEOUT)
         SerialUSB.println("Try again with a better view of the sky.");
       #endif
-      return FALSE;
+      return false;
     }
 
     else
@@ -205,16 +207,24 @@ bool SatComReceive(char satComCommandArray[])
       #ifdef TESTING
       SerialUSB.print("Inbound buffer size is: ");
       SerialUSB.println(bufferSize);
+      #endif
 
       for (int i = 0; i < bufferSize; i++)
       {
+        satComCommandArray[i] = (char) buffer[i];
+        #ifdef TESTING
         SerialUSB.write(buffer[i]);
+        #endif
       }
+
+      #ifdef TESTING
       SerialUSB.println();
       #endif
-      return TRUE;
+
+      return true;
     }
-  return FALSE;
+  }
+  return false;
 }
 
 // I don't think we need this

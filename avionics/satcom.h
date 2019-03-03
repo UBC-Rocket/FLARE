@@ -9,7 +9,7 @@
 
 /*Constants------------------------------------------------------------*/
 #define IridiumSerial Serial3
-#define SAT_COM_DATA_ARRAY_SIZE 10
+#define SAT_COM_DATA_ARRAY_SIZE 34
 // #define DIAGNOSTICS // testing
 #define BUFSIZE 100
 
