@@ -198,7 +198,7 @@ void initSensors(InitStatus *status)
     while (!SerialRadio) {}
 
     /*init satcom*/
-
+    // bool satsetup = SatComSetup();
     // if (!SatComSetup())
     //     status = false;
 

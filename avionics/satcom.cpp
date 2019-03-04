@@ -126,11 +126,9 @@ int SatComQuality()
  */
 void SatComSend(unsigned long *timestamp, float GPS_data[])
 {
-
-    // err = modem.sendSBDText("Hello, world!");
     int gps_array1[2];
     int gps_array2[2];
-    char sendbuf[BUFSIZE]; //
+    char sendbuf[BUFSIZE];
     String send_timestamp = String(*timestamp);
 
     for (int i = 0; i < 2; i++){
@@ -145,16 +143,11 @@ void SatComSend(unsigned long *timestamp, float GPS_data[])
 
     // String longitude = String(GPS_data[1]);
     String altitude = String(GPS_data[2]);
-    String satsend = String("timestamp: " + send_timestamp + "\n" + "Lat: " + lat1 + "." + lat2 + "\n"
-                                  + "Long: " + long1 + "." + long2 + "\n" + "Alt: " + altitude + "\n");
-
-    /*
-    int bufferSize = length(satsend);
-    char sendbuf[bufferSize + 1];
-    */
+    String satsend = String("timestamp: " + send_timestamp + " Lat: " + lat1 + "." + lat2 +
+                                      " Long: " + long1 + "." + long2 + " Alt: " + altitude);
 
     satsend.toCharArray(sendbuf, BUFSIZE);
-    int err = modem.sendSBDText(sendbuf);   // try strings and shit
+    int err = modem.sendSBDText(sendbuf);
     if (err != ISBD_SUCCESS)
     {
       #ifdef TESTING
@@ -175,20 +168,18 @@ void SatComSend(unsigned long *timestamp, float GPS_data[])
 
 /* void SatComReceive(null) {}
  * @brief Receives message from satellite via SatCom module
- * @param satComCommandArray[] buffer for message to be received (size 100)
+ * @param satComCommandArray[] buffer for message to be received
  * @return void
  */
 bool SatComReceive(char satComCommandArray[])
 {
   int err;
   uint8_t buffer[SAT_COM_DATA_ARRAY_SIZE];
-  // size_t bufferSize = sizeof(satComCommandArray);
   size_t bufferSize = sizeof(buffer);
 
   // Check to see if there are remaining messages not retrieved
   if (modem.getWaitingMessageCount() > 0)
   {
-    //err = modem.sendReceiveSBDText(NULL, satComCommandArray, bufferSize);
     err = modem.sendReceiveSBDText(NULL, buffer, bufferSize);
 
     if (err != ISBD_SUCCESS)

@@ -85,8 +85,6 @@ static float ground_alt_arr[GROUND_ALT_SIZE]; //values for the baseline pressure
   */
 void setup()
 {
-    int i;
-
     initPins();
 
     /*init serial comms*/
@@ -127,7 +125,7 @@ void setup()
 
     /* init various arrays */
     baseline_pressure = barSensorInit(); /* for baseline pressure calculation */
-    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) // for moving average
+    for (int i = 0; i < PRESSURE_AVG_SET_SIZE; i++) // for moving average
     {
         pressure_set[i] = baseline_pressure;
     }
@@ -215,24 +213,35 @@ void loop()
     //SatCom receive check
     if (SatComReceive(satComCommandArray))
     {
+        #ifdef TESTING
+            for(int q = 0; q < SAT_COM_DATA_ARRAY_SIZE; q++){
+                SerialUSB.write(satComCommandArray[q]);
+            }
+            SerialUSB.println();
+        #endif
+
         if(check(satComCommandArray)) // this check array will move and be renamed
         {
             #ifdef TESTING
             SerialUSB.print("Good Command: ");
-            SerialUSB.println(satComCommandArray);
+            SerialUSB.write(satComCommandArray[0]);
+            SerialUSB.println();
             #endif
 
             doCommand(satComCommandArray[0], &state, &s_statusOfInit);
-            // send sat com command back through sat com
+            // send sat com command back through sat com  ???
         }
         else
         {
             #ifdef TESTING
             SerialUSB.print("Bad Command: ");
-            SerialUSB.println(satComCommandArray);
+            for (int b = 0; b < 5; b++){
+            SerialUSB.write(satComCommandArray[b]);
+            SerialUSB.println();
+            }
             #endif
 
-            // send sat com error back through sat com
+            // send sat com error back through sat com ????
         }
     }
 
