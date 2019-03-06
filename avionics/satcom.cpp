@@ -124,7 +124,7 @@ int SatComQuality()
  * @param  float GPS_data[] - most recently acquired GPS data
  * @return void.
  */
-void SatComSend(unsigned long *timestamp, float GPS_data[])
+void SatComSendGPS(unsigned long *timestamp, float GPS_data[])
 {
     int gps_array1[2];
     int gps_array2[2];
@@ -166,10 +166,10 @@ void SatComSend(unsigned long *timestamp, float GPS_data[])
     }
 }
 
-/* void SatComReceive(null) {}
+/* bool SatComReceive(char *) {}
  * @brief Receives message from satellite via SatCom module
  * @param satComCommandArray[] buffer for message to be received
- * @return void
+ * @return bool indicating if a message was received or not
  */
 bool SatComReceive(char satComCommandArray[])
 {

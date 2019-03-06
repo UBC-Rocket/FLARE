@@ -18,7 +18,7 @@
 /*Functions------------------------------------------------------------*/
 bool SatComSetup(void);
 int SatComQuality(void);
-void SatComSend(unsigned long*, float*);
+void SatComSendGPS(unsigned long*, float*);
 bool SatComReceive(char*);
 
 #endif

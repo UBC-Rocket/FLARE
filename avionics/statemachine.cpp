@@ -14,6 +14,7 @@
 
 /*Includes------------------------------------------------------------*/
 #include "statemachine.h"
+#include "satcom.h"
 
 #include <math.h>
 #include <Arduino.h>
@@ -80,7 +81,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case ASCENT:    // checks for Mach threshold + apogee
-            digitalWrite(LED_BUILTIN,LOW);
+            digitalWrite(LED_BUILTIN,LOW);  // do we need this? what are we doing with LEDs
             if (*delta_altitude > MACH_THRESHOLD) {
                 mach_count++;
                 if (mach_count >= MACH_CHECKS) {
@@ -94,10 +95,8 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             if (*delta_altitude <= 0) {
                 apogee_count ++;
                 if (apogee_count >= APOGEE_CHECKS) {
-                    //deploy drogue and payload
-                    //delay to avoid pressure spikes
-
-                    digitalWrite(LED_BUILTIN,HIGH);
+                    deployDrogue();
+                    digitalWrite(LED_BUILTIN,HIGH); // do we need this? what are we doing with LEDs
                     switchState(state, PRESSURE_DELAY);
                     apogee_count = 0;
                 }
@@ -132,7 +131,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             if (*altitude < FINAL_DESCENT_THRESHOLD) {
                 main_count ++;
                 if (main_count >= MAIN_CHECKS) {
-                    //deploy main
+                    deployMain();
                     old_time_landed = millis();
                     old_altitude_landed = *altitude;
                     switchState(state, FINAL_DESCENT);
@@ -145,9 +144,9 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case FINAL_DESCENT:
+            // SEND GPS via SATCOM
             if(millis() - old_time_landed >= LANDING_TIME_INTERVAL) {
                 float delta_altitude_landed = *altitude - old_altitude_landed;
-                // if (*altitude < LAND_HEIGHT_THRESHOLD && delta_altitude_landed <= LAND_VELOCITY_THRESHOLD) {
                 if (delta_altitude_landed <= LAND_VELOCITY_THRESHOLD) { // Landed threshold based on velocity alone
                     land_count++;
                     if (land_count >= LAND_CHECKS) {
@@ -165,6 +164,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case LANDED:
+            // SEND GPS coords??
             break;
 
         case WINTER_CONTINGENCY:
