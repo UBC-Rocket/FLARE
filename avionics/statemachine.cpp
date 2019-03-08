@@ -95,7 +95,9 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             if (*delta_altitude <= 0) {
                 apogee_count ++;
                 if (apogee_count >= APOGEE_CHECKS) {
-                    deployDrogue();
+                    #ifdef BODY
+                        deployDrogue();
+                    #endif
                     digitalWrite(LED_BUILTIN,HIGH); // do we need this? what are we doing with LEDs
                     switchState(state, PRESSURE_DELAY);
                     apogee_count = 0;
@@ -131,7 +133,9 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             if (*altitude < FINAL_DESCENT_THRESHOLD) {
                 main_count ++;
                 if (main_count >= MAIN_CHECKS) {
-                    deployMain();
+                    #ifdef BODY
+                        deployMain();
+                    #endif
                     old_time_landed = millis();
                     old_altitude_landed = *altitude;
                     switchState(state, FINAL_DESCENT);

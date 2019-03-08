@@ -85,7 +85,9 @@ static float ground_alt_arr[GROUND_ALT_SIZE]; //values for the baseline pressure
   */
 void setup()
 {
-    initPins();
+    #ifdef BODY
+        initPins();
+    #endif
 
     /*init serial comms*/
     #ifdef TESTING
@@ -163,13 +165,16 @@ void loop()
 
     static float prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
 
-    static FlightStates state = ARMED;
+    static FlightStates state = STANDBY;
 
     char command[RADIO_DATA_ARRAY_SIZE];
     char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
     char goodResponse[] = {'G','x','x','x','x'};
     const char badResponse[] = {'B','B','B','B','B'};
-    char satComCommandArray[SAT_COM_DATA_ARRAY_SIZE];
+
+    #ifdef NOSECONE
+        char satComCommandArray[SAT_COM_DATA_ARRAY_SIZE];
+    #endif
 
     if(s_statusOfInit.overview == CRITICAL_FAILURE)
         state = WINTER_CONTINGENCY; //makes sure that even if it does somehow get accidentally changed, it gets reverted
@@ -210,40 +215,42 @@ void loop()
         }
     }
 
-    //SatCom receive check
-    if (SatComReceive(satComCommandArray))
-    {
-        #ifdef TESTING
-            for(int q = 0; q < SAT_COM_DATA_ARRAY_SIZE; q++){
-                SerialUSB.write(satComCommandArray[q]);
-            }
-            SerialUSB.println();
-        #endif
-
-        if(check(satComCommandArray)) // this check array will move and be renamed
+    #ifdef NOSECONE
+        //SatCom receive check
+        if (SatComReceive(satComCommandArray))
         {
             #ifdef TESTING
-            SerialUSB.print("Good Command: ");
-            SerialUSB.write(satComCommandArray[0]);
-            SerialUSB.println();
+                for(int q = 0; q < SAT_COM_DATA_ARRAY_SIZE; q++){
+                    SerialUSB.write(satComCommandArray[q]);
+                }
+                SerialUSB.println();
             #endif
 
-            doCommand(satComCommandArray[0], &state, &s_statusOfInit);
-            // send sat com command back through sat com  ???
-        }
-        else
-        {
-            #ifdef TESTING
-            SerialUSB.print("Bad Command: ");
-            for (int b = 0; b < 5; b++){
-            SerialUSB.write(satComCommandArray[b]);
-            SerialUSB.println();
+            if(check(satComCommandArray)) // this check array will move and be renamed
+            {
+                #ifdef TESTING
+                SerialUSB.print("Good Command: ");
+                SerialUSB.write(satComCommandArray[0]);
+                SerialUSB.println();
+                #endif
+
+                doCommand(satComCommandArray[0], &state, &s_statusOfInit);
+                // send sat com command back through sat com  ???
             }
-            #endif
+            else
+            {
+                #ifdef TESTING
+                SerialUSB.print("Bad Command: ");
+                for (int b = 0; b < 5; b++){
+                SerialUSB.write(satComCommandArray[b]);
+                SerialUSB.println();
+                }
+                #endif
 
-            // send sat com error back through sat com ????
+                // send sat com error back through sat com ????
+            }
         }
-    }
+    #endif
 
     if(state == STANDBY)
         time_interval = STANDBY_POLLING_TIME_INTERVAL;

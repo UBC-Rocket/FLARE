@@ -215,6 +215,9 @@ bool SatComReceive(char satComCommandArray[])
       return true;
     }
   }
+  else
+    return false;
+
   return false;
 }
 

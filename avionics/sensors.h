@@ -10,6 +10,8 @@
 #include "statemachine.h"
 
 /*Constants------------------------------------------------------------*/
+#define NOSECONE
+#define BODY
 #define TESTING //enable or disable debug output
 #define GROUND_TEST
 
