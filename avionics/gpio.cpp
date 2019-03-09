@@ -98,8 +98,8 @@ void deployMain(void)
   *             false if the ematch is disconnected or broken.
   */
  bool continuityCheck(void){
-     digitalWrite(CONTINUITY_CHECK_PIN, HIGH);
-     delayMicroseconds(CONTINUITY_CHECK_DELAY);
+    digitalWrite(CONTINUITY_CHECK_PIN, HIGH);
+    delayMicroseconds(CONTINUITY_CHECK_DELAY);
 
     int continuity = analogRead(CONTINUITY_CHECK_ADC);
     digitalWrite(CONTINUITY_CHECK_PIN, LOW);

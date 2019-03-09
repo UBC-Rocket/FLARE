@@ -10,8 +10,8 @@
 #include "statemachine.h"
 
 /*Constants------------------------------------------------------------*/
-#define NOSECONE
-#define BODY
+#define NOSECONE //enable or disable nosecone-avionics specific functionality
+#define BODY //enable or disable body-avionics specific functionality
 #define TESTING //enable or disable debug output
 #define GROUND_TEST
 
