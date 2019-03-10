@@ -17,9 +17,10 @@
 #include "sensors.h"
 #include <Arduino.h>
 #include "sensors.h"
+#include "cameras.h"
 
 
-void communicateThroughSerial(HardwareSerial SerialVar, FlightStates * state)
+void communicateThroughSerial(HardwareSerial SerialVar, FlightStates * state, InitStatus *status)
 {
     char command[RADIO_DATA_ARRAY_SIZE];
     char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
@@ -45,7 +46,7 @@ void communicateThroughSerial(HardwareSerial SerialVar, FlightStates * state)
                 #ifdef TESTING
 
                 SerialUSB.println(command);
-                doCommand(command[0], state);
+                doCommand(command[0], state, status);
 
                 #endif
 
@@ -68,7 +69,7 @@ void communicateThroughSerial(HardwareSerial SerialVar, FlightStates * state)
   * @return void
   */
 
-void doCommand(char command, FlightStates * state){
+void doCommand(char command, FlightStates * state, InitStatus *status){
     const char satComResponse[] = {'O','K','A','Y','!'};
     switch (command){
         case ARM:
@@ -77,11 +78,13 @@ void doCommand(char command, FlightStates * state){
             break;
 
         case CAMERAS_ON:
+            power_cameras();
             //turn on the cameras
             break;
 
         //turn on the cameras
         case CAMERAS_OFF:
+            power_cameras();
             //turn off the cameras
             break;
 
@@ -111,7 +114,7 @@ void doCommand(char command, FlightStates * state){
             char statusReport1[RADIO_DATA_ARRAY_SIZE];
             char statusReport2[RADIO_DATA_ARRAY_SIZE];
             char statusReport3[RADIO_DATA_ARRAY_SIZE];
-           // generateStatusReport(status, statusReport1, statusReport2, statusReport3); ASK
+            generateStatusReport(status, statusReport1, statusReport2, statusReport3);
             sendRadioResponse(statusReport1);
             sendRadioResponse(statusReport2);
             sendRadioResponse(statusReport3);

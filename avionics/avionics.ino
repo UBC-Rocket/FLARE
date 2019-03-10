@@ -63,6 +63,8 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "gpio.h"
 #include "radio.h"
 #include "groundaltitude.h"
+#include "cameras.h"
+
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <i2c_t3.h>
@@ -91,6 +93,7 @@ void setup()
     /*init serial comms*/
     #ifdef TESTING
     SerialUSB.begin(9600);
+    SerialCamera1.begin(115200);
     while (!SerialUSB) {} //TODO add print in while to see what happens
     SerialUSB.println("Initializing...");
     #endif
@@ -177,11 +180,11 @@ void loop()
         state = WINTER_CONTINGENCY; //makes sure that even if it does somehow get accidentally changed, it gets reverted
 
     if(SerialRadio.available() >= 5){
-        communicateThroughSerial(SerialRadio, &state);
+        communicateThroughSerial(SerialRadio, &state, &s_statusOfInit );
     }
 
     else if(SerialSatCom.available()){
-        communicateThroughSerial(SerialSatCom, &state);
+        communicateThroughSerial(SerialSatCom, &state, &s_statusOfInit );
     }
 
     static uint16_t radio_time_interval = 100;

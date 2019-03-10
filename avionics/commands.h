@@ -26,7 +26,7 @@
 
 
 /*Functions------------------------------------------------------------*/
-void communicateThroughSerial(HardwareSerial SerialVar,FlightStates * state);
+void communicateThroughSerial(HardwareSerial SerialVar,FlightStates * state, InitStatus *status);
 void doCommand(char command,FlightStates * state );
 void sendRadioResponse(const char* response);
 void sendSatComResponse(const char* response);

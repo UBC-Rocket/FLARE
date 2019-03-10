@@ -24,6 +24,7 @@
 #include "gpio.h"                   //GPIO
 
 #include "commands.h"               //for sendRadioResponse(const char* response);
+#include "cameras.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -198,6 +199,13 @@ void initSensors(InitStatus *status)
     #endif
     SerialRadio.begin(921600);
     while (!SerialRadio) {}
+
+    #ifdef TESTING
+    SerialUSB.println("Initializing cameras");
+    #endif
+    SerialCamera1.begin(115200);
+    SerialCamera2.begin(115200);
+    while(!SerialCamera1 || !SerialCamera2){}
 
     /* log initialization status for each sensor */
     // 'X' for N/A, 'G' for good, 'B' for bad
