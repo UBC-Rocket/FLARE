@@ -190,7 +190,7 @@ const int underworld_tempo[] = {
   3, 3, 3
 };
 /*Functions------------------------------------------------------------*/
-void initBuzzer(void);
+void initBuzzer();
 void startBuzzer();
 void sing(int s);
 void buzz(int targetPin, long frequency, long length);

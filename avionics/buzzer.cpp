@@ -1,7 +1,7 @@
 #include "buzzer.h"
 
 
-void initBuzzer(void)
+void initBuzzer()
 {
   pinMode(3, OUTPUT);//buzzer
   pinMode(13, OUTPUT);//led indicator when singing a note
