@@ -173,50 +173,18 @@ void loop()
     static uint16_t tier_two_interval = 2000;
     static uint16_t tier_three_interval = 20000;
 
-
-    char command[RADIO_DATA_ARRAY_SIZE];
-    char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
-    char goodResponse[] = {'G','x','x','x','x'};
-    const char badResponse[] = {'B','B','B','B','B'};
-
     if(s_statusOfInit.overview == CRITICAL_FAILURE)
         state = WINTER_CONTINGENCY; //makes sure that even if it does somehow get accidentally changed, it gets reverted
 
-    if (SerialRadio.available() >= 5) {
-
-        #ifdef TESTING
-        SerialUSB.print("Received Message: ");
-        #endif
-
-        for(int i = 0; i< RADIO_DATA_ARRAY_SIZE; i++){
-            command[i] = SerialRadio.read();
-        }
-
-        bool correctCommand = check(command);
-
-        if(correctCommand){
-            for(int i =1; i<5; i++)
-            {
-                goodResponse[i] = command[0];
-            }
-
-            #ifdef TESTING
-            SerialUSB.print("Good command: ");
-            SerialUSB.println(command);
-            #endif
-
-            doCommand(command[0], &state, &s_statusOfInit);
-            sendRadioResponse(goodResponse);
-        }
-        else{
-            #ifdef TESTING
-            SerialUSB.print("Bad command: ");
-            SerialUSB.println(command);
-            #endif
-
-            sendRadioResponse(badResponse);
-        }
+    if(SerialRadio.available() >= 5){
+        communicateThroughSerial(SerialRadio, &state);
     }
+
+    else if(SerialSatCom.available()){
+        communicateThroughSerial(SerialSatCom, &state);
+    }
+
+    static uint16_t radio_time_interval = 100;
 
     if(state == STANDBY)
         time_interval = STANDBY_POLLING_TIME_INTERVAL;
@@ -274,15 +242,3 @@ void loop()
     #endif
 }
 
-//checks if all indexes are equal for radio commands
-bool check(char *radioCommand)
- {
-    const char a0 = radioCommand[0];
-
-    for (int i = 1; i < 5; i++)
-    {
-        if (radioCommand[i] != a0)
-            return false;
-    }
-    return true;
-}

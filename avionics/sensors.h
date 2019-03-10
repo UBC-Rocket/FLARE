@@ -17,6 +17,7 @@
 #define SerialUSB               Serial
 #define SerialGPS               Serial1
 #define SerialRadio             Serial2
+#define SerialSatCom            Serial5
 
 #define EARTHS_GRAVITY          9.80665
 
@@ -32,7 +33,7 @@
 #define GPS_DATA_ARRAY_SIZE     3
 #define GPS_FIELD_LENGTH        20
 
-#define RADIO_DATA_ARRAY_SIZE   5
+
 
 #define NUM_SENSORS 7       // + 1 = 7 for ematch checking
 #define FILE_STATUS_POSITION 0

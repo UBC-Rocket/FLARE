@@ -4,14 +4,17 @@
 
 /*Includes------------------------------------------------------------*/
 #include "sensors.h"
+#include <Arduino.h>
 
 /*Constants------------------------------------------------------------*/
+
+#define RADIO_DATA_ARRAY_SIZE  5
 
 #define ARM 'r'
 #define CAMERAS_ON 'C'
 #define CAMERAS_OFF 'O'
 #define HALO 'H'
-#define SATCOM 's'
+#define SATCOM_TEST 'A'
 #define RESET 'R'
 #define PING 'p'
 #define MAIN 'm'
@@ -23,8 +26,10 @@
 
 
 /*Functions------------------------------------------------------------*/
-void doCommand(char command,FlightStates * state, InitStatus *status);
+void communicateThroughSerial(HardwareSerial SerialVar,FlightStates * state);
+void doCommand(char command,FlightStates * state );
 void sendRadioResponse(const char* response);
-
+void sendSatComResponse(const char* response);
+bool checkForValidty(char *radioCommand);
 
 #endif
