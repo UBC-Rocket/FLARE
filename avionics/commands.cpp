@@ -55,25 +55,22 @@ void doCommand(char command, FlightStates * state){
         case HALO:
         //play HALO
         case SATCOM_TEST:
-            for(int i=0; i<5; i++){
-                SerialSatCom.write(satComResponse[i]);
-            }
+        sendSatComResponse(sendSatComResponse);
         break;
         case RESET:
-        //not sure
         case MAIN:
-        //testing purposes
-        digitalWrite(LED_BUILTIN, HIGH);
-        // delay(400);
-        // digitalWrite(LED_BUILTIN,LOW);
         break;
         case DROGUE:
-        //testing purposes
-        // digitalWrite(LED_BUILTIN, HIGH);
-        // delay(400);
-        digitalWrite(LED_BUILTIN,LOW);
         break;
     }
+
+}
+
+void sendSatComResponse(const char* response){
+     for(int i=0; i<5; i++)
+      {
+          SerialSatCom.write(response[i]);
+      }
 
 }
 
