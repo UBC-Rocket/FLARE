@@ -87,7 +87,9 @@
 #define NOTE_CS8 4435
 #define NOTE_D8  4699
 #define NOTE_DS8 4978
-#define melodyPin 3
+#define MELODY_PIN 3
+#define MARIO      1
+#define UNDERWORLD 2
 
 /*Cameras Header*/
 #ifndef BUZZER_H
