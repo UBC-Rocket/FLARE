@@ -303,7 +303,7 @@ void loop()
             bodyTierOne(bar_data, state, altitude, &timestamp);
         #endif
         #ifdef NOSECONE
-            noseconeTierOne(&timestamp, GPS_data);
+            noseconeTierOne(GPS_data);
         #endif
         tier_one_old_time = new_time;
     }
