@@ -8,7 +8,7 @@
 // #include "statemachine.h"
 
 /*Constants------------------------------------------------------------*/
-#define IridiumSerial Serial3
+#define IridiumSerial Serial4
 #define SAT_COM_DATA_ARRAY_SIZE 34
 // #define DIAGNOSTICS // testing
 #define BUFSIZE 100
