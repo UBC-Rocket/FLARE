@@ -61,6 +61,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "calculations.h"
 #include "commands.h"
 #include "gpio.h"
+#include "radio.h"
 #include "groundaltitude.h"
 #include "satcom.h"
 
@@ -126,8 +127,9 @@ void setup()
     }
 
     /* init various arrays */
+    int i;
     baseline_pressure = barSensorInit(); /* for baseline pressure calculation */
-    for (int i = 0; i < PRESSURE_AVG_SET_SIZE; i++) // for moving average
+    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) // for moving average
     {
         pressure_set[i] = baseline_pressure;
     }
@@ -151,9 +153,11 @@ void loop()
     unsigned long delta_time;
     static uint16_t time_interval = NOMINAL_POLLING_TIME_INTERVAL; //ms
 
-    static unsigned long radio_old_time = 0;
-    static unsigned long radio_new_time = 0;
-    static uint16_t radio_time_interval = 300;
+
+    static unsigned long tier_one_old_time = 0;
+    static unsigned long tier_two_old_time = 0;
+    static unsigned long tier_three_old_time = 0;
+
 
     static unsigned long init_status_old_time = 0;
     static unsigned long init_status_new_time = 0;
@@ -166,6 +170,12 @@ void loop()
     static float prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
 
     static FlightStates state = STANDBY;
+
+
+    static uint16_t tier_one_interval = 400;
+    static uint16_t tier_two_interval = 2000;
+    static uint16_t tier_three_interval = 20000;
+
 
     char command[RADIO_DATA_ARRAY_SIZE];
     char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
@@ -270,11 +280,22 @@ void loop()
         logData(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure);
     }
 
+    if((new_time - tier_one_old_time) >= tier_one_interval) {
+        sendTierOne(&timestamp, GPS_data, bar_data, state, altitude);
+        //bodyTierOne(bar_data, state, altitude, &timestamp);
+       // noseconeTierOne(&timestamp, GPS_data);
+        tier_one_old_time = new_time;
+    }
 
-    radio_new_time = millis();
-    if ( (radio_new_time - radio_old_time) > radio_time_interval ){
-        radio_old_time = radio_new_time;
-        processRadioData(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude);
+    if ( (new_time - tier_two_old_time) >= tier_two_interval ){
+        sendTierTwo(acc_data, bar_data, &temp_sensor_data, IMU_data);
+        //noseconeTierTwo(bar_data, acc_data, &temp_sensor_data, IMU_data);
+        tier_two_old_time = new_time;
+    }
+
+    if ( (new_time - tier_three_old_time) >= tier_three_interval ){
+       sendTierThree(&battery_voltage, &ground_altitude);
+        tier_three_old_time = new_time;
     }
 
     if (s_statusOfInit.overview == NONCRITICAL_FAILURE)

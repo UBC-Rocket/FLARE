@@ -61,6 +61,7 @@ void initSensors(InitStatus *status)
     #ifdef TESTING
     SerialUSB.println("Initializing battery");
     #endif
+
     if(powerbattery.getVoltage() <= LOW_BATTERY_VOLTAGE)
     { //TODO: Uncomment once the battery sensor is implemented
         //status->sensorNominal[BATTERY_STATUS_POSITION] = false;
@@ -78,6 +79,7 @@ void initSensors(InitStatus *status)
         //     SerialUSB.println("WARNING: Battery at low voltage!");
         //     #endif
         // }
+
     }
 
     #ifdef TESTING
@@ -91,15 +93,15 @@ void initSensors(InitStatus *status)
     SerialUSB.println("Checking ematch continuity");
     #endif
 
-    if (!continuityCheck()){
-        status->overview = CRITICAL_FAILURE;
-        status->sensorNominal[EMATCH_STATUS_POSITION] = false;
+    // if (!continuityCheck()){
+    //     status->overview = CRITICAL_FAILURE;
+    //     status->sensorNominal[EMATCH_STATUS_POSITION] = false;
 
-        #ifdef TESTING
-        SerialUSB.println("ERROR: ematch continuity");
-        #endif
-    }
-    #endif
+    //     #ifdef TESTING
+    //     SerialUSB.println("ERROR: ematch continuity");
+    //     #endif
+    // }
+    #endif //to IFDEF BODY
 
     /*init SD card*/
     #ifdef TESTING
@@ -516,72 +518,3 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
         #endif
     #endif
 }
-
-/*
-* @brief Processes data to send over the radio
-* @param unsigned long *timestamp - current system timestamp
-* @param float *battery_voltage - battery meter
-* @param float acc_data[] - x,y,z accelerometer reading
-* @param float bar_data[] - barometer data array
-* @param float *temp_sensor_data - temperature sensor reading
-* @param float IMU_data[] - pitch, roll, yaw IMU data
-* @param float* GPS_data[] - lat, long, altitude GPS array
-* @param FlightStates state - current statemachine flight state
-* @param float altitude -   calculated altitude
-* @return void
-*/
-void processRadioData(unsigned long *timestamp, float* battery_voltage, float acc_data[], float bar_data[],
-    float *temp_sensor_data, float IMU_data[], float* GPS_data, FlightStates state, float altitude){
-
-    float time = *timestamp;
-    sendRadioData(time, 't');
-    sendRadioData(*battery_voltage, UID_batt);
-
-    sendRadioData(acc_data[0], UID_acc_acc_x);
-    sendRadioData(acc_data[1], UID_acc_acc_y);
-    sendRadioData(acc_data[2], UID_acc_acc_z);
-
-    sendRadioData(bar_data[0], UID_bar_pres);
-    sendRadioData(bar_data[1], UID_bar_temp);
-
-    sendRadioData(*temp_sensor_data, UID_temp_temp);
-
-    sendRadioData(IMU_data[0], UID_IMU_acc_x);
-    sendRadioData(IMU_data[1], UID_IMU_acc_y);
-    sendRadioData(IMU_data[2], UID_IMU_acc_z);
-    sendRadioData(IMU_data[3], UID_IMU_gyro_x);
-    sendRadioData(IMU_data[4], UID_IMU_gyro_y);
-    sendRadioData(IMU_data[5], UID_IMU_gyro_z);
-    sendRadioData(IMU_data[6], UID_IMU_mag_x);
-    sendRadioData(IMU_data[7], UID_IMU_mag_y);
-    sendRadioData(IMU_data[8], UID_IMU_mag_z);
-    sendRadioData( altitude, UID_altitude);
-    sendRadioData((float) state, UID_state);
-
-
-
-    // gps_data is already float?
-    #ifdef NOSECONE
-        sendRadioData(GPS_data[0], UID_GPS_lat);
-        sendRadioData(GPS_data[1], UID_GPS_long);
-        sendRadioData(GPS_data[2], UID_GPS_alt);
-    #endif
-}
-
-/**
-  * @brief  Takes a 4 byte float and sends each byte sequentially over the radio
-  * @param  float data - one float worth of data to be sent via radio
-  * @param  char id - data identifier
-  * @return void
-  */
-void sendRadioData(float data, char id){
-    //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly
-    u_int8_t b[4];
-    *(float*) b = data;
-    SerialRadio.write(id);
-    for(int i=0; i<4; i++)
-    {
-        SerialRadio.write(b[i]);
-    }
-}
-
