@@ -184,6 +184,9 @@ void loop()
 
     #ifdef NOSECONE
         char satComCommandArray[SAT_COM_DATA_ARRAY_SIZE];
+        static bool mainDeploySatcomSent = false;
+        static int landedSatcomSentCount = 0;
+        static uint16_t satcomMsgOldTime = millis();
     #endif
 
     if(s_statusOfInit.overview == CRITICAL_FAILURE)
@@ -260,7 +263,21 @@ void loop()
                 // send sat com error back through sat com ????
             }
         }
-    #endif
+
+        /* send radio data */
+        if(state == FINAL_DESCENT && !mainDeploySatcomSent)
+        {
+            mainDeploySatcomSent = true;
+            SatComSendGPS(&timestamp, GPS_data);
+        }
+        else if(state == LANDED && landedSatcomSentCount < NUM_SATCOM_SENDS_ON_LANDED && millis() - satcomMsgOldTime >= SATCOM_LANDED_TIME_INTERVAL)
+        { //sends Satcom total of NUM_SATCOM_SENDS_ON_LANDED times, once every SATCOM_LANDED_TIME_INTERVAL
+            landedSatcomSentCount++;
+            SatComSendGPS(&timestamp, GPS_data);
+            satcomMsgOldTime = millis();
+        }
+
+    #endif //def NOSECONE
 
     if(state == STANDBY)
         time_interval = STANDBY_POLLING_TIME_INTERVAL;

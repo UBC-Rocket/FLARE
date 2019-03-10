@@ -46,9 +46,10 @@ THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
 ***
 
 ## Definable stuff
+All definable things are located in "sensors.h".
+
 ### Nosecone/Body
-For the 2018-2019 work year, the rocket has two avionics systems; one in the nosecone and one in the body.
-The specific functions they can perform are as follows:
+For the 2018-2019 work year, the rocket has two avionics systems; one in the nosecone and one in the body. The specific functions they can perform are as follows:
 
 |Nosecone            | Body|
 |---- | ----|
@@ -60,8 +61,7 @@ The specific functions they can perform are as follows:
 | | Accepts unique nosecone commands from radio _(not implemented as of Mar 2)_ |
 
 ### Testing
-When defined, enables debugging output. All polled sensor values are printed to USB, and a 1 second delay is added to the main
-Arduino loop function. **DO NOT HAVE THIS DEFINED WHEN FLASHING TO FLIGHT PCBS**
+When defined, enables debugging output. All polled sensor values are printed to USB, and a 1 second delay is added to the main Arduino loop function. **DO NOT HAVE THIS DEFINED WHEN FLASHING TO FLIGHT PCBS**
 
 ### Ground Test
-??? hey sam allan can you fill this in
+When defined, eanbles radio-activated deployment of the main and drogue parachutes. This is to allow for deployment tests while on the ground. GROUND_TEST also enables other features facilitating testing on the ground (e.g. LED for rocket state) **DO NOT HAVE THIS DEFINED WHEN FLASHING TO FLIGHT PCBS**

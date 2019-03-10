@@ -81,7 +81,10 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case ASCENT:    // checks for Mach threshold + apogee
-            digitalWrite(LED_BUILTIN,LOW);  // do we need this? what are we doing with LEDs
+                #ifdef GROUND_TEST
+                digitalWrite(LED_BUILTIN,LOW);  // do we need this? what are we doing with LEDs
+                #endif
+
             if (*delta_altitude > MACH_THRESHOLD) {
                 mach_count++;
                 if (mach_count >= MACH_CHECKS) {
@@ -98,7 +101,9 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                     #ifdef BODY
                         deployDrogue();
                     #endif
-                    digitalWrite(LED_BUILTIN,HIGH); // do we need this? what are we doing with LEDs
+                        #ifdef GROUND_TEST
+                        digitalWrite(LED_BUILTIN,HIGH); // do we need this? what are we doing with LEDs
+                        #endif
                     switchState(state, PRESSURE_DELAY);
                     apogee_count = 0;
                 }
@@ -148,13 +153,12 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case FINAL_DESCENT:
-            // SEND GPS via SATCOM
             if(millis() - old_time_landed >= LANDING_TIME_INTERVAL) {
                 float delta_altitude_landed = *altitude - old_altitude_landed;
                 if (delta_altitude_landed <= LAND_VELOCITY_THRESHOLD) { // Landed threshold based on velocity alone
                     land_count++;
                     if (land_count >= LAND_CHECKS) {
-                        //turn off sensors except GPS
+                        //Nice to have: get sensor sleep mode and turn off sensors except GPS to conserve power
                         switchState(state, LANDED);
                         land_count = 0;
                     }

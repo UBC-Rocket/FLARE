@@ -134,7 +134,7 @@ void SatComSendGPS(unsigned long *timestamp, float GPS_data[])
     for (int i = 0; i < 2; i++){
       gps_array1[i] = GPS_data[i];
       gps_array2[i] = (GPS_data[i]-gps_array1[i]) * 1000;
-    } // !!!!
+    }
 
     String lat1 = String(gps_array1[0]);
     String lat2 = String(gps_array2[0]);

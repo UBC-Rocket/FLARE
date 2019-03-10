@@ -12,6 +12,8 @@
 #define SAT_COM_DATA_ARRAY_SIZE 34
 // #define DIAGNOSTICS // testing
 #define BUFSIZE 100
+#define NUM_SATCOM_SENDS_ON_LANDED 3
+#define SATCOM_LANDED_TIME_INTERVAL 60000 //in ms
 
 /*Variables------------------------------------------------------------*/
 
