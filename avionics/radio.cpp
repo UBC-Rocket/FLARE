@@ -28,7 +28,7 @@
 
 //send pressure, gps, state, and altitude over radio
 //FILLER FUNCTIONS
-void sendTierOne(unsigned long *timestamp, float* GPS_data, float bar_data[], FlightStates state, float altitude){
+void  sendTierOne(unsigned long *timestamp, float* GPS_data, float bar_data[], FlightStates state, float altitude){
     float time = *timestamp;
     sendRadioData(time, 't');
     sendRadioData(bar_data[0], UID_bar_pres);
@@ -78,9 +78,7 @@ void bodyTierOne(float bar_data[], FlightStates state, float altitude, unsigned 
   * @param  unsigned long *timestamp - address for the timestamp
   * @return void
   */
-void noseconeTierOne(unsigned long *timestamp, float* GPS_data){
-    float time = *timestamp;
-    sendRadioData(time, 't');
+void noseconeTierOne(float* GPS_data){
     sendRadioData(GPS_data[0], UID_GPS_lat);
     sendRadioData(GPS_data[1], UID_GPS_long);
     sendRadioData(GPS_data[2], UID_GPS_alt);

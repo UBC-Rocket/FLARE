@@ -14,6 +14,7 @@
 
 /*Includes------------------------------------------------------------*/
 #include "statemachine.h"
+#include "satcom.h"
 
 #include <math.h>
 #include <Arduino.h>
@@ -80,7 +81,10 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case ASCENT:    // checks for Mach threshold + apogee
-            digitalWrite(LED_BUILTIN,LOW);
+                #ifdef GROUND_TEST
+                digitalWrite(LED_BUILTIN,LOW);  // do we need this? what are we doing with LEDs
+                #endif
+
             if (*delta_altitude > MACH_THRESHOLD) {
                 mach_count++;
                 if (mach_count >= MACH_CHECKS) {
@@ -94,10 +98,12 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             if (*delta_altitude <= 0) {
                 apogee_count ++;
                 if (apogee_count >= APOGEE_CHECKS) {
-                    //deploy drogue and payload
-                    //delay to avoid pressure spikes
-
-                    digitalWrite(LED_BUILTIN,HIGH);
+                    #ifdef BODY
+                        deployDrogue();
+                    #endif
+                        #ifdef GROUND_TEST
+                        digitalWrite(LED_BUILTIN,HIGH); // do we need this? what are we doing with LEDs
+                        #endif
                     switchState(state, PRESSURE_DELAY);
                     apogee_count = 0;
                 }
@@ -132,7 +138,9 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             if (*altitude < FINAL_DESCENT_THRESHOLD) {
                 main_count ++;
                 if (main_count >= MAIN_CHECKS) {
-                    //deploy main
+                    #ifdef BODY
+                        deployMain();
+                    #endif
                     old_time_landed = millis();
                     old_altitude_landed = *altitude;
                     switchState(state, FINAL_DESCENT);
@@ -147,11 +155,10 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
         case FINAL_DESCENT:
             if(millis() - old_time_landed >= LANDING_TIME_INTERVAL) {
                 float delta_altitude_landed = *altitude - old_altitude_landed;
-                // if (*altitude < LAND_HEIGHT_THRESHOLD && delta_altitude_landed <= LAND_VELOCITY_THRESHOLD) {
                 if (delta_altitude_landed <= LAND_VELOCITY_THRESHOLD) { // Landed threshold based on velocity alone
                     land_count++;
                     if (land_count >= LAND_CHECKS) {
-                        //turn off sensors except GPS
+                        //Nice to have: get sensor sleep mode and turn off sensors except GPS to conserve power
                         switchState(state, LANDED);
                         land_count = 0;
                     }
@@ -165,6 +172,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case LANDED:
+            // SEND GPS coords??
             break;
 
         case WINTER_CONTINGENCY:

@@ -63,6 +63,8 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "gpio.h"
 #include "radio.h"
 #include "groundaltitude.h"
+#include "satcom.h"
+
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <i2c_t3.h>
@@ -85,8 +87,9 @@ static float ground_alt_arr[GROUND_ALT_SIZE]; //values for the baseline pressure
 void setup()
 {
     int i;
-
-    initPins();
+    #ifdef BODY
+        initPins();
+    #endif
 
     /*init serial comms*/
     #ifdef TESTING
@@ -166,7 +169,7 @@ void loop()
 
     static float prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
 
-    static FlightStates state = ARMED;
+    static FlightStates state = STANDBY;
 
 
     static uint16_t tier_one_interval = 400;
@@ -178,6 +181,13 @@ void loop()
     char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
     char goodResponse[] = {'G','x','x','x','x'};
     const char badResponse[] = {'B','B','B','B','B'};
+
+    #ifdef NOSECONE
+        char satComCommandArray[SAT_COM_DATA_ARRAY_SIZE];
+        static bool mainDeploySatcomSent = false;
+        static int landedSatcomSentCount = 0;
+        static uint16_t satcomMsgOldTime = millis();
+    #endif
 
     if(s_statusOfInit.overview == CRITICAL_FAILURE)
         state = WINTER_CONTINGENCY; //makes sure that even if it does somehow get accidentally changed, it gets reverted
@@ -218,6 +228,57 @@ void loop()
         }
     }
 
+    #ifdef NOSECONE
+        //SatCom receive check
+        if (SatComReceive(satComCommandArray))
+        {
+            #ifdef TESTING
+                for(int q = 0; q < SAT_COM_DATA_ARRAY_SIZE; q++){
+                    SerialUSB.write(satComCommandArray[q]);
+                }
+                SerialUSB.println();
+            #endif
+
+            if(check(satComCommandArray)) // this check array will move and be renamed
+            {
+                #ifdef TESTING
+                SerialUSB.print("Good Command: ");
+                SerialUSB.write(satComCommandArray[0]);
+                SerialUSB.println();
+                #endif
+
+                doCommand(satComCommandArray[0], &state, &s_statusOfInit);
+                // send sat com command back through sat com  ???
+            }
+            else
+            {
+                #ifdef TESTING
+                SerialUSB.print("Bad Command: ");
+                for (int b = 0; b < 5; b++){
+                SerialUSB.write(satComCommandArray[b]);
+                SerialUSB.println();
+                }
+                #endif
+
+                // send sat com error back through sat com ????
+            }
+        }
+
+        /* send radio data */
+        if(state == FINAL_DESCENT && !mainDeploySatcomSent)
+        {
+            mainDeploySatcomSent = true;
+            SatComSendGPS(&timestamp, GPS_data);
+        }
+        else if(state == LANDED && landedSatcomSentCount < NUM_SATCOM_SENDS_ON_LANDED && millis() - satcomMsgOldTime >= SATCOM_LANDED_TIME_INTERVAL)
+        { //sends Satcom total of NUM_SATCOM_SENDS_ON_LANDED times, once every SATCOM_LANDED_TIME_INTERVAL
+            landedSatcomSentCount++;
+            SatComSendGPS(&timestamp, GPS_data);
+            satcomMsgOldTime = millis();
+        }
+
+    #endif //def NOSECONE
+
     if(state == STANDBY)
         time_interval = STANDBY_POLLING_TIME_INTERVAL;
     else if (state == LANDED)
@@ -237,22 +298,29 @@ void loop()
     }
 
     if((new_time - tier_one_old_time) >= tier_one_interval) {
-        sendTierOne(&timestamp, GPS_data, bar_data, state, altitude);
-        //bodyTierOne(bar_data, state, altitude, &timestamp);
-       // noseconeTierOne(&timestamp, GPS_data);
+        // sendTierOne(&timestamp, GPS_data, bar_data, state, altitude);
+        #ifdef BODY
+            bodyTierOne(bar_data, state, altitude, &timestamp);
+        #endif
+        #ifdef NOSECONE
+            noseconeTierOne(GPS_data);
+        #endif
         tier_one_old_time = new_time;
     }
 
     if ( (new_time - tier_two_old_time) >= tier_two_interval ){
-        sendTierTwo(acc_data, bar_data, &temp_sensor_data, IMU_data);
-        //noseconeTierTwo(bar_data, acc_data, &temp_sensor_data, IMU_data);
+        // sendTierTwo(acc_data, bar_data, &temp_sensor_data, IMU_data);
+        #ifdef NOSECONE
+            noseconeTierTwo(bar_data, acc_data, &temp_sensor_data, IMU_data);
+        #endif
         tier_two_old_time = new_time;
     }
 
-    if ( (new_time - tier_three_old_time) >= tier_three_interval ){
-       sendTierThree(&battery_voltage, &ground_altitude);
-        tier_three_old_time = new_time;
-    }
+    // Anything that would go in tier_three would probably only be sent once @ start and on radio request
+    // if ( (new_time - tier_three_old_time) >= tier_three_interval ){
+    //     sendTierThree(&battery_voltage, &ground_altitude);
+    //     tier_three_old_time = new_time;
+    // }
 
     if (s_statusOfInit.overview == NONCRITICAL_FAILURE)
     {

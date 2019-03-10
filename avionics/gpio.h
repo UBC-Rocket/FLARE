@@ -6,15 +6,17 @@
 #include <Arduino.h>
 
 /*Constants------------------------------------------------------------*/
-#define IGNITOR_PIN 5
-#define SERVO_PIN 30
-#define CONTINUITY_CHECK_PIN 6 // I DONT KNOW!!
-#define CONTINUITY_CHECK_ADC 7 // I DONT KNOW!!
+
+//Double, triple check pin assignments
+#define IGNITOR_PIN 4
+#define SERVO_PIN 2
+#define CONTINUITY_CHECK_PIN 16
+#define CONTINUITY_CHECK_ADC 14
 
 #define INIT_SERVO_POS  60
 #define FINAL_SERVO_POS 160
 
-#define IGNITOR_DELAY 10    // in milliseconds
+#define IGNITOR_DELAY 12    // in milliseconds
 #define SERVO_DELAY 1000
 #define CONTINUITY_CHECK_DELAY 30 // in microseconds!
 
