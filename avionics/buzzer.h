@@ -1,3 +1,12 @@
+
+/*Cameras Header*/
+#ifndef BUZZER_H
+#define BUZZER_H
+
+/*Includes------------------------------------------------------------*/
+#include <Arduino.h>
+
+/*Constants------------------------------------------------------------*/
 #define NOTE_B0  31
 #define NOTE_C1  33
 #define NOTE_CS1 35
@@ -90,16 +99,6 @@
 #define MELODY_PIN 3
 #define MARIO      ('M')
 #define UNDERWORLD ('U')
-
-/*Cameras Header*/
-#ifndef BUZZER_H
-#define BUZZER_H
-
-/*Includes------------------------------------------------------------*/
-#include <Arduino.h>
-
-/*Constants------------------------------------------------------------*/
-// #define TESTING //enable or disable debug output
 
 /*Variables------------------------------------------------------------*/
 const int melody[] = {
