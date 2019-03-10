@@ -86,6 +86,7 @@ static float ground_alt_arr[GROUND_ALT_SIZE]; //values for the baseline pressure
   */
 void setup()
 {
+    int i;
     #ifdef BODY
         initPins();
     #endif
@@ -127,7 +128,6 @@ void setup()
     }
 
     /* init various arrays */
-    int i;
     baseline_pressure = barSensorInit(); /* for baseline pressure calculation */
     for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) // for moving average
     {
@@ -281,22 +281,29 @@ void loop()
     }
 
     if((new_time - tier_one_old_time) >= tier_one_interval) {
-        sendTierOne(&timestamp, GPS_data, bar_data, state, altitude);
-        //bodyTierOne(bar_data, state, altitude, &timestamp);
-       // noseconeTierOne(&timestamp, GPS_data);
+        // sendTierOne(&timestamp, GPS_data, bar_data, state, altitude);
+        #ifdef BODY
+            bodyTierOne(bar_data, state, altitude, &timestamp);
+        #endif
+        #ifdef NOSECONE
+            noseconeTierOne(&timestamp, GPS_data);
+        #endif
         tier_one_old_time = new_time;
     }
 
     if ( (new_time - tier_two_old_time) >= tier_two_interval ){
-        sendTierTwo(acc_data, bar_data, &temp_sensor_data, IMU_data);
-        //noseconeTierTwo(bar_data, acc_data, &temp_sensor_data, IMU_data);
+        // sendTierTwo(acc_data, bar_data, &temp_sensor_data, IMU_data);
+        #ifdef NOSECONE
+            noseconeTierTwo(bar_data, acc_data, &temp_sensor_data, IMU_data);
+        #endif
         tier_two_old_time = new_time;
     }
 
-    if ( (new_time - tier_three_old_time) >= tier_three_interval ){
-       sendTierThree(&battery_voltage, &ground_altitude);
-        tier_three_old_time = new_time;
-    }
+    // Anything that would go in tier_three would probably only be sent once @ start and on radio request
+    // if ( (new_time - tier_three_old_time) >= tier_three_interval ){
+    //     sendTierThree(&battery_voltage, &ground_altitude);
+    //     tier_three_old_time = new_time;
+    // }
 
     if (s_statusOfInit.overview == NONCRITICAL_FAILURE)
     {
