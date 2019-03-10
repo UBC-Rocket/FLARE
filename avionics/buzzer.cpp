@@ -13,9 +13,10 @@ void startBuzzer()
   sing(UNDERWORLD);
 }
 
-void sing(int song) {
+void sing(char song) {
     switch(song){
         case UNDERWORLD:
+        {
             SerialUSB.println(" 'Underworld Theme'");
             int size = sizeof(underworld_melody) / sizeof(int);
             for (int thisNote = 0; thisNote < size; thisNote++) {
@@ -32,7 +33,9 @@ void sing(int song) {
                 buzz(MELODY_PIN, 0, noteDuration);
             }
             break;
+        }
         case MARIO:
+        {
             SerialUSB.println(" 'Mario Theme'");
             int size = sizeof(melody) / sizeof(int);
             for (int thisNote = 0; thisNote < size; thisNote++) {
@@ -49,6 +52,7 @@ void sing(int song) {
                 buzz(MELODY_PIN, 0, noteDuration);
             }
             break;
+        }
     }
 }
 
