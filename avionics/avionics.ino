@@ -88,11 +88,10 @@ static float ground_alt_arr[GROUND_ALT_SIZE]; //values for the baseline pressure
 void setup()
 {
     int i;
-
-    initBuzzer();
     #ifdef BODY
-       initPins();
+        initPins();
     #endif
+    initBuzzer();
 
     /*init serial comms*/
     #ifdef TESTING
