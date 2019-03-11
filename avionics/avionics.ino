@@ -144,7 +144,6 @@ void setup()
         ground_alt_arr[i] = baseline_pressure;
     }
 
-
 }
 
 /**
