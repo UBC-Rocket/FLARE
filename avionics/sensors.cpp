@@ -87,6 +87,7 @@ void initSensors(InitStatus *status)
     SerialUSB.println(powerbattery.getVoltage());
     #endif
 
+    #ifdef BODY
     /* check ematch continuity */
     #ifdef TESTING
     SerialUSB.println("Checking ematch continuity");
@@ -100,6 +101,7 @@ void initSensors(InitStatus *status)
     //     SerialUSB.println("ERROR: ematch continuity");
     //     #endif
     // }
+    #endif //to IFDEF BODY
 
     /*init SD card*/
     #ifdef TESTING
@@ -125,11 +127,20 @@ void initSensors(InitStatus *status)
             SerialUSB.println("ERROR: Opening file failed!");
             #endif
         } else {
-            datalog.write("SENSOR LOG DATA\n");
-            datalog.write("Time (ms), State, Battery Voltage (V),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
-            "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
-            "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
-            "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude,ematch\n");
+            #ifdef NOSECONE
+                datalog.write("NOSECONE SENSOR LOG DATA\n");
+                datalog.write("Time (ms), State, Battery Voltage (V),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
+                "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
+                "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
+                "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude\n");
+            #endif
+            #ifdef BODY
+                datalog.write("BODY SENSOR LOG DATA\n");
+                datalog.write("Time (ms), State, Battery Voltage (V),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
+                "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
+                "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
+                "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),ematch\n");
+            #endif
         }
     }
 
@@ -181,16 +192,18 @@ void initSensors(InitStatus *status)
     }
     IMU.setExtCrystalUse(true);
 
-    /*init GPS*/
-    #ifdef TESTING
-    SerialUSB.println("Initializing GPS");
+    #ifdef NOSECONE
+        /*init GPS*/
+        #ifdef TESTING
+        SerialUSB.println("Initializing GPS");
+        #endif
+        SerialGPS.begin(4800);
+        while (!SerialGPS) {}
+        SerialGPS.write(GPS_reset_defaults, sizeof(GPS_reset_defaults));
+        // SerialGPS.write(GPS_set_baud_rate, sizeof(GPS_set_baud_rate));
+        SerialGPS.write(GPS_set_NMEA_message, sizeof(GPS_set_NMEA_message));
+        SerialGPS.write(GPS_set_update_rate, sizeof(GPS_set_update_rate));
     #endif
-    SerialGPS.begin(4800);
-    while (!SerialGPS) {}
-    SerialGPS.write(GPS_reset_defaults, sizeof(GPS_reset_defaults));
-    // SerialGPS.write(GPS_set_baud_rate, sizeof(GPS_set_baud_rate));
-    SerialGPS.write(GPS_set_NMEA_message, sizeof(GPS_set_NMEA_message));
-    SerialGPS.write(GPS_set_update_rate, sizeof(GPS_set_update_rate));
 
     /*init radio*/
     #ifdef TESTING
@@ -198,6 +211,13 @@ void initSensors(InitStatus *status)
     #endif
     SerialRadio.begin(921600);
     while (!SerialRadio) {}
+
+    #ifdef NOSECONE
+        /*init satcom*/
+        // bool satsetup = SatComSetup();
+        // if (!SatComSetup())
+        //     status = false;
+    #endif
 
     /* log initialization status for each sensor */
     // 'X' for N/A, 'G' for good, 'B' for bad
@@ -230,13 +250,18 @@ void initSensors(InitStatus *status)
     else
         datalog.write("B,B,B,");
 
+    #ifdef NOSECONE
     datalog.write("X, X, X,");   //GPS - as of time of writing, no capability to test success
+    #endif
 
-    if(status->sensorNominal[EMATCH_STATUS_POSITION])   //ematch continuity
-        datalog.write("G\n");
-    else
-        datalog.write("B\n");
+    #ifdef BODY
+        if(status->sensorNominal[EMATCH_STATUS_POSITION])   //ematch continuity
+            datalog.write("G\n");
+        else
+            datalog.write("B\n");
+    #endif
 
+    // ADD SATCOM FAIL CODE
 
     /* transmit sensor report */
         // Key for receiver:
@@ -308,10 +333,15 @@ void generateStatusReport(InitStatus *status, char *statusReport1, char *statusR
     statusReport3[0] = UID_status;
     statusReport3[1] = '3';
 
-    if(status->sensorNominal[EMATCH_STATUS_POSITION])
-        statusReport3[2] = 'G';
-    else
-        statusReport3[2] = 'B';
+    #ifdef BODY
+        if(status->sensorNominal[EMATCH_STATUS_POSITION])
+            statusReport3[2] = 'G';
+        else
+            statusReport3[2] = 'B';
+    #endif
+    #ifdef NOSECONE
+        statusReport3[2] = 'X';
+    #endif
 
     statusReport3[3] = 'X';
     statusReport3[4] = 'X';
@@ -385,12 +415,14 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
     IMU_data[1] = event.orientation.y;
     IMU_data[2] = event.orientation.z;
 
-    #ifdef TESTING
-    SerialUSB.println("Polling GPS");
+    #ifdef NOSECONE
+        #ifdef TESTING
+        SerialUSB.println("Polling GPS");
+        #endif
+        if (updateGPS()) {
+            getGPS(GPS_data);
+        }
     #endif
-    if (updateGPS()) {
-        getGPS(GPS_data);
-    }
 }
 
 /**
@@ -436,10 +468,12 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
         datalog.print(IMU_data[i]);
         datalog.print(",");
     }
-    for (unsigned int i = 0; i < GPS_DATA_ARRAY_SIZE; i++) {
-        datalog.print(GPS_data[i]);
-        datalog.print(",");
-    }
+    #ifdef NOSECONE
+        for (unsigned int i = 0; i < GPS_DATA_ARRAY_SIZE; i++) {
+            datalog.print(GPS_data[i]);
+            datalog.print(",");
+        }
+    #endif
     datalog.print("\n");
     datalog.flush();
 
@@ -473,15 +507,14 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
     SerialUSB.println(IMU_data[1]);
     SerialUSB.print("IMU - Pitch:                        ");
     SerialUSB.println(IMU_data[2]);
-    SerialUSB.print("GPS latitude:                       ");
-    SerialUSB.println(GPS_data[0]);
-    SerialUSB.print("GPS longitude:                      ");
-    SerialUSB.println(GPS_data[1]);
-    SerialUSB.print("GPS altitude:                       ");
-    SerialUSB.println(GPS_data[2]);
-    SerialUSB.println("");
+        #ifdef NOSECONE
+        SerialUSB.print("GPS latitude:                       ");
+        SerialUSB.println(GPS_data[0]);
+        SerialUSB.print("GPS longitude:                      ");
+        SerialUSB.println(GPS_data[1]);
+        SerialUSB.print("GPS altitude:                       ");
+        SerialUSB.println(GPS_data[2]);
+        SerialUSB.println("");
+        #endif
     #endif
 }
-
-
-

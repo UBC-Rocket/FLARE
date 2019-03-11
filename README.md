@@ -1,6 +1,6 @@
-# 30k-Sensors
+# IMPORTANT WARNINGS
 
-VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!
+**VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!**
 
                      uuuuuuu
                  uu$$$$$$$$$$$uu
@@ -40,4 +40,28 @@ On Windows: [user_drive]\Program Files (x86)\Arduino\hardware\teensy\avr\cores\t
 On line 43 increase SERIAL1_RX_BUFFER_SIZE from 64 to 128.
 THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
 
-VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!
+**VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!**
+
+***
+***
+
+## Definable stuff
+All definable things are located in "sensors.h".
+
+### Nosecone/Body
+For the 2018-2019 work year, the rocket has two avionics systems; one in the nosecone and one in the body. The specific functions they can perform are as follows:
+
+|Nosecone            | Body|
+|---- | ----|
+| Log all sensor data | Log all sensor data |
+|                    | Communicate with SATCOM
+|                    | Utilize GPS
+| Uses `bodyTierX` radio functions| Uses `noseconeTierX` radio functions - a subset of data is sent |
+|Runs state machine and controls deployment actuators (e.g. servos, ematch) | Runs state machine without control of actuators |
+| | Accepts unique nosecone commands from radio _(not implemented as of Mar 2)_ |
+
+### Testing
+When defined, enables debugging output. All polled sensor values are printed to USB, and a 1 second delay is added to the main Arduino loop function. **DO NOT HAVE THIS DEFINED WHEN FLASHING TO FLIGHT PCBS**
+
+### Ground Test
+When defined, eanbles radio-activated deployment of the main and drogue parachutes. This is to allow for deployment tests while on the ground. GROUND_TEST also enables other features facilitating testing on the ground (e.g. LED for rocket state) **DO NOT HAVE THIS DEFINED WHEN FLASHING TO FLIGHT PCBS**

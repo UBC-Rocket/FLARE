@@ -41,8 +41,8 @@ void initPins(void)
     #endif
 
     /*init ematch continuity check pins */
-    // pinMode(CONTINUITY_CHECK_PIN, OUTPUT);
-    // digitalWrite(CONTINUITY_CHECK_PIN, LOW);
+    pinMode(CONTINUITY_CHECK_PIN, OUTPUT);
+    digitalWrite(CONTINUITY_CHECK_PIN, LOW);
     // the ADC read pin does not need to be initialized !!
 
     #ifdef TESTING
@@ -98,8 +98,8 @@ void deployMain(void)
   *             false if the ematch is disconnected or broken.
   */
  bool continuityCheck(void){
-     digitalWrite(CONTINUITY_CHECK_PIN, HIGH);
-     delayMicroseconds(CONTINUITY_CHECK_DELAY);
+    digitalWrite(CONTINUITY_CHECK_PIN, HIGH);
+    delayMicroseconds(CONTINUITY_CHECK_DELAY);
 
     int continuity = analogRead(CONTINUITY_CHECK_ADC);
     digitalWrite(CONTINUITY_CHECK_PIN, LOW);
