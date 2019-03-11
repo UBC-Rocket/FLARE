@@ -1,10 +1,10 @@
 #include "buzzer.h"
 
-
 void initBuzzer()
 {
-  pinMode(MELODY_PIN, OUTPUT);//buzzer
+  pinMode(MELODY_PIN, OUTPUT);  //buzzer pin init
 }
+
 void startBuzzer()
 {
   //sing the tunes

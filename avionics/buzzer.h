@@ -168,7 +168,8 @@ const int underworld_melody[] = {
   NOTE_AS3, NOTE_A3, NOTE_GS3,
   0, 0, 0
 };
-//Underwolrd tempo
+
+//Underworld tempo
 const int underworld_tempo[] = {
   12, 12, 12, 12,
   12, 12, 6,
@@ -190,10 +191,11 @@ const int underworld_tempo[] = {
   10, 10, 10,
   3, 3, 3
 };
+
 /*Functions------------------------------------------------------------*/
 void initBuzzer();
 void startBuzzer();
-void sing(int s);
-void buzz(int targetPin, long frequency, long length);
+void sing(char);
+void buzz(int, long, long);
 
 #endif

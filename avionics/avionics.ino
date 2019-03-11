@@ -62,7 +62,9 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "commands.h"
 #include "gpio.h"
 #include "radio.h"
+#include "buzzer.h"
 #include "groundaltitude.h"
+
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <i2c_t3.h>
@@ -86,6 +88,7 @@ void setup()
 {
     int i;
 
+    initBuzzer();
     initPins();
 
     /*init serial comms*/
@@ -267,7 +270,6 @@ void loop()
                 digitalWrite(LED_BUILTIN, LOW);
         }
     }
-
 
     #ifdef TESTING
     delay(1000);
