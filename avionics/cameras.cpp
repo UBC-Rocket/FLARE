@@ -28,6 +28,7 @@ void power_cameras(){
     SerialCamera1.write(power_command,sizeof(power_command));
     SerialCamera2.write(power_command,sizeof(power_command));
 }
+
 /**
   * @brief  starts recording on both cameras
   * @param  None
@@ -39,6 +40,7 @@ void start_record(){
     SerialCamera1.write(startRecord_command,sizeof(startRecord_command));
     SerialCamera2.write(startRecord_command,sizeof(startRecord_command));
 }
+
 /**
   * @brief  stops recording on both cameras
   * @param  None
@@ -50,6 +52,7 @@ void stop_record(){
     SerialCamera1.write(stopRecord_command,sizeof(stopRecord_command));
     SerialCamera2.write(stopRecord_command,sizeof(stopRecord_command));
 }
+
 /**
   * @brief  calculates the crc for the specific command
   * @param  the first three bytes of the command (not sure about the unsigned char)

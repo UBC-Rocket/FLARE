@@ -1,11 +1,37 @@
+/* @file    buzzer.cpp
+ * @author  UBC Rocket Avionics 2018/2019
+ * @description   Initializes buzzer pins and plays melodies using
+ *      the buzzer.  These are blocking functions.
+ *
+ * @section LICENSE
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * Distributed as-is; no warranty is given.
+ */
+
+/*Includes------------------------------------------------------------*/
 #include "buzzer.h"
 
-void initBuzzer()
+/*Variables------------------------------------------------------------*/
+
+/*Functions------------------------------------------------------------*/
+/* void initBuzzer(void){}
+ * @brief  Initializes buzzer control output pins
+ * @return void.
+ */
+void initBuzzer(void)
 {
   pinMode(MELODY_PIN, OUTPUT);  //buzzer pin init
 }
 
-void startBuzzer()
+/* void startBuzzer(void){}
+ * @brief  Plays three melodies through the buzzer
+ * @return void.
+ */
+void startBuzzer(void)
 {
   //sing the tunes
   sing(MARIO);
@@ -13,6 +39,11 @@ void startBuzzer()
   sing(UNDERWORLD);
 }
 
+/* void sing(char){}
+ * @brief  Calculates current values
+ * @param  char song - char ID of the melody to be played, defined in buzzer.h
+ * @return void.
+ */
 void sing(char song) {
     switch(song){
         case UNDERWORLD:
@@ -56,6 +87,13 @@ void sing(char song) {
     }
 }
 
+/* void buzz(int, long, long){}
+ * @brief  Creates a buzzer note at a specified frequency and duration
+ * @param  int targetPin - the buzzer control pin
+ * @param  long frequency - frequency of the note to be played
+ * @param  long length - length of note to be played
+ * @return void.
+ */
 void buzz(int targetPin, long frequency, long length) {
   long delayValue = 1000000 / frequency / 2; // calculate the delay value between transitions
   //// 1 second's worth of microseconds, divided by the frequency, then split in half since

@@ -64,6 +64,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "radio.h"
 #include "buzzer.h"
 #include "groundaltitude.h"
+#include "satcom.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -89,7 +90,9 @@ void setup()
     int i;
 
     initBuzzer();
-    initPins();
+    #ifdef BODY
+       initPins();
+    #endif
 
     /*init serial comms*/
     #ifdef TESTING

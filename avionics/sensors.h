@@ -11,7 +11,9 @@
 
 
 /*Constants------------------------------------------------------------*/
-//#define TESTING //enable or disable debug output
+#define TESTING //enable or disable debug output
+#define NOSECONE
+#define BODY
 #define GROUND_TEST
 
 #define SerialUSB               Serial

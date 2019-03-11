@@ -1,5 +1,4 @@
-
-/*Cameras Header*/
+/*Buzzer Header*/
 #ifndef BUZZER_H
 #define BUZZER_H
 
