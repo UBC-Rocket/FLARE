@@ -36,7 +36,7 @@
 
 #define RADIO_DATA_ARRAY_SIZE   5
 
-#define NUM_SENSORS 7       // + 1 = 7 for ematch checking
+#define NUM_SENSORS 8       // + 2 = 8 for ematch, satcom checking
 #define FILE_STATUS_POSITION 0
 #define BATTERY_STATUS_POSITION 1
 #define ACCELEROMETER_STATUS_POSITION 2
@@ -44,6 +44,7 @@
 #define TEMPERATURE_STATUS_POSITION 4
 #define IMU_STATUS_POSITION 5
 #define EMATCH_STATUS_POSITION 6
+#define SATCOM_STATUS_POSITION 7
 
 /*Variables------------------------------------------------------------*/
 

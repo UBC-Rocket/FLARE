@@ -64,6 +64,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "radio.h"
 #include "groundaltitude.h"
 #include "satcom.h"
+#include "cameras.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -105,6 +106,10 @@ void setup()
     /*init sensors*/
     initSensors(&s_statusOfInit);
 
+    /*init camera serial port*/
+    SerialCamera.begin(CameraBaud);
+    while (!SerialCamera) {}        //do we want to replace this or leave these {}?
+
     /*if something went wrong spin infinitely, otherwise indicate completion*/
     if (s_statusOfInit.overview == CRITICAL_FAILURE) {
         #ifdef TESTING
@@ -138,6 +143,8 @@ void setup()
     {
         ground_alt_arr[i] = baseline_pressure;
     }
+
+
 }
 
 /**

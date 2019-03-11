@@ -15,8 +15,9 @@
 #include "commands.h"
 #include "gpio.h"
 #include "sensors.h"
+#include "cameras.h"
+
 #include <Arduino.h>
-#include "sensors.h"
 
 /** void doCommand(char, FlightStates *state, InitStatus *status)
   * @brief  Takes a radio command input and executes the command
@@ -30,14 +31,17 @@ void doCommand(char command, FlightStates *state, InitStatus *status){
         case ARM:
             //if(*state == STANDBY) //Don't want to switch out of drogue deploy or something into Armed
             //  switchState(*state, ARMED);
+            //power_cameras();
             break;
 
         case CAMERAS_ON:
             //turn on the cameras
+            //power_cameras();
             break;
 
         case CAMERAS_OFF:
             //turn off the cameras
+            //power_cameras();
             break;
 
         case HALO:

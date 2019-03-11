@@ -118,7 +118,7 @@ int SatComQuality()
 
 }
 
-/* void SatComSend(unsigned long*, float[]){}
+/* void SatComSendGPS(unsigned long*, float[]){}
  * @brief  Sends an unsigned long timestamp and GPS array through the SatCom
  * @param  unsigned long *timestamp - the time stamp of the incoming data
  * @param  float GPS_data[] - most recently acquired GPS data
