@@ -91,6 +91,7 @@ void setup()
     #ifdef BODY
         initPins();
     #endif
+
     initBuzzer();
 
     /*init serial comms*/
