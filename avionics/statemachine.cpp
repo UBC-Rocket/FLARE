@@ -15,6 +15,8 @@
 /*Includes------------------------------------------------------------*/
 #include "statemachine.h"
 #include "satcom.h"
+#include "cameras.h"
+#include "gpio.h"
 
 #include <math.h>
 #include <Arduino.h>
@@ -57,7 +59,9 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 launch_count++;
                 if (launch_count >= STANDBY_LAUNCH_CHECKS){
                     switchState(state, ASCENT);
-                    launch_count = 0;
+                    // launch_count = 0;
+                    // turn on cameras
+                    power_cameras();
                 }
             }
             else{
@@ -159,6 +163,8 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                     land_count++;
                     if (land_count >= LAND_CHECKS) {
                         //Nice to have: get sensor sleep mode and turn off sensors except GPS to conserve power
+                        // turn off cameras:
+                        power_cameras();
                         switchState(state, LANDED);
                         land_count = 0;
                     }

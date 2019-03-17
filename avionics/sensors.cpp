@@ -22,6 +22,7 @@
 #include "Adafruit_BNO055.h"        //IMU
 #include "Venus638FLPx.h"           //GPS
 #include "gpio.h"                   //GPIO
+#include "satcom.h"
 
 #include "commands.h"               //for sendRadioResponse(const char* response);
 
@@ -93,14 +94,14 @@ void initSensors(InitStatus *status)
     SerialUSB.println("Checking ematch continuity");
     #endif
 
-    // if (!continuityCheck()){
-    //     status->overview = CRITICAL_FAILURE;
-    //     status->sensorNominal[EMATCH_STATUS_POSITION] = false;
+    if (!continuityCheck()){
+        // status->overview = CRITICAL_FAILURE;     //put this in eventually
+        status->sensorNominal[EMATCH_STATUS_POSITION] = false;
 
-    //     #ifdef TESTING
-    //     SerialUSB.println("ERROR: ematch continuity");
-    //     #endif
-    // }
+        #ifdef TESTING
+        SerialUSB.println("ERROR: ematch continuity");
+        #endif
+    }
     #endif //to IFDEF BODY
 
     /*init SD card*/
@@ -132,7 +133,7 @@ void initSensors(InitStatus *status)
                 datalog.write("Time (ms), State, Battery Voltage (V),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
                 "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
                 "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
-                "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude\n");
+                "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude,SatCom\n");
             #endif
             #ifdef BODY
                 datalog.write("BODY SENSOR LOG DATA\n");
@@ -214,9 +215,12 @@ void initSensors(InitStatus *status)
 
     #ifdef NOSECONE
         /*init satcom*/
-        // bool satsetup = SatComSetup();
-        // if (!SatComSetup())
-        //     status = false;
+        if (!SatComSetup()){
+            if(status->overview < NONCRITICAL_FAILURE)
+                status->overview = NONCRITICAL_FAILURE;
+            status->sensorNominal[SATCOM_STATUS_POSITION] = false;
+        }
+
     #endif
 
     /* log initialization status for each sensor */
@@ -261,7 +265,12 @@ void initSensors(InitStatus *status)
             datalog.write("B\n");
     #endif
 
-    // ADD SATCOM FAIL CODE
+    #ifdef NOSECONE
+        if(status->sensorNominal[SATCOM_STATUS_POSITION])
+            datalog.write("G\n");
+        else
+            datalog.write("B\n");
+    #endif
 
     /* transmit sensor report */
         // Key for receiver:
@@ -341,9 +350,16 @@ void generateStatusReport(InitStatus *status, char *statusReport1, char *statusR
     #endif
     #ifdef NOSECONE
         statusReport3[2] = 'X';
+        if(status->sensorNominal[SATCOM_STATUS_POSITION])
+            statusReport3[3] = 'G';
+        else
+            statusReport3[3] = 'B';
     #endif
 
-    statusReport3[3] = 'X';
+    #ifdef BODY
+        statusReport3[3] = 'X';
+    #endif
+
     statusReport3[4] = 'X';
 }
 

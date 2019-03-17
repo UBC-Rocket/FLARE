@@ -118,7 +118,7 @@ int SatComQuality()
 
 }
 
-/* void SatComSend(unsigned long*, float[]){}
+/* void SatComSendGPS(unsigned long*, float[]){}
  * @brief  Sends an unsigned long timestamp and GPS array through the SatCom
  * @param  unsigned long *timestamp - the time stamp of the incoming data
  * @param  float GPS_data[] - most recently acquired GPS data
@@ -165,6 +165,34 @@ void SatComSendGPS(unsigned long *timestamp, float GPS_data[])
       #endif
     }
 }
+
+/* void SatComSendCharArray(char SendArray[]){}
+ * @brief  Sends a char array through the SatCom
+ * @param  char Send_Array[] - a 1D char array with no new line characters
+ * @return void.
+ */
+void SatComSendCharArray(char Send_Array[])
+{
+    int err = modem.sendSBDText(Send_Array);
+
+    if (err != ISBD_SUCCESS)
+    {
+      #ifdef TESTING
+      SerialUSB.print("sendSBDText failed: error ");
+      SerialUSB.println(err);
+      if (err == ISBD_SENDRECEIVE_TIMEOUT)
+        SerialUSB.println("Try again with a better view of the sky.");
+      #endif
+    }
+
+    else
+    {
+      #ifdef TESTING
+      SerialUSB.println("sendSBDText: Success!");
+      #endif
+    }
+}
+
 
 /* bool SatComReceive(char *) {}
  * @brief Receives message from satellite via SatCom module
