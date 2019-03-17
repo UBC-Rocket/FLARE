@@ -62,6 +62,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "commands.h"
 #include "gpio.h"
 #include "radio.h"
+#include "buzzer.h"
 #include "groundaltitude.h"
 #include "satcom.h"
 #include "cameras.h"
@@ -91,7 +92,9 @@ void setup()
     #ifdef BODY
         initPins();
     #endif
-
+  
+    initBuzzer();
+  
     /*init serial comms*/
     #ifdef TESTING
     SerialUSB.begin(9600);
@@ -341,7 +344,6 @@ void loop()
                 digitalWrite(LED_BUILTIN, LOW);
         }
     }
-
 
     #ifdef TESTING
     delay(1000);

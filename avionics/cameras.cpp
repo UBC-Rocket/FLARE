@@ -32,6 +32,7 @@ void power_cameras(){
     //SerialUSB.println("the power command is %d", power_command[3]);
     SerialCamera.write(power_command,sizeof(power_command));
 }
+
 /**
   * @brief  starts recording on both cameras
   * @param  None
@@ -43,6 +44,7 @@ void start_record(){
     startRecord_command[3] = crc;
     SerialCamera.write(startRecord_command,sizeof(startRecord_command));
 }
+
 /**
   * @brief  stops recording on both cameras
   * @param  None
@@ -54,6 +56,7 @@ void stop_record(){
     stopRecord_command[3] = crc;
     SerialCamera.write(stopRecord_command,sizeof(stopRecord_command));
 }
+
 /**
   * @brief  calculates the crc for the specific command
   * @param  the first three bytes of the command (not sure about the unsigned char)
