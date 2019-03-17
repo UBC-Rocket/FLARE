@@ -162,7 +162,7 @@ void loop()
 
     static unsigned long tier_one_old_time = 0;
     static unsigned long tier_two_old_time = 0;
-    static unsigned long tier_three_old_time = 0;
+    // static unsigned long tier_three_old_time = 0; //decided to be unused
 
 
     static unsigned long init_status_old_time = 0;
@@ -180,7 +180,7 @@ void loop()
 
     static uint16_t tier_one_interval = 400;
     static uint16_t tier_two_interval = 2000;
-    static uint16_t tier_three_interval = 20000;
+    // static uint16_t tier_three_interval = 20000; //decided to be unused
 
 
     char command[RADIO_DATA_ARRAY_SIZE];
