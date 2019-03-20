@@ -16,6 +16,7 @@
 #include "gpio.h"
 #include "sensors.h"
 #include "cameras.h"
+#include "satcom.h"
 
 #include <Arduino.h>
 
@@ -29,19 +30,19 @@
 void doCommand(char command, FlightStates *state, InitStatus *status){
     switch (command){
         case ARM:
-            //if(*state == STANDBY) //Don't want to switch out of drogue deploy or something into Armed
-            //  switchState(*state, ARMED);
-            //power_cameras();
+            // if(*state == STANDBY) //Don't want to switch out of drogue deploy or something into Armed
+                // switchState(*state, ARMED);
+            power_cameras();
             break;
 
         case CAMERAS_ON:
             //turn on the cameras
-            //power_cameras();
+            power_cameras();
             break;
 
         case CAMERAS_OFF:
             //turn off the cameras
-            //power_cameras();
+            power_cameras();
             break;
 
         case HALO:
@@ -103,3 +104,56 @@ void sendRadioResponse(const char* response){
     }
 }
 
+void communicateThroughSerial(FlightStates * state, InitStatus *status)
+{
+    char command[RADIO_DATA_ARRAY_SIZE];
+    char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
+    char goodResponse[] = {'G','x','x','x','x'};
+    const char badResponse[] = {'B','B','B','B','B'};
+    HardwareSerial &currentSerial = SerialRadio;
+
+    for(int i = 0; i< RADIO_DATA_ARRAY_SIZE; i++){
+           command[i] = SerialRadio.read();
+    }
+
+    bool correctCommand = check(command);
+
+    #ifdef TESTING
+    SerialUSB.print("Received Message: ");
+    SerialUSB.println(command);
+    #endif
+
+    if(correctCommand){
+        #ifdef TESTING
+        SerialUSB.print("Good Command: ");
+        SerialUSB.write(command[0]);
+        SerialUSB.println();
+        #endif
+
+        sendRadioResponse(goodResponse);
+        doCommand(command[0], state, status);
+    }
+
+    else {
+        #ifdef TESTING
+        SerialUSB.print("Bad Command: ");
+        SerialUSB.write(command[0]);
+        SerialUSB.println();
+        #endif
+
+        sendRadioResponse(badResponse);
+    }
+}
+
+//checks if all indexes are equal for radio commands
+bool check(char *radioCommand)
+ {
+    const char a0 = radioCommand[0];
+
+    for (int i = 1; i < 5; i++)
+    {
+        if (radioCommand[i] != a0)
+            return false;
+    }
+    return true;
+}

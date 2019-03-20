@@ -5,6 +5,8 @@
 /*Includes------------------------------------------------------------*/
 #include "sensors.h"
 
+#include <Arduino.h>
+
 /*Constants------------------------------------------------------------*/
 
 #define ARM 'r'
@@ -21,10 +23,10 @@
 
 /*Variables------------------------------------------------------------*/
 
-
 /*Functions------------------------------------------------------------*/
-void doCommand(char command,FlightStates * state, InitStatus *status);
-void sendRadioResponse(const char* response);
-
+void doCommand(char,FlightStates * state, InitStatus *status);
+void sendRadioResponse(const char*);
+void communicateThroughSerial(FlightStates * state, InitStatus * status);
+bool check(char*);
 
 #endif
