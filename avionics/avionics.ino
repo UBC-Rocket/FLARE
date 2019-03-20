@@ -92,9 +92,9 @@ void setup()
     #ifdef BODY
         initPins();
     #endif
-  
+
     initBuzzer();
-  
+
     /*init serial comms*/
     #ifdef TESTING
     SerialUSB.begin(9600);
@@ -192,7 +192,6 @@ void loop()
     const char badResponse[] = {'B','B','B','B','B'};
 
     #ifdef NOSECONE
-        char satComCommandArray[SAT_COM_DATA_ARRAY_SIZE];
         static bool mainDeploySatcomSent = false;
         static int landedSatcomSentCount = 0;
         static uint16_t satcomMsgOldTime = millis();
@@ -238,53 +237,18 @@ void loop()
     }
 
     #ifdef NOSECONE
-        //SatCom receive check
-        if (SatComReceive(satComCommandArray))
-        {
-            #ifdef TESTING
-                for(int q = 0; q < SAT_COM_DATA_ARRAY_SIZE; q++){
-                    SerialUSB.write(satComCommandArray[q]);
-                }
-                SerialUSB.println();
-            #endif
-
-            if(check(satComCommandArray)) // this check array will move and be renamed
-            {
-                #ifdef TESTING
-                SerialUSB.print("Good Command: ");
-                SerialUSB.write(satComCommandArray[0]);
-                SerialUSB.println();
-                #endif
-
-                doCommand(satComCommandArray[0], &state, &s_statusOfInit);
-                // send sat com command back through sat com  ???
-            }
-            else
-            {
-                #ifdef TESTING
-                SerialUSB.print("Bad Command: ");
-                for (int b = 0; b < 5; b++){
-                SerialUSB.write(satComCommandArray[b]);
-                SerialUSB.println();
-                }
-                #endif
-
-                // send sat com error back through sat com ????
-            }
-        }
-
-        /* send radio data */
-        if(state == FINAL_DESCENT && !mainDeploySatcomSent)
-        {
-            mainDeploySatcomSent = true;
-            SatComSendGPS(&timestamp, GPS_data);
-        }
-        else if(state == LANDED && landedSatcomSentCount < NUM_SATCOM_SENDS_ON_LANDED && millis() - satcomMsgOldTime >= SATCOM_LANDED_TIME_INTERVAL)
-        { //sends Satcom total of NUM_SATCOM_SENDS_ON_LANDED times, once every SATCOM_LANDED_TIME_INTERVAL
-            landedSatcomSentCount++;
-            SatComSendGPS(&timestamp, GPS_data);
-            satcomMsgOldTime = millis();
-        }
+     /* send radio data */
+    if(state == FINAL_DESCENT && !mainDeploySatcomSent)
+    {
+        mainDeploySatcomSent = true;
+        SatComSendGPS(&timestamp, GPS_data);
+    }
+    else if(state == LANDED && landedSatcomSentCount < NUM_SATCOM_SENDS_ON_LANDED && millis() - satcomMsgOldTime >= SATCOM_LANDED_TIME_INTERVAL)
+    { //sends Satcom total of NUM_SATCOM_SENDS_ON_LANDED times, once every SATCOM_LANDED_TIME_INTERVAL
+        landedSatcomSentCount++;
+        SatComSendGPS(&timestamp, GPS_data);
+        satcomMsgOldTime = millis();
+    }
 
     #endif //def NOSECONE
 
