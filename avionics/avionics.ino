@@ -92,9 +92,9 @@ void setup()
     #ifdef BODY
         initPins();
     #endif
-  
+
     initBuzzer();
-  
+
     /*init serial comms*/
     #ifdef TESTING
     SerialUSB.begin(9600);
@@ -288,9 +288,7 @@ void loop()
 
     #endif //def NOSECONE
 
-    if(state == STANDBY)
-        time_interval = STANDBY_POLLING_TIME_INTERVAL;
-    else if (state == LANDED)
+    if (state == LANDED)
         time_interval = LANDED_POLLING_TIME_INTERVAL;
     else
         time_interval = NOMINAL_POLLING_TIME_INTERVAL;
