@@ -49,9 +49,9 @@ void doCommand(char command, FlightStates *state, InitStatus *status){
             //play HALO
             break;
 
-        case SATCOM:
-            //switch to SATCOM
-            break;
+        // case SATCOM:
+        //     //switch to SATCOM
+        //     break;
 
         case RESET:
             //not sure
@@ -90,7 +90,7 @@ void doCommand(char command, FlightStates *state, InitStatus *status){
 
 }
 
-/**
+/** void sendRadioResponse(const char*)
   * @brief  Takes a 5 byte char and sequentially sends it over the radio
   * @param  const char* response - 5 bytes worth of data to be sent via radio
   * @return void
@@ -104,6 +104,12 @@ void sendRadioResponse(const char* response){
     }
 }
 
+/** void communicateThroughSerial(FlightStates *state, InitStatus *status)
+  * @brief  Receives radio commands and evaluates their validity
+  * @param  FlightStates *state - current flight state
+  * @param  InitStatus *status - Sensor status structure
+  * @return void
+  */
 void communicateThroughSerial(FlightStates * state, InitStatus *status)
 {
     char command[RADIO_DATA_ARRAY_SIZE];
@@ -116,7 +122,7 @@ void communicateThroughSerial(FlightStates * state, InitStatus *status)
            command[i] = SerialRadio.read();
     }
 
-    bool correctCommand = check(command);
+    bool correctCommand = checkCommand(command);
 
     #ifdef TESTING
     SerialUSB.print("Received Message: ");
@@ -145,8 +151,14 @@ void communicateThroughSerial(FlightStates * state, InitStatus *status)
     }
 }
 
+/** bool checkCommand(char*)
+  * @brief  Takes a 5 byte char and checks that all elements are the same
+  * @param  char* radioCommand - 5 bytes worth of received radio data
+  * @return bool - true if the 5 bytes are the same
+  *                 false if the 5 bytes are not all the same
+  */
 //checks if all indexes are equal for radio commands
-bool check(char *radioCommand)
+bool checkCommand(char *radioCommand)
  {
     const char a0 = radioCommand[0];
 

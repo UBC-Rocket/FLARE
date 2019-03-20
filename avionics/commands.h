@@ -13,7 +13,7 @@
 #define CAMERAS_ON 'C'
 #define CAMERAS_OFF 'O'
 #define HALO 'H'
-#define SATCOM 's'
+// #define SATCOM 's'
 #define RESET 'R'
 #define PING 'p'
 #define MAIN 'm'
@@ -27,6 +27,6 @@
 void doCommand(char,FlightStates * state, InitStatus *status);
 void sendRadioResponse(const char*);
 void communicateThroughSerial(FlightStates * state, InitStatus * status);
-bool check(char*);
+bool checkCommand(char*);
 
 #endif

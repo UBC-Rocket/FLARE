@@ -22,9 +22,9 @@
 #include "Adafruit_BNO055.h"        //IMU
 #include "Venus638FLPx.h"           //GPS
 #include "gpio.h"                   //GPIO
-#include "satcom.h"
-
+#include "satcom.h"                 //SATCOM
 #include "commands.h"               //for sendRadioResponse(const char* response);
+#include "cameras.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -192,6 +192,13 @@ void initSensors(InitStatus *status)
         #endif
     }
     IMU.setExtCrystalUse(true);
+
+    /* Init Cameras */
+    #ifdef TESTING
+    SerialUSB.println("Initializing the camera");
+    #endif
+    SerialCamera.begin(CameraBaud);
+    while (!SerialCamera) {}        //do we want to replace this or leave these {}?
 
     #ifdef NOSECONE
         /*init GPS*/
