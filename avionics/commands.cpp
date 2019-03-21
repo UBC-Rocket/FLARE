@@ -17,6 +17,7 @@
 #include "sensors.h"
 #include "cameras.h"
 #include "satcom.h"
+#include "statemachine.h"
 
 #include <Arduino.h>
 
@@ -30,8 +31,8 @@
 void doCommand(char command, FlightStates *state, InitStatus *status){
     switch (command){
         case ARM:
-            // if(*state == STANDBY) //Don't want to switch out of drogue deploy or something into Armed
-                // switchState(*state, ARMED);
+            if(*state == STANDBY) //Don't want to switch out of drogue deploy or something into Armed
+                switchState(state, ARMED);
             power_cameras();
             break;
 
