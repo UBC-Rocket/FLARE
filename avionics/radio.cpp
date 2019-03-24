@@ -78,7 +78,9 @@ void bodyTierOne(float bar_data[], FlightStates state, float altitude, unsigned 
   * @param  unsigned long *timestamp - address for the timestamp
   * @return void
   */
-void noseconeTierOne(float* GPS_data){
+void noseconeTierOne(float* GPS_data, unsigned long *timestamp){
+    float time = *timestamp;
+    sendRadioData(time, 't');
     sendRadioData(GPS_data[0], UID_GPS_lat);
     sendRadioData(GPS_data[1], UID_GPS_long);
     sendRadioData(GPS_data[2], UID_GPS_alt);
