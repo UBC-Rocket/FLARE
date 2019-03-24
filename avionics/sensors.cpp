@@ -490,7 +490,7 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
     }
     #ifdef NOSECONE
         for (unsigned int i = 0; i < GPS_DATA_ARRAY_SIZE; i++) {
-            datalog.print(GPS_data[i]);
+            datalog.print(GPS_data[i], 6);
             datalog.print(",");
         }
     #endif
@@ -529,11 +529,11 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
     SerialUSB.println(IMU_data[2]);
         #ifdef NOSECONE
         SerialUSB.print("GPS latitude:                       ");
-        SerialUSB.println(GPS_data[0], 5);
+        SerialUSB.println(GPS_data[0], 6);
         SerialUSB.print("GPS longitude:                      ");
-        SerialUSB.println(GPS_data[1], 5);
+        SerialUSB.println(GPS_data[1], 6);
         SerialUSB.print("GPS altitude:                       ");
-        SerialUSB.println(GPS_data[2], 5);
+        SerialUSB.println(GPS_data[2], 3);
         SerialUSB.println("");
         #endif
     #endif
