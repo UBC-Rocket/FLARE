@@ -6,7 +6,7 @@
 #include "sensors.h"
 
 /*Constants------------------------------------------------------------*/
-#define SerialCamera        Serial3
+#define SerialCamera        Serial1
 #define CameraBaud          115200
 
 /*Variables------------------------------------------------------------*/
