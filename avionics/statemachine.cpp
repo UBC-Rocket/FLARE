@@ -59,7 +59,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 launch_count++;
                 if (launch_count >= STANDBY_LAUNCH_CHECKS){
                     switchState(state, ASCENT);
-                    // launch_count = 0;
+                    launch_count = 0;
                     // turn on cameras
                     power_cameras();
                 }
