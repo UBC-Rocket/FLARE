@@ -20,7 +20,7 @@
 #include "MS5803_01.h"              //barometer
 #include "SparkFunTMP102.h"         //temp sensor
 #include "Adafruit_BNO055.h"        //IMU
-#include "Venus638FLPx.h"           //GPS
+#include "GP20U7.h"           //GPS
 #include "gpio.h"                   //GPIO
 #include "satcom.h"                 //SATCOM
 #include "commands.h"               //for sendRadioResponse(const char* response);
@@ -205,12 +205,9 @@ void initSensors(InitStatus *status)
         #ifdef TESTING
         SerialUSB.println("Initializing GPS");
         #endif
-        SerialGPS.begin(4800);
+        SerialGPS.begin(9600);  //baud rate 9600 for the GP-20U7
         while (!SerialGPS) {}
-        SerialGPS.write(GPS_reset_defaults, sizeof(GPS_reset_defaults));
-        // SerialGPS.write(GPS_set_baud_rate, sizeof(GPS_set_baud_rate));
-        SerialGPS.write(GPS_set_NMEA_message, sizeof(GPS_set_NMEA_message));
-        SerialGPS.write(GPS_set_update_rate, sizeof(GPS_set_update_rate));
+
     #endif
 
     /*init radio*/
@@ -532,11 +529,11 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
     SerialUSB.println(IMU_data[2]);
         #ifdef NOSECONE
         SerialUSB.print("GPS latitude:                       ");
-        SerialUSB.println(GPS_data[0]);
+        SerialUSB.println(GPS_data[0], 5);
         SerialUSB.print("GPS longitude:                      ");
-        SerialUSB.println(GPS_data[1]);
+        SerialUSB.println(GPS_data[1], 5);
         SerialUSB.print("GPS altitude:                       ");
-        SerialUSB.println(GPS_data[2]);
+        SerialUSB.println(GPS_data[2], 5);
         SerialUSB.println("");
         #endif
     #endif
