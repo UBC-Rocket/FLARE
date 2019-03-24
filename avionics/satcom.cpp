@@ -194,11 +194,12 @@ void SatComSendCharArray(char Send_Array[])
 }
 
 
-/* bool SatComReceive(char *) {}
- * @brief Receives message from satellite via SatCom module
- * @param satComCommandArray[] buffer for message to be received
- * @return bool indicating if a message was received or not
- */
+/* UNUSED
+// bool SatComReceive(char *) {}
+// @brief Receives message from satellite via SatCom module
+// @param satComCommandArray[] buffer for message to be received
+// @return bool indicating if a message was received or not
+
 bool SatComReceive(char satComCommandArray[])
 {
   int err;
@@ -248,8 +249,9 @@ bool SatComReceive(char satComCommandArray[])
 
   return false;
 }
+*/
 
-// I don't think we need this
+// Unused SATCOM diagnostics
 #ifdef DIAGNOSTICS
 void ISBDConsoleCallback(IridiumSBD *device, char c)
 {
