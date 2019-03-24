@@ -3,6 +3,8 @@
  * @description   Main sensor initialization and polling file.
  * Implements sensor initialization and error checking as well as
  * sensor polling, sensor logging, and sending data over the radio.
+ * Also performs rocket status-related work - startup buzzer, status report
+ * generation, etc.
  *
  * @section LICENSE
  * This program is free software; you can redistribute it and/or
@@ -25,6 +27,7 @@
 #include "satcom.h"
 
 #include "commands.h"               //for sendRadioResponse(const char* response);
+#include "buzzer.h"                 //for buzzer response on startup
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -289,12 +292,14 @@ void initSensors(InitStatus *status)
     sendRadioResponse(statusReport1);
     sendRadioResponse(statusReport2);
     sendRadioResponse(statusReport3);
+
+    displayStatus(status);
     return;
 }
 
 /*
  * @brief  Generates status report for initialization. 'G' for good, 'B' for bad, 'X' for Not applicable
- * @param  InitStatus status - status of initialization.
+ * @param  InitStatus *status - status of initialization.
  * @param  char* statusReport1 - char array to hold radio data
  * @param  char* statusReport2 - same as statusReport2 but it's the 2nd half
  * @return void
@@ -361,6 +366,38 @@ void generateStatusReport(InitStatus *status, char *statusReport1, char *statusR
     #endif
 
     statusReport3[4] = 'X';
+}
+
+/*
+ * @brief  Reports status with buzzer tune and LED.
+ * @param  InitStatus *status - status of initialization.
+ * @return void
+ */
+
+void displayStatus(InitStatus *status){
+    if (status->overview == CRITICAL_FAILURE) {
+        #ifdef TESTING
+        SerialUSB.println("Critical failure! >:-{");
+        #endif
+        sing(SongTypes_CRITICALFAIL);
+    }
+    else if (status->overview == NONCRITICAL_FAILURE){
+        #ifdef TESTING
+        SerialUSB.println("Noncritical failure! :(");
+        #endif
+        pinMode(LED_BUILTIN, OUTPUT);
+        sing(SongTypes_NONCRITFAIL);
+    }
+    else {
+        #ifdef TESTING
+        SerialUSB.println("Initialization complete! :D");
+        #endif
+        pinMode(LED_BUILTIN,OUTPUT);
+        digitalWrite(LED_BUILTIN,HIGH);
+        sing(SongTypes_SUCCESS);
+    }
+
+    return;
 }
 
 /**

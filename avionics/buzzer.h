@@ -95,9 +95,16 @@
 #define NOTE_CS8 4435
 #define NOTE_D8  4699
 #define NOTE_DS8 4978
+
 #define MELODY_PIN 3
-#define MARIO      ('M')
-#define UNDERWORLD ('U')
+
+enum SongTypes{
+  SongTypes_MARIO,
+  SongTypes_UNDERWORLD,
+  SongTypes_SUCCESS,
+  SongTypes_NONCRITFAIL,
+  SongTypes_CRITICALFAIL
+};
 
 /*Variables------------------------------------------------------------*/
 const int melody[] = {
@@ -194,7 +201,7 @@ const int underworld_tempo[] = {
 /*Functions------------------------------------------------------------*/
 void initBuzzer();
 void startBuzzer();
-void sing(char);
+void sing(SongTypes song) ;
 void buzz(int, long, long);
 
 #endif

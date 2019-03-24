@@ -92,9 +92,9 @@ void setup()
     #ifdef BODY
         initPins();
     #endif
-  
+
     initBuzzer();
-  
+
     /*init serial comms*/
     #ifdef TESTING
     SerialUSB.begin(9600);
@@ -106,34 +106,12 @@ void setup()
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400); //400kHz
     Wire.setDefaultTimeout(100000); //100ms
 
-    /*init sensors*/
+    /*init sensors and report status in many ways*/
     initSensors(&s_statusOfInit);
 
     /*init camera serial port*/
     SerialCamera.begin(CameraBaud);
     while (!SerialCamera) {}        //do we want to replace this or leave these {}?
-
-    /*if something went wrong spin infinitely, otherwise indicate completion*/
-    if (s_statusOfInit.overview == CRITICAL_FAILURE) {
-        #ifdef TESTING
-        SerialUSB.println("Critical failure! >:-{");
-        #endif
-    }
-    else if (s_statusOfInit.overview == NONCRITICAL_FAILURE){
-        #ifdef TESTING
-        SerialUSB.println("Noncritical failure! :(");
-        #endif
-
-        pinMode(LED_BUILTIN, OUTPUT);
-    }
-    else {
-        pinMode(LED_BUILTIN,OUTPUT);
-        digitalWrite(LED_BUILTIN,HIGH);
-        #ifdef TESTING
-        SerialUSB.println("Initialization complete! :D");
-        #endif
-
-    }
 
     /* init various arrays */
     baseline_pressure = barSensorInit(); /* for baseline pressure calculation */

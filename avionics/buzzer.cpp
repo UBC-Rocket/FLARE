@@ -24,7 +24,7 @@
  */
 void initBuzzer(void)
 {
-  pinMode(MELODY_PIN, OUTPUT);  //buzzer pin init
+    pinMode(MELODY_PIN, OUTPUT);  //buzzer pin init
 }
 
 /* void startBuzzer(void){}
@@ -33,20 +33,20 @@ void initBuzzer(void)
  */
 void startBuzzer(void)
 {
-  //sing the tunes
-  sing(MARIO);
-  sing(MARIO);
-  sing(UNDERWORLD);
+    //sing the tunes
+    sing(SongTypes_MARIO);
+    sing(SongTypes_MARIO);
+    sing(SongTypes_UNDERWORLD);
 }
 
-/* void sing(char){}
+/* void sing(SongTypes song){}
  * @brief  Calculates current values
- * @param  char song - char ID of the melody to be played, defined in buzzer.h
+ * @param  SongTypes song - ID of the melody to be played, defined in buzzer.h
  * @return void.
  */
-void sing(char song) {
+void sing(SongTypes song) {
     switch(song){
-        case UNDERWORLD:
+        case SongTypes_UNDERWORLD:
         {
             SerialUSB.println(" 'Underworld Theme'");
             int size = sizeof(underworld_melody) / sizeof(int);
@@ -65,7 +65,7 @@ void sing(char song) {
             }
             break;
         }
-        case MARIO:
+        case SongTypes_MARIO:
         {
             SerialUSB.println(" 'Mario Theme'");
             int size = sizeof(melody) / sizeof(int);
@@ -84,6 +84,36 @@ void sing(char song) {
             }
             break;
         }
+        case SongTypes_SUCCESS:
+        {
+            buzz(MELODY_PIN, NOTE_C1, 500);
+            buzz(MELODY_PIN, NOTE_C7, 1000);
+            buzz(MELODY_PIN, NOTE_G7, 1000);
+            buzz(MELODY_PIN, NOTE_C8, 1000);
+            break;
+        }
+        case SongTypes_NONCRITFAIL:
+        {
+            buzz(MELODY_PIN, NOTE_C1, 500);
+            buzz(MELODY_PIN, NOTE_C6, 1000/4);
+            buzz(MELODY_PIN, 0, 1000/4);
+            buzz(MELODY_PIN, NOTE_C6, 1000/4);
+            buzz(MELODY_PIN, 0, 1000/4);
+            buzz(MELODY_PIN, NOTE_C6, 1000/4);
+            buzz(MELODY_PIN, 0, 1000/4);
+            buzz(MELODY_PIN, NOTE_C6, 1000/4);
+            buzz(MELODY_PIN, 0, 10);
+            break;
+        }
+        case SongTypes_CRITICALFAIL:
+        {
+            buzz(MELODY_PIN, NOTE_C1, 500);
+            buzz(MELODY_PIN, NOTE_C7, 500);
+            buzz(MELODY_PIN, NOTE_B6, 500);
+            buzz(MELODY_PIN, NOTE_AS6, 500);
+            buzz(MELODY_PIN, NOTE_A6, 2500);
+            break;
+        }
     }
 }
 
@@ -91,20 +121,21 @@ void sing(char song) {
  * @brief  Creates a buzzer note at a specified frequency and duration
  * @param  int targetPin - the buzzer control pin
  * @param  long frequency - frequency of the note to be played
- * @param  long length - length of note to be played
+ * @param  long length - length of note to be played. to calculate the note duration, take one second
+ *            divided by the note type. e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
  * @return void.
  */
 void buzz(int targetPin, long frequency, long length) {
-  long delayValue = 1000000 / frequency / 2; // calculate the delay value between transitions
-  //// 1 second's worth of microseconds, divided by the frequency, then split in half since
-  //// there are two phases to each cycle
-  long numCycles = frequency * length / 1000; // calculate the number of cycles for proper timing
-  //// multiply frequency, which is really cycles per second, by the number of seconds to
-  //// get the total number of cycles to produce
-  for (long i = 0; i < numCycles; i++) { // for the calculated length of time...
-    digitalWrite(targetPin, HIGH); // write the buzzer pin high to push out the diaphram
-    delayMicroseconds(delayValue); // wait for the calculated delay value
-    digitalWrite(targetPin, LOW); // write the buzzer pin low to pull back the diaphram
-    delayMicroseconds(delayValue); // wait again or the calculated delay value
-  }
+    long delayValue = 1000000 / frequency / 2; // calculate the delay value between transitions
+    //// 1 second's worth of microseconds, divided by the frequency, then split in half since
+    //// there are two phases to each cycle
+    long numCycles = frequency * length / 1000; // calculate the number of cycles for proper timing
+    //// multiply frequency, which is really cycles per second, by the number of seconds to
+    //// get the total number of cycles to produce
+    for (long i = 0; i < numCycles; i++) { // for the calculated length of time...
+        digitalWrite(targetPin, HIGH); // write the buzzer pin high to push out the diaphram
+        delayMicroseconds(delayValue); // wait for the calculated delay value
+        digitalWrite(targetPin, LOW); // write the buzzer pin low to pull back the diaphram
+        delayMicroseconds(delayValue); // wait again or the calculated delay value
+    }
 }
