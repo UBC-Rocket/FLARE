@@ -52,6 +52,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
     static int launch_count, armed_count, mach_count, mach_lock_count, apogee_count, main_count, land_count = 0,camera_toggle_count = 0;
     static uint32_t old_time_landed; //initialize on switching state
     static float old_altitude_landed; //initialize on switching state
+    bool camera_toggle = true;
 
     switch (*state) {
         case STANDBY:
@@ -177,10 +178,11 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 old_time_landed = millis();
                 old_altitude_landed = *altitude;
             }
-            if(camera_toggle_count >= TOGGLE_CAMERA_INTERVAL){
+            if((camera_toggle_count >= TOGGLE_CAMERA_INTERVAL) && (camera_toggle)){
                 stop_record();
                 start_record(); //toggles the camera so we won't lose the video in case it gets damaged during landing.
                 camera_toggle_count = 0;
+                camera_toggle = false;
             }
             break;
 
