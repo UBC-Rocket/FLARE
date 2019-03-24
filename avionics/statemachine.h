@@ -24,6 +24,7 @@
 
 #define APOGEE_DELAY 3000 //ms
 #define LANDING_TIME_INTERVAL 10000 //ms  //datapoint delay when looking for landing event
+#define TOGGLE_CAMERA_INTERVAL 200
 
 // Polling time changes
 #define LANDED_POLLING_TIME_INTERVAL 5000 //ms

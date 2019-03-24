@@ -19,6 +19,8 @@
 #define MAIN 'm'
 #define DROGUE 'd'
 #define STATUS 'S'
+#define STARTUP_BUZZER 'B'
+#define RECOVERY_BUZZER 'b'
 
 
 /*Variables------------------------------------------------------------*/

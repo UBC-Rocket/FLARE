@@ -18,6 +18,7 @@
 #include "cameras.h"
 #include "satcom.h"
 #include "statemachine.h"
+#include "buzzer.h"
 
 #include <Arduino.h>
 
@@ -33,17 +34,14 @@ void doCommand(char command, FlightStates *state, InitStatus *status){
         case ARM:
             if(*state == STANDBY) //Don't want to switch out of drogue deploy or something into Armed
                 switchState(state, ARMED);
-            power_cameras();
             break;
 
         case CAMERAS_ON:
-            //turn on the cameras
-            power_cameras();
+            start_record();
             break;
 
         case CAMERAS_OFF:
-            //turn off the cameras
-            power_cameras();
+            stop_record();
             break;
 
         case HALO:
@@ -81,6 +79,13 @@ void doCommand(char command, FlightStates *state, InitStatus *status){
             sendRadioResponse(statusReport2);
             sendRadioResponse(statusReport3);
             break;
+        case STARTUP_BUZZER:
+            // add the buzzer command
+            break;
+
+        case RECOVERY_BUZZER:
+            // add the recovery buzzer command
+            break;
 
         default:
             #ifdef TESTING
@@ -114,10 +119,8 @@ void sendRadioResponse(const char* response){
 void communicateThroughSerial(FlightStates * state, InitStatus *status)
 {
     char command[RADIO_DATA_ARRAY_SIZE];
-    char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
     char goodResponse[] = {'G','x','x','x','x'};
     const char badResponse[] = {'B','B','B','B','B'};
-    HardwareSerial &currentSerial = SerialRadio;
 
     for(int i = 0; i< RADIO_DATA_ARRAY_SIZE; i++){
            command[i] = SerialRadio.read();
