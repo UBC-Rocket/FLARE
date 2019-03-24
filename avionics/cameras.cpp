@@ -26,9 +26,6 @@ void power_cameras(){
     uint8_t power_command[] = {0xCC,0x01,0x01,0x0}; // LEAVE THESE HERE
     uint8_t crc = crc_calculator(power_command,3); //hypothetically only looks at the first three indexes
     power_command[3] = crc;
-    for(int i = 0 ; i < 4 ; i++){
-        SerialUSB.println(power_command[i]);
-    }
     //SerialUSB.println("the power command is %d", power_command[3]);
     SerialCamera.write(power_command,sizeof(power_command));
 }
