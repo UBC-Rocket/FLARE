@@ -228,7 +228,7 @@ bool SatComReceive(char satComCommandArray[])
       SerialUSB.println(bufferSize);
       #endif
 
-      for (int i = 0; i < bufferSize; i++)
+      for (unsigned int i = 0; i < bufferSize; i++)
       {
         satComCommandArray[i] = (char) buffer[i];
         #ifdef TESTING

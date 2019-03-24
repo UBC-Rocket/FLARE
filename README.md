@@ -45,7 +45,8 @@ THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
 ***
 ***
 
-## Definable stuff
+
+# Definable stuff
 All definable things are located in "sensors.h".
 
 ### Nosecone/Body
@@ -59,6 +60,8 @@ For the 2018-2019 work year, the rocket has two avionics systems; one in the nos
 | Uses `bodyTierX` radio functions| Uses `noseconeTierX` radio functions - a subset of data is sent |
 |Runs state machine and controls deployment actuators (e.g. servos, ematch) | Runs state machine without control of actuators |
 | | Accepts unique nosecone commands from radio _(not implemented as of Mar 2)_ |
+
+As a hack, you can undefine NOSECONE to deactivate SATCOM (e.g. since SATCOM is blocking)
 
 ### Testing
 When defined, enables debugging output. All polled sensor values are printed to USB, and a 1 second delay is added to the main Arduino loop function. **DO NOT HAVE THIS DEFINED WHEN FLASHING TO FLIGHT PCBS**
