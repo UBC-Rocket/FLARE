@@ -95,22 +95,31 @@ void sing(SongTypes song) {
         case SongTypes_NONCRITFAIL:
         {
             buzz(MELODY_PIN, NOTE_C1, 500);
-            buzz(MELODY_PIN, NOTE_C6, 1000/4);
-            buzz(MELODY_PIN, 0, 1000/4);
-            buzz(MELODY_PIN, NOTE_C6, 1000/4);
-            buzz(MELODY_PIN, 0, 1000/4);
-            buzz(MELODY_PIN, NOTE_C6, 1000/4);
-            buzz(MELODY_PIN, 0, 1000/4);
-            buzz(MELODY_PIN, NOTE_C6, 1000/4);
-            buzz(MELODY_PIN, 0, 10);
+            buzz(MELODY_PIN, NOTE_C6, 300);
+            delay(300);
+            buzz(MELODY_PIN, NOTE_C6, 300);
+            delay(300);
+            buzz(MELODY_PIN, NOTE_C6, 300);
+            delay(300);
+            buzz(MELODY_PIN, NOTE_C6, 300);
+            delay(300);
+            buzz(MELODY_PIN, NOTE_C6, 300);
+            delay(300);
+            buzz(MELODY_PIN, NOTE_C6, 300);
+            delay(300);
+            buzz(MELODY_PIN, NOTE_C6, 300);
+            delay(300);
+            buzz(MELODY_PIN, NOTE_C6, 300);
+            delay(300);
+
             break;
         }
         case SongTypes_CRITICALFAIL:
         {
-            buzz(MELODY_PIN, NOTE_C1, 500);
-            buzz(MELODY_PIN, NOTE_C7, 500);
-            buzz(MELODY_PIN, NOTE_B6, 500);
-            buzz(MELODY_PIN, NOTE_AS6, 500);
+            buzz(MELODY_PIN, NOTE_C1, 300);
+            buzz(MELODY_PIN, NOTE_C7, 800);
+            buzz(MELODY_PIN, NOTE_B6, 800);
+            buzz(MELODY_PIN, NOTE_AS6, 800);
             buzz(MELODY_PIN, NOTE_A6, 2500);
             break;
         }

@@ -379,14 +379,20 @@ void displayStatus(InitStatus *status){
         #ifdef TESTING
         SerialUSB.println("Critical failure! >:-{");
         #endif
-        sing(SongTypes_CRITICALFAIL);
+        for(int i = 1; i <= 5; i++){
+            sing(SongTypes_CRITICALFAIL);
+            delay(400);
+        }
     }
     else if (status->overview == NONCRITICAL_FAILURE){
         #ifdef TESTING
         SerialUSB.println("Noncritical failure! :(");
         #endif
         pinMode(LED_BUILTIN, OUTPUT);
-        sing(SongTypes_NONCRITFAIL);
+        for(int i = 1; i <= 5; i++){
+            sing(SongTypes_NONCRITFAIL);
+            delay(400);
+        }
     }
     else {
         #ifdef TESTING
@@ -394,7 +400,10 @@ void displayStatus(InitStatus *status){
         #endif
         pinMode(LED_BUILTIN,OUTPUT);
         digitalWrite(LED_BUILTIN,HIGH);
-        sing(SongTypes_SUCCESS);
+        for(int i = 1; i <= 5; i++){
+            sing(SongTypes_SUCCESS);
+            delay(400);
+        }
     }
 
     return;
