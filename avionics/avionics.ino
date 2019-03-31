@@ -94,13 +94,15 @@ void setup()
     #ifdef BODY
         initPins();
     #endif
+    pinMode(FLIGHT_LED, OUTPUT);
+    digitalWrite(FLIGHT_LED, LOW);
 
     initBuzzer();
 
     /*init serial comms*/
     #ifdef TESTING
     SerialUSB.begin(9600);
-    while (!SerialUSB) {} //TODO add print in while to see what happens
+    while (!SerialUSB) {}
     SerialUSB.println("Initializing...");
     #endif
 
@@ -113,7 +115,7 @@ void setup()
 
     /*init camera serial port*/
     SerialCamera.begin(CameraBaud);
-    while (!SerialCamera) {}        //do we want to replace this or leave these {}?
+    while (!SerialCamera) {}
 
     /* init various arrays */
     baseline_pressure = barSensorInit(); /* for baseline pressure calculation */
@@ -142,12 +144,6 @@ void loop()
     unsigned long delta_time;
     static uint16_t time_interval = NOMINAL_POLLING_TIME_INTERVAL; //ms
 
-
-    static unsigned long tier_one_old_time = 0;
-    static unsigned long tier_two_old_time = 0;
-    // static unsigned long tier_three_old_time = 0; //decided to be unused
-
-
     static unsigned long init_status_old_time = 0;
     static unsigned long init_status_new_time = 0;
     static const uint16_t init_status_time_interval = 500;
@@ -160,12 +156,13 @@ void loop()
 
     static FlightStates state = STANDBY;
 
-
+    static unsigned long tier_one_old_time = 0;
     static uint16_t tier_one_interval = 400;
-    static uint16_t tier_two_interval = 2000;
-    // static uint16_t tier_three_interval = 20000; //decided to be unused
 
     #ifdef NOSECONE
+        static uint16_t tier_two_interval = 2000;
+        static unsigned long tier_two_old_time = 0;
+
         static bool mainDeploySatcomSent = false;
         static int landedSatcomSentCount = 0;
         static uint16_t satcomMsgOldTime = millis();
@@ -178,7 +175,6 @@ void loop()
     // if radio communications are received
     if (SerialRadio.available() >= 5)
         communicateThroughSerial(&state, &s_statusOfInit);
-
 
     #ifdef NOSECONE
      /* send radio data */
@@ -215,29 +211,21 @@ void loop()
 
 
     if((new_time - tier_one_old_time) >= tier_one_interval) {
-        // sendTierOne(&timestamp, GPS_data, bar_data, state, altitude);
         #ifdef BODY
             bodyTierOne(bar_data, state, altitude, &timestamp);
-        #endif
+        #endif  // def BODY
         #ifdef NOSECONE
             noseconeTierOne(GPS_data, &timestamp);
-        #endif
+        #endif  //def NOSECONE
         tier_one_old_time = new_time;
     }
 
+    #ifdef NOSECONE
     if ( (new_time - tier_two_old_time) >= tier_two_interval ){
-        // sendTierTwo(acc_data, bar_data, &temp_sensor_data, IMU_data);
-        #ifdef NOSECONE
-            noseconeTierTwo(bar_data, acc_data, &temp_sensor_data, IMU_data);
-        #endif
+        noseconeTierTwo(bar_data, acc_data, &temp_sensor_data, IMU_data);
         tier_two_old_time = new_time;
     }
-
-    // Anything that would go in tier_three would probably only be sent once @ start and on radio request
-    // if ( (new_time - tier_three_old_time) >= tier_three_interval ){
-    //     sendTierThree(&battery_voltage, &ground_altitude);
-    //     tier_three_old_time = new_time;
-    // }
+    #endif // def NOSECONE
 
     if (s_statusOfInit.overview == NONCRITICAL_FAILURE)
     {

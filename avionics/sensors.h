@@ -11,10 +11,10 @@
 
 
 /*Constants------------------------------------------------------------*/
-#define NOSECONE //enable or disable nosecone-avionics specific functionality
+// #define NOSECONE //enable or disable nosecone-avionics specific functionality
 #define BODY //enable or disable body-avionics specific functionality
-#define TESTING //enable or disable debug output
-#define GROUND_TEST
+// #define TESTING //enable or disable debug output
+// #define GROUND_TEST
 
 #define SerialUSB               Serial
 #define SerialGPS               Serial1
@@ -36,7 +36,7 @@
 
 #define RADIO_DATA_ARRAY_SIZE   5
 
-#define NUM_SENSORS 8       // + 2 = 8 for ematch, satcom checking
+#define NUM_SENSORS 8
 #define FILE_STATUS_POSITION 0
 #define BATTERY_STATUS_POSITION 1
 #define ACCELEROMETER_STATUS_POSITION 2

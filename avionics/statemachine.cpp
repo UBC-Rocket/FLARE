@@ -60,6 +60,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 launch_count++;
                 if (launch_count >= STANDBY_LAUNCH_CHECKS){
                     switchState(state, ASCENT);
+                    digitalWrite(FLIGHT_LED, LOW);
                     launch_count = 0;
                     // turn on cameras
                     power_cameras();
@@ -78,6 +79,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 armed_count++;
                 if (armed_count >= ARMED_LAUNCH_CHECKS){
                     switchState(state, ASCENT);
+                    digitalWrite(FLIGHT_LED, LOW);
                     armed_count = 0;
                 }
             }
@@ -87,10 +89,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case ASCENT:    // checks for Mach threshold + apogee
-                start_record();
-                #ifdef GROUND_TEST
-                digitalWrite(LED_BUILTIN,LOW);  // do we need this? what are we doing with LEDs
-                #endif
+            start_record();
 
             if (*delta_altitude > MACH_THRESHOLD) {
                 mach_count++;
@@ -108,9 +107,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                     #ifdef BODY
                         deployDrogue();
                     #endif
-                        #ifdef GROUND_TEST
-                        digitalWrite(LED_BUILTIN,HIGH); // do we need this? what are we doing with LEDs
-                        #endif
+                    digitalWrite(FLIGHT_LED, HIGH);
                     switchState(state, PRESSURE_DELAY);
                     apogee_count = 0;
                 }
@@ -138,6 +135,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             if((millis() - delay_start) >= APOGEE_DELAY)
             {
                 switchState(state, INITIAL_DESCENT);
+                digitalWrite(FLIGHT_LED, LOW);
             }
             break;
 
@@ -148,6 +146,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                     #ifdef BODY
                         deployMain();
                     #endif
+                    digitalWrite(FLIGHT_LED, HIGH);
                     old_time_landed = millis();
                     old_altitude_landed = *altitude;
                     switchState(state, FINAL_DESCENT);
@@ -166,9 +165,9 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 if (delta_altitude_landed <= LAND_VELOCITY_THRESHOLD) { // Landed threshold based on velocity alone
                     land_count++;
                     if (land_count >= LAND_CHECKS) {
-                        //Nice to have: get sensor sleep mode and turn off sensors except GPS to conserve power
                         // turn off cameras:
                         switchState(state, LANDED);
+                        digitalWrite(FLIGHT_LED, LOW);
                         land_count = 0;
                     }
                 }
@@ -188,7 +187,6 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
 
         case LANDED:
             stop_record();
-            // SEND GPS coords??
             break;
 
         case WINTER_CONTINGENCY:
