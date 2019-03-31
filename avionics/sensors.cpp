@@ -194,13 +194,6 @@ void initSensors(InitStatus *status)
     }
     IMU.setExtCrystalUse(true);
 
-    uint8_t calibData[21];
-    IMU.getSensorOffsets(calibData);
-    SerialUSB.println("calibData is:");
-    for(int i = 0; i < sizeof(calibData); i++ ){
-        SerialUSB.println(calibData[i]);
-    }
-
     /* Init Cameras */
     #ifdef TESTING
     SerialUSB.println("Initializing the camera");
