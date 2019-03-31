@@ -53,9 +53,7 @@ bool SatComSetup()
     #ifdef TESTING
     SerialUSB.print("Begin failed: error ");
     SerialUSB.println(err);
-    // #endif
     if (err == ISBD_NO_MODEM_DETECTED){
-    // #ifdef TESTING
       SerialUSB.println("No modem detected: check wiring.");
     }
     #endif
@@ -141,7 +139,7 @@ void SatComSendGPS(unsigned long *timestamp, float GPS_data[])
     String long1 = String(gps_array1[1]);
     String long2 = String(gps_array2[1]);
 
-    // String longitude = String(GPS_data[1]);
+    // String longitude = String(GPS_data[1]); //NOT SURE
     String altitude = String(GPS_data[2]);
     String satsend = String("timestamp: " + send_timestamp + " Lat: " + lat1 + "." + lat2 +
                                       " Long: " + long1 + "." + long2 + " Alt: " + altitude);

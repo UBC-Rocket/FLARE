@@ -44,8 +44,7 @@ float groundAlt_arr_sum(float ground_alt_arr[]){
  * @return float baseline_pressure_update - The updated moving average of the ground altitude array, in millibars.
  */
 float groundAlt_update(float *bar_data, float ground_alt_arr[]){
-    static float prev_bar_data = ground_alt_arr[GROUND_ALT_SIZE-1];  // Can you even do this??
-    // otherwise comment in code above to make it a global var if not possible
+    static float prev_bar_data = ground_alt_arr[GROUND_ALT_SIZE-1];  
     static int k = 0;
     float sum_arr_update, baseline_pressure_update;
 
