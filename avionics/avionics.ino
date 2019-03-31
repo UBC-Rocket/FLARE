@@ -94,8 +94,8 @@ void setup()
     #ifdef BODY
         initPins();
     #endif
-    pinMode(FlightLED, OUTPUT);
-    digitalWrite(FlightLED, LOW);
+    pinMode(FLIGHT_LED, OUTPUT);
+    digitalWrite(FLIGHT_LED, LOW);
 
     initBuzzer();
 
