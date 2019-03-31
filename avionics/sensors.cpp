@@ -95,7 +95,7 @@ void initSensors(InitStatus *status)
     #endif
 
     if (!continuityCheck()){
-        // status->overview = CRITICAL_FAILURE;     //put this in eventually
+        status->overview = CRITICAL_FAILURE;     //put this in eventually
         status->sensorNominal[EMATCH_STATUS_POSITION] = false;
 
         #ifdef TESTING
@@ -181,7 +181,7 @@ void initSensors(InitStatus *status)
     SerialUSB.println("Initializing IMU");
     #endif
 
-    delay(7); //TODO investigate this
+    delay(7);
     if(!IMU.begin()){
         if(status->overview < NONCRITICAL_FAILURE)
             status->overview = NONCRITICAL_FAILURE;
