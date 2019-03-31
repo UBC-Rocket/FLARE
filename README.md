@@ -33,11 +33,13 @@ In order to successfully poll the GPS, the serial RX buffer size must be increas
 to be done on the computer used for compilation. This can be done by navigating to the following
 path in the Arduino contents folder:
 
-On Mac: ‎⁨Contents⁩/⁨Java⁩/⁨hardware⁩/⁨teensy⁩/⁨avr⁩/⁨cores⁩/⁨teensy3⁩/serial1.c
+On Mac: Got to the Applications folder, right click on the Arduino app, select Show Package Contents,
+  then navigate to ‎⁨Contents⁩/⁨Java⁩/⁨hardware⁩/⁨teensy⁩/⁨avr⁩/⁨cores⁩/⁨teensy3⁩/serial1.c
 
 On Windows: [user_drive]\Program Files (x86)\Arduino\hardware\teensy\avr\cores\teensy3\serial1.c
 
-On line 43 increase SERIAL1_RX_BUFFER_SIZE from 64 to 128.
+On line 43 increase SERIAL1_RX_BUFFER_SIZE from 64 to 1024
+
 THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
 
 **VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!**
@@ -50,7 +52,8 @@ THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
 All definable things are located in "sensors.h".
 
 ### Nosecone/Body
-For the 2018-2019 work year, the rocket has two avionics systems; one in the nosecone and one in the body. The specific functions they can perform are as follows:
+For the 2018-2019 work year, the rocket has two avionics systems; one in the nosecone and one in the body.
+The specific functions they can perform are as follows:
 
 |Nosecone            | Body|
 |---- | ----|
@@ -68,3 +71,16 @@ When defined, enables debugging output. All polled sensor values are printed to 
 
 ### Ground Test
 When defined, eanbles radio-activated deployment of the main and drogue parachutes. This is to allow for deployment tests while on the ground. GROUND_TEST also enables other features facilitating testing on the ground (e.g. LED for rocket state) **DO NOT HAVE THIS DEFINED WHEN FLASHING TO FLIGHT PCBS**
+
+# LEDs
+Pin 13 -> built-in LED
+  The LED will be on if all sensors have been successfully initialized
+  The LED will blink if there is a non-critical failure
+  The LED will not turn on if there is a critical failure
+
+Pin 20 -> Power status LED
+  The LED will turn on if there is power to the microcontroller
+
+Pin 21 -> Flight status LED
+  The LED will turn on in ARMED, upon hitting Apogee, and upon deploying the main chute
+  The LED will be off in the Standby, Ascent, Mach Lock, Initial Descent, and Landed states.

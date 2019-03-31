@@ -3,6 +3,8 @@
  * @description   Main sensor initialization and polling file.
  * Implements sensor initialization and error checking as well as
  * sensor polling, sensor logging, and sending data over the radio.
+ * Also performs rocket status-related work - startup buzzer, status report
+ * generation, etc.
  *
  * @section LICENSE
  * This program is free software; you can redistribute it and/or
@@ -20,10 +22,11 @@
 #include "MS5803_01.h"              //barometer
 #include "SparkFunTMP102.h"         //temp sensor
 #include "Adafruit_BNO055.h"        //IMU
-#include "Venus638FLPx.h"           //GPS
+#include "GP20U7.h"           //GPS
 #include "gpio.h"                   //GPIO
 #include "satcom.h"                 //SATCOM
 #include "commands.h"               //for sendRadioResponse(const char* response);
+#include "buzzer.h"                 //for buzzer response on startup
 #include "cameras.h"
 
 #include <Arduino.h>
@@ -54,7 +57,7 @@ void initSensors(InitStatus *status)
 {
     status->overview = NOMINAL;
     int i;
-    for(i = 0; i < NUM_SENSORS; i++){       // + 1 for ematch continuity
+    for(i = 0; i < NUM_SENSORS; i++){
         status->sensorNominal[i] = true;
     }
 
@@ -95,7 +98,7 @@ void initSensors(InitStatus *status)
     #endif
 
     if (!continuityCheck()){
-        // status->overview = CRITICAL_FAILURE;     //put this in eventually
+        status->overview = CRITICAL_FAILURE;     //@jesse This is now here!
         status->sensorNominal[EMATCH_STATUS_POSITION] = false;
 
         #ifdef TESTING
@@ -182,14 +185,14 @@ void initSensors(InitStatus *status)
     SerialUSB.println("Initializing IMU");
     #endif
 
-    delay(7); //TODO investigate this
+    delay(7);
     if(!IMU.begin()){
         if(status->overview < NONCRITICAL_FAILURE)
             status->overview = NONCRITICAL_FAILURE;
         status->sensorNominal[IMU_STATUS_POSITION] = false;
 
         #ifdef TESTING
-        SerialUSB.print("ERROR: IMU initialization failed!");
+        SerialUSB.println("ERROR: IMU initialization failed!");
         #endif
     }
     IMU.setExtCrystalUse(true);
@@ -207,12 +210,9 @@ void initSensors(InitStatus *status)
         #ifdef TESTING
         SerialUSB.println("Initializing GPS");
         #endif
-        SerialGPS.begin(4800);
+        SerialGPS.begin(9600);  //baud rate 9600 for the GP-20U7
         while (!SerialGPS) {}
-        SerialGPS.write(GPS_reset_defaults, sizeof(GPS_reset_defaults));
-        // SerialGPS.write(GPS_set_baud_rate, sizeof(GPS_set_baud_rate));
-        SerialGPS.write(GPS_set_NMEA_message, sizeof(GPS_set_NMEA_message));
-        SerialGPS.write(GPS_set_update_rate, sizeof(GPS_set_update_rate));
+
     #endif
 
     /*init radio*/
@@ -251,7 +251,7 @@ void initSensors(InitStatus *status)
     else
         datalog.write("B,B,");
 
-    datalog.write("X,X,"); //Baseline pressure & altitude
+    datalog.write("X,X,"); //Baseline pressure & altitude, no capability to test
 
     if(status->sensorNominal[TEMPERATURE_STATUS_POSITION])
         datalog.write("G,");
@@ -264,7 +264,7 @@ void initSensors(InitStatus *status)
         datalog.write("B,B,B,");
 
     #ifdef NOSECONE
-    datalog.write("X, X, X,");   //GPS - as of time of writing, no capability to test success
+    datalog.write("X, X, X,");   //GPS no capability to test success
     #endif
 
     #ifdef BODY
@@ -298,12 +298,14 @@ void initSensors(InitStatus *status)
     sendRadioResponse(statusReport1);
     sendRadioResponse(statusReport2);
     sendRadioResponse(statusReport3);
+
+    displayStatus(status);
     return;
 }
 
 /*
  * @brief  Generates status report for initialization. 'G' for good, 'B' for bad, 'X' for Not applicable
- * @param  InitStatus status - status of initialization.
+ * @param  InitStatus *status - status of initialization.
  * @param  char* statusReport1 - char array to hold radio data
  * @param  char* statusReport2 - same as statusReport2 but it's the 2nd half
  * @return void
@@ -370,6 +372,47 @@ void generateStatusReport(InitStatus *status, char *statusReport1, char *statusR
     #endif
 
     statusReport3[4] = 'X';
+}
+
+/*
+ * @brief  Reports status with buzzer tune and LED.
+ * @param  InitStatus *status - status of initialization.
+ * @return void
+ */
+
+void displayStatus(InitStatus *status){
+    if (status->overview == CRITICAL_FAILURE) {
+        #ifdef TESTING
+        SerialUSB.println("Critical failure! >:-{");
+        #endif
+        for(int i = 1; i <= 5; i++){
+            sing(SongTypes_CRITICALFAIL);
+            delay(400);
+        }
+    }
+    else if (status->overview == NONCRITICAL_FAILURE){
+        #ifdef TESTING
+        SerialUSB.println("Noncritical failure! :(");
+        #endif
+        pinMode(LED_BUILTIN, OUTPUT);
+        for(int i = 1; i <= 5; i++){
+            sing(SongTypes_NONCRITFAIL);
+            delay(400);
+        }
+    }
+    else {
+        #ifdef TESTING
+        SerialUSB.println("Initialization complete! :D");
+        #endif
+        pinMode(LED_BUILTIN,OUTPUT);
+        digitalWrite(LED_BUILTIN,HIGH);
+        for(int i = 1; i <= 5; i++){
+            sing(SongTypes_SUCCESS);
+            delay(400);
+        }
+    }
+
+    return;
 }
 
 /**
@@ -495,7 +538,7 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
     }
     #ifdef NOSECONE
         for (unsigned int i = 0; i < GPS_DATA_ARRAY_SIZE; i++) {
-            datalog.print(GPS_data[i]);
+            datalog.print(GPS_data[i], 6);
             datalog.print(",");
         }
     #endif
@@ -534,11 +577,11 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
     SerialUSB.println(IMU_data[2]);
         #ifdef NOSECONE
         SerialUSB.print("GPS latitude:                       ");
-        SerialUSB.println(GPS_data[0]);
+        SerialUSB.println(GPS_data[0], 6);
         SerialUSB.print("GPS longitude:                      ");
-        SerialUSB.println(GPS_data[1]);
+        SerialUSB.println(GPS_data[1], 6);
         SerialUSB.print("GPS altitude:                       ");
-        SerialUSB.println(GPS_data[2]);
+        SerialUSB.println(GPS_data[2], 3);
         SerialUSB.println("");
         #endif
     #endif

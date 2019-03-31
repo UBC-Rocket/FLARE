@@ -34,9 +34,11 @@ void doCommand(char command, FlightStates *state, InitStatus *status){
         case ARM:
             if(*state == STANDBY) { //Don't want to switch out of drogue deploy or something into Armed
                 switchState(state, ARMED);
+                digitalWrite(FLIGHT_LED, HIGH);
                 // turn on cameras
                 start_record();
             }
+        
             break;
 
         case CAMERAS_ON:
