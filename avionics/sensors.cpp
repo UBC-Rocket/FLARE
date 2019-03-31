@@ -54,7 +54,7 @@ void initSensors(InitStatus *status)
 {
     status->overview = NOMINAL;
     int i;
-    for(i = 0; i < NUM_SENSORS; i++){       // + 1 for ematch continuity
+    for(i = 0; i < NUM_SENSORS; i++){
         status->sensorNominal[i] = true;
     }
 
@@ -198,7 +198,7 @@ void initSensors(InitStatus *status)
     SerialUSB.println("Initializing the camera");
     #endif
     SerialCamera.begin(CameraBaud);
-    while (!SerialCamera) {}        //do we want to replace this or leave these {}?
+    while (!SerialCamera) {}
 
     #ifdef NOSECONE
         /*init GPS*/
@@ -246,7 +246,7 @@ void initSensors(InitStatus *status)
     else
         datalog.write("B,B,");
 
-    datalog.write("X,X,"); //Baseline pressure & altitude
+    datalog.write("X,X,"); //Baseline pressure & altitude, no capability to test
 
     if(status->sensorNominal[TEMPERATURE_STATUS_POSITION])
         datalog.write("G,");
@@ -259,7 +259,7 @@ void initSensors(InitStatus *status)
         datalog.write("B,B,B,");
 
     #ifdef NOSECONE
-    datalog.write("X, X, X,");   //GPS - as of time of writing, no capability to test success
+    datalog.write("X, X, X,");   //GPS no capability to test success
     #endif
 
     #ifdef BODY
