@@ -21,7 +21,7 @@
 #include "MS5803_01.h"              //barometer
 #include "SparkFunTMP102.h"         //temp sensor
 #include "Adafruit_BNO055.h"        //IMU
-#include "Venus638FLPx.h"           //GPS
+#include "GP20U7.h"           //GPS
 
 #include <Arduino.h>
 #include <HardwareSerial.h>

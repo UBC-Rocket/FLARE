@@ -32,10 +32,12 @@ $$$$"""$$$$$$$$$$uuu   uu$$$$$$$$$"""$$$"
 In order to successfully poll the GPS, the serial RX buffer size must be increased. This needs
 to be done on the computer used for compilation. This can be done by navigating to the following
 path in the Arduino contents folder:
-On Mac: ‎⁨Contents⁩/⁨Java⁩/⁨hardware⁩/⁨teensy⁩/⁨avr⁩/⁨cores⁩/⁨teensy3⁩/serial1.c
+On Mac: Got to the Applications folder, right click on the Arduino app, select Show Package Contents,
+    then navigate to ‎⁨Contents⁩/⁨Java⁩/⁨hardware⁩/⁨teensy⁩/⁨avr⁩/⁨cores⁩/⁨teensy3⁩/serial1.c
 On Windows: [user_drive]\Program Files (x86)\Arduino\hardware\teensy\avr\cores\teensy3\serial1.c
 
-On line 43 increase SERIAL1_RX_BUFFER_SIZE from 64 to 128.
+On line 43 increase SERIAL1_RX_BUFFER_SIZE from 64 to 1024
+
 THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
 
 VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!
