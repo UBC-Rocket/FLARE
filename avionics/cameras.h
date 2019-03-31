@@ -12,9 +12,6 @@
 /*Variables------------------------------------------------------------*/
 
 /*CAMERA initialization commands*/ //crc is zero initially
-// uint8_t power_command[] = {0xCC,0x01,0x01,0x0};
-// uint8_t startRecord_command[] = {0xCC,0x01,0x03,0x0};
-// uint8_t stopRecord_command[] = {0xCC,0x01,0x04,0x0};
 // const uint8_t checkStatus_command[] = {0xCC,0x11,0x0}; not sure yet
 
 /*Functions------------------------------------------------------------*/

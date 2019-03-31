@@ -30,7 +30,7 @@
 
 // For I2C, set the CSB Pin (pin 3) high for address 0x76, and pull low
 // for address 0x77. If you use 0x77, change the value on the line below:
-#define MS5803_I2C_ADDRESS    0x76 // or 0x77
+#define MS5803_I2C_ADDRESS  0x77    //0x76 // or 0x77
 
 #define CMD_RESET		0x1E	// ADC reset command
 #define CMD_ADC_READ	0x00	// ADC read command
@@ -46,9 +46,7 @@
 
 // Create array to hold the 8 sensor calibration coefficients
 static unsigned int      sensorCoeffs[8]; // unsigned 16-bit integer (0-65535)
-// D1 and D2 need to be unsigned 32-bit integers (long 0-4294967295)
-static uint32_t     D1 = 0;    // Store uncompensated pressure value
-static uint32_t     D2 = 0;    // Store uncompensated temperature value
+
 // These three variables are used for the conversion steps
 // They should be signed 32-bit integer initially
 // i.e. signed long from -2147483648 to 2147483647
@@ -84,7 +82,7 @@ boolean MS_5803::initializeMS_5803(boolean Verbose) {
 
     if (Verbose) {
     	// Display the oversampling resolution or an error message
-    	if (_Resolution == 256 | _Resolution == 512 | _Resolution == 1024 | _Resolution == 2048 | _Resolution == 4096){
+    	if (_Resolution == 256 || _Resolution == 512 || _Resolution == 1024 || _Resolution == 2048 || _Resolution == 4096){
         	Serial.print("Oversampling setting: ");
         	Serial.println(_Resolution);
     	} else {
@@ -151,6 +149,10 @@ boolean MS_5803::initializeMS_5803(boolean Verbose) {
  *      fails; those values will simply not be updated.
  * */
 bool MS_5803::readSensor() {
+    // D1 and D2 need to be unsigned 32-bit integers (long 0-4294967295)
+    static uint32_t     D1 = 0;    // Store uncompensated pressure value
+    static uint32_t     D2 = 0;    // Store uncompensated temperature value
+
 	// Choose from CMD_ADC_256, 512, 1024, 2048, 4096 for mbar resolutions
 	// of 1, 0.6, 0.4, 0.3, 0.2 respectively. Higher resolutions take longer
 	// to read.

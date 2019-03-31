@@ -6,7 +6,7 @@
 #include "groundaltitude.h"
 
 /*Constants------------------------------------------------------------*/
-#define STANDBY_LAUNCH_CHECKS 4
+#define STANDBY_LAUNCH_CHECKS 4  // same as armed launch checks for backup standby to launch
 #define ARMED_LAUNCH_CHECKS 4
 #define MACH_CHECKS 3
 #define APOGEE_CHECKS   5
@@ -14,22 +14,20 @@
 #define MAIN_CHECKS     10
 #define LAND_CHECKS     6
 
-#define LAUNCH_THRESHOLD 25 //150 // in meters
-#define MACH_THRESHOLD 275 //in meters per second
-#define MACH_LOCK_THRESHOLD 250 //in meters per second
-#define FINAL_DESCENT_THRESHOLD 14 //meters
-//#define FINAL_DESCENT_THRESHOLD 458 // ~ 1500 feet for final launch
-// #define LAND_HEIGHT_THRESHOLD 5 //meters
+#define LAUNCH_THRESHOLD 50 // in meters
+#define MACH_THRESHOLD 260 //in meters per second
+#define MACH_LOCK_THRESHOLD 240 //in meters per second
+#define FINAL_DESCENT_THRESHOLD 460 // 458 ~= 1500 feet for final
 #define LAND_VELOCITY_THRESHOLD 4  // meters per LANDING_TIME_INTERVAL
 
 #define SEA_PRESSURE 1013.25
 
 #define APOGEE_DELAY 3000 //ms
 #define LANDING_TIME_INTERVAL 10000 //ms  //datapoint delay when looking for landing event
+#define TOGGLE_CAMERA_INTERVAL 200
 
 // Polling time changes
-#define STANDBY_POLLING_TIME_INTERVAL 500 //ms
-#define LANDED_POLLING_TIME_INTERVAL 2000 //ms
+#define LANDED_POLLING_TIME_INTERVAL 5000 //ms
 #define NOMINAL_POLLING_TIME_INTERVAL 50  //ms
 
 /*Variables------------------------------------------------------------*/

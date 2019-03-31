@@ -49,9 +49,10 @@ void switchState(FlightStates *curr_state, FlightStates new_state){
  */
 void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_altitude, float bar_data[], float *baseline_pressure,
     float *ground_altitude, float ground_alt_arr[], FlightStates *state) {
-    static int launch_count, armed_count, mach_count, mach_lock_count, apogee_count, main_count, land_count = 0;
+    static int launch_count, armed_count, mach_count, mach_lock_count, apogee_count, main_count, land_count = 0,camera_toggle_count = 0;
     static uint32_t old_time_landed; //initialize on switching state
     static float old_altitude_landed; //initialize on switching state
+    bool camera_toggle = true;
 
     switch (*state) {
         case STANDBY:
@@ -59,7 +60,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 launch_count++;
                 if (launch_count >= STANDBY_LAUNCH_CHECKS){
                     switchState(state, ASCENT);
-                    // launch_count = 0;
+                    launch_count = 0;
                     // turn on cameras
                     power_cameras();
                 }
@@ -72,6 +73,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case ARMED:
+            start_record();
             if (*altitude > LAUNCH_THRESHOLD) {
                 armed_count++;
                 if (armed_count >= ARMED_LAUNCH_CHECKS){
@@ -85,6 +87,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case ASCENT:    // checks for Mach threshold + apogee
+                start_record();
                 #ifdef GROUND_TEST
                 digitalWrite(LED_BUILTIN,LOW);  // do we need this? what are we doing with LEDs
                 #endif
@@ -157,6 +160,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case FINAL_DESCENT:
+            camera_toggle_count ++;
             if(millis() - old_time_landed >= LANDING_TIME_INTERVAL) {
                 float delta_altitude_landed = *altitude - old_altitude_landed;
                 if (delta_altitude_landed <= LAND_VELOCITY_THRESHOLD) { // Landed threshold based on velocity alone
@@ -164,7 +168,6 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                     if (land_count >= LAND_CHECKS) {
                         //Nice to have: get sensor sleep mode and turn off sensors except GPS to conserve power
                         // turn off cameras:
-                        power_cameras();
                         switchState(state, LANDED);
                         land_count = 0;
                     }
@@ -175,9 +178,16 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 old_time_landed = millis();
                 old_altitude_landed = *altitude;
             }
+            if((camera_toggle_count >= TOGGLE_CAMERA_INTERVAL) && (camera_toggle)){
+                stop_record();
+                start_record(); //toggles the camera so we won't lose the video in case it gets damaged during landing.
+                camera_toggle_count = 0;
+                camera_toggle = false;
+            }
             break;
 
         case LANDED:
+            stop_record();
             // SEND GPS coords??
             break;
 

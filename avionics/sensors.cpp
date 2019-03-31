@@ -22,12 +22,12 @@
 #include "MS5803_01.h"              //barometer
 #include "SparkFunTMP102.h"         //temp sensor
 #include "Adafruit_BNO055.h"        //IMU
-#include "Venus638FLPx.h"           //GPS
+#include "GP20U7.h"           //GPS
 #include "gpio.h"                   //GPIO
-#include "satcom.h"
-
+#include "satcom.h"                 //SATCOM
 #include "commands.h"               //for sendRadioResponse(const char* response);
 #include "buzzer.h"                 //for buzzer response on startup
+#include "cameras.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -98,7 +98,7 @@ void initSensors(InitStatus *status)
     #endif
 
     if (!continuityCheck()){
-        // status->overview = CRITICAL_FAILURE;     //put this in eventually
+        status->overview = CRITICAL_FAILURE;     //@jesse This is now here!
         status->sensorNominal[EMATCH_STATUS_POSITION] = false;
 
         #ifdef TESTING
@@ -184,29 +184,33 @@ void initSensors(InitStatus *status)
     SerialUSB.println("Initializing IMU");
     #endif
 
-    delay(7); //TODO investigate this
+    delay(7);
     if(!IMU.begin()){
         if(status->overview < NONCRITICAL_FAILURE)
             status->overview = NONCRITICAL_FAILURE;
         status->sensorNominal[IMU_STATUS_POSITION] = false;
 
         #ifdef TESTING
-        SerialUSB.print("ERROR: IMU initialization failed!");
+        SerialUSB.println("ERROR: IMU initialization failed!");
         #endif
     }
     IMU.setExtCrystalUse(true);
+
+    /* Init Cameras */
+    #ifdef TESTING
+    SerialUSB.println("Initializing the camera");
+    #endif
+    SerialCamera.begin(CameraBaud);
+    while (!SerialCamera) {}        //do we want to replace this or leave these {}?
 
     #ifdef NOSECONE
         /*init GPS*/
         #ifdef TESTING
         SerialUSB.println("Initializing GPS");
         #endif
-        SerialGPS.begin(4800);
+        SerialGPS.begin(9600);  //baud rate 9600 for the GP-20U7
         while (!SerialGPS) {}
-        SerialGPS.write(GPS_reset_defaults, sizeof(GPS_reset_defaults));
-        // SerialGPS.write(GPS_set_baud_rate, sizeof(GPS_set_baud_rate));
-        SerialGPS.write(GPS_set_NMEA_message, sizeof(GPS_set_NMEA_message));
-        SerialGPS.write(GPS_set_update_rate, sizeof(GPS_set_update_rate));
+
     #endif
 
     /*init radio*/
@@ -532,7 +536,7 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
     }
     #ifdef NOSECONE
         for (unsigned int i = 0; i < GPS_DATA_ARRAY_SIZE; i++) {
-            datalog.print(GPS_data[i]);
+            datalog.print(GPS_data[i], 6);
             datalog.print(",");
         }
     #endif
@@ -571,11 +575,11 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
     SerialUSB.println(IMU_data[2]);
         #ifdef NOSECONE
         SerialUSB.print("GPS latitude:                       ");
-        SerialUSB.println(GPS_data[0]);
+        SerialUSB.println(GPS_data[0], 6);
         SerialUSB.print("GPS longitude:                      ");
-        SerialUSB.println(GPS_data[1]);
+        SerialUSB.println(GPS_data[1], 6);
         SerialUSB.print("GPS altitude:                       ");
-        SerialUSB.println(GPS_data[2]);
+        SerialUSB.println(GPS_data[2], 3);
         SerialUSB.println("");
         #endif
     #endif

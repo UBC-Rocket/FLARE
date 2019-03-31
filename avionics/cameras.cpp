@@ -23,12 +23,9 @@
   * @return none/ should be changed to boolean if possible
   */
 void power_cameras(){
-    uint8_t power_command[] = {0xCC,0x01,0x01,0x0};
+    uint8_t power_command[] = {0xCC,0x01,0x01,0x0}; // LEAVE THESE HERE
     uint8_t crc = crc_calculator(power_command,3); //hypothetically only looks at the first three indexes
     power_command[3] = crc;
-    for(int i = 0 ; i < 4 ; i++){
-        SerialUSB.println(power_command[i]);
-    }
     //SerialUSB.println("the power command is %d", power_command[3]);
     SerialCamera.write(power_command,sizeof(power_command));
 }
@@ -39,7 +36,7 @@ void power_cameras(){
   * @return none/ should be changed to boolean if possible
   */
 void start_record(){
-    uint8_t startRecord_command[] = {0xCC,0x01,0x03,0x0};
+    uint8_t startRecord_command[] = {0xCC,0x01,0x03,0x0}; // LEAVE THESE HERE
     uint8_t crc = crc_calculator(startRecord_command,3); //hypothetically only looks at the first three indexes
     startRecord_command[3] = crc;
     SerialCamera.write(startRecord_command,sizeof(startRecord_command));
@@ -51,7 +48,7 @@ void start_record(){
   * @return none/ should be changed to boolean if possible
   */
 void stop_record(){
-    uint8_t stopRecord_command[] = {0xCC,0x01,0x04,0x0};
+    uint8_t stopRecord_command[] = {0xCC,0x01,0x04,0x0}; // LEAVE THESE HERE
     uint8_t crc = crc_calculator(stopRecord_command,3); //hypothetically only looks at the first three indexes
     stopRecord_command[3] = crc;
     SerialCamera.write(stopRecord_command,sizeof(stopRecord_command));

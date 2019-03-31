@@ -32,10 +32,12 @@ $$$$"""$$$$$$$$$$uuu   uu$$$$$$$$$"""$$$"
 In order to successfully poll the GPS, the serial RX buffer size must be increased. This needs
 to be done on the computer used for compilation. This can be done by navigating to the following
 path in the Arduino contents folder:
-On Mac: ‎⁨Contents⁩/⁨Java⁩/⁨hardware⁩/⁨teensy⁩/⁨avr⁩/⁨cores⁩/⁨teensy3⁩/serial1.c
+On Mac: Got to the Applications folder, right click on the Arduino app, select Show Package Contents,
+    then navigate to ‎⁨Contents⁩/⁨Java⁩/⁨hardware⁩/⁨teensy⁩/⁨avr⁩/⁨cores⁩/⁨teensy3⁩/serial1.c
 On Windows: [user_drive]\Program Files (x86)\Arduino\hardware\teensy\avr\cores\teensy3\serial1.c
 
-On line 43 increase SERIAL1_RX_BUFFER_SIZE from 64 to 128.
+On line 43 increase SERIAL1_RX_BUFFER_SIZE from 64 to 1024
+
 THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
 
 VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!
@@ -143,7 +145,7 @@ void loop()
 
     static unsigned long tier_one_old_time = 0;
     static unsigned long tier_two_old_time = 0;
-    static unsigned long tier_three_old_time = 0;
+    // static unsigned long tier_three_old_time = 0; //decided to be unused
 
 
     static unsigned long init_status_old_time = 0;
@@ -161,117 +163,44 @@ void loop()
 
     static uint16_t tier_one_interval = 400;
     static uint16_t tier_two_interval = 2000;
-    static uint16_t tier_three_interval = 20000;
-
-
-    char command[RADIO_DATA_ARRAY_SIZE];
-    char recognitionRadio[RADIO_DATA_ARRAY_SIZE];
-    char goodResponse[] = {'G','x','x','x','x'};
-    const char badResponse[] = {'B','B','B','B','B'};
+    // static uint16_t tier_three_interval = 20000; //decided to be unused
 
     #ifdef NOSECONE
-        char satComCommandArray[SAT_COM_DATA_ARRAY_SIZE];
         static bool mainDeploySatcomSent = false;
         static int landedSatcomSentCount = 0;
         static uint16_t satcomMsgOldTime = millis();
     #endif
 
+
     if(s_statusOfInit.overview == CRITICAL_FAILURE)
         state = WINTER_CONTINGENCY; //makes sure that even if it does somehow get accidentally changed, it gets reverted
 
-    if (SerialRadio.available() >= 5) {
+    // if radio communications are received
+    if (SerialRadio.available() >= 5)
+        communicateThroughSerial(&state, &s_statusOfInit);
 
-        #ifdef TESTING
-        SerialUSB.print("Received Message: ");
-        #endif
-
-        for(int i = 0; i< RADIO_DATA_ARRAY_SIZE; i++){
-            command[i] = SerialRadio.read();
-        }
-
-        bool correctCommand = check(command);
-
-        if(correctCommand){
-            for(int i =1; i<5; i++)
-            {
-                goodResponse[i] = command[0];
-            }
-
-            #ifdef TESTING
-            SerialUSB.print("Good command: ");
-            SerialUSB.println(command);
-            #endif
-
-            doCommand(command[0], &state, &s_statusOfInit);
-            sendRadioResponse(goodResponse);
-        }
-        else{
-            #ifdef TESTING
-            SerialUSB.print("Bad command: ");
-            SerialUSB.println(command);
-            #endif
-
-            sendRadioResponse(badResponse);
-        }
-    }
 
     #ifdef NOSECONE
-        //SatCom receive check
-        if (SatComReceive(satComCommandArray))
-        {
-            #ifdef TESTING
-                for(int q = 0; q < SAT_COM_DATA_ARRAY_SIZE; q++){
-                    SerialUSB.write(satComCommandArray[q]);
-                }
-                SerialUSB.println();
-            #endif
-
-            if(check(satComCommandArray)) // this check array will move and be renamed
-            {
-                #ifdef TESTING
-                SerialUSB.print("Good Command: ");
-                SerialUSB.write(satComCommandArray[0]);
-                SerialUSB.println();
-                #endif
-
-                doCommand(satComCommandArray[0], &state, &s_statusOfInit);
-                // send sat com command back through sat com  ???
-            }
-            else
-            {
-                #ifdef TESTING
-                SerialUSB.print("Bad Command: ");
-                for (int b = 0; b < 5; b++){
-                SerialUSB.write(satComCommandArray[b]);
-                SerialUSB.println();
-                }
-                #endif
-
-                // send sat com error back through sat com ????
-            }
-        }
-
-        /* send radio data */
-        if(state == FINAL_DESCENT && !mainDeploySatcomSent)
-        {
-            mainDeploySatcomSent = true;
-            SatComSendGPS(&timestamp, GPS_data);
-        }
-        else if(state == LANDED && landedSatcomSentCount < NUM_SATCOM_SENDS_ON_LANDED && millis() - satcomMsgOldTime >= SATCOM_LANDED_TIME_INTERVAL)
-        { //sends Satcom total of NUM_SATCOM_SENDS_ON_LANDED times, once every SATCOM_LANDED_TIME_INTERVAL
-            landedSatcomSentCount++;
-            SatComSendGPS(&timestamp, GPS_data);
-            satcomMsgOldTime = millis();
-        }
+     /* send radio data */
+    if(state == FINAL_DESCENT && !mainDeploySatcomSent)
+    {
+        mainDeploySatcomSent = true;
+        SatComSendGPS(&timestamp, GPS_data);
+    }
+    else if(state == LANDED && landedSatcomSentCount < NUM_SATCOM_SENDS_ON_LANDED && millis() - satcomMsgOldTime >= SATCOM_LANDED_TIME_INTERVAL)
+    { //sends Satcom total of NUM_SATCOM_SENDS_ON_LANDED times, once every SATCOM_LANDED_TIME_INTERVAL
+        landedSatcomSentCount++;
+        SatComSendGPS(&timestamp, GPS_data);
+        satcomMsgOldTime = millis();
+    }
 
     #endif //def NOSECONE
 
-    if(state == STANDBY)
-        time_interval = STANDBY_POLLING_TIME_INTERVAL;
-    else if (state == LANDED)
+    if (state == LANDED)
         time_interval = LANDED_POLLING_TIME_INTERVAL;
     else
         time_interval = NOMINAL_POLLING_TIME_INTERVAL;
+
 
     new_time = millis();
     if ((new_time - old_time) >= time_interval) {
@@ -284,13 +213,14 @@ void loop()
         logData(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure);
     }
 
+
     if((new_time - tier_one_old_time) >= tier_one_interval) {
         // sendTierOne(&timestamp, GPS_data, bar_data, state, altitude);
         #ifdef BODY
             bodyTierOne(bar_data, state, altitude, &timestamp);
         #endif
         #ifdef NOSECONE
-            noseconeTierOne(GPS_data);
+            noseconeTierOne(GPS_data, &timestamp);
         #endif
         tier_one_old_time = new_time;
     }
@@ -326,17 +256,4 @@ void loop()
     #ifdef TESTING
     delay(1000);
     #endif
-}
-
-//checks if all indexes are equal for radio commands
-bool check(char *radioCommand)
- {
-    const char a0 = radioCommand[0];
-
-    for (int i = 1; i < 5; i++)
-    {
-        if (radioCommand[i] != a0)
-            return false;
-    }
-    return true;
 }
