@@ -95,7 +95,7 @@ void initSensors(InitStatus *status)
     #endif
 
     if (!continuityCheck()){
-        status->overview = CRITICAL_FAILURE;     //put this in eventually
+        status->overview = CRITICAL_FAILURE;     //@jesse This is now here!
         status->sensorNominal[EMATCH_STATUS_POSITION] = false;
 
         #ifdef TESTING
