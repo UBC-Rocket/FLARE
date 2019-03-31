@@ -188,7 +188,7 @@ void initSensors(InitStatus *status)
         status->sensorNominal[IMU_STATUS_POSITION] = false;
 
         #ifdef TESTING
-        SerialUSB.print("ERROR: IMU initialization failed!");
+        SerialUSB.println("ERROR: IMU initialization failed!");
         #endif
     }
     IMU.setExtCrystalUse(true);
