@@ -151,6 +151,7 @@ void initSensors(InitStatus *status)
     #endif
     accelerometer.setI2CAddr(ACCELEROMETER_ADDRESS);
     accelerometer.begin(LIS331::USE_I2C);
+    accelerometer.setFullScale(LIS331::HIGH_RANGE);
 
     /*init barometer*/
     #ifdef TESTING
@@ -192,6 +193,13 @@ void initSensors(InitStatus *status)
         #endif
     }
     IMU.setExtCrystalUse(true);
+
+    uint calibData[21];
+    IMU.getSensorOffsets(calibData);
+    SerialUSB.println("calibData is:");
+    for(int i = 0; i < calibData.length; i++ ){
+        SerialUSB.println(calibData[i]);
+    }
 
     /* Init Cameras */
     #ifdef TESTING
