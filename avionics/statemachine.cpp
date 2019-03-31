@@ -60,6 +60,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 launch_count++;
                 if (launch_count >= STANDBY_LAUNCH_CHECKS){
                     switchState(state, ASCENT);
+                    digitalWrite(FlightLED, LOW);
                     launch_count = 0;
                     // turn on cameras
                     power_cameras();
@@ -78,6 +79,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 armed_count++;
                 if (armed_count >= ARMED_LAUNCH_CHECKS){
                     switchState(state, ASCENT);
+                    digitalWrite(FlightLED, LOW);
                     armed_count = 0;
                 }
             }
@@ -88,7 +90,6 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
 
         case ASCENT:    // checks for Mach threshold + apogee
             start_record();
-            digitalWrite(FlightLED, LOW);
 
             if (*delta_altitude > MACH_THRESHOLD) {
                 mach_count++;
