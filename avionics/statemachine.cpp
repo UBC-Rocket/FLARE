@@ -62,7 +62,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                     switchState(state, ASCENT);
                     launch_count = 0;
                     // turn on cameras
-                    power_cameras();
+                    start_record();
                 }
             }
             else{
@@ -73,7 +73,6 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case ARMED:
-            start_record();
             if (*altitude > LAUNCH_THRESHOLD) {
                 armed_count++;
                 if (armed_count >= ARMED_LAUNCH_CHECKS){
@@ -87,7 +86,6 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case ASCENT:    // checks for Mach threshold + apogee
-                start_record();
                 #ifdef GROUND_TEST
                 digitalWrite(LED_BUILTIN,LOW);  // do we need this? what are we doing with LEDs
                 #endif

@@ -200,6 +200,7 @@ void initSensors(InitStatus *status)
     #endif
     SerialCamera.begin(CameraBaud);
     while (!SerialCamera) {}        //do we want to replace this or leave these {}?
+    stop_record();
 
     #ifdef NOSECONE
         /*init GPS*/
