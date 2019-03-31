@@ -8,9 +8,9 @@
 /*Constants------------------------------------------------------------*/
 
 //Double, triple check pin assignments
-#define IGNITOR_PIN 4
+#define IGNITOR_PIN 16
 #define SERVO_PIN 2
-#define CONTINUITY_CHECK_PIN 16
+#define CONTINUITY_CHECK_PIN 4
 #define CONTINUITY_CHECK_ADC 14
 #define FLIGHT_LED   21
 
