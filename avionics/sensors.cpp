@@ -202,7 +202,7 @@ void initSensors(InitStatus *status)
     SerialUSB.println("Initializing the camera");
     #endif
     SerialCamera.begin(CameraBaud);
-    while (!SerialCamera) {}        //do we want to replace this or leave these {}?
+    while (!SerialCamera) {}
     stop_record();
 
     #ifdef NOSECONE
