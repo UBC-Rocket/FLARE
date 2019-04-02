@@ -17,7 +17,7 @@
 // #define GROUND_TEST
 
 #define SerialUSB               Serial
-#define SerialGPS               Serial1
+#define SerialGPS               Serial5
 #define SerialRadio             Serial2
 
 #define EARTHS_GRAVITY          9.80665

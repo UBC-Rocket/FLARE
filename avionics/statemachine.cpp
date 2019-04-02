@@ -62,6 +62,8 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                     switchState(state, ASCENT);
                     digitalWrite(FLIGHT_LED, LOW);
                     launch_count = 0;
+                    // turn on cameras
+                    start_record();
                 }
             }
             else{
@@ -72,7 +74,6 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case ARMED:
-            start_record();
             if (*altitude > LAUNCH_THRESHOLD) {
                 armed_count++;
                 if (armed_count >= ARMED_LAUNCH_CHECKS){
@@ -87,8 +88,6 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case ASCENT:    // checks for Mach threshold + apogee
-            start_record();
-
             if (*delta_altitude > MACH_THRESHOLD) {
                 mach_count++;
                 if (mach_count >= MACH_CHECKS) {

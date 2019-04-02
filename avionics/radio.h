@@ -35,7 +35,8 @@ void sendTierOne(unsigned long*, float*, float*, FlightStates state, float altit
 void sendTierTwo(float*, float*, float*, float*);
 void sendTierThree(float*, float*);
 void bodyTierOne(float*, FlightStates state, float altitude, unsigned long*);
-void noseconeTierOne(float*, unsigned long*);
+//void bodyTierTwo(float*); not needed
+void noseconeTierOne(float*, unsigned long*, FlightStates state, float);
 void noseconeTierTwo(float*, float*, float*, float*);
 
 #endif

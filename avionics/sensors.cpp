@@ -154,6 +154,7 @@ void initSensors(InitStatus *status)
     #endif
     accelerometer.setI2CAddr(ACCELEROMETER_ADDRESS);
     accelerometer.begin(LIS331::USE_I2C);
+    accelerometer.setFullScale(LIS331::HIGH_RANGE);
 
     /*init barometer*/
     #ifdef TESTING
@@ -200,6 +201,7 @@ void initSensors(InitStatus *status)
     #endif
     SerialCamera.begin(CameraBaud);
     while (!SerialCamera) {}
+    stop_record();
 
     #ifdef NOSECONE
         /*init GPS*/
