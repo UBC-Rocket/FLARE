@@ -267,7 +267,7 @@ void LIS331::setFullScale(fs_range range)
   uint8_t data;
   LIS331_read(CTRL_REG4, &data, 1);
   data &= ~0xcf;
-  data |= range<<5;
+  data |= range<<4;
   LIS331_write(CTRL_REG4, &data, 1);
 }
 

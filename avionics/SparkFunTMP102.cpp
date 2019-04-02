@@ -53,7 +53,6 @@ byte TMP102::readRegister(bool registerNumber){
 
   // Read current configuration register value
   Wire.requestFrom(_address, 2); 	// Read two bytes from TMP102
-  Wire.endTransmission();
   registerByte[0] = (Wire.read());	// Read first byte
   registerByte[1] = (Wire.read());	// Read second byte
 
