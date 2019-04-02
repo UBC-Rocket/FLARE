@@ -78,12 +78,14 @@ void bodyTierOne(float bar_data[], FlightStates state, float altitude, unsigned 
   * @param  unsigned long *timestamp - address for the timestamp
   * @return void
   */
-void noseconeTierOne(float* GPS_data, unsigned long *timestamp){
+void noseconeTierOne(float* GPS_data, unsigned long *timestamp, FlightStates state, float altitude){
     float time = *timestamp;
     sendRadioData(time, 't');
     sendRadioData(GPS_data[0], UID_GPS_lat);
     sendRadioData(GPS_data[1], UID_GPS_long);
     sendRadioData(GPS_data[2], UID_GPS_alt);
+    sendRadioData((float) state, UID_state);
+    sendRadioData( altitude, UID_altitude);
 }
 /**
   * @brief  Function to send the less essential data from the nosecone over radio,
