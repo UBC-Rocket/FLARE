@@ -14,7 +14,7 @@
 
 #include "commands.h"
 #include "gpio.h"
-#include "sensors.h"
+#include "sensors.h" 
 #include "cameras.h"
 #include "satcom.h"
 #include "statemachine.h"
