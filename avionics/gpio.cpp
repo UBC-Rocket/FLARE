@@ -1,8 +1,9 @@
 /* @file    gpio.cpp
  * @author  UBC Rocket Avionics 2018/2019
  * @description  Initializes gpio pins that enable us to control our
- *  drogue and main parachute releases.  The drogue servo control
- *  function and main parachute release functions are also contained
+ *  drogue and main parachute releases, status LEDs, buzzer.
+ *
+ *  The drogue servo control function and main parachute release functions are also contained
  *  here. There is a function that implements continuity testing of the
  *  ematch - required as per IREC regulations.
  *
@@ -26,35 +27,51 @@ Servo myServo;
 
 /*Functions------------------------------------------------------------*/
 /**
-  * @brief  Initializes pins for servo (drogue release) and e-match (main release)
+  * @brief  Initializes pins for servo (drogue release), e-match (main release),
+  *         LEDs, buzzer
   * @param  None
   * @return None
   */
 void initPins(void)
 {
-    /*init ignitor*/
-    pinMode(IGNITOR_PIN, OUTPUT);
-    digitalWrite(IGNITOR_PIN, LOW);
+    /* Initialize and startup power status LEDs*/
+    pinMode(POWER_STATUS_LED, OUTPUT);
+    digitalWrite(POWER_STATUS_LED, HIGH);
 
-    #ifdef TESTING
-    SerialUSB.println("ignitor pin init low");
-    #endif
+    /* Initialize and startup flight status LEDs*/
+    pinMode(FLIGHT_LED, OUTPUT);
+    digitalWrite(FLIGHT_LED, LOW);
 
-    /*init ematch continuity check pins */
-    pinMode(CONTINUITY_CHECK_PIN, OUTPUT);
-    digitalWrite(CONTINUITY_CHECK_PIN, LOW);
-    // the ADC read pin does not need to be initialized !!
+    initBuzzer();
 
-    #ifdef TESTING
-    SerialUSB.println("continuity pins init");
-    #endif
+    #ifdef BODY
+        /*init ignitor*/
+        pinMode(IGNITOR_PIN, OUTPUT);
+        digitalWrite(IGNITOR_PIN, LOW);
 
-    /*init servo*/
-    myServo.attach(SERVO_PIN);
-    myServo.write(INIT_SERVO_POS);
-    #ifdef TESTING
-    SerialUSB.println("servo pins init");
-    #endif
+        #ifdef TESTING
+        SerialUSB.println("ignitor pin init low");
+        #endif
+
+        /*init ematch continuity check pins */
+        pinMode(CONTINUITY_CHECK_PIN, OUTPUT);
+        digitalWrite(CONTINUITY_CHECK_PIN, LOW);
+        // the ADC read pin does not need to be initialized !!
+
+        #ifdef TESTING
+        SerialUSB.println("continuity pins init");
+        #endif
+
+        /*init servo*/
+        myServo.attach(SERVO_PIN);
+        myServo.write(INIT_SERVO_POS);
+        #ifdef TESTING
+        SerialUSB.println("servo pins init");
+        #endif
+
+    #endif //body
+
+
 }
 
 /**

@@ -4,7 +4,8 @@
 
 /*Includes------------------------------------------------------------*/
 #include <Arduino.h>
-
+#include "sensors.h" //for macros
+#include "buzzer.h"
 /*Constants------------------------------------------------------------*/
 
 //Double, triple check pin assignments
@@ -12,6 +13,7 @@
 #define SERVO_PIN 2
 #define CONTINUITY_CHECK_PIN 4
 #define CONTINUITY_CHECK_ADC 14
+#define POWER_STATUS_LED 20
 #define FLIGHT_LED   21
 
 #define INIT_SERVO_POS  60

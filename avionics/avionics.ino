@@ -91,13 +91,8 @@ static float ground_alt_arr[GROUND_ALT_SIZE]; //values for the baseline pressure
 void setup()
 {
     int i;
-    #ifdef BODY
-        initPins();
-    #endif
-    pinMode(FLIGHT_LED, OUTPUT);
-    digitalWrite(FLIGHT_LED, LOW);
 
-    initBuzzer();
+    initPins();
 
     /*init serial comms*/
     #ifdef TESTING

@@ -385,7 +385,12 @@ void displayStatus(InitStatus *status){
         #ifdef TESTING
         SerialUSB.println("Critical failure! >:-{");
         #endif
+
+        #ifdef TESTING //Only plays song once if testing, because it's annoying
+        for(int i = 1; i <= 1; i++){
+        #else
         for(int i = 1; i <= 5; i++){
+        #endif
             sing(SongTypes_CRITICALFAIL);
             delay(400);
         }
@@ -395,7 +400,12 @@ void displayStatus(InitStatus *status){
         SerialUSB.println("Noncritical failure! :(");
         #endif
         pinMode(LED_BUILTIN, OUTPUT);
+
+        #ifdef TESTING
+        for(int i = 1; i <= 1; i++){
+        #else
         for(int i = 1; i <= 5; i++){
+        #endif
             sing(SongTypes_NONCRITFAIL);
             delay(400);
         }
@@ -406,7 +416,12 @@ void displayStatus(InitStatus *status){
         #endif
         pinMode(LED_BUILTIN,OUTPUT);
         digitalWrite(LED_BUILTIN,HIGH);
+
+        #ifdef TESTING
+        for(int i = 1; i <= 1; i++){
+        #else
         for(int i = 1; i <= 5; i++){
+        #endif
             sing(SongTypes_SUCCESS);
             delay(400);
         }
