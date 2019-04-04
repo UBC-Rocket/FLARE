@@ -49,16 +49,7 @@ void doCommand(char command, FlightStates *state, InitStatus *status){
             stop_record();
             break;
 
-        case HALO:
-            //play HALO
-            break;
-
-        // case SATCOM:
-        //     //switch to SATCOM
-        //     break;
-
         case RESET:
-            //not sure
             break;
 
         case MAIN:

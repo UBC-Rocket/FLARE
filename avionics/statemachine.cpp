@@ -162,7 +162,6 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 if (delta_altitude_landed <= LAND_VELOCITY_THRESHOLD) { // Landed threshold based on velocity alone
                     land_count++;
                     if (land_count >= LAND_CHECKS) {
-                        // turn off cameras:
                         switchState(state, LANDED);
                         digitalWrite(FLIGHT_LED, LOW);
                         land_count = 0;

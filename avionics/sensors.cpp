@@ -160,8 +160,6 @@ void initSensors(InitStatus *status)
     #ifdef TESTING
     SerialUSB.println("Initializing barometer");
     #endif
-    //barometer.reset();
-    //barometer.begin();
     #ifdef TESTING
     if (!barometer.initializeMS_5803(true)) { //because one is verbose
         status->overview = CRITICAL_FAILURE;
@@ -478,8 +476,6 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
     if(!bar_flag)
         SerialUSB.println("BAROMETER FAILED READING");
     #endif
-    //bar_data[0] = barometer.getPressure(ADC_4096);
-    //bar_data[1] = barometer.getTemperature(CELSIUS, ADC_512);
     bar_data[0] = barometer.pressure();
     bar_data[1] = barometer.temperature();
 
