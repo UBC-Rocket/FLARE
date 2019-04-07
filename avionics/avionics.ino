@@ -111,6 +111,8 @@ void setup()
     /*init camera serial port*/
     SerialCamera.begin(CameraBaud);
     while (!SerialCamera) {}
+    if(s_statusOfInit.overview == CRITICAL_FAILURE)
+        start_record();
 
     /* init various arrays */
     baseline_pressure = barSensorInit(); /* for baseline pressure calculation */
