@@ -43,12 +43,10 @@ void doCommand(char command, FlightStates *state, InitStatus *status){
 
         case CAMERAS_ON:
             start_record();
-            digitalWrite(FLIGHT_LED, HIGH);
             break;
 
         case CAMERAS_OFF:
             stop_record();
-            digitalWrite(FLIGHT_LED,LOW);
             break;
 
         case RESET:
