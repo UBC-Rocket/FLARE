@@ -14,7 +14,7 @@
 
 #include "commands.h"
 #include "gpio.h"
-#include "sensors.h" 
+#include "sensors.h"
 #include "cameras.h"
 #include "satcom.h"
 #include "statemachine.h"
@@ -38,15 +38,17 @@ void doCommand(char command, FlightStates *state, InitStatus *status){
                 // turn on cameras
                 start_record();
             }
-        
+
             break;
 
         case CAMERAS_ON:
             start_record();
+            digitalWrite(FLIGHT_LED, HIGH);
             break;
 
         case CAMERAS_OFF:
             stop_record();
+            digitalWrite(FLIGHT_LED,LOW);
             break;
 
         case RESET:
@@ -54,7 +56,7 @@ void doCommand(char command, FlightStates *state, InitStatus *status){
 
         case MAIN:
             #ifdef GROUND_TEST  // Ground radio testing purposes
-            digitalWrite(LED_BUILTIN, HIGH);
+            digitalWrite(FLIGHT_LED, HIGH);
             deployMain();
             #endif
             break;
@@ -62,7 +64,7 @@ void doCommand(char command, FlightStates *state, InitStatus *status){
         case DROGUE:
             #ifdef GROUND_TEST
             //testing purposes!
-            digitalWrite(LED_BUILTIN,LOW);
+            digitalWrite(FLIGHT_LED,LOW);
             deployDrogue();
             #endif
 
@@ -135,6 +137,10 @@ void communicateThroughSerial(FlightStates * state, InitStatus *status)
         SerialUSB.write(command[0]);
         SerialUSB.println();
         #endif
+        //create the correct good response
+        for(int i =1; i<5; i++){
+            goodResponse[i] = command[1];
+        }
 
         sendRadioResponse(goodResponse);
         doCommand(command[0], state, status);
