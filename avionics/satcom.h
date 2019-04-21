@@ -7,7 +7,6 @@
 
 /*Constants------------------------------------------------------------*/
 #define IridiumSerial Serial4
-// #define SAT_COM_DATA_ARRAY_SIZE 34
 #define BUFSIZE 100
 #define NUM_SATCOM_SENDS_ON_LANDED 5
 #define SATCOM_LANDED_TIME_INTERVAL 60000 //in ms
@@ -19,6 +18,5 @@ bool SatComSetup(void);
 int SatComQuality(void);
 void SatComSendGPS(unsigned long*, float*);
 void SatComSendCharArray(char*);
-// bool SatComReceive(char*);
 
 #endif

@@ -60,8 +60,6 @@ void stop_record(){
   * @return calculated crc
   */
 //crc calculation,source: https://github.com/betaflight/betaflight/blob/5c5520ecf43bcd2c042828e08e7e11ab2342ccdd/src/main/common/crc.c?fbclid=IwAR3647Rv68ECXgWra1OktmKaQbQ1DhghM5o7r9s1hPTJkTfR6IW13qzt6LY#L60-L71
-//should look into it more
-
 uint8_t crc_calculator(uint8_t *command, uint8_t len){
     uint8_t crc = 0;
     for (int i = 0 ; i < len ; i++){
