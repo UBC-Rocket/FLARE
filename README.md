@@ -66,6 +66,13 @@ The specific functions they can perform are as follows:
 
 As a hack, you can undefine NOSECONE to deactivate SATCOM (e.g. since SATCOM is blocking)
 
+### Servo/Pow
+There are two systems in use for separating the rocket and deploying the drogue chute.
+
+One system is a CO2 canister that is punctured by a servo actuator, and the other system is a black powder charge.
+
+During nominal flight conditions, only define servo OR pow and not both depending on which drogue system is being used.
+
 ### Testing
 When defined, enables debugging output. All polled sensor values are printed to USB, and a 1 second delay is added to the main Arduino loop function. **DO NOT HAVE THIS DEFINED WHEN FLASHING TO FLIGHT PCBS**
 
