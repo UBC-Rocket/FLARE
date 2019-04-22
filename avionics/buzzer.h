@@ -4,6 +4,7 @@
 
 /*Includes------------------------------------------------------------*/
 #include <Arduino.h>
+#include "gpio.h"
 
 /*Constants------------------------------------------------------------*/
 #define NOTE_B0  31
@@ -95,8 +96,6 @@
 #define NOTE_CS8 4435
 #define NOTE_D8  4699
 #define NOTE_DS8 4978
-
-#define MELODY_PIN 3
 
 enum SongTypes{
   SongTypes_MARIO,

@@ -11,6 +11,7 @@
 //Double, triple check pin assignments
 #define IGNITOR_PIN 16
 #define SERVO_PIN 2
+#define MELODY_PIN 3
 #define CONTINUITY_CHECK_PIN 4
 #define CONTINUITY_CHECK_ADC 14
 #define POWER_STATUS_LED 20
@@ -20,7 +21,7 @@
 #define FINAL_SERVO_POS 160
 
 #define IGNITOR_DELAY 12    // in milliseconds
-#define SERVO_DELAY 1500
+#define SERVO_DELAY 1500    // in miliseconds
 #define CONTINUITY_CHECK_DELAY 35 // in microseconds!
 
 // tested at 11.1V with a 2.2k/470 divider (606)

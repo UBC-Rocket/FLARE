@@ -98,7 +98,7 @@ void initSensors(InitStatus *status)
     #endif
 
     if (!continuityCheck()){
-        status->overview = CRITICAL_FAILURE;     //@jesse This is now here!
+        status->overview = CRITICAL_FAILURE;     //Critical failure if the ignitor is broken
         status->sensorNominal[EMATCH_STATUS_POSITION] = false;
 
         #ifdef TESTING

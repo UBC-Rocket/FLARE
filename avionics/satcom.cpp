@@ -139,7 +139,6 @@ void SatComSendGPS(unsigned long *timestamp, float GPS_data[])
     String long1 = String(gps_array1[1]);
     String long2 = String(gps_array2[1]);
 
-    // String longitude = String(GPS_data[1]); //NOT SURE
     String altitude = String(GPS_data[2]);
     String satsend = String("timestamp: " + send_timestamp + " Lat: " + lat1 + "." + lat2 +
                                       " Long: " + long1 + "." + long2 + " Alt: " + altitude);
@@ -190,64 +189,6 @@ void SatComSendCharArray(char Send_Array[])
       #endif
     }
 }
-
-
-/* UNUSED
-// bool SatComReceive(char *) {}
-// @brief Receives message from satellite via SatCom module
-// @param satComCommandArray[] buffer for message to be received
-// @return bool indicating if a message was received or not
-
-bool SatComReceive(char satComCommandArray[])
-{
-  int err;
-  uint8_t buffer[SAT_COM_DATA_ARRAY_SIZE];
-  size_t bufferSize = sizeof(buffer);
-
-  // Check to see if there are remaining messages not retrieved
-  if (modem.getWaitingMessageCount() > 0)
-  {
-    err = modem.sendReceiveSBDText(NULL, buffer, bufferSize);
-
-    if (err != ISBD_SUCCESS)
-    {
-      #ifdef TESTING
-      SerialUSB.print("sendReceiveSBD* failed: error ");
-      SerialUSB.println(err);
-      if (err == ISBD_SENDRECEIVE_TIMEOUT)
-        SerialUSB.println("Try again with a better view of the sky.");
-      #endif
-      return false;
-    }
-
-    else
-    {
-      #ifdef TESTING
-      SerialUSB.print("Inbound buffer size is: ");
-      SerialUSB.println(bufferSize);
-      #endif
-
-      for (unsigned int i = 0; i < bufferSize; i++)
-      {
-        satComCommandArray[i] = (char) buffer[i];
-        #ifdef TESTING
-        SerialUSB.write(buffer[i]);
-        #endif
-      }
-
-      #ifdef TESTING
-      SerialUSB.println();
-      #endif
-
-      return true;
-    }
-  }
-  else
-    return false;
-
-  return false;
-}
-*/
 
 // Unused SATCOM diagnostics
 #ifdef DIAGNOSTICS

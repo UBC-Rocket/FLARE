@@ -27,8 +27,8 @@
 #include <HardwareSerial.h>
 
 //send pressure, gps, state, and altitude over radio
-//FILLER FUNCTIONS
-void  sendTierOne(unsigned long *timestamp, float* GPS_data, float bar_data[], FlightStates state, float altitude){
+//Functions for testing purposes
+void  sendTierOne(unsigned long *timestamp, float *GPS_data, float bar_data[], FlightStates state, float altitude){
     float time = *timestamp;
     sendRadioData(time, 't');
     sendRadioData(bar_data[0], UID_bar_pres);
@@ -40,7 +40,7 @@ void  sendTierOne(unsigned long *timestamp, float* GPS_data, float bar_data[], F
 }
 
 //Send Acceleration, IMU data, and temperature
-//FILLER FUNCTION
+//Functions for testing purposes
 void sendTierTwo(float acc_data[], float bar_data[], float *temp_sensor_data, float IMU_data[]){
     sendRadioData(bar_data[1], UID_bar_temp);
     sendRadioData(*temp_sensor_data, UID_temp_temp);
@@ -52,7 +52,7 @@ void sendTierTwo(float acc_data[], float bar_data[], float *temp_sensor_data, fl
     sendRadioData(acc_data[2], UID_acc_acc_z);
 }
 //Send data that only needs to be sent once, battery voltage, Ground Altitude
-//FILLER FUNCTION
+//Functions for testing purposes
 void sendTierThree(float* battery_voltage, float* ground_altitude){
     sendRadioData(*ground_altitude, UID_ground_altitude);
     sendRadioData(*battery_voltage, UID_batt);
