@@ -17,6 +17,7 @@
 #include "satcom.h"
 #include "cameras.h"
 #include "gpio.h"
+#include "sensors.h"
 
 #include <math.h>
 #include <Arduino.h>
@@ -49,9 +50,10 @@ void switchState(FlightStates *curr_state, FlightStates new_state){
  */
 void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_altitude, float bar_data[], float *baseline_pressure,
     float *ground_altitude, float ground_alt_arr[], FlightStates *state) {
-    static int launch_count, armed_count, mach_count, mach_lock_count, apogee_count, main_count, land_count = 0,camera_toggle_count = 0;
-    static uint32_t old_time_landed; //initialize on switching state
-    static float old_altitude_landed; //initialize on switching state
+    static int launch_count = 0, armed_count = 0, mach_count = 0, mach_lock_count = 0, apogee_count = 0,
+        main_count = 0, land_count = 0, camera_toggle_count = 0;
+    static uint32_t old_time_landed = millis(); //initialize on switching state
+    static float old_altitude_landed = *altitude; //initialize on switching state
     static bool camera_toggle = true;
 
     switch (*state) {
