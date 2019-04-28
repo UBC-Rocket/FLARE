@@ -115,11 +115,11 @@ void noseconeTierTwo(float bar_data[], float acc_data[], float *temp_sensor_data
   */
 void sendRadioData(float data, char id){
     //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly
-     u_int8_t b[4];
-      *(float*) b = data;
-      SerialRadio.write(id);
-      for(int i=0; i<4; i++)
-      {
-          SerialRadio.write(b[i]);
-      }
+    u_int8_t b[4];
+    *(float*) b = data;
+    SerialRadio.write(id);
+    for(int i=0; i<4; i++)
+    {
+        SerialRadio.write(b[i]);
+    }
 }
