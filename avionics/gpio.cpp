@@ -45,12 +45,12 @@ void initPins(void)
     initBuzzer();
 
     #ifdef BODY
-        /*init ignitor*/
+        /*init main ignitor*/
         pinMode(IGNITOR_PIN, OUTPUT);
         digitalWrite(IGNITOR_PIN, LOW);
 
         #ifdef TESTING
-        SerialUSB.println("ignitor pin init low");
+        SerialUSB.println("main ignitor pin init low");
         #endif
 
         /*init ematch continuity check pins */
@@ -59,36 +59,68 @@ void initPins(void)
         // the ADC read pin does not need to be initialized !!
 
         #ifdef TESTING
-        SerialUSB.println("continuity pins init");
+        SerialUSB.println("main continuity pins init");
         #endif
 
-        /*init servo*/
-        myServo.attach(SERVO_PIN);
-        myServo.write(INIT_SERVO_POS);
-        #ifdef TESTING
-        SerialUSB.println("servo pins init");
-        #endif
+        #ifdef POW
+            /*init drogue ignitor*/
+            pinMode(DROGUE_IGNITOR_PIN, OUTPUT);
+            digitalWrite(DROGUE_IGNITOR_PIN, LOW);
+
+            #ifdef TESTING
+            SerialUSB.println("drogue ignitor pin init low");
+            #endif
+
+            /*init drogue ematch continuity check pins */
+            pinMode(DROGUE_CONTINUITY_CHECK_PIN, OUTPUT);
+            digitalWrite(DROGUE_CONTINUITY_CHECK_PIN, LOW);
+
+            #ifdef TESTING
+            SerialUSB.println("drogue continuity pins init");
+            #endif
+        #endif // POW
+
+        #ifdef SERVO
+            /*init servo*/
+            myServo.attach(SERVO_PIN);
+            myServo.write(INIT_SERVO_POS);
+            #ifdef TESTING
+            SerialUSB.println("servo pins init");
+            #endif
+        #endif // SERVO
 
     #endif //body
-
 
 }
 
 /**
-  * @brief  Actuates servo to deploy drogue and payload
+  * @brief  Deploys drogue and payload
   * @param  None
   * @return None
   */
 void deployDrogue(void)
 {
-    myServo.write(FINAL_SERVO_POS);
+    #ifdef SERVO
+        myServo.write(FINAL_SERVO_POS);
 
-    #ifdef TESTING
-    SerialUSB.println("DROGUE SERVO DEPLOYED");
-    #endif
+        #ifdef TESTING
+        SerialUSB.println("DROGUE SERVO DEPLOYED");
+        #endif
 
-    delay(SERVO_DELAY);
-    myServo.write(INIT_SERVO_POS);
+        delay(SERVO_DELAY);
+        myServo.write(INIT_SERVO_POS);
+    #endif  // SERVO
+
+    #ifdef POW
+        digitalWrite(DROGUE_IGNITOR_PIN, HIGH);
+
+        #ifdef TESTING
+        SerialUSB.println("DROGUE IGNITER FIRED");
+        #endif
+
+        delay(IGNITOR_DELAY);
+        digitalWrite(DROGUE_IGNITOR_PIN, LOW);
+    #endif // POW
 }
 
 /**
@@ -109,7 +141,7 @@ void deployMain(void)
 }
 
 /** bool continuityCheck(void)
-  * @brief  Checks the ematch for continuity
+  * @brief  Checks the ematches for continuity
   * @param  None
   * @return bool flag that is true if there is continuity,
   *             false if the ematch is disconnected or broken.
@@ -118,17 +150,34 @@ void deployMain(void)
     digitalWrite(CONTINUITY_CHECK_PIN, HIGH);
     delayMicroseconds(CONTINUITY_CHECK_DELAY);
 
-    int continuity = analogRead(CONTINUITY_CHECK_ADC);
+    int main_continuity = analogRead(CONTINUITY_CHECK_ADC);
     digitalWrite(CONTINUITY_CHECK_PIN, LOW);
 
     #ifdef TESTING
-    SerialUSB.print("Contiunity check ADC read: ");
-    SerialUSB.println(continuity);
+    SerialUSB.print("Main contiunity check ADC read: ");
+    SerialUSB.println(main_continuity);
     #endif
 
-    if (continuity <= DISCONTINUOUS_THRESHOLD)
+    #ifdef POW
+        digitalWrite(DROGUE_CONTINUITY_CHECK_PIN, HIGH);
+        delayMicroseconds(CONTINUITY_CHECK_DELAY);
+
+        int drogue_continuity = analogRead(DROGUE_CONTINUITY_CHECK_ADC);
+        digitalWrite(DROGUE_CONTINUITY_CHECK_PIN, LOW);
+
+        #ifdef TESTING
+        SerialUSB.print("Drogue contiunity check ADC read: ");
+        SerialUSB.println(drogue_continuity);
+        #endif
+    #endif // POW
+
+    if (main_continuity <= DISCONTINUOUS_THRESHOLD)
         return false;
-    else
-        return true;
+    #ifdef POW
+        if(drogue_continuity <= DISCONTINUOUS_THRESHOLD)
+            return false;
+    #endif  // POW
+
+    return true;
 
  }
