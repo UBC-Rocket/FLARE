@@ -34,7 +34,6 @@ IridiumSBD modem(IridiumSerial);
 bool SatComSetup()
 {
   bool SatComSuccess = true;
-  int signalQuality = -1;
   int err;
 
   // Start the serial port connected to the satellite modem
@@ -73,6 +72,8 @@ bool SatComSetup()
 
   // Signal Quality Test:
   #ifdef TESTING
+  int signalQuality = -1;
+
   err = modem.getSignalQuality(signalQuality);
   if (err != ISBD_SUCCESS)
   {
@@ -98,9 +99,9 @@ int SatComQuality()
 {
   int SignalQuality = -1;
 
-  int err = modem.getSignalQuality(SignalQuality);
-
   #ifdef TESTING
+  int err = modem.getSignalQuality(SignalQuality);
+  
   if (err != ISBD_SUCCESS)
   {
     SerialUSB.print("SignalQuality failed: error ");

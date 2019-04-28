@@ -470,8 +470,9 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
     #ifdef TESTING
     SerialUSB.println("Polling barometer");
     #endif
-    bool bar_flag = barometer.readSensor();
-
+    // bool bar_flag = barometer.readSensor();
+    barometer.readSensor();
+    
     #ifdef TESTING
     if(!bar_flag)
         SerialUSB.println("BAROMETER FAILED READING");
