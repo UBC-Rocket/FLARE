@@ -24,7 +24,7 @@
  * Implementation of functions defined in SparkFunMAX31855k.h                  *
  ******************************************************************************/
 
-#include "SparkFunMAX31855k.h"
+#include "MAX31855k.h"
 #include "Sensors.h"
 
 ////////////////////////////////////////////////////////////////////////////////

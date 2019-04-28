@@ -22,12 +22,13 @@
 #include "MS5803_01.h"              //barometer
 #include "SparkFunTMP102.h"         //temp sensor
 #include "Adafruit_BNO055.h"        //IMU
-#include "GP20U7.h"           //GPS
+#include "GP20U7.h"                 //GPS
 #include "gpio.h"                   //GPIO
 #include "satcom.h"                 //SATCOM
 #include "commands.h"               //for sendRadioResponse(const char* response);
 #include "buzzer.h"                 //for buzzer response on startup
 #include "cameras.h"
+#include "MAX31855k.h"              //Thermocouple
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -474,7 +475,7 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
         SerialUSB.println("BAROMETER FAILED READING");
 
     #else
-    
+
     barometer.readSensor();
     #endif
 
