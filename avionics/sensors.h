@@ -21,6 +21,7 @@
 #define SerialUSB               Serial
 #define SerialGPS               Serial5
 #define SerialRadio             Serial2
+#define SPIThermo               SPI1
 
 #define EARTHS_GRAVITY          9.80665
 
