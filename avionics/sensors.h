@@ -74,14 +74,9 @@ const uint8_t GPS_set_update_rate[] = {0xA0, 0xA1, 0x00, 0x03, 0x0E, 0x01, 0x00,
 void initSensors(InitStatus* status);
 float barSensorInit(void);
 
-void processRadioData(unsigned long*, float*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
-void sendRadioData(float data, char id);
 void generateStatusReport(InitStatus *status, char *statusReport1, char *statusReport2, char *statusReport3);
 void displayStatus(InitStatus *status);
 void pollSensors(unsigned long*, float*, float*, float*, float*, float*, float*, float*);
 void logData(unsigned long *, float*, float*, float*, float*, float*, float*, FlightStates, float, float, float);
-void processRadioData(unsigned long*, float*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
-void sendRadioData(float data, char id);
-
 
 #endif
