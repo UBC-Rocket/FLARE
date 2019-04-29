@@ -1,4 +1,4 @@
-/*************************** SparkFunMAX31855k.cpp *****************************
+/*************************** MAX31855k.cpp *****************************
  * Copyright (c) 2015 SparkFun Electronics                                     *
  *                                                                             *
  * Permission is hereby granted, free of charge, to any person obtaining a     *
@@ -21,7 +21,7 @@
  *                                                                             *
  *                                                                             *
  * Library to read temperature from a MAX31855K type K thermocouple digitizer  *
- * Implementation of functions defined in SparkFunMAX31855k.h                  *
+ * Implementation of functions defined in MAX31855k.h                          *
  ******************************************************************************/
 
 #include "MAX31855k.h"
@@ -37,9 +37,9 @@
 //                uint8_t _gnd: The Arduino pin number to sink the power
 // Output       : Instance of this class with pins configured
 // Return       : None
-// Usage        : SparkFunMAX31855k <name>(<pinNumber>);
+// Usage        : MAX31855k <name>(<pinNumber>);
 ////////////////////////////////////////////////////////////////////////////////
-SparkFunMAX31855k::SparkFunMAX31855k(const uint8_t _cs, const uint8_t _vcc,
+MAX31855k::MAX31855k(const uint8_t _cs, const uint8_t _vcc,
     const uint8_t _gnd, const bool _debug) : cs(_cs), debug(_debug)
 {
   // Redundant with SPI library if using default SS
@@ -65,7 +65,7 @@ SparkFunMAX31855k::SparkFunMAX31855k(const uint8_t _cs, const uint8_t _vcc,
 ////////////////////////////////////////////////////////////////////////////////
 // Change the cs pin
 ////////////////////////////////////////////////////////////////////////////////
-void SparkFunMAX31855k::setCS(int pin)
+void MAX31855k::setCS(int pin)
 {
   digitalWrite(cs, HIGH); // Make sure to set old cs high to disable the chip
   cs = pin;               //change to new cs pin
@@ -95,7 +95,7 @@ void SparkFunMAX31855k::setCS(int pin)
 //  D1       SCG fault: Reads 1 when thermocouple is shorted to gnd, else 0
 //  D0       OC  fault: Reads 1 when thermocouple is open-circuit, else 0
 ////////////////////////////////////////////////////////////////////////////////
-void SparkFunMAX31855k::readBytes(void)
+void MAX31855k::readBytes(void)
 {
   digitalWrite(cs, LOW);
 
@@ -113,17 +113,17 @@ void SparkFunMAX31855k::readBytes(void)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Description  : This function reads the current temperature
-// Input        : SparkFunMAX31855k::units _u: The units of temperature to
+// Input        : MAX31855k::units _u: The units of temperature to
 //                  return. C (default), K, R, or F
 // Output       : Error messages before freezing
 // Return:      : float: The temperature in requested units.
 // Usage        : float tempC = <objectName>.read_temp();
-//                float tempC = <objectName>.read_temp(SparkFunMAX31855k::C);
-//                float tempF = <objectName>.read_temp(SparkFunMAX31855k::F);
-//                float tempK = <objectName>.read_temp(SparkFunMAX31855k::K);
-//                float tempR = <objectName>.read_temp(SparkFunMAX31855k::R);
+//                float tempC = <objectName>.read_temp(MAX31855k::C);
+//                float tempF = <objectName>.read_temp(MAX31855k::F);
+//                float tempK = <objectName>.read_temp(MAX31855k::K);
+//                float tempR = <objectName>.read_temp(MAX31855k::R);
 ////////////////////////////////////////////////////////////////////////////////
-float SparkFunMAX31855k::readTemp(SparkFunMAX31855k::units _u)
+float MAX31855k::readTemp(MAX31855k::units _u)
 {
   int16_t value;
   float temp;
@@ -166,7 +166,7 @@ float SparkFunMAX31855k::readTemp(SparkFunMAX31855k::units _u)
 // Return:      : float: The temperature in ˚C
 // Usage        : float tempC = <objectName>.readCJT();
 ////////////////////////////////////////////////////////////////////////////////
-float SparkFunMAX31855k::readCJT(void)
+float MAX31855k::readCJT(void)
 {
   float ret;
 
@@ -196,33 +196,33 @@ float SparkFunMAX31855k::readCJT(void)
 // Return:      : Fault bits that were high, or 8 for unknow & 0 for no faults
 // Usage        : checkHasFault();
 ////////////////////////////////////////////////////////////////////////////////
-uint8_t SparkFunMAX31855k::checkHasFault(void)
+uint8_t MAX31855k::checkHasFault(void)
 {
   if (!data.uint32) {
     // If all bits are low, either it's not wired right, or we actually measured
     // 0˚.  There is no way to tell. With debug turned on this will warn.
     if (debug)
-      Serial.println(F("\nMAX31855K::All bits were zero.  Fishy..."));
+      SerialUSB.println(F("\nMAX31855K::All bits were zero.  Fishy..."));
   }
 
   if (data.uint32 & ((uint32_t)1<<16)) { // Bit D16 is high => fault
     if (data.uint32 & 1) {
       if (debug){
-        Serial.println(data.uint32);
-        Serial.println(F("\nMAX31855K::OC Fault: No Probe"));
+        SerialUSB.println(data.uint32);
+        SerialUSB.println(F("\nMAX31855K::OC Fault: No Probe"));
       }
       return 0b1;
     } else if (data.uint32 & (1<<1)) {
       if (debug)
-        Serial.println(F("\nMAX31855K::SCG Fault: Thermocouple is shorted to GND"));
+        SerialUSB.println(F("\nMAX31855K::SCG Fault: Thermocouple is shorted to GND"));
       return 0b10;
     } else if (data.uint32 & (1<<2)) {
       if (debug)
-        Serial.println(F("\nMAX31855K::SCV Fault: Thermocouple is shorted to VCC"));
+        SerialUSB.println(F("\nMAX31855K::SCV Fault: Thermocouple is shorted to VCC"));
       return 0b100;
     } else {
       if (debug)
-        Serial.println(F("\nMAX31855K::Unknown Fault"));
+        SerialUSB.println(F("\nMAX31855K::Unknown Fault"));
       return 0b1000;
     }
   } else {

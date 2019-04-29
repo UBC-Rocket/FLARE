@@ -1,4 +1,4 @@
-/********************************** max31855k.h ********************************
+/********************************** MAX31855k.h ********************************
  * Copyright (c) 2015 SparkFun Electronics                                     *
  *                                                                             *
  * Permission is hereby granted, free of charge, to any person obtaining a     *
@@ -36,23 +36,26 @@
  * max31855k::F will return degrees Fahrenheit                                 *
  * max31855k::R will return degrees Rankine                                    *
  *******************************************************************************/
-#ifndef _SPARKFUN_MAX31855K_h_
-#define _SPARKFUN_MAX31855K_h_
+#ifndef _MAX31855K_h_
+#define _MAX31855K_h_
 
 #include <Arduino.h>
 #include "Sensors.h"
 #include <SPI.h> // Have to include this in the main sketch too... (Using SPI)
 
+/*Constants------------------------------------------------------------*/
+#define THERMO_SELECT_PIN 6
+
 const uint8_t NONE = 256; // This is used to indicate VCC or GND pin isn't used
 
-class SparkFunMAX31855k
+class MAX31855k
 {
 public:
   // Simple Arduino API style guide functions
-  inline float readTempC() { return readTemp(SparkFunMAX31855k::C); }
-  inline float readTempF() { return readTemp(SparkFunMAX31855k::F); }
-  inline float readTempR() { return readTemp(SparkFunMAX31855k::R); }
-  inline float readTempK() { return readTemp(SparkFunMAX31855k::K); }
+  inline float readTempC() { return readTemp(MAX31855k::C); }
+  inline float readTempF() { return readTemp(MAX31855k::F); }
+  inline float readTempR() { return readTemp(MAX31855k::R); }
+  inline float readTempK() { return readTemp(MAX31855k::K); }
 
   // More advanced code concepts used below
   enum units {
@@ -61,16 +64,16 @@ public:
   // If non-zero will turn on serial debugging messages
   uint8_t debug;
   // Returns the temperature in degrees F, K, R, or C (default if unspecified)
-  float readTemp(SparkFunMAX31855k::units _u=C);
+  float readTemp(MAX31855k::units _u=C);
   // Returns the cold junction temperature in ˚C
   float readCJT(void);
 
   // Pass a pin number to set as CS
   void setCS(int pin);
 
-  SparkFunMAX31855k(const uint8_t, const uint8_t _vcc=NONE,
+  MAX31855k(const uint8_t, const uint8_t _vcc=NONE,
                     const uint8_t _gnd=NONE, const bool _debug=0);
-  ~SparkFunMAX31855k() {} // User responsible 4 reassigning pins & stopping SPI
+  ~MAX31855k() {} // User responsible 4 reassigning pins & stopping SPI
 protected:
   union { // Union makes conversion from 4 bytes to an unsigned 32-bit int easy
     uint8_t bytes[4];
