@@ -46,7 +46,7 @@
 /*Constants------------------------------------------------------------*/
 #define THERMO_SELECT_PIN 6
 
-const uint8_t NONE = 256; // This is used to indicate VCC or GND pin isn't used
+const uint8_t NONE = 0; // This is used to indicate VCC or GND pin isn't used
 
 class MAX31855k
 {

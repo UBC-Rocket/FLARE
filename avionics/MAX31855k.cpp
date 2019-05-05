@@ -25,7 +25,7 @@
  ******************************************************************************/
 
 #include "MAX31855k.h"
-#include "Sensors.h"
+#include "sensors.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Description  : This constructor does the required setup
