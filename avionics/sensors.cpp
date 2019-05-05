@@ -240,6 +240,7 @@ void initSensors(InitStatus *status)
         }
     #endif // NOSECONE
 
+    /* init Thermocouple */
     #ifdef NOSECONE
         #ifdef TESTING
             SerialUSB.println("Initializing thermocouple");
@@ -248,7 +249,7 @@ void initSensors(InitStatus *status)
         float thermo_temp = probe.readCJT();
         if (!isnan(thermo_temp)) {
             #ifdef TESTING
-                SerialUSB.print("Cold Junction Temperature is (˚C): ");
+                SerialUSB.print("Cold Junction Temperature is [C]: ");
                 SerialUSB.println(thermo_temp);
                 SerialUSB.println("Thermocouple initialized");
             #endif
@@ -659,8 +660,7 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
         SerialUSB.println(GPS_data[1], 6);
         SerialUSB.print("GPS altitude:                       ");
         SerialUSB.println(GPS_data[2], 3);
-        SerialUSB.println("");
-        SerialUSB.print("Thermocouple:                       ");
+        SerialUSB.print("Thermocouple (C):                       ");
         SerialUSB.println(thermocouple_data);
         SerialUSB.println("");
         #endif

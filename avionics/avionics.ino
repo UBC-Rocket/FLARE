@@ -72,6 +72,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <i2c_t3.h>
+#include <SPI.h>
 #include <SD.h>
 #include <string.h>
 
