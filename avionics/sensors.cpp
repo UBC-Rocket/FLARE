@@ -660,7 +660,7 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
         SerialUSB.println(GPS_data[1], 6);
         SerialUSB.print("GPS altitude:                       ");
         SerialUSB.println(GPS_data[2], 3);
-        SerialUSB.print("Thermocouple (C):                       ");
+        SerialUSB.print("Thermocouple (C):                   ");
         SerialUSB.println(thermocouple_data);
         SerialUSB.println("");
         #endif
