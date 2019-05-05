@@ -64,6 +64,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "commands.h"
 #include "gpio.h"
 #include "radio.h"
+#include "xbee.h"
 #include "buzzer.h"
 #include "groundaltitude.h"
 #include "satcom.h"

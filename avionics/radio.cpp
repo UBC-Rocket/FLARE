@@ -89,8 +89,8 @@ void noseconeTierOne(float* GPS_data, unsigned long *timestamp, FlightStates sta
 }
 /**
   * @brief  Function to send the less essential data from the nosecone over radio,
-  * barameter temperature, accelerometer, tmeperature, and IMU data
-  * @param  float bar_data - barmoeter data array for temperature
+  * barometer temperature, accelerometer, temperature, and IMU data
+  * @param  float bar_data - barometer data array for temperature
   * @param  float acc_data - accelerometer data array
   * @param  float *temp_sensor_data - pointer for the temperature data
   * @param  float IMU_data - IMU data array
