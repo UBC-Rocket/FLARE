@@ -40,7 +40,7 @@
 #define _MAX31855K_h_
 
 #include <Arduino.h>
-#include "Sensors.h"
+#include "sensors.h"
 #include <SPI.h> // Have to include this in the main sketch too... (Using SPI)
 
 /*Constants------------------------------------------------------------*/
