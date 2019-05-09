@@ -26,7 +26,7 @@
 
 #define ACCELEROMETER_ADDRESS   0x18
 #define TEMP_SENSOR_ADDRESS     0x48
-#define IMU_ADDRESS             0x37
+#define IMU_ADDRESS             0x28
 #define ACCELEROMETER_SCALE     6
 #define BATTERY_SENSOR_PIN      9
 
