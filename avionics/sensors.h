@@ -5,7 +5,6 @@
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
 
-//#include <string.h>
 #include "radio.h"
 #include "statemachine.h"
 
@@ -21,12 +20,13 @@
 #define SerialUSB               Serial
 #define SerialGPS               Serial5
 #define SerialRadio             Serial2
+#define SPIThermo               SPI2
 
 #define EARTHS_GRAVITY          9.80665
 
 #define ACCELEROMETER_ADDRESS   0x18
 #define TEMP_SENSOR_ADDRESS     0x48
-#define IMU_ADDRESS             0x37
+#define IMU_ADDRESS             0x28
 #define ACCELEROMETER_SCALE     6
 #define BATTERY_SENSOR_PIN      9
 
@@ -38,7 +38,7 @@
 
 #define RADIO_DATA_ARRAY_SIZE   5
 
-#define NUM_SENSORS 8
+#define NUM_SENSORS 9
 #define FILE_STATUS_POSITION 0
 #define BATTERY_STATUS_POSITION 1
 #define ACCELEROMETER_STATUS_POSITION 2
@@ -47,6 +47,7 @@
 #define IMU_STATUS_POSITION 5
 #define EMATCH_STATUS_POSITION 6
 #define SATCOM_STATUS_POSITION 7
+#define THERMOCOUPLE_STATUS_POSITION 8
 
 /*Variables------------------------------------------------------------*/
 
@@ -69,20 +70,13 @@ const uint8_t GPS_set_NMEA_message[] = {0xA0, 0xA1, 0x00, 0x09, 0x08, 0x01, 0x00
 const uint8_t GPS_set_update_rate[] = {0xA0, 0xA1, 0x00, 0x03, 0x0E, 0x01, 0x00, 0x0F, 0x0D, 0x0A}; //1 Hz
 
 
-
-
 /*Functions------------------------------------------------------------*/
 void initSensors(InitStatus* status);
 float barSensorInit(void);
 
-void processRadioData(unsigned long*, float*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
-void sendRadioData(float data, char id);
 void generateStatusReport(InitStatus *status, char *statusReport1, char *statusReport2, char *statusReport3);
 void displayStatus(InitStatus *status);
-void pollSensors(unsigned long*, float*, float*, float*, float*, float*, float*);
-void logData(unsigned long *, float*, float*, float*, float*, float*, float*, FlightStates, float, float);
-void processRadioData(unsigned long*, float*, float*, float*, float*, float*, float*, FlightStates state, float altitude);
-void sendRadioData(float data, char id);
-
+void pollSensors(unsigned long*, float*, float*, float*, float*, float*, float*, float*);
+void logData(unsigned long *, float*, float*, float*, float*, float*, float*, FlightStates, float, float, float);
 
 #endif

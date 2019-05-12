@@ -22,12 +22,13 @@
 #include "MS5803_01.h"              //barometer
 #include "SparkFunTMP102.h"         //temp sensor
 #include "Adafruit_BNO055.h"        //IMU
-#include "GP20U7.h"           //GPS
+#include "GP20U7.h"                 //GPS
 #include "gpio.h"                   //GPIO
 #include "satcom.h"                 //SATCOM
 #include "commands.h"               //for sendRadioResponse(const char* response);
 #include "buzzer.h"                 //for buzzer response on startup
 #include "cameras.h"
+#include "MAX31855k.h"              //Thermocouple
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -41,7 +42,17 @@ Battery powerbattery(BATTERY_SENSOR_PIN);
 LIS331 accelerometer;
 MS_5803 barometer(1024);
 TMP102 temp_sensor(TEMP_SENSOR_ADDRESS);
-Adafruit_BNO055 IMU(IMU_ADDRESS);
+Adafruit_BNO055 IMU(-1, IMU_ADDRESS);
+
+#ifdef NOSECONE
+    #ifdef TESTING
+        // Self powered with debug output
+        MAX31855k probe(THERMO_SELECT_PIN, NONE, NONE, true);
+    #else
+        // Self powered with no debug messages
+        MAX31855k probe(THERMO_SELECT_PIN);
+    #endif  // TESTING
+#endif // NOSECONE
 
 
 /*Functions------------------------------------------------------------*/
@@ -136,7 +147,7 @@ void initSensors(InitStatus *status)
                 datalog.write("Time (ms), State, Battery Voltage (V),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
                 "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
                 "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
-                "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude,SatCom\n");
+                "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude,SatCom,Thermocouple (C)\n");
             #endif
             #ifdef BODY
                 datalog.write("BODY SENSOR LOG DATA\n");
@@ -227,8 +238,31 @@ void initSensors(InitStatus *status)
                 status->overview = NONCRITICAL_FAILURE;
             status->sensorNominal[SATCOM_STATUS_POSITION] = false;
         }
+    #endif // NOSECONE
 
-    #endif
+    /* init Thermocouple */
+    #ifdef NOSECONE
+        #ifdef TESTING
+            SerialUSB.println("Initializing thermocouple");
+        #endif
+
+        float thermo_temp = probe.readCJT();
+        if (!isnan(thermo_temp)) {
+            #ifdef TESTING
+                SerialUSB.print("Cold Junction Temperature is [C]: ");
+                SerialUSB.println(thermo_temp);
+                SerialUSB.println("Thermocouple initialized");
+            #endif
+        }
+        else{
+            if(status->overview < NONCRITICAL_FAILURE)
+                status->overview = NONCRITICAL_FAILURE;
+            status->sensorNominal[THERMOCOUPLE_STATUS_POSITION] = false;
+            #ifdef TESTING
+                SerialUSB.println("Thermocouple failed to init");
+            #endif
+        }
+    #endif // NOSECONE
 
     /* log initialization status for each sensor */
     // 'X' for N/A, 'G' for good, 'B' for bad
@@ -277,6 +311,12 @@ void initSensors(InitStatus *status)
             datalog.write("G\n");
         else
             datalog.write("B\n");
+
+        if(status->sensorNominal[THERMOCOUPLE_STATUS_POSITION])
+            datalog.write("G\n");
+        else
+            datalog.write("B\n");
+
     #endif
 
     /* transmit sensor report */
@@ -359,17 +399,24 @@ void generateStatusReport(InitStatus *status, char *statusReport1, char *statusR
     #endif
     #ifdef NOSECONE
         statusReport3[2] = 'X';
+
         if(status->sensorNominal[SATCOM_STATUS_POSITION])
             statusReport3[3] = 'G';
         else
             statusReport3[3] = 'B';
+
+        if(status->sensorNominal[THERMOCOUPLE_STATUS_POSITION])
+            statusReport3[4] = 'G';
+        else
+            statusReport3[4] = 'B';
+
     #endif
 
     #ifdef BODY
         statusReport3[3] = 'X';
+        statusReport3[4] = 'X';
     #endif
 
-    statusReport3[4] = 'X';
 }
 
 /*
@@ -448,7 +495,7 @@ float barSensorInit(void){
   * @return None
   */
 void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_data[], float bar_data[],
-                float *temp_sensor_data, float IMU_data[], float GPS_data[])
+                float *temp_sensor_data, float IMU_data[], float GPS_data[], float *thermocouple_data)
 {
     int16_t x, y, z;
 
@@ -474,7 +521,7 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
         SerialUSB.println("BAROMETER FAILED READING");
 
     #else
-    
+
     barometer.readSensor();
     #endif
 
@@ -504,6 +551,21 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
             getGPS(GPS_data);
         }
     #endif
+
+    #ifdef NOSECONE
+        #ifdef TESTING
+            SerialUSB.println("Polling Thermocouple");
+        #endif
+        *thermocouple_data = probe.readTempC();
+        #ifdef TESTING
+            if (!isnan(*thermocouple_data)) {
+                SerialUSB.print("Temp[C]=");
+                SerialUSB.println(*thermocouple_data);
+            }
+            else
+                SerialUSB.print("Thermocouple ERROR");
+        #endif
+    #endif
 }
 
 /**
@@ -519,7 +581,7 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
   */
 void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[], float bar_data[],
             float *temp_sensor_data, float IMU_data[], float GPS_data[],
-            FlightStates state, float altitude, float baseline_pressure)
+            FlightStates state, float altitude, float baseline_pressure, float thermocouple_data)
 {
     /*write data to SD card*/
     #ifdef TESTING
@@ -554,6 +616,9 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
             datalog.print(GPS_data[i], 6);
             datalog.print(",");
         }
+        datalog.print(",");
+        datalog.print(thermocouple_data);
+        datalog.print(",");
     #endif
     datalog.print("\n");
     datalog.flush();
@@ -595,6 +660,8 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
         SerialUSB.println(GPS_data[1], 6);
         SerialUSB.print("GPS altitude:                       ");
         SerialUSB.println(GPS_data[2], 3);
+        SerialUSB.print("Thermocouple (C):                   ");
+        SerialUSB.println(thermocouple_data);
         SerialUSB.println("");
         #endif
     #endif
