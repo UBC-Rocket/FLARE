@@ -65,12 +65,27 @@ void sendTierThree(float* battery_voltage, float* ground_altitude){
   * @param  unsigned long *timestamp - address for the timestamp
   * @return void
   */
-void bodyTierOne(float bar_data[], FlightStates state, float altitude, unsigned long *timestamp){
-    float time = *timestamp;
-    sendRadioData(time, 't');
-    sendRadioData(bar_data[0], UID_bar_pres);
-    sendRadioData( altitude, UID_altitude);
-    sendRadioData((float) state, UID_state);
+void bodyTierOne(XBee* radio, ZBTxRequest* txPacket, float bar_data[], FlightStates state, float altitude, uint32_t *timestamp){
+    // float time = *timestamp;
+
+    static uint8_t payload[20]; //random number
+    payload[0] = 0;
+    memcpy(payload + 1, timestamp, sizeof(float));
+    payload[5] = UID_bar_pres;
+    memcpy(payload + 1 + 5, bar_data, sizeof(float));
+    payload[10] = UID_altitude;
+    memcpy(payload + 1 + 10, &altitude, sizeof(float));
+    payload[15] = UID_state;
+    memcpy(payload + 1 + 15, &state, sizeof(float));
+
+    txPacket->setPayloadLength(20); //TODO: determine
+    txPacket->setPayload(payload);
+
+    // sendRadioData(time, 't');
+    // sendRadioData(bar_data[0], UID_bar_pres);
+    // sendRadioData( altitude, UID_altitude);
+    // sendRadioData((float) state, UID_state);
+
 }
 /**
   * @brief  Sends more essential data over radio from the nosecone, timestamp(WHICH SHOULD BE REMOVED) and GPS data
@@ -78,7 +93,7 @@ void bodyTierOne(float bar_data[], FlightStates state, float altitude, unsigned 
   * @param  unsigned long *timestamp - address for the timestamp
   * @return void
   */
-void noseconeTierOne(float* GPS_data, unsigned long *timestamp, FlightStates state, float altitude){
+void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float* GPS_data, unsigned long *timestamp, FlightStates state, float altitude){
     float time = *timestamp;
     sendRadioData(time, 't');
     sendRadioData(GPS_data[0], UID_GPS_lat);

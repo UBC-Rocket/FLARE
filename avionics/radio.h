@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include "statemachine.h"
+#include "XBee.h"
 
 /*Constants------------------------------------------------------------*/
 /*radio data unique identifiers*/
@@ -29,14 +30,17 @@ const char UID_batt = 'b';  //Battery voltage
 const char UID_ground_altitude = 'g';//Ground Altitude
 const char UID_status = 'S';  //Status
 
+#define GROUND_STATION_ADDR_MSB 0x0013A200
+#define GROUND_STATION_ADDR_LSB 0x41678FC0
+
 /*Functions------------------------------------------------------------*/
 void sendRadioData(float data, char id);
 void sendTierOne(unsigned long*, float*, float*, FlightStates state, float altitude);
 void sendTierTwo(float*, float*, float*, float*);
 void sendTierThree(float*, float*);
-void bodyTierOne(float*, FlightStates state, float altitude, unsigned long*);
+void bodyTierOne(XBee* radio, ZBTxRequest* txPacket, float*, FlightStates state, float altitude, uint32_t*);
 //void bodyTierTwo(float*); not needed
-void noseconeTierOne(float*, unsigned long*, FlightStates state, float);
+void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float*, unsigned long*, FlightStates state, float);
 void noseconeTierTwo(float*, float*, float*, float*);
 
 #endif

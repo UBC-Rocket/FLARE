@@ -224,12 +224,7 @@ void initSensors(InitStatus *status)
 
     #endif
 
-    /*init radio*/
-    #ifdef TESTING
-    SerialUSB.println("Initializing radio");
-    #endif
-    SerialRadio.begin(921600);
-    while (!SerialRadio) {}
+
 
     #ifdef NOSECONE
         /*init satcom*/

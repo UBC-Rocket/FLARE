@@ -84,6 +84,10 @@ static float pressure_set[PRESSURE_AVG_SET_SIZE]; //set of pressure values for a
 static float baseline_pressure;
 static float ground_alt_arr[GROUND_ALT_SIZE]; //values for the baseline pressure calculation
 
+static XBee radio = XBee();
+static XBeeAddress64 groundAddress = XBeeAddress64(GROUND_STATION_ADDR_MSB, GROUND_STATION_ADDR_LSB);
+static ZBTxRequest txPacket = ZBTxRequest();
+
 /*Functions------------------------------------------------------------*/
 /**
   * @brief  The Arduino setup function
@@ -96,12 +100,26 @@ void setup()
 
     initPins();
 
-    /*init serial comms*/
+    /* Setup all UART comms */
+    // Serial comms to computer
     #ifdef TESTING
     SerialUSB.begin(9600);
     while (!SerialUSB) {}
     SerialUSB.println("Initializing...");
     #endif
+
+    // Comms to radio serial port
+    #ifdef TESTING
+    SerialUSB.println("Initializing radio");
+    #endif
+    SerialRadio.begin(921600);
+    while (!SerialRadio) {}
+    radio.setSerial(SerialRadio);
+    txPacket.setAddress64(groundAddress);
+
+    // Comms to camera serial port
+    SerialCamera.begin(CameraBaud);
+    while (!SerialCamera) {}
 
     /*init I2C bus*/
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400); //400kHz
@@ -109,10 +127,6 @@ void setup()
 
     /*init sensors and report status in many ways*/
     initSensors(&s_statusOfInit);
-
-    /*init camera serial port*/
-    SerialCamera.begin(CameraBaud);
-    while (!SerialCamera) {}
 
     /* init various arrays */
     baseline_pressure = barSensorInit(); /* for baseline pressure calculation */
@@ -135,7 +149,7 @@ void setup()
   */
 void loop()
 {
-    static unsigned long timestamp;
+    uint32_t timestamp;
     static unsigned long old_time = 0; //ms
     static unsigned long new_time = 0; //ms
     unsigned long delta_time;
@@ -153,12 +167,15 @@ void loop()
 
     static FlightStates state = STANDBY;
 
-    static unsigned long tier_one_old_time = 0;
-    static uint16_t tier_one_interval = 400;
+    static unsigned long radio_old_time = 0;
+    static unsigned long radio_time_interval = 400; //milliseconds
+
+    // static unsigned long tier_one_old_time = 0;
+    // static uint16_t tier_one_interval = 400;
 
     #ifdef NOSECONE
-        static uint16_t tier_two_interval = 2000;
-        static unsigned long tier_two_old_time = 0;
+        // static uint16_t tier_two_interval = 2000;
+        // static unsigned long tier_two_old_time = 0;
 
         static bool mainDeploySatcomSent = false;
         static int landedSatcomSentCount = 0;
@@ -207,22 +224,23 @@ void loop()
     }
 
 
-    if((new_time - tier_one_old_time) >= tier_one_interval) {
+    // if((new_time - tier_one_old_time) >= tier_one_interval) {
+    if((new_time - radio_old_time) >= radio_time_interval) {
         #ifdef BODY
-            bodyTierOne(bar_data, state, altitude, &timestamp);
+            // bodyTierOne(bar_data, state, altitude, &timestamp);
         #endif  // def BODY
         #ifdef NOSECONE
-            noseconeTierOne(GPS_data, &timestamp, state, altitude);
+            // noseconeTierOne(GPS_data, &timestamp, state, altitude);
         #endif  //def NOSECONE
-        tier_one_old_time = new_time;
+        radio_old_time = new_time;
     }
 
-    #ifdef NOSECONE
-    if ( (new_time - tier_two_old_time) >= tier_two_interval ){
-        noseconeTierTwo(bar_data, acc_data, &temp_sensor_data, IMU_data);
-        tier_two_old_time = new_time;
-    }
-    #endif // def NOSECONE
+    // #ifdef NOSECONE
+    // if ( (new_time - tier_two_old_time) >= tier_two_interval ){
+    //     noseconeTierTwo(bar_data, acc_data, &temp_sensor_data, IMU_data);
+    //     tier_two_old_time = new_time;
+    // }
+    // #endif // def NOSECONE
 
     if (s_statusOfInit.overview == NONCRITICAL_FAILURE)
     {
