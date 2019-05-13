@@ -227,7 +227,7 @@ void loop()
     // if((new_time - tier_one_old_time) >= tier_one_interval) {
     if((new_time - radio_old_time) >= radio_time_interval) {
         #ifdef BODY
-            // bodyTierOne(bar_data, state, altitude, &timestamp);
+            // bodyTierOne(bar_data, state, altitude, &timestamp); //Once these get uncommented, recheck the fcn prototypes
         #endif  // def BODY
         #ifdef NOSECONE
             // noseconeTierOne(GPS_data, &timestamp, state, altitude);

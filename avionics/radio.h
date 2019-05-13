@@ -40,7 +40,8 @@ void sendTierTwo(float*, float*, float*, float*);
 void sendTierThree(float*, float*);
 void bodyTierOne(XBee* radio, ZBTxRequest* txPacket, float*, FlightStates state, float altitude, uint32_t*);
 //void bodyTierTwo(float*); not needed
-void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float*, unsigned long*, FlightStates state, float);
-void noseconeTierTwo(float*, float*, float*, float*);
+void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
+                     float bar_data[], float acc_data[], float *temp_sensor_data, float IMU_data[]);
+// void noseconeTierTwo(float*, float*, float*, float*);
 
 #endif

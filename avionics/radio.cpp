@@ -66,9 +66,8 @@ void sendTierThree(float* battery_voltage, float* ground_altitude){
   * @return void
   */
 void bodyTierOne(XBee* radio, ZBTxRequest* txPacket, float bar_data[], FlightStates state, float altitude, uint32_t *timestamp){
-    // float time = *timestamp;
 
-    static uint8_t payload[20]; //random number
+    static uint8_t payload[20];
     payload[0] = 0;
     memcpy(payload + 1, timestamp, sizeof(float));
     payload[5] = UID_bar_pres;
@@ -78,29 +77,64 @@ void bodyTierOne(XBee* radio, ZBTxRequest* txPacket, float bar_data[], FlightSta
     payload[15] = UID_state;
     memcpy(payload + 1 + 15, &state, sizeof(float));
 
-    txPacket->setPayloadLength(20); //TODO: determine
+    txPacket->setPayloadLength(20);
     txPacket->setPayload(payload);
 
-    // sendRadioData(time, 't');
-    // sendRadioData(bar_data[0], UID_bar_pres);
-    // sendRadioData( altitude, UID_altitude);
-    // sendRadioData((float) state, UID_state);
-
+    radio->send(*txPacket);
 }
 /**
-  * @brief  Sends more essential data over radio from the nosecone, timestamp(WHICH SHOULD BE REMOVED) and GPS data
+  * @brief  Sends more essential data over radio from the nosecone, and GPS data
   * @param  float GPS_data - gps data array
   * @param  unsigned long *timestamp - address for the timestamp
   * @return void
   */
-void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float* GPS_data, unsigned long *timestamp, FlightStates state, float altitude){
-    float time = *timestamp;
-    sendRadioData(time, 't');
-    sendRadioData(GPS_data[0], UID_GPS_lat);
-    sendRadioData(GPS_data[1], UID_GPS_long);
-    sendRadioData(GPS_data[2], UID_GPS_alt);
-    sendRadioData((float) state, UID_state);
-    sendRadioData( altitude, UID_altitude);
+void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
+                     float bar_data[], float acc_data[], float *temp_sensor_data, float IMU_data[]){
+
+    static uint8_t payload[55];
+
+    payload[0] = UID_GPS_lat;
+    memcpy(payload + 1, GPS_data, sizeof(float));
+    payload[5] = UID_GPS_long;
+    memcpy(payload + 1 + 5, GPS_data + 1, sizeof(float));
+    payload[10] = UID_GPS_alt;
+    memcpy(payload + 1 + 10, GPS_data + 2, sizeof(float));
+    payload[15] = UID_bar_temp;
+    memcpy(payload + 1 + 15, bar_data + 1, sizeof(float));
+    payload[20] = UID_acc_acc_x;
+    memcpy(payload + 1 + 20, acc_data, sizeof(float));
+    payload[25] = UID_acc_acc_y;
+    memcpy(payload + 1 + 25, acc_data + 1, sizeof(float));
+    payload[30] = UID_acc_acc_z;
+    memcpy(payload + 1 + 30, acc_data + 2, sizeof(float));
+    payload[35] = UID_temp_temp;
+    memcpy(payload + 1 + 35, temp_sensor_data, sizeof(float));
+    payload[40] = UID_IMU_yaw;
+    memcpy(payload + 1 + 40, IMU_data, sizeof(float));
+    payload[45] = UID_IMU_roll;
+    memcpy(payload + 1 + 45, IMU_data + 1, sizeof(float));
+    payload[50] = UID_IMU_pitch;
+    memcpy(payload + 1 + 50, IMU_data + 2, sizeof(float));
+
+    txPacket->setPayloadLength(55);
+    txPacket->setPayload(payload);
+
+    radio->send(*txPacket);
+    // sendRadioData(GPS_data[0], UID_GPS_lat);
+    // sendRadioData(GPS_data[1], UID_GPS_long);
+    // sendRadioData(GPS_data[2], UID_GPS_alt);
+    // sendRadioData((float) state, UID_state);
+    // sendRadioData( altitude, UID_altitude);
+
+    /* Copied from tier2: */
+    // sendRadioData(bar_data[1], UID_bar_temp);
+    // sendRadioData(*temp_sensor_data, UID_temp_temp);
+    // sendRadioData(IMU_data[0], UID_IMU_yaw);
+    // sendRadioData(IMU_data[1], UID_IMU_roll);
+    // sendRadioData(IMU_data[2], UID_IMU_pitch);
+    // sendRadioData(acc_data[0], UID_acc_acc_x);
+    // sendRadioData(acc_data[1], UID_acc_acc_y);
+    // sendRadioData(acc_data[2], UID_acc_acc_z);
 }
 /**
   * @brief  Function to send the less essential data from the nosecone over radio,
@@ -111,16 +145,16 @@ void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float* GPS_data, unsign
   * @param  float IMU_data - IMU data array
   * @return void
   */
-void noseconeTierTwo(float bar_data[], float acc_data[], float *temp_sensor_data, float IMU_data[]){
-    sendRadioData(bar_data[1], UID_bar_temp);
-    sendRadioData(*temp_sensor_data, UID_temp_temp);
-    sendRadioData(IMU_data[0], UID_IMU_yaw);
-    sendRadioData(IMU_data[1], UID_IMU_roll);
-    sendRadioData(IMU_data[2], UID_IMU_pitch);
-    sendRadioData(acc_data[0], UID_acc_acc_x);
-    sendRadioData(acc_data[1], UID_acc_acc_y);
-    sendRadioData(acc_data[2], UID_acc_acc_z);
-}
+// void noseconeTierTwo(float bar_data[], float acc_data[], float *temp_sensor_data, float IMU_data[]){
+//     sendRadioData(bar_data[1], UID_bar_temp);
+//     sendRadioData(*temp_sensor_data, UID_temp_temp);
+//     sendRadioData(IMU_data[0], UID_IMU_yaw);
+//     sendRadioData(IMU_data[1], UID_IMU_roll);
+//     sendRadioData(IMU_data[2], UID_IMU_pitch);
+//     sendRadioData(acc_data[0], UID_acc_acc_x);
+//     sendRadioData(acc_data[1], UID_acc_acc_y);
+//     sendRadioData(acc_data[2], UID_acc_acc_z);
+// }
 
 /**
   * @brief  Takes a 4 byte float and sends each byte sequentially over the radio
