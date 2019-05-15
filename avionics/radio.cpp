@@ -157,6 +157,36 @@ void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
 // }
 
 /**
+  * @brief  Deals with all received messages from the radio driver, including commands and status.
+  * @param  XBee radio
+  * @param  char id - data identifier
+  * @return void
+  */
+void resolveRadioRx(XBee* radio, FlightStates *state, InitStatus *status)
+{
+    static ZBRxResponse rx = ZBRxResponse();
+    static char command = '\0';
+
+    radio->readPacket();
+    while(radio->getResponse().isAvailable() || radio->getResponse().isError()) //goes through all radio packets in buffer
+    {
+        #ifdef TESTING
+            //SerialUSB.println("Radio received something")
+        #endif
+
+        if(radio->getResponse().getApiId() == ZB_RX_RESPONSE) //received command from radio
+        {
+            radio->getResponse().getZBRxResponse(rx);
+            command = *(rx.getData());
+            doCommand(command, state, status);
+        }
+        // else if(radio.getResponse().getApiId() == ZB_TX_STATUS_RESPONSE) {}
+        // essentially an acknowledge of delivery status. may be useful later
+
+        radio->readPacket();
+    }
+}
+/**
   * @brief  Takes a 4 byte float and sends each byte sequentially over the radio
   * @param  float data - one float worth of data to be sent via radio
   * @param  char id - data identifier

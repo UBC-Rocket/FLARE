@@ -19,6 +19,7 @@
 #define STATUS 'S'
 #define STARTUP_BUZZER 'B'
 #define RECOVERY_BUZZER 'b'
+#define DO_NOTHING '\0'
 
 
 /*Variables------------------------------------------------------------*/

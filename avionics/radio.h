@@ -7,7 +7,9 @@
 #include <stdint.h>
 
 #include "statemachine.h"
+#include "sensors.h"
 #include "XBee.h"
+#include "commands.h"
 
 /*Constants------------------------------------------------------------*/
 /*radio data unique identifiers*/
@@ -43,5 +45,7 @@ void bodyTierOne(XBee* radio, ZBTxRequest* txPacket, float*, FlightStates state,
 void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
                      float bar_data[], float acc_data[], float *temp_sensor_data, float IMU_data[]);
 // void noseconeTierTwo(float*, float*, float*, float*);
+
+void resolveRadioRx(XBee* radio, FlightStates *state, InitStatus *status);
 
 #endif

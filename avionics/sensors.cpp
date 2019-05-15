@@ -29,6 +29,8 @@
 #include "buzzer.h"                 //for buzzer response on startup
 #include "cameras.h"
 #include "MAX31855k.h"              //Thermocouple
+#include "radio.h"
+#include "statemachine.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>

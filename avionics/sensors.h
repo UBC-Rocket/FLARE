@@ -5,7 +5,6 @@
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
 
-#include "radio.h"
 #include "statemachine.h"
 
 

@@ -187,11 +187,14 @@ void loop()
         state = WINTER_CONTINGENCY; //makes sure that even if it does somehow get accidentally changed, it gets reverted
 
     // if radio communications are received
-    if (SerialRadio.available() >= 5)
-        communicateThroughSerial(&state, &s_statusOfInit);
+    resolveRadioRx(&radio, &state, &s_statusOfInit);
+
+    // if (SerialRadio.available() >= 5)
+    //     communicateThroughSerial(&state, &s_statusOfInit);
+
 
     #ifdef NOSECONE
-     /* send radio data */
+     /* send satcom data */
     if(state == FINAL_DESCENT && !mainDeploySatcomSent)
     {
         mainDeploySatcomSent = true;

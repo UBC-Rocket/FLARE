@@ -75,12 +75,16 @@ void doCommand(char command, FlightStates *state, InitStatus *status){
             sendRadioResponse(statusReport2);
             sendRadioResponse(statusReport3);
             break;
+
         case STARTUP_BUZZER:
             // add the buzzer command
             break;
 
         case RECOVERY_BUZZER:
             // add the recovery buzzer command
+            break;
+            
+        case DO_NOTHING:
             break;
 
         default:
