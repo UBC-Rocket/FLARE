@@ -25,7 +25,7 @@
 /*Variables------------------------------------------------------------*/
 
 /*Functions------------------------------------------------------------*/
-void doCommand(char,FlightStates * state, InitStatus *status);
+// void doCommand(char,FlightStates * state, InitStatus *status);
 void sendRadioResponse(const char*);
 void communicateThroughSerial(FlightStates * state, InitStatus * status);
 bool checkCommand(char*);

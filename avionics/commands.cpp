@@ -29,72 +29,72 @@
   * @param  InitStatus *status - Sensor status structure
   * @return void
   */
-void doCommand(char command, FlightStates *state, InitStatus *status){
-    switch (command){
-        case ARM:
-            if(*state == STANDBY) { //Don't want to switch out of drogue deploy or something into Armed
-                switchState(state, ARMED);
-                digitalWrite(FLIGHT_LED, HIGH);
-                // turn on cameras
-                start_record();
-            }
+// void doCommand(char command, FlightStates *state, InitStatus *status){
+//     switch (command){
+//         case ARM:
+//             if(*state == STANDBY) { //Don't want to switch out of drogue deploy or something into Armed
+//                 switchState(state, ARMED);
+//                 digitalWrite(FLIGHT_LED, HIGH);
+//                 // turn on cameras
+//                 start_record();
+//             }
 
-            break;
+//             break;
 
-        case CAMERAS_ON:
-            start_record();
-            break;
+//         case CAMERAS_ON:
+//             start_record();
+//             break;
 
-        case CAMERAS_OFF:
-            stop_record();
-            break;
+//         case CAMERAS_OFF:
+//             stop_record();
+//             break;
 
-        case RESET:
-            break;
+//         case RESET:
+//             break;
 
-        case MAIN:
-            #ifdef GROUND_TEST  // Ground radio testing purposes
-            digitalWrite(FLIGHT_LED, HIGH);
-            deployMain();
-            #endif
-            break;
+//         case MAIN:
+//             #ifdef GROUND_TEST  // Ground radio testing purposes
+//             digitalWrite(FLIGHT_LED, HIGH);
+//             deployMain();
+//             #endif
+//             break;
 
-        case DROGUE:
-            #ifdef GROUND_TEST
-            //testing purposes!
-            digitalWrite(FLIGHT_LED,LOW);
-            deployDrogue();
-            #endif
+//         case DROGUE:
+//             #ifdef GROUND_TEST
+//             //testing purposes!
+//             digitalWrite(FLIGHT_LED, LOW);
+//             deployDrogue();
+//             #endif
 
-        case STATUS:
-            char statusReport1[RADIO_DATA_ARRAY_SIZE];
-            char statusReport2[RADIO_DATA_ARRAY_SIZE];
-            char statusReport3[RADIO_DATA_ARRAY_SIZE];
-            generateStatusReport(status, statusReport1, statusReport2, statusReport3);
-            sendRadioResponse(statusReport1);
-            sendRadioResponse(statusReport2);
-            sendRadioResponse(statusReport3);
-            break;
+//         case STATUS:
+//             // char statusReport1[RADIO_DATA_ARRAY_SIZE];
+//             // char statusReport2[RADIO_DATA_ARRAY_SIZE];
+//             // char statusReport3[RADIO_DATA_ARRAY_SIZE];
+//             // generateStatusReport(status, statusReport1, statusReport2, statusReport3);
+//             // sendRadioResponse(statusReport1);
+//             // sendRadioResponse(statusReport2);
+//             // sendRadioResponse(statusReport3);
+//             break;
 
-        case STARTUP_BUZZER:
-            // add the buzzer command
-            break;
+//         case STARTUP_BUZZER:
+//             // add the buzzer command
+//             break;
 
-        case RECOVERY_BUZZER:
-            // add the recovery buzzer command
-            break;
-            
-        case DO_NOTHING:
-            break;
+//         case RECOVERY_BUZZER:
+//             // add the recovery buzzer command
+//             break;
 
-        default:
-            #ifdef TESTING
-            SerialUSB.println("ERROR: COMMAND NOT RECOGNIZED");
-            #endif
-            break;
-    }
+//         case DO_NOTHING:
+//             break;
 
-}
+//         default:
+//             #ifdef TESTING
+//             SerialUSB.println("ERROR: COMMAND NOT RECOGNIZED");
+//             #endif
+//             break;
+//     }
+
+// }
 
 /** void sendRadioResponse(const char*)
   * @brief  Takes a 5 byte char and sequentially sends it over the radio

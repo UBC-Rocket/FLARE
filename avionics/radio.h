@@ -32,6 +32,20 @@ const char UID_batt = 'b';  //Battery voltage
 const char UID_ground_altitude = 'g';//Ground Altitude
 const char UID_status = 'S';  //Status
 
+/* commands */
+#define ARM 'r'
+#define CAMERAS_ON 'C'
+#define CAMERAS_OFF 'O'
+#define RESET 'R'
+#define PING 'p'
+#define MAIN 'm'
+#define DROGUE 'd'
+#define STATUS 'S'
+#define STARTUP_BUZZER 'B'
+#define RECOVERY_BUZZER 'b'
+#define DO_NOTHING '\0'
+
+/* radio addressing */
 #define GROUND_STATION_ADDR_MSB 0x0013A200
 #define GROUND_STATION_ADDR_LSB 0x41678FC0
 
@@ -47,5 +61,5 @@ void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
 // void noseconeTierTwo(float*, float*, float*, float*);
 
 void resolveRadioRx(XBee* radio, FlightStates *state, InitStatus *status);
-
+void doCommand(char,FlightStates * state, InitStatus *status);
 #endif
