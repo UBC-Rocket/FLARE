@@ -9,7 +9,6 @@
 #include "statemachine.h"
 #include "sensors.h"
 #include "XBee.h"
-#include "commands.h"
 
 /*Constants------------------------------------------------------------*/
 /*radio data unique identifiers*/

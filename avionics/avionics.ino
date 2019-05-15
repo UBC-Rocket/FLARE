@@ -61,7 +61,6 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "sensors.h"
 #include "statemachine.h"
 #include "calculations.h"
-#include "commands.h"
 #include "gpio.h"
 #include "radio.h"
 #include "xbee.h"

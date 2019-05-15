@@ -25,7 +25,6 @@
 #include "GP20U7.h"                 //GPS
 #include "gpio.h"                   //GPIO
 #include "satcom.h"                 //SATCOM
-#include "commands.h"               //for sendRadioResponse(const char* response);
 #include "buzzer.h"                 //for buzzer response on startup
 #include "cameras.h"
 #include "MAX31855k.h"              //Thermocouple
@@ -325,14 +324,14 @@ void initSensors(InitStatus *status)
         // e.g. if all things succeeded except accelerometer, code sends:
         // "S-1-G-B-G", "S-2-G-G-G", "S-3-G-X-X"
 
-    char statusReport1[RADIO_DATA_ARRAY_SIZE];
-    char statusReport2[RADIO_DATA_ARRAY_SIZE];
-    char statusReport3[RADIO_DATA_ARRAY_SIZE];
+    // char statusReport1[RADIO_DATA_ARRAY_SIZE];
+    // char statusReport2[RADIO_DATA_ARRAY_SIZE];
+    // char statusReport3[RADIO_DATA_ARRAY_SIZE];
 
-    generateStatusReport(status, statusReport1, statusReport2, statusReport3);
-    sendRadioResponse(statusReport1);
-    sendRadioResponse(statusReport2);
-    sendRadioResponse(statusReport3);
+    // generateStatusReport(status, statusReport1, statusReport2, statusReport3);
+    // sendRadioResponse(statusReport1);
+    // sendRadioResponse(statusReport2);
+    // sendRadioResponse(statusReport3);
 
     displayStatus(status);
     return;
