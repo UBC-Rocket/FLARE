@@ -33,35 +33,35 @@
 
 //send pressure, gps, state, and altitude over radio
 //Functions for testing purposes
-void  sendTierOne(unsigned long *timestamp, float *GPS_data, float bar_data[], FlightStates state, float altitude){
-    float time = *timestamp;
-    sendRadioData(time, 't');
-    sendRadioData(bar_data[0], UID_bar_pres);
-    sendRadioData(GPS_data[0], UID_GPS_lat);
-    sendRadioData(GPS_data[1], UID_GPS_long);
-    sendRadioData(GPS_data[2], UID_GPS_alt);
-    sendRadioData( altitude, UID_altitude);
-    sendRadioData((float) state, UID_state);
-}
+// void sendTierOne(unsigned long *timestamp, float *GPS_data, float bar_data[], FlightStates state, float altitude){
+//     float time = *timestamp;
+//     sendRadioData(time, 't');
+//     sendRadioData(bar_data[0], UID_bar_pres);
+//     sendRadioData(GPS_data[0], UID_GPS_lat);
+//     sendRadioData(GPS_data[1], UID_GPS_long);
+//     sendRadioData(GPS_data[2], UID_GPS_alt);
+//     sendRadioData( altitude, UID_altitude);
+//     sendRadioData((float) state, UID_state);
+// }
 
-//Send Acceleration, IMU data, and temperature
-//Functions for testing purposes
-void sendTierTwo(float acc_data[], float bar_data[], float *temp_sensor_data, float IMU_data[]){
-    sendRadioData(bar_data[1], UID_bar_temp);
-    sendRadioData(*temp_sensor_data, UID_temp_temp);
-    sendRadioData(IMU_data[0], UID_IMU_yaw);
-    sendRadioData(IMU_data[1], UID_IMU_roll);
-    sendRadioData(IMU_data[2], UID_IMU_pitch);
-    sendRadioData(acc_data[0], UID_acc_acc_x);
-    sendRadioData(acc_data[1], UID_acc_acc_y);
-    sendRadioData(acc_data[2], UID_acc_acc_z);
-}
-//Send data that only needs to be sent once, battery voltage, Ground Altitude
-//Functions for testing purposes
-void sendTierThree(float* battery_voltage, float* ground_altitude){
-    sendRadioData(*ground_altitude, UID_ground_altitude);
-    sendRadioData(*battery_voltage, UID_batt);
-}
+// //Send Acceleration, IMU data, and temperature
+// //Functions for testing purposes
+// void sendTierTwo(float acc_data[], float bar_data[], float *temp_sensor_data, float IMU_data[]){
+//     sendRadioData(bar_data[1], UID_bar_temp);
+//     sendRadioData(*temp_sensor_data, UID_temp_temp);
+//     sendRadioData(IMU_data[0], UID_IMU_yaw);
+//     sendRadioData(IMU_data[1], UID_IMU_roll);
+//     sendRadioData(IMU_data[2], UID_IMU_pitch);
+//     sendRadioData(acc_data[0], UID_acc_acc_x);
+//     sendRadioData(acc_data[1], UID_acc_acc_y);
+//     sendRadioData(acc_data[2], UID_acc_acc_z);
+// }
+// //Send data that only needs to be sent once, battery voltage, Ground Altitude
+// //Functions for testing purposes
+// void sendTierThree(float* battery_voltage, float* ground_altitude){
+//     sendRadioData(*ground_altitude, UID_ground_altitude);
+//     sendRadioData(*battery_voltage, UID_batt);
+// }
 /**
   * @brief  Send more essential data from the body over radio, pressure, state, altitude, timestamp
   * @param  float bar_data - baramoeter data array
@@ -197,22 +197,6 @@ void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, FlightStates *state, Ini
         radio->readPacket();
     }
 }
-/**
-  * @brief  Takes a 4 byte float and sends each byte sequentially over the radio
-  * @param  float data - one float worth of data to be sent via radio
-  * @param  char id - data identifier
-  * @return void
-  */
-void sendRadioData(float data, char id){
-    //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly
-    u_int8_t b[4];
-    *(float*) b = data;
-    SerialRadio.write(id);
-    for(int i=0; i<4; i++)
-    {
-        SerialRadio.write(b[i]);
-    }
-}
 
 /** void doCommand(char, FlightStates *state, InitStatus *status)
   * @brief  Takes a radio command input and executes the command
@@ -325,3 +309,13 @@ void radioStatus(XBee* radio, ZBTxRequest* txPacket, InitStatus *status)
     radio->send(*txPacket);
 }
 
+// void sendRadioData(float data, char id){
+//     //teensy should be little endian, which means least significant is stored first, make sure ground station decodes accordingly
+//     u_int8_t b[4];
+//     *(float*) b = data;
+//     SerialRadio.write(id);
+//     for(int i=0; i<4; i++)
+//     {
+//         SerialRadio.write(b[i]);
+//     }
+// }
