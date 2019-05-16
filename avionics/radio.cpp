@@ -167,7 +167,7 @@ void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
   * @param  char id - data identifier
   * @return void
   */
-void resolveRadioRx(XBee* radio, FlightStates *state, InitStatus *status)
+void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, FlightStates *state, InitStatus *status)
 {
     static ZBRxResponse rx = ZBRxResponse();
     static char command = '\0';
@@ -179,11 +179,17 @@ void resolveRadioRx(XBee* radio, FlightStates *state, InitStatus *status)
             //SerialUSB.println("Radio received something")
         #endif
 
-        if(radio->getResponse().getApiId() == ZB_RX_RESPONSE) //received command from radio
+        if(radio->getResponse().isError()) //will we use this?
+        {
+            // #ifdef TESTING
+            //     SerialUSB.println("Radio error");
+            // #endif
+        }
+        else if(radio->getResponse().getApiId() == ZB_RX_RESPONSE) //received command from radio
         {
             radio->getResponse().getZBRxResponse(rx);
             command = *(rx.getData());
-            doCommand(command, state, status);
+            doCommand(command, state, status, radio, txPacket);
         }
         // else if(radio.getResponse().getApiId() == ZB_TX_STATUS_RESPONSE) {}
         // essentially an acknowledge of delivery status. may be useful later
@@ -215,7 +221,7 @@ void sendRadioData(float data, char id){
   * @param  InitStatus *status - Sensor status structure
   * @return void
   */
-void doCommand(char command, FlightStates *state, InitStatus *status){
+void doCommand(char command, FlightStates *state, InitStatus *status, XBee* radio, ZBTxRequest* txPacket){
     switch (command){
         case ARM:
             if(*state == STANDBY) { //Don't want to switch out of drogue deploy or something into Armed
@@ -253,13 +259,7 @@ void doCommand(char command, FlightStates *state, InitStatus *status){
             #endif
 
         case STATUS:
-            // char statusReport1[RADIO_DATA_ARRAY_SIZE];
-            // char statusReport2[RADIO_DATA_ARRAY_SIZE];
-            // char statusReport3[RADIO_DATA_ARRAY_SIZE];
-            // generateStatusReport(status, statusReport1, statusReport2, statusReport3);
-            // sendRadioResponse(statusReport1);
-            // sendRadioResponse(statusReport2);
-            // sendRadioResponse(statusReport3);
+            radioStatus(radio, txPacket, status);
             break;
 
         case STARTUP_BUZZER:

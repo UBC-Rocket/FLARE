@@ -83,9 +83,9 @@ static float pressure_set[PRESSURE_AVG_SET_SIZE]; //set of pressure values for a
 static float baseline_pressure;
 static float ground_alt_arr[GROUND_ALT_SIZE]; //values for the baseline pressure calculation
 
-static XBee radio = XBee();
-static XBeeAddress64 groundAddress = XBeeAddress64(GROUND_STATION_ADDR_MSB, GROUND_STATION_ADDR_LSB);
-static ZBTxRequest txPacket = ZBTxRequest();
+static XBee s_radio = XBee();
+static XBeeAddress64 s_groundAddress = XBeeAddress64(GROUND_STATION_ADDR_MSB, GROUND_STATION_ADDR_LSB);
+static ZBTxRequest s_txPacket = ZBTxRequest();
 
 /*Functions------------------------------------------------------------*/
 /**
@@ -113,8 +113,8 @@ void setup()
     #endif
     SerialRadio.begin(921600);
     while (!SerialRadio) {}
-    radio.setSerial(SerialRadio);
-    txPacket.setAddress64(groundAddress);
+    s_radio.setSerial(SerialRadio);
+    s_txPacket.setAddress64(s_groundAddress);
 
     // Comms to camera serial port
     SerialCamera.begin(CameraBaud);
@@ -126,6 +126,7 @@ void setup()
 
     /*init sensors and report status in many ways*/
     initSensors(&s_statusOfInit);
+    radioStatus(&s_radio, &s_txPacket, &s_statusOfInit);
 
     /* init various arrays */
     baseline_pressure = barSensorInit(); /* for baseline pressure calculation */
@@ -186,11 +187,7 @@ void loop()
         state = WINTER_CONTINGENCY; //makes sure that even if it does somehow get accidentally changed, it gets reverted
 
     // if radio communications are received
-    resolveRadioRx(&radio, &state, &s_statusOfInit);
-
-    // if (SerialRadio.available() >= 5)
-    //     communicateThroughSerial(&state, &s_statusOfInit);
-
+    resolveRadioRx(&s_radio, &s_txPacket, &state, &s_statusOfInit);
 
     #ifdef NOSECONE
      /* send satcom data */
@@ -229,10 +226,10 @@ void loop()
     // if((new_time - tier_one_old_time) >= tier_one_interval) {
     if((new_time - radio_old_time) >= radio_time_interval) {
         #ifdef BODY
-            bodyTierOne(&radio, &txPacket, bar_data, state, altitude, &timestamp);
+            bodyTierOne(&s_radio, &s_txPacket, bar_data, state, altitude, &timestamp);
         #endif  // def BODY
         #ifdef NOSECONE
-            noseconeTierOne(&radio, &txPacket, GPS_data, bar_data, acc_data, *temp_sensor_data, IMU_data);
+            noseconeTierOne(&s_radio, &s_txPacket, GPS_data, bar_data, acc_data, *temp_sensor_data, IMU_data);
         #endif  //def NOSECONE
         radio_old_time = new_time;
     }

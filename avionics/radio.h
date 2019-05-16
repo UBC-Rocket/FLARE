@@ -72,7 +72,7 @@ void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
                      float bar_data[], float acc_data[], float *temp_sensor_data, float IMU_data[]);
 // void noseconeTierTwo(float*, float*, float*, float*);
 
-void resolveRadioRx(XBee* radio, FlightStates *state, InitStatus *status);
+void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, FlightStates *state, InitStatus *status);
 void radioStatus(XBee* radio, ZBTxRequest* txPacket, InitStatus *status);
-void doCommand(char,FlightStates * state, InitStatus *status);
+void doCommand(char command, FlightStates *state, InitStatus *status, XBee* radio, ZBTxRequest* txPacket);
 #endif
