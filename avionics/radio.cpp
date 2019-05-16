@@ -281,3 +281,47 @@ void doCommand(char command, FlightStates *state, InitStatus *status){
     }
 
 }
+
+/*
+ * @brief  Sends a radio message containing status information
+ * @param XBee *radio - the class for the xbee module in use
+ * @param ZBTxRequest *txPacket - reuse this class to save memory
+ * @param  InitStatus *status - status of initialization
+ * @return void
+ */
+void radioStatus(XBee* radio, ZBTxRequest* txPacket, InitStatus *status)
+{
+    #ifdef NOSECONE
+    static char statusByte = 0x00; //NOSECONE INDICATOR
+    #else
+    static char statusByte = 0x01; //BODY INDICATOR
+    #endif
+    static uint8_t payload[3] = {UID_status};
+
+    payload[1] = static_cast<uint8_t>(status->overview);
+
+    if( !(status->sensorNominal[BAROMETER_STATUS_POSITION]) )
+        statusByte |= BAROMETER_BIT_FLAG;
+    if( !(status->sensorNominal[IMU_STATUS_POSITION]) )
+        statusByte |= IMU_BIT_FLAG;
+    #ifdef BODY
+        if( !(status->sensorNominal[EMATCH_STATUS_POSITION]) )
+            statusByte |= EMATCH_0_BIT_FLAG;
+        // if( !(status->sensorNominal[EMATCH_1_STATUS_POSITION]) ) //Resolve once 2nd ematch is implemented
+        //     statusByte |= EMATCH_1_BIT_FLAG;
+    #else
+        if( !(status->sensorNominal[THERMOCOUPLE_STATUS_POSITION]) )
+            statusByte |= THERMOCOUPLE_BIT_FLAG;
+        if( !(status->sensorNominal[SATCOM_STATUS_POSITION]) )
+            statusByte |= SATCOM_BIT_FLAG;
+    #endif
+    if( !(status->sensorNominal[FILE_STATUS_POSITION]) )
+        statusByte |= FILE_BIT_FLAG;
+
+
+    txPacket->setPayload(payload);
+    txPacket->setPayloadLength(3);
+
+    radio->send(*txPacket);
+}
+

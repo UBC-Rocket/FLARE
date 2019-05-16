@@ -316,13 +316,8 @@ void initSensors(InitStatus *status)
     #endif
 
     /* transmit sensor report */
-        // Key for receiver:
-        // S-#-G/B - G/B - G/B
-        // S is UID for status, # is digit indicating which part is being sent. G/B is status of a sensor
-        // (good/bad), X indicates no sensor for that value yet.
-        // Refer to sensors.h definitions to find what order data comes in at.
-        // e.g. if all things succeeded except accelerometer, code sends:
-        // "S-1-G-B-G", "S-2-G-G-G", "S-3-G-X-X"
+
+
 
     // char statusReport1[RADIO_DATA_ARRAY_SIZE];
     // char statusReport2[RADIO_DATA_ARRAY_SIZE];
@@ -335,84 +330,6 @@ void initSensors(InitStatus *status)
 
     displayStatus(status);
     return;
-}
-
-/*
- * @brief  Generates status report for initialization. 'G' for good, 'B' for bad, 'X' for Not applicable
- * @param  InitStatus *status - status of initialization.
- * @param  char* statusReport1 - char array to hold radio data
- * @param  char* statusReport2 - same as statusReport2 but it's the 2nd half
- * @return void
- */
-void generateStatusReport(InitStatus *status, char *statusReport1, char *statusReport2, char *statusReport3)
-{
-    statusReport1[0] = UID_status;
-    statusReport1[1] = '1';
-
-    if(status->sensorNominal[FILE_STATUS_POSITION])
-        statusReport1[2] = 'G';
-    else
-        statusReport1[2] = 'B';
-
-    if(status->sensorNominal[BATTERY_STATUS_POSITION])
-        statusReport1[3] = 'G';
-    else
-        statusReport1[3] = 'B';
-
-    if(status->sensorNominal[ACCELEROMETER_STATUS_POSITION])
-        statusReport1[4] = 'G';
-    else
-        statusReport1[4] = 'B';
-
-
-    statusReport2[0] = UID_status;
-    statusReport2[1] = '2';
-
-    if(status->sensorNominal[BAROMETER_STATUS_POSITION])
-        statusReport2[2] = 'G';
-    else
-        statusReport2[2] = 'B';
-
-    if(status->sensorNominal[TEMPERATURE_STATUS_POSITION])
-        statusReport2[3] = 'G';
-    else
-        statusReport2[3] = 'B';
-
-    if(status->sensorNominal[IMU_STATUS_POSITION])
-        statusReport2[4] = 'G';
-    else
-        statusReport2[4] = 'B';
-
-
-    statusReport3[0] = UID_status;
-    statusReport3[1] = '3';
-
-    #ifdef BODY
-        if(status->sensorNominal[EMATCH_STATUS_POSITION])
-            statusReport3[2] = 'G';
-        else
-            statusReport3[2] = 'B';
-    #endif
-    #ifdef NOSECONE
-        statusReport3[2] = 'X';
-
-        if(status->sensorNominal[SATCOM_STATUS_POSITION])
-            statusReport3[3] = 'G';
-        else
-            statusReport3[3] = 'B';
-
-        if(status->sensorNominal[THERMOCOUPLE_STATUS_POSITION])
-            statusReport3[4] = 'G';
-        else
-            statusReport3[4] = 'B';
-
-    #endif
-
-    #ifdef BODY
-        statusReport3[3] = 'X';
-        statusReport3[4] = 'X';
-    #endif
-
 }
 
 /*

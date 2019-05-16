@@ -48,6 +48,19 @@ const char UID_status = 'S';  //Status
 #define GROUND_STATION_ADDR_MSB 0x0013A200
 #define GROUND_STATION_ADDR_LSB 0x41678FC0
 
+/* status bit flags */
+#define BAROMETER_BIT_FLAG 0x02
+#define IMU_BIT_FLAG 0x04
+#ifdef BODY
+    #define EMATCH_0_BIT_FLAG 0x08
+    #define EMATCH_1_BIT_FLAG 0x10
+#endif
+#ifdef NOSECONE
+    #define THERMOCOUPLE_BIT_FLAG 0x08
+    #define SATCOM_BIT_FLAG 0x10
+#endif
+#define FILE_BIT_FLAG 0x20
+
 /*Functions------------------------------------------------------------*/
 void sendRadioData(float data, char id);
 void sendTierOne(unsigned long*, float*, float*, FlightStates state, float altitude);
@@ -60,5 +73,6 @@ void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
 // void noseconeTierTwo(float*, float*, float*, float*);
 
 void resolveRadioRx(XBee* radio, FlightStates *state, InitStatus *status);
+void radioStatus(XBee* radio, ZBTxRequest* txPacket, InitStatus *status);
 void doCommand(char,FlightStates * state, InitStatus *status);
 #endif
