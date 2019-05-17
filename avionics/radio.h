@@ -62,10 +62,6 @@ const char UID_status = 'S';  //Status
 #define FILE_BIT_FLAG 0x20
 
 /*Functions------------------------------------------------------------*/
-// void sendRadioData(float data, char id);
-// void sendTierOne(unsigned long*, float*, float*, FlightStates state, float altitude);
-// void sendTierTwo(float*, float*, float*, float*);
-// void sendTierThree(float*, float*);
 void bodyTierOne(XBee* radio, ZBTxRequest* txPacket, float*, FlightStates state, float altitude, uint32_t*);
 //void bodyTierTwo(float*); not needed
 void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
