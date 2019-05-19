@@ -183,6 +183,12 @@ void doCommand(char command, FlightStates *state, InitStatus *status, XBee* radi
             break;
 
         case RESET:
+            if(*state == ARMED) { //Don't want to switch out of drogue deploy or something into standby
+                switchState(state, STANDBY);
+                digitalWrite(FLIGHT_LED, LOW);
+                // turn off cameras
+                stop_record();
+            }
             break;
 
         case MAIN:
