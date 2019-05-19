@@ -40,7 +40,7 @@
   * @return void
   */
 void bodyTierOne(XBee* radio, ZBTxRequest* txPacket, float bar_data[], FlightStates state, float altitude, uint32_t *timestamp){
-
+    uint32_t stateAsInt = static_cast<uint32_t>(state);
     static uint8_t payload[20];
     payload[0] = UID_time;
     memcpy(payload + 1, timestamp, sizeof(float));
@@ -49,7 +49,7 @@ void bodyTierOne(XBee* radio, ZBTxRequest* txPacket, float bar_data[], FlightSta
     payload[10] = UID_altitude;
     memcpy(payload + 1 + 10, &altitude, sizeof(float));
     payload[15] = UID_state;
-    memcpy(payload + 1 + 15, &state, sizeof(float));
+    memcpy(payload + 1 + 15, &stateAsInt, sizeof(float));
 
     txPacket->setPayloadLength(20);
     txPacket->setPayload(payload);
