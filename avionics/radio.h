@@ -45,8 +45,12 @@ const char UID_status = 'S';  //Status
 #define DO_NOTHING '\0'
 
 /* radio addressing */
-#define GROUND_STATION_ADDR_MSB 0x0013A200
-#define GROUND_STATION_ADDR_LSB 0x41678FC0
+// #define GROUND_STATION_ADDR_MSB 0x0013A200 //Ground Station - Body
+// #define GROUND_STATION_ADDR_LSB 0x41678FC0
+
+#define GROUND_STATION_ADDR_MSB 0x0013A200 //Ground Station - Nose
+#define GROUND_STATION_ADDR_LSB 0x41678FB9
+
 
 /* status bit flags */
 #define BAROMETER_BIT_FLAG 0x02

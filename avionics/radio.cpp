@@ -42,7 +42,7 @@
 void bodyTierOne(XBee* radio, ZBTxRequest* txPacket, float bar_data[], FlightStates state, float altitude, uint32_t *timestamp){
 
     static uint8_t payload[20];
-    payload[0] = 0;
+    payload[0] = UID_time;
     memcpy(payload + 1, timestamp, sizeof(float));
     payload[5] = UID_bar_pres;
     memcpy(payload + 1 + 5, bar_data, sizeof(float));
@@ -160,6 +160,9 @@ void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, FlightStates *state, Ini
   * @return void
   */
 void doCommand(char command, FlightStates *state, InitStatus *status, XBee* radio, ZBTxRequest* txPacket){
+    unsigned char payload[2] = {'G'};
+    payload[1] = command;
+
     switch (command){
         case ARM:
             if(*state == STANDBY) { //Don't want to switch out of drogue deploy or something into Armed
@@ -215,9 +218,13 @@ void doCommand(char command, FlightStates *state, InitStatus *status, XBee* radi
             #ifdef TESTING
             SerialUSB.println("ERROR: COMMAND NOT RECOGNIZED");
             #endif
+            payload[0] = 'B';
             break;
     }
 
+    txPacket->setPayload(payload);
+    txPacket->setPayloadLength(2);
+    radio->send(*txPacket);
 }
 
 /*

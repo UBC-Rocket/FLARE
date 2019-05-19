@@ -229,7 +229,7 @@ void loop()
             bodyTierOne(&s_radio, &s_txPacket, bar_data, state, altitude, &timestamp);
         #endif  // def BODY
         #ifdef NOSECONE
-            noseconeTierOne(&s_radio, &s_txPacket, GPS_data, bar_data, acc_data, *temp_sensor_data, IMU_data);
+            noseconeTierOne(&s_radio, &s_txPacket, GPS_data, bar_data, acc_data, &temp_sensor_data, IMU_data);
         #endif  //def NOSECONE
         radio_old_time = new_time;
     }
