@@ -162,7 +162,7 @@ void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, FlightStates *state, Ini
 void doCommand(char command, FlightStates *state, InitStatus *status, XBee* radio, ZBTxRequest* txPacket){
     unsigned char payload[2] = {'G'};
     payload[1] = command;
-
+    static String pingMessage = String("Please help I'm stuck on a rocket");
     switch (command){
         case ARM:
             if(*state == STANDBY) { //Don't want to switch out of drogue deploy or something into Armed
@@ -216,7 +216,9 @@ void doCommand(char command, FlightStates *state, InitStatus *status, XBee* radi
         case RECOVERY_BUZZER:
             // add the recovery buzzer command
             break;
-
+        case PING:
+            sendMessage(radio, txPacket, &pingMessage);
+            break;
         case DO_NOTHING:
             break;
 
@@ -273,5 +275,21 @@ void radioStatus(XBee* radio, ZBTxRequest* txPacket, InitStatus *status)
     txPacket->setPayload(payload);
     txPacket->setPayloadLength(3);
 
+    radio->send(*txPacket);
+}
+
+/*
+ * @brief  Sends a string message across radio
+ * @param XBee *radio - the class for the xbee module in use
+ * @param ZBTxRequest *txPacket - reuse this class to save memory
+ * @param  String *msg - Arduino String containing the string to use
+ * @return void
+ */
+void sendMessage(XBee* radio, ZBTxRequest* txPacket, String* msg)
+{
+    String payload = String(UID_message);
+    payload.concat(*msg);
+    txPacket->setPayloadLength(payload.length()+1);
+    txPacket->setPayload( reinterpret_cast<unsigned char*>( const_cast<char*>( payload.c_str() ) ) );
     radio->send(*txPacket);
 }

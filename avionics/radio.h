@@ -30,6 +30,7 @@ const char UID_state = 's'; //state machine state
 const char UID_batt = 'b';  //Battery voltage
 const char UID_ground_altitude = 'g';//Ground Altitude
 const char UID_status = 'S';  //Status
+const char UID_message = '"';
 
 /* commands */
 #define ARM 'r'
@@ -75,4 +76,5 @@ void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
 void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, FlightStates *state, InitStatus *status);
 void radioStatus(XBee* radio, ZBTxRequest* txPacket, InitStatus *status);
 void doCommand(char command, FlightStates *state, InitStatus *status, XBee* radio, ZBTxRequest* txPacket);
+void sendMessage(XBee* radio, ZBTxRequest* txPacket, String* msg);
 #endif
