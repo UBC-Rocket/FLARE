@@ -143,7 +143,7 @@ void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, FlightStates *state, Ini
 void doCommand(char command, FlightStates *state, InitStatus *status, XBee* radio, ZBTxRequest* txPacket){
     unsigned char payload[2] = {'G'};
     payload[1] = command;
-    static String pingMessage = String("Please help I'm stuck on a rocket");
+    String msg;
     switch (command){
         case ARM:
             if(*state == STANDBY) { //Don't want to switch out of drogue deploy or something into Armed
@@ -151,6 +151,14 @@ void doCommand(char command, FlightStates *state, InitStatus *status, XBee* radi
                 digitalWrite(FLIGHT_LED, HIGH);
                 // turn on cameras
                 start_record();
+            }
+            else if(*state == ARMED) {
+                msg = String("Already in ARMED");
+                sendMessage(radio, txPacket, &msg);
+            }
+            else{
+                msg = String("!! ALREADY IN FLIGHT !!");
+                sendMessage(radio, txPacket, &msg);
             }
 
             break;
@@ -170,12 +178,23 @@ void doCommand(char command, FlightStates *state, InitStatus *status, XBee* radi
                 // turn off cameras
                 stop_record();
             }
+            else if(*state == ARMED) {
+                msg = String("Already in STANDBY");
+                sendMessage(radio, txPacket, &msg);
+            }
+            else{
+                msg = String("!! ALREADY IN FLIGHT !!");
+                sendMessage(radio, txPacket, &msg);
+            }
             break;
 
         case MAIN:
             #ifdef GROUND_TEST  // Ground radio testing purposes
-            digitalWrite(FLIGHT_LED, HIGH);
-            deployMain();
+                digitalWrite(FLIGHT_LED, HIGH);
+                deployMain();
+            #else
+                msg = String("!! MAIN PARACHUTE COMMAND RECEIVED, NO ACTION TAKEN !!");
+                sendMessage(radio, txPacket, &msg);
             #endif
             break;
 
@@ -184,6 +203,9 @@ void doCommand(char command, FlightStates *state, InitStatus *status, XBee* radi
             //testing purposes!
             digitalWrite(FLIGHT_LED, LOW);
             deployDrogue();
+            #else
+                msg = String("!! DROGUE PARACHUTE COMMAND RECEIVED, NO ACTION TAKEN !!");
+                sendMessage(radio, txPacket, &msg);
             #endif
 
         case STATUS:
@@ -197,9 +219,12 @@ void doCommand(char command, FlightStates *state, InitStatus *status, XBee* radi
         case RECOVERY_BUZZER:
             // add the recovery buzzer command
             break;
+
         case PING:
-            sendMessage(radio, txPacket, &pingMessage);
+            msg = String("Please help I'm stuck on a rocket");
+            sendMessage(radio, txPacket, &msg);
             break;
+
         case DO_NOTHING:
             break;
 
