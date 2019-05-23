@@ -149,7 +149,7 @@ void setup()
   */
 void loop()
 {
-    uint32_t timestamp;
+    static uint32_t timestamp;
     static unsigned long old_time = 0; //ms
     static unsigned long new_time = 0; //ms
     unsigned long delta_time;
