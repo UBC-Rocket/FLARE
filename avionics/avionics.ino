@@ -170,13 +170,7 @@ void loop()
     static unsigned long radio_old_time = 0;
     static unsigned long radio_time_interval = 400; //milliseconds
 
-    // static unsigned long tier_one_old_time = 0;
-    // static uint16_t tier_one_interval = 400;
-
     #ifdef NOSECONE
-        // static uint16_t tier_two_interval = 2000;
-        // static unsigned long tier_two_old_time = 0;
-
         static bool mainDeploySatcomSent = false;
         static int landedSatcomSentCount = 0;
         static uint16_t satcomMsgOldTime = millis();
@@ -222,8 +216,6 @@ void loop()
         logData(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure, thermocouple_data);
     }
 
-
-    // if((new_time - tier_one_old_time) >= tier_one_interval) {
     if((new_time - radio_old_time) >= radio_time_interval) {
         #ifdef BODY
             bodyTierOne(&s_radio, &s_txPacket, bar_data, state, altitude, &timestamp);
@@ -233,13 +225,6 @@ void loop()
         #endif  //def NOSECONE
         radio_old_time = new_time;
     }
-
-    // #ifdef NOSECONE
-    // if ( (new_time - tier_two_old_time) >= tier_two_interval ){
-    //     noseconeTierTwo(bar_data, acc_data, &temp_sensor_data, IMU_data);
-    //     tier_two_old_time = new_time;
-    // }
-    // #endif // def NOSECONE
 
     if (s_statusOfInit.overview == NONCRITICAL_FAILURE)
     {
