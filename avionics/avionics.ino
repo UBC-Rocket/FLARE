@@ -218,10 +218,10 @@ void loop()
 
     if((new_time - radio_old_time) >= radio_time_interval) {
         #ifdef BODY
-            bodyTierOne(&s_radio, &s_txPacket, bar_data, state, altitude, &timestamp);
+            sendRadioBody(&s_radio, &s_txPacket, bar_data, state, altitude, &timestamp);
         #endif  // def BODY
         #ifdef NOSECONE
-            noseconeTierOne(&s_radio, &s_txPacket, GPS_data, bar_data, acc_data, &temp_sensor_data, IMU_data);
+            sendRadioNosecone(&s_radio, &s_txPacket, GPS_data, bar_data, acc_data, &temp_sensor_data, IMU_data);
         #endif  //def NOSECONE
         radio_old_time = new_time;
     }

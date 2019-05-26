@@ -39,7 +39,7 @@
   * @param  unsigned long *timestamp - address for the timestamp
   * @return void
   */
-void bodyTierOne(XBee* radio, ZBTxRequest* txPacket, float bar_data[], FlightStates state, float altitude, uint32_t *timestamp){
+void sendRadioBody(XBee* radio, ZBTxRequest* txPacket, float bar_data[], FlightStates state, float altitude, uint32_t *timestamp){
     uint32_t stateAsInt = static_cast<uint32_t>(state);
     static uint8_t payload[20];
     payload[0] = UID_time;
@@ -62,7 +62,7 @@ void bodyTierOne(XBee* radio, ZBTxRequest* txPacket, float bar_data[], FlightSta
   * @param  unsigned long *timestamp - address for the timestamp
   * @return void
   */
-void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
+void sendRadioNosecone(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
                      float bar_data[], float acc_data[], float *temp_sensor_data, float IMU_data[]){
 
     static uint8_t payload[55];
@@ -95,25 +95,6 @@ void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
 
     radio->send(*txPacket);
 }
-/**
-  * @brief  Function to send the less essential data from the nosecone over radio,
-  * barometer temperature, accelerometer, temperature, and IMU data
-  * @param  float bar_data - barometer data array for temperature
-  * @param  float acc_data - accelerometer data array
-  * @param  float *temp_sensor_data - pointer for the temperature data
-  * @param  float IMU_data - IMU data array
-  * @return void
-  */
-// void noseconeTierTwo(float bar_data[], float acc_data[], float *temp_sensor_data, float IMU_data[]){
-//     sendRadioData(bar_data[1], UID_bar_temp);
-//     sendRadioData(*temp_sensor_data, UID_temp_temp);
-//     sendRadioData(IMU_data[0], UID_IMU_yaw);
-//     sendRadioData(IMU_data[1], UID_IMU_roll);
-//     sendRadioData(IMU_data[2], UID_IMU_pitch);
-//     sendRadioData(acc_data[0], UID_acc_acc_x);
-//     sendRadioData(acc_data[1], UID_acc_acc_y);
-//     sendRadioData(acc_data[2], UID_acc_acc_z);
-// }
 
 /**
   * @brief  Deals with all received messages from the radio driver, including commands and status.

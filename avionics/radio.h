@@ -69,11 +69,9 @@ const char UID_message = '"';
 #define FILE_BIT_FLAG 0x20
 
 /*Functions------------------------------------------------------------*/
-void bodyTierOne(XBee* radio, ZBTxRequest* txPacket, float*, FlightStates state, float altitude, uint32_t*);
-//void bodyTierTwo(float*); not needed
-void noseconeTierOne(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
+void sendRadioBody(XBee* radio, ZBTxRequest* txPacket, float*, FlightStates state, float altitude, uint32_t*);
+void sendRadioNosecone(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
                      float bar_data[], float acc_data[], float *temp_sensor_data, float IMU_data[]);
-// void noseconeTierTwo(float*, float*, float*, float*);
 
 void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, FlightStates *state, InitStatus *status);
 void radioStatus(XBee* radio, ZBTxRequest* txPacket, InitStatus *status);
