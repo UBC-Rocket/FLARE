@@ -13,8 +13,24 @@
  */
 
 #include "battery.h"
+#include "sensors.h"
 #include "Arduino.h"
 
+/*Constants------------------------------------------------------------*/
+#define MINIMUM_BATTERY_VOLTAGE 10
+#define LOW_BATTERY_VOLTAGE 11
+
+#define R1 44170  //Nominal: 44200. Higher is larger range.
+#define R2 15150  //Nominal: 16000. Lower is larger range.
+//Maximum voltage = 3.3*(R1+R2)/R2
+
+
+
+Battery::Battery(byte batterySensorPin)
+{
+    m_divider = static_cast<float>(R2) /(R1 + R2);
+    m_batterySensorPin = batterySensorPin;
+}
 /**
   * @brief  Gets the battery voltage level. Maximum voltage readable is 11.0 volts; to adjust, change the resistors used in the voltage divider.
   * @param  None
@@ -29,3 +45,13 @@ float Battery::getVoltage()
     return batteryVoltage;
 }
 
+OverallError Battery::getStatus()
+{
+    float voltage = getVoltage();
+    if(voltage < MINIMUM_BATTERY_VOLTAGE)
+        return CRITICAL_FAILURE;
+    else if (voltage < LOW_BATTERY_VOLTAGE)
+        return NONCRITICAL_FAILURE;
+    else
+        return NOMINAL;
+}

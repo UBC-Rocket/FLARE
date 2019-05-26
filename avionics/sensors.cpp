@@ -36,6 +36,23 @@
 #include <i2c_t3.h>
 #include <SD.h>
 
+/*Constants------------------------------------------------------------*/
+#define ACCELEROMETER_ADDRESS   0x18
+#define TEMP_SENSOR_ADDRESS     0x48
+#define IMU_ADDRESS             0x28
+#define ACCELEROMETER_SCALE     24
+#define BATTERY_SENSOR_PIN      9
+
+#define FILE_STATUS_POSITION 0
+#define BATTERY_STATUS_POSITION 1
+#define ACCELEROMETER_STATUS_POSITION 2
+#define BAROMETER_STATUS_POSITION 3
+#define TEMPERATURE_STATUS_POSITION 4
+#define IMU_STATUS_POSITION 5
+#define EMATCH_STATUS_POSITION 6
+#define SATCOM_STATUS_POSITION 7
+#define THERMOCOUPLE_STATUS_POSITION 8
+
 /*Variables------------------------------------------------------------*/
 File datalog;
 
@@ -78,25 +95,24 @@ void initSensors(InitStatus *status)
     SerialUSB.println("Initializing battery");
     #endif
 
-    if(powerbattery.getVoltage() <= LOW_BATTERY_VOLTAGE)
-    { //TODO: Uncomment once the battery sensor is implemented
-        //status->sensorNominal[BATTERY_STATUS_POSITION] = false;
-        // if(powerbattery.getVoltage() <= MINIMUM_BATTERY_VOLTAGE){
-        //     status->overview = CRITICAL_FAILURE;
-        //     #ifdef TESTING
-        //     SerialUSB.println("DANGER: BATTERY AT UNACCEPTABLY LOW VOLTAGE!");
-        //     #endif
-        // }
-        // else{
-        //     if(status->overview < NONCRITICAL_FAILURE){
-        //         status->overview = NONCRITICAL_FAILURE;
-        //     }
-        //     #ifdef TESTING
-        //     SerialUSB.println("WARNING: Battery at low voltage!");
-        //     #endif
-        // }
-
-    }
+    // if(powerbattery.getVoltage() <= LOW_BATTERY_VOLTAGE)
+    // { //TODO: Uncomment once the battery sensor is implemented
+    //     status->sensorNominal[BATTERY_STATUS_POSITION] = false;
+    //     if(powerbattery.getVoltage() <= MINIMUM_BATTERY_VOLTAGE){
+    //         status->overview = CRITICAL_FAILURE;
+    //         #ifdef TESTING
+    //         SerialUSB.println("DANGER: BATTERY AT UNACCEPTABLY LOW VOLTAGE!");
+    //         #endif
+    //     }
+    //     else{
+    //         if(status->overview < NONCRITICAL_FAILURE){
+    //             status->overview = NONCRITICAL_FAILURE;
+    //         }
+    //         #ifdef TESTING
+    //         SerialUSB.println("WARNING: Battery at low voltage!");
+    //         #endif
+    //     }
+    // }
 
     #ifdef TESTING
     SerialUSB.print("Read voltage (V): ");

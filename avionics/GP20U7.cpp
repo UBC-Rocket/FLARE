@@ -51,8 +51,11 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include <Arduino.h>
 #include <TinyGPS.h>
 
+/*Constants------------------------------------------------------------*/
+#define GPS_TIMEOUT     100
+
 /*Variables------------------------------------------------------------*/
-TinyGPS gps;
+static TinyGPS gps;
 
 /*Functions------------------------------------------------------------*/
 bool updateGPS(void)

@@ -142,10 +142,6 @@ There's a couple of other parameters in there that are useful/important to check
         #define ISBD_STARTUP_MAX_TIME           15 //240
 Modified from defaults to match our needs better.
 
-### sensors.h
-        #define EARTHS_GRAVITY          9.80665
-Set this to whatever g is at launch site. NOTE: Doesn't seem to be used?
-
 ### statemachine.h
         (all of the parameters given in the define block)
 These should all be checked with relavent people in recovery, etc. before flashing.

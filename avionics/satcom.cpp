@@ -20,9 +20,13 @@
 #include "IridiumSBD.h"
 #include <HardwareSerial.h>
 
+/*Constants------------------------------------------------------------*/
+#define BUFSIZE 100
+#define SATCOM_LANDED_TIME_INTERVAL 60000 //in ms
+
 /*Variables-------------------------------------------------------------*/
 // Declare the IridiumSBD object
-IridiumSBD modem(IridiumSerial);
+static IridiumSBD modem(IridiumSerial);
 
 /*Functions------------------------------------------------------------*/
 
@@ -101,7 +105,7 @@ int SatComQuality()
 
   #ifdef TESTING
   int err = modem.getSignalQuality(SignalQuality);
-  
+
   if (err != ISBD_SUCCESS)
   {
     SerialUSB.print("SignalQuality failed: error ");

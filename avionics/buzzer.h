@@ -6,13 +6,12 @@
 #include <Arduino.h>
 #include "gpio.h"
 
+/*Variables------------------------------------------------------------*/
 enum SongTypes{
   SongTypes_SUCCESS,
   SongTypes_NONCRITFAIL,
   SongTypes_CRITICALFAIL
 };
-
-/*Variables------------------------------------------------------------*/
 
 /*Functions------------------------------------------------------------*/
 void initBuzzer();
