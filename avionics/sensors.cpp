@@ -195,7 +195,11 @@ void initSensors(InitStatus *status)
     #endif
 
     delay(7);
-    if(!IMU.begin()){
+        #if defined NOSECONE
+            if(!IMU.begin(Adafruit_BNO055::OPERATION_MODE_NDOF)){
+        #elif defined BODY
+            if(!IMU.begin(Adafruit_BNO055::OPERATION_MODE_AMG)){
+        #endif
         if(status->overview < NONCRITICAL_FAILURE)
             status->overview = NONCRITICAL_FAILURE;
         status->sensorNominal[IMU_STATUS_POSITION] = false;
@@ -338,6 +342,16 @@ void initSensors(InitStatus *status)
     sendRadioResponse(statusReport3);
 
     displayStatus(status);
+
+    /* IMU STATUS */
+    byte opr_mode = IMU.read8(Adafruit_BNO055::BNO055_OPR_MODE_ADDR);
+    byte pwr_mode = IMU.read8(Adafruit_BNO055::BNO055_PWR_MODE_ADDR);
+    SerialUSB.print("opr_mode:  ");
+    SerialUSB.println(opr_mode);
+    SerialUSB.print("pwr_mode: ");
+    SerialUSB.println(pwr_mode);
+
+
     return;
 }
 
@@ -538,10 +552,34 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
     SerialUSB.println("Polling IMU");
     #endif
     sensors_event_t event; //we don't know what this is but it works so
+
+    #if defined NOSECONE
     IMU.getEvent(&event);
-    IMU_data[0] = event.orientation.x;
-    IMU_data[1] = event.orientation.y;
-    IMU_data[2] = event.orientation.z;
+    IMU_data[0] = event.orientation.heading;
+    IMU_data[1] = event.orientation.roll;
+    IMU_data[2] = event.orientation.pitch;
+    #elif defined BODY
+    float gyroo[3], magg[3];
+    imu::Vector<3> acceler;
+    acceler = IMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+    IMU_data[0] = acceler[0];
+    IMU_data[1] = acceler[1];
+    IMU_data[2] = acceler[2];
+    // IMU.getEvent(&event);
+    // IMU_data[0] = event.acceleration.x;
+    // IMU_data[1] = event.acceleration.y;
+    // IMU_data[2] = event.acceleration.z;
+    IMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+    IMU.getEvent(&event);
+    IMU_data[3] = event.gyro.x;
+    IMU_data[4] = event.gyro.y;
+    IMU_data[5] = event.gyro.z;
+    IMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+    IMU.getEvent(&event);
+    IMU_data[6] = event.magnetic.x;
+    IMU_data[7] = event.magnetic.y;
+    IMU_data[8] = event.magnetic.z;
+    #endif
 
     #ifdef NOSECONE
         #ifdef TESTING
@@ -566,6 +604,7 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
                 SerialUSB.print("Thermocouple ERROR");
         #endif
     #endif
+
 }
 
 /**
@@ -647,12 +686,26 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
     SerialUSB.println(altitude);
     SerialUSB.print("Temperature sensor temperature (C): ");
     SerialUSB.println(*temp_sensor_data);
-    SerialUSB.print("IMU - Yaw:                          ");
+    SerialUSB.print("IMU - Heading / acc x:                          ");
     SerialUSB.println(IMU_data[0]);
-    SerialUSB.print("IMU - Roll:                         ");
+    SerialUSB.print("IMU - Roll / acc y:                         ");
     SerialUSB.println(IMU_data[1]);
-    SerialUSB.print("IMU - Pitch:                        ");
+    SerialUSB.print("IMU - Pitch / acc z:                        ");
     SerialUSB.println(IMU_data[2]);
+    #ifdef BODY
+        SerialUSB.print("IMU - gyro x:                          ");
+        SerialUSB.println(IMU_data[3]);
+        SerialUSB.print("IMU - gyro y:                         ");
+        SerialUSB.println(IMU_data[4]);
+        SerialUSB.print("IMU - gyro z:                        ");
+        SerialUSB.println(IMU_data[5]);
+        SerialUSB.print("IMU - mag X:                          ");
+        SerialUSB.println(IMU_data[6]);
+        SerialUSB.print("IMU - mag y:                         ");
+        SerialUSB.println(IMU_data[7]);
+        SerialUSB.print("IMU - mag Z:                        ");
+        SerialUSB.println(IMU_data[8]);
+    #endif
         #ifdef NOSECONE
         SerialUSB.print("GPS latitude:                       ");
         SerialUSB.println(GPS_data[0], 6);
