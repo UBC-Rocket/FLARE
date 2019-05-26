@@ -46,11 +46,13 @@ const char UID_message = '"';
 #define DO_NOTHING '\0'
 
 /* radio addressing */
-// #define GROUND_STATION_ADDR_MSB 0x0013A200 //Ground Station - Body
-// #define GROUND_STATION_ADDR_LSB 0x41678FC0
+#define GROUND_STATION_ADDR_MSB 0x0013A200 //Ground Station - Body
+#define GROUND_STATION_ADDR_LSB 0x41678FC0
 
-#define GROUND_STATION_ADDR_MSB 0x0013A200 //Ground Station - Nose
-#define GROUND_STATION_ADDR_LSB 0x41678FB9
+//Don't use the nose - it has a glued on capacitor which is more sketchy than
+//the body
+// #define GROUND_STATION_ADDR_MSB 0x0013A200 //Ground Station - Nose
+// #define GROUND_STATION_ADDR_LSB 0x41678FB9
 
 
 /* status bit flags */
