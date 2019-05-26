@@ -50,6 +50,16 @@ const uint8_t NONE = 0; // This is used to indicate VCC or GND pin isn't used
 
 class MAX31855k
 {
+protected:
+  union { // Union makes conversion from 4 bytes to an unsigned 32-bit int easy
+    uint8_t bytes[4];
+    uint32_t uint32;
+  } data;
+  uint8_t cs;
+
+  void readBytes(void);
+  uint8_t checkHasFault(void);
+
 public:
   // Simple Arduino API style guide functions
   inline float readTempC() { return readTemp(MAX31855k::C); }
@@ -74,15 +84,7 @@ public:
   MAX31855k(const uint8_t, const uint8_t _vcc=NONE,
                     const uint8_t _gnd=NONE, const bool _debug=0);
   ~MAX31855k() {} // User responsible 4 reassigning pins & stopping SPI
-protected:
-  union { // Union makes conversion from 4 bytes to an unsigned 32-bit int easy
-    uint8_t bytes[4];
-    uint32_t uint32;
-  } data;
-  uint8_t cs;
 
-  void readBytes(void);
-  uint8_t checkHasFault(void);
 };
 
 #endif
