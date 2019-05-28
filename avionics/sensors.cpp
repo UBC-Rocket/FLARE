@@ -147,14 +147,17 @@ void initSensors(InitStatus *status)
                 datalog.write("Time (ms), State, Battery Voltage (V),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
                 "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
                 "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
-                "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude,SatCom,Thermocouple (C)\n");
+                "IMU - Heading (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude,SatCom,Thermocouple (C)\n");
             #endif
             #ifdef BODY
                 datalog.write("BODY SENSOR LOG DATA\n");
                 datalog.write("Time (ms), State, Battery Voltage (V),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
                 "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
                 "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
-                "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),ematch\n");
+                "IMU - acceleration X (g),IMU - acceleration Y (g),IMU - acceleration Z (G),"
+                "IMU - gyroscope X (rads),IMU - gyroscope Y (rads),IMU - gyroscope Z (rads),"
+                "IMU - magnetometer X (g),IMU - magnetometer Y (g),IMU - magnetometer Z (G),"
+                "ematch\n");
             #endif
         }
     }
@@ -342,15 +345,6 @@ void initSensors(InitStatus *status)
     sendRadioResponse(statusReport3);
 
     displayStatus(status);
-
-    /* IMU STATUS */
-    byte opr_mode = IMU.read8(Adafruit_BNO055::BNO055_OPR_MODE_ADDR);
-    byte pwr_mode = IMU.read8(Adafruit_BNO055::BNO055_PWR_MODE_ADDR);
-    SerialUSB.print("opr_mode:  ");
-    SerialUSB.println(opr_mode);
-    SerialUSB.print("pwr_mode: ");
-    SerialUSB.println(pwr_mode);
-
 
     return;
 }
@@ -551,35 +545,33 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
     #ifdef TESTING
     SerialUSB.println("Polling IMU");
     #endif
-    sensors_event_t event; //we don't know what this is but it works so
 
     #if defined NOSECONE
+    sensors_event_t event;
     IMU.getEvent(&event);
     IMU_data[0] = event.orientation.heading;
     IMU_data[1] = event.orientation.roll;
     IMU_data[2] = event.orientation.pitch;
+
     #elif defined BODY
-    float gyroo[3], magg[3];
-    imu::Vector<3> acceler;
-    acceler = IMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-    IMU_data[0] = acceler[0];
-    IMU_data[1] = acceler[1];
-    IMU_data[2] = acceler[2];
-    // IMU.getEvent(&event);
-    // IMU_data[0] = event.acceleration.x;
-    // IMU_data[1] = event.acceleration.y;
-    // IMU_data[2] = event.acceleration.z;
-    IMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-    IMU.getEvent(&event);
-    IMU_data[3] = event.gyro.x;
-    IMU_data[4] = event.gyro.y;
-    IMU_data[5] = event.gyro.z;
-    IMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-    IMU.getEvent(&event);
-    IMU_data[6] = event.magnetic.x;
-    IMU_data[7] = event.magnetic.y;
-    IMU_data[8] = event.magnetic.z;
-    #endif
+    imu::Vector<3> accelerometer_data, gyroscope_data, magnetometer_data;
+
+    accelerometer_data = IMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+    gyroscope_data = IMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+    magnetometer_data = IMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+
+    IMU_data[0] = accelerometer_data[0];
+    IMU_data[1] = accelerometer_data[1];
+    IMU_data[2] = accelerometer_data[2];
+
+    IMU_data[3] = gyroscope_data[0];
+    IMU_data[4] = gyroscope_data[1];
+    IMU_data[5] = gyroscope_data[2];
+
+    IMU_data[6] = magnetometer_data[0];
+    IMU_data[7] = magnetometer_data[1];
+    IMU_data[8] = magnetometer_data[2];
+    #endif // NOSECONE elif BODY
 
     #ifdef NOSECONE
         #ifdef TESTING
@@ -686,24 +678,34 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
     SerialUSB.println(altitude);
     SerialUSB.print("Temperature sensor temperature (C): ");
     SerialUSB.println(*temp_sensor_data);
-    SerialUSB.print("IMU - Heading / acc x:                          ");
-    SerialUSB.println(IMU_data[0]);
-    SerialUSB.print("IMU - Roll / acc y:                         ");
-    SerialUSB.println(IMU_data[1]);
-    SerialUSB.print("IMU - Pitch / acc z:                        ");
-    SerialUSB.println(IMU_data[2]);
+    #if defined NOSECONE
+        SerialUSB.print("IMU - Heading:                      ");
+        SerialUSB.println(IMU_data[0]);
+        SerialUSB.print("IMU - Roll:                         ");
+        SerialUSB.println(IMU_data[1]);
+        SerialUSB.print("IMU - Pitch:                        ");
+        SerialUSB.println(IMU_data[2]);
+    #elif defined BODY
+        SerialUSB.print("IMU - accelerometer X (g):          ");
+        SerialUSB.println(IMU_data[0]);
+        SerialUSB.print("IMU - accelerometer Y (g):          ");
+        SerialUSB.println(IMU_data[1]);
+        SerialUSB.print("IMU - accelerometer Z (g):          ");
+        SerialUSB.println(IMU_data[2]);
+    #endif
+
     #ifdef BODY
-        SerialUSB.print("IMU - gyro x:                          ");
+        SerialUSB.print("IMU - gyroscope X:                  ");
         SerialUSB.println(IMU_data[3]);
-        SerialUSB.print("IMU - gyro y:                         ");
+        SerialUSB.print("IMU - gyroscope Y:                  ");
         SerialUSB.println(IMU_data[4]);
-        SerialUSB.print("IMU - gyro z:                        ");
+        SerialUSB.print("IMU - gyroscope Z:                  ");
         SerialUSB.println(IMU_data[5]);
-        SerialUSB.print("IMU - mag X:                          ");
+        SerialUSB.print("IMU - magnetometer X:               ");
         SerialUSB.println(IMU_data[6]);
-        SerialUSB.print("IMU - mag y:                         ");
+        SerialUSB.print("IMU - magnetometer Y:               ");
         SerialUSB.println(IMU_data[7]);
-        SerialUSB.print("IMU - mag Z:                        ");
+        SerialUSB.print("IMU - magnetometer Z:               ");
         SerialUSB.println(IMU_data[8]);
     #endif
         #ifdef NOSECONE

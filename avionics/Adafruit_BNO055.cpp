@@ -353,6 +353,10 @@ imu::Vector<3> Adafruit_BNO055::getVector(adafruit_vector_type_t vector_type)
       xyz[2] = ((double)z)/16.0;
       break;
     case VECTOR_ACCELEROMETER:
+    /* not sure if I need this yet
+      xyz[0] = ((double)x)/16.0;
+      xyz[0] = ((double)y)/16.0;
+      xyz[0] = ((double)z)/16.0;  */
     case VECTOR_LINEARACCEL:
     case VECTOR_GRAVITY:
       /* 1m/s^2 = 100 LSB */
@@ -476,7 +480,7 @@ bool Adafruit_BNO055::getSensorOffsets(adafruit_bno055_offsets_t &offsets_type)
            +/-2g  = +/- 2000 mg
            +/-4g  = +/- 4000 mg
            +/-8g  = +/- 8000 mg
-           +/-1§g = +/- 16000 mg */
+           +/-16g = +/- 16000 mg */
         offsets_type.accel_offset_x = (read8(ACCEL_OFFSET_X_MSB_ADDR) << 8) | (read8(ACCEL_OFFSET_X_LSB_ADDR));
         offsets_type.accel_offset_y = (read8(ACCEL_OFFSET_Y_MSB_ADDR) << 8) | (read8(ACCEL_OFFSET_Y_LSB_ADDR));
         offsets_type.accel_offset_z = (read8(ACCEL_OFFSET_Z_MSB_ADDR) << 8) | (read8(ACCEL_OFFSET_Z_LSB_ADDR));
