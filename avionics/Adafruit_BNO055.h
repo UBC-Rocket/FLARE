@@ -214,7 +214,7 @@ class Adafruit_BNO055 : public Adafruit_Sensor
     typedef enum
     {
       /* Page id register definition */
-      BNO055_PAGE_ID_ADDR                                     = 0X07,
+      // BNO055_PAGE_ID_ADDR                                     = 0X07,
 
       /* REGISTERS 0 - 6 RESERVED*/
 
@@ -332,10 +332,8 @@ class Adafruit_BNO055 : public Adafruit_Sensor
 
   private:
     byte  read8   ( adafruit_bno055_reg_t );
-    byte  read8v2   ( adafruit_bno055_reg2_t );
     bool  readLen ( adafruit_bno055_reg_t, byte* buffer, uint8_t len );
     bool  write8  ( adafruit_bno055_reg_t, byte value );
-    bool  write8v2 ( adafruit_bno055_reg2_t, byte value );
 
     uint8_t _address;
     int32_t _sensorID;
