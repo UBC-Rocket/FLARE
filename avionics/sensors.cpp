@@ -685,6 +685,17 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
         SerialUSB.println(IMU_data[1]);
         SerialUSB.print("IMU - Pitch:                        ");
         SerialUSB.println(IMU_data[2]);
+
+        SerialUSB.print("GPS latitude:                       ");
+        SerialUSB.println(GPS_data[0], 6);
+        SerialUSB.print("GPS longitude:                      ");
+        SerialUSB.println(GPS_data[1], 6);
+        SerialUSB.print("GPS altitude:                       ");
+        SerialUSB.println(GPS_data[2], 3);
+
+        SerialUSB.print("Thermocouple (C):                   ");
+        SerialUSB.println(thermocouple_data);
+
     #elif defined BODY
         SerialUSB.print("IMU - accelerometer X (g):          ");
         SerialUSB.println(IMU_data[0]);
@@ -692,9 +703,6 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
         SerialUSB.println(IMU_data[1]);
         SerialUSB.print("IMU - accelerometer Z (g):          ");
         SerialUSB.println(IMU_data[2]);
-    #endif
-
-    #ifdef BODY
         SerialUSB.print("IMU - gyroscope X:                  ");
         SerialUSB.println(IMU_data[3]);
         SerialUSB.print("IMU - gyroscope Y:                  ");
@@ -708,16 +716,7 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
         SerialUSB.print("IMU - magnetometer Z:               ");
         SerialUSB.println(IMU_data[8]);
     #endif
-        #ifdef NOSECONE
-        SerialUSB.print("GPS latitude:                       ");
-        SerialUSB.println(GPS_data[0], 6);
-        SerialUSB.print("GPS longitude:                      ");
-        SerialUSB.println(GPS_data[1], 6);
-        SerialUSB.print("GPS altitude:                       ");
-        SerialUSB.println(GPS_data[2], 3);
-        SerialUSB.print("Thermocouple (C):                   ");
-        SerialUSB.println(thermocouple_data);
-        SerialUSB.println("");
-        #endif
+
+    SerialUSB.println("");
     #endif
 }
