@@ -154,9 +154,9 @@ void initSensors(InitStatus *status)
                 datalog.write("Time (ms), State, Battery Voltage (V),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
                 "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
                 "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
-                "IMU - acceleration X (g),IMU - acceleration Y (g),IMU - acceleration Z (G),"
-                "IMU - gyroscope X (rads),IMU - gyroscope Y (rads),IMU - gyroscope Z (rads),"
-                "IMU - magnetometer X (g),IMU - magnetometer Y (g),IMU - magnetometer Z (G),"
+                "IMU - acceleration X (mg),IMU - acceleration Y (mg),IMU - acceleration Z (mg),"
+                "IMU - gyroscope X (rad/s),IMU - gyroscope Y (rad/s),IMU - gyroscope Z (rad/s),"
+                "IMU - magnetometer X (mT),IMU - magnetometer Y (mT),IMU - magnetometer Z (mT),"
                 "ematch\n");
             #endif
         }
@@ -703,17 +703,17 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
         SerialUSB.println(IMU_data[1]);
         SerialUSB.print("IMU - accelerometer Z (g):          ");
         SerialUSB.println(IMU_data[2]);
-        SerialUSB.print("IMU - gyroscope X:                  ");
+        SerialUSB.print("IMU - gyroscope X (rad/s):          ");
         SerialUSB.println(IMU_data[3]);
-        SerialUSB.print("IMU - gyroscope Y:                  ");
+        SerialUSB.print("IMU - gyroscope Y (rad/s):          ");
         SerialUSB.println(IMU_data[4]);
-        SerialUSB.print("IMU - gyroscope Z:                  ");
+        SerialUSB.print("IMU - gyroscope Z (rad/s):          ");
         SerialUSB.println(IMU_data[5]);
-        SerialUSB.print("IMU - magnetometer X:               ");
+        SerialUSB.print("IMU - magnetometer X (mT):          ");
         SerialUSB.println(IMU_data[6]);
-        SerialUSB.print("IMU - magnetometer Y:               ");
+        SerialUSB.print("IMU - magnetometer Y (mT):          ");
         SerialUSB.println(IMU_data[7]);
-        SerialUSB.print("IMU - magnetometer Z:               ");
+        SerialUSB.print("IMU - magnetometer Z (mT):          ");
         SerialUSB.println(IMU_data[8]);
     #endif
 
