@@ -20,7 +20,9 @@
 #include <Arduino.h>
 #include <Servo.h>
 
+#include "buzzer.h"
 #include "gpio.h"
+#include "options.h"
 
 /*Constants------------------------------------------------------------*/
 

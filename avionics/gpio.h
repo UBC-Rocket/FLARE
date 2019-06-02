@@ -4,8 +4,6 @@
 
 /*Includes------------------------------------------------------------*/
 #include <Arduino.h>
-#include "sensors.h" //for macros
-#include "buzzer.h"
 
 /*Constants------------------------------------------------------------*/
 #define POWER_STATUS_LED 20 //kept in one place w/ FLIGHT_LED

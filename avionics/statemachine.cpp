@@ -17,7 +17,7 @@
 #include "satcom.h"
 #include "cameras.h"
 #include "gpio.h"
-#include "sensors.h"
+#include "options.h"
 
 #include <math.h>
 #include <Arduino.h>

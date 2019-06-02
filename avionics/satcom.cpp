@@ -15,6 +15,7 @@
 /*Includes------------------------------------------------------------*/
 #include "satcom.h"
 #include "sensors.h"
+#include "options.h"
 #include <string.h>
 #include <Arduino.h>
 #include "IridiumSBD.h"

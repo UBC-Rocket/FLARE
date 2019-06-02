@@ -15,7 +15,7 @@
 /*Includes------------------------------------------------------------*/
 #include "radio.h"
 
-#include "sensors.h"
+#include "options.h"
 #include "battery.h"
 #include "SparkFun_LIS331.h"        //accelerometer
 #include "MS5803_01.h"              //barometer

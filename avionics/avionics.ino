@@ -58,22 +58,23 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
  */
 
 /*Includes------------------------------------------------------------*/
+#include "buzzer.h"
+#include "calculations.h"
+#include "cameras.h"
+#include "gpio.h"
+#include "groundaltitude.h"
+#include "options.h"
+#include "radio.h"
+#include "satcom.h"
 #include "sensors.h"
 #include "statemachine.h"
-#include "calculations.h"
-#include "gpio.h"
-#include "radio.h"
 #include "xbee.h"
-#include "buzzer.h"
-#include "groundaltitude.h"
-#include "satcom.h"
-#include "cameras.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <i2c_t3.h>
-#include <SPI.h>
 #include <SD.h>
+#include <SPI.h>
 #include <string.h>
 
 /*Errors---------------------------------------------------------------*/

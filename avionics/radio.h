@@ -8,6 +8,7 @@
 
 #include "statemachine.h"
 #include "sensors.h"
+#include "options.h"
 #include "XBee.h"
 
 /*Constants------------------------------------------------------------*/
