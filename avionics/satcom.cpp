@@ -23,7 +23,6 @@
 
 /*Constants------------------------------------------------------------*/
 #define BUFSIZE 100
-#define SATCOM_LANDED_TIME_INTERVAL 60000 //in ms
 
 /*Variables-------------------------------------------------------------*/
 // Declare the IridiumSBD object

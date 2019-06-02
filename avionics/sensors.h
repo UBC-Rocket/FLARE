@@ -7,7 +7,7 @@
 
 #include "statemachine.h"
 #include "Adafruit_BNO055.h"
-
+#include "options.h"
 
 /*Constants------------------------------------------------------------*/
 #define SerialUSB               Serial

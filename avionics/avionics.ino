@@ -96,6 +96,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #if defined GROUND_TEST
     #warning GROUND_TEST is defined! Do not fly this code
 #endif
+
 /*Variables------------------------------------------------------------*/
 File radiolog;
 static InitStatus s_statusOfInit;
