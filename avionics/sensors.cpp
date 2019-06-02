@@ -325,7 +325,6 @@ void initSensors(InitStatus *status)
     /* transmit sensor report */
 
     displayStatus(status);
-
     return;
 }
 

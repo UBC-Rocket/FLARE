@@ -5,14 +5,13 @@
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
 
-#include "radio.h"
 #include "statemachine.h"
 #include "Adafruit_BNO055.h"
 
 
 /*Constants------------------------------------------------------------*/
-#define NOSECONE //enable or disable nosecone-avionics specific functionality
-// #define BODY //enable or disable body-avionics specific functionality
+// #define NOSECONE //enable or disable nosecone-avionics specific functionality
+#define BODY //enable or disable body-avionics specific functionality
 // #define SERVO //if drogue release utilizes CO2 canister
 #define POW //if drogue release utilizes black powder charge
 #define TESTING //enable or disable debug output
@@ -40,8 +39,6 @@
 #endif
 #define GPS_DATA_ARRAY_SIZE     3
 #define GPS_FIELD_LENGTH        20
-
-#define RADIO_DATA_ARRAY_SIZE   5
 
 #define NUM_SENSORS 9
 #define FILE_STATUS_POSITION 0
@@ -79,7 +76,6 @@ const uint8_t GPS_set_update_rate[] = {0xA0, 0xA1, 0x00, 0x03, 0x0E, 0x01, 0x00,
 void initSensors(InitStatus* status);
 float barSensorInit(void);
 
-void generateStatusReport(InitStatus *status, char *statusReport1, char *statusReport2, char *statusReport3);
 void displayStatus(InitStatus *status);
 void pollSensors(unsigned long*, float*, float*, float*, float*, float*, float*, float*);
 void logData(unsigned long *, float*, float*, float*, float*, float*, float*, FlightStates, float, float, float);
