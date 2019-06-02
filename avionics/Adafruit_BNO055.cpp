@@ -102,23 +102,23 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode)
     byte check_reg;
   #endif
 
-  #if defined BODY
+  #ifdef BODY
 
     write8(BNO055_PAGE_ID_ADDR, 0x01);
     delay(10);
 
     #ifdef TESTING
-      check_reg = read8v2(BNO055_ACC_CONF);
+      check_reg = read8(BNO055_ACC_CONF); // !!
       delay(10);
       SerialUSB.print("ACC_CONF = ");
       SerialUSB.println(check_reg);
     #endif
 
-    write8v2(BNO055_ACC_CONF, 0x0F);
+    write8(BNO055_ACC_CONF, 0x0F);  // !!
     delay(10);
 
     #ifdef TESTING
-    check_reg = read8v2(BNO055_ACC_CONF);
+    check_reg = read8(BNO055_ACC_CONF);// !!
     SerialUSB.println(check_reg);
     #endif
 
@@ -133,7 +133,7 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode)
     write8(BNO055_UNIT_SEL_ADDR, unitsel);
     delay(10);
 
-  #elif defined NOSECONE
+  #else
     uint8_t unitsel = (0 << 7) | // Orientation = Android
                     (0 << 4) | // Temperature = Celsius
                     (0 << 2) | // Euler = Degrees
@@ -152,7 +152,7 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode)
   #ifdef TESTING
     write8(BNO055_PAGE_ID_ADDR, 0x01);
     delay(10);
-    check_reg = read8v2(BNO055_ACC_CONF);
+    check_reg = read8(BNO055_ACC_CONF); // !!
     SerialUSB.println(check_reg);
     write8(BNO055_PAGE_ID_ADDR, 0);
     delay(10);
@@ -696,7 +696,7 @@ bool Adafruit_BNO055::write8(adafruit_bno055_reg_t reg, byte value)
     @brief  Writes an 8 bit value over I2C
 */
 /**************************************************************************/
-bool Adafruit_BNO055::write8v2(adafruit_bno055_reg2_t reg, byte value)
+bool Adafruit_BNO055::write8(adafruit_bno055_reg2_t reg, byte value)
 {
   Wire.beginTransmission(_address);
   #if ARDUINO >= 100
@@ -744,7 +744,7 @@ byte Adafruit_BNO055::read8(adafruit_bno055_reg_t reg )
     @brief  Reads an 8 bit value over I2C
 */
 /**************************************************************************/
-byte Adafruit_BNO055::read8v2(adafruit_bno055_reg2_t reg )
+byte Adafruit_BNO055::read8(adafruit_bno055_reg2_t reg )
 {
   byte value = 0;
 
