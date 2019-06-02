@@ -98,8 +98,11 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode)
   write8(BNO055_AXIS_MAP_SIGN_ADDR, REMAP_SIGN_P0); // P0-P7, Default is P1
   delay(10);
 
-  #if defined BODY
+  #ifdef TESTING
     byte check_reg;
+  #endif
+
+  #if defined BODY
 
     write8(BNO055_PAGE_ID_ADDR, 0x01);
     delay(10);
