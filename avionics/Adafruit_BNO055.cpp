@@ -130,26 +130,7 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode)
     write8(BNO055_UNIT_SEL_ADDR, unitsel);
     delay(10);
 
-    write8(BNO055_SYS_TRIGGER_ADDR, 0x0);
-    delay(10);
-
-    /* Set the requested operating mode (see section 3.3) */
-    setMode(mode);
-    delay(20);
-
-    #ifdef TESTING
-      write8(BNO055_PAGE_ID_ADDR, 0x01);
-      delay(10);
-      check_reg = read8v2(BNO055_ACC_CONF);
-      SerialUSB.println(check_reg);
-      write8(BNO055_PAGE_ID_ADDR, 0);
-      delay(10);
-    #endif
-
   #elif defined NOSECONE
-    // write8(BNO055_PAGE_ID_ADDR, 0);
-    // delay(10);
-
     uint8_t unitsel = (0 << 7) | // Orientation = Android
                     (0 << 4) | // Temperature = Celsius
                     (0 << 2) | // Euler = Degrees
@@ -157,12 +138,21 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode)
                     (0 << 0);  // Accelerometer: 0 = m/s^2, 1 = mg
     write8(BNO055_UNIT_SEL_ADDR, unitsel);
     delay(10);
+  #endif
 
-    write8(BNO055_SYS_TRIGGER_ADDR, 0x0);
+  write8(BNO055_SYS_TRIGGER_ADDR, 0x0);
+  delay(10);
+  /* Set the requested operating mode (see section 3.3) */
+  setMode(mode);
+  delay(20);
+
+  #ifdef TESTING
+    write8(BNO055_PAGE_ID_ADDR, 0x01);
     delay(10);
-    /* Set the requested operating mode (see section 3.3) */
-    setMode(mode);
-    delay(20);
+    check_reg = read8v2(BNO055_ACC_CONF);
+    SerialUSB.println(check_reg);
+    write8(BNO055_PAGE_ID_ADDR, 0);
+    delay(10);
   #endif
 
   return true;
@@ -404,7 +394,7 @@ imu::Vector<3> Adafruit_BNO055::getVector(adafruit_vector_type_t vector_type)
       xyz[2] = ((double)z)/16.0;
       break;
     case VECTOR_ACCELEROMETER:
-    /* not sure if I need this yet
+    /* not needed
       xyz[0] = ((double)x)/16.0;
       xyz[0] = ((double)y)/16.0;
       xyz[0] = ((double)z)/16.0;  */

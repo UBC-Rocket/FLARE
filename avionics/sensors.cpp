@@ -155,7 +155,7 @@ void initSensors(InitStatus *status)
                 datalog.write("Time (ms), State, Battery Voltage (V),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
                 "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
                 "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
-                "IMU - acceleration X (mg),IMU - acceleration Y (mg),IMU - acceleration Z (mg),"
+                "IMU - acceleration X (g),IMU - acceleration Y (g),IMU - acceleration Z (g),"
                 "IMU - gyroscope X (rad/s),IMU - gyroscope Y (rad/s),IMU - gyroscope Z (rad/s),"
                 "IMU - magnetometer X (mT),IMU - magnetometer Y (mT),IMU - magnetometer Z (mT),"
                 "ematch\n");

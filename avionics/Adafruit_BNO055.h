@@ -213,9 +213,6 @@ class Adafruit_BNO055 : public Adafruit_Sensor
 
     typedef enum
     {
-      /* Page id register definition */
-      // BNO055_PAGE_ID_ADDR                                     = 0X07,
-
       /* REGISTERS 0 - 6 RESERVED*/
 
       /* Accel data register */
