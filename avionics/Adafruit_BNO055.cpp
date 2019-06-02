@@ -26,6 +26,7 @@
 #include <math.h>
 #include <limits.h>
 
+#include "sensors.h"
 #include "Adafruit_BNO055.h"
 
 /***************************************************************************
@@ -88,31 +89,74 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode)
   write8(BNO055_PWR_MODE_ADDR, POWER_MODE_NORMAL);
   delay(10);
 
-  write8(BNO055_PAGE_ID_ADDR, 0);
+  /* Configure axis mapping (see section 3.4) */
+  write8(BNO055_PAGE_ID_ADDR, 0x01);
+  delay(10);
 
-  /* Set the output units */
-  /*
-  uint8_t unitsel = (0 << 7) | // Orientation = Android
+  write8(BNO055_AXIS_MAP_CONFIG_ADDR, REMAP_CONFIG_P0); // P0-P7, Default is P1
+  delay(10);
+  write8(BNO055_AXIS_MAP_SIGN_ADDR, REMAP_SIGN_P0); // P0-P7, Default is P1
+  delay(10);
+
+  #ifdef TESTING
+    byte check_reg;
+  #endif
+
+  #ifdef BODY
+
+    write8(BNO055_PAGE_ID_ADDR, 0x01);
+    delay(10);
+
+    #ifdef TESTING
+      check_reg = read8(BNO055_ACC_CONF); // !!
+      delay(10);
+      SerialUSB.print("ACC_CONF = ");
+      SerialUSB.println(check_reg);
+    #endif
+
+    write8(BNO055_ACC_CONF, 0x0F);  // !!
+    delay(10);
+
+    #ifdef TESTING
+    check_reg = read8(BNO055_ACC_CONF);// !!
+    SerialUSB.println(check_reg);
+    #endif
+
+    write8(BNO055_PAGE_ID_ADDR, 0);
+    delay(10);
+
+    uint8_t unitsel = (0 << 7) | // Orientation = Android
                     (0 << 4) | // Temperature = Celsius
                     (0 << 2) | // Euler = Degrees
                     (1 << 1) | // Gyro = Rads
-                    (0 << 0);  // Accelerometer = m/s^2
-  write8(BNO055_UNIT_SEL_ADDR, unitsel);
-  */
+                    (1 << 0);  // Accelerometer: 0 = m/s^2, 1 = mg
+    write8(BNO055_UNIT_SEL_ADDR, unitsel);
+    delay(10);
 
-  /* Configure axis mapping (see section 3.4) */
-  /*
-  write8(BNO055_AXIS_MAP_CONFIG_ADDR, REMAP_CONFIG_P2); // P0-P7, Default is P1
-  delay(10);
-  write8(BNO055_AXIS_MAP_SIGN_ADDR, REMAP_SIGN_P2); // P0-P7, Default is P1
-  delay(10);
-  */
+  #else
+    uint8_t unitsel = (0 << 7) | // Orientation = Android
+                    (0 << 4) | // Temperature = Celsius
+                    (0 << 2) | // Euler = Degrees
+                    (1 << 1) | // Gyro = Rads
+                    (0 << 0);  // Accelerometer: 0 = m/s^2, 1 = mg
+    write8(BNO055_UNIT_SEL_ADDR, unitsel);
+    delay(10);
+  #endif
 
   write8(BNO055_SYS_TRIGGER_ADDR, 0x0);
   delay(10);
   /* Set the requested operating mode (see section 3.3) */
   setMode(mode);
   delay(20);
+
+  #ifdef TESTING
+    write8(BNO055_PAGE_ID_ADDR, 0x01);
+    delay(10);
+    check_reg = read8(BNO055_ACC_CONF); // !!
+    SerialUSB.println(check_reg);
+    write8(BNO055_PAGE_ID_ADDR, 0);
+    delay(10);
+  #endif
 
   return true;
 }
@@ -353,6 +397,10 @@ imu::Vector<3> Adafruit_BNO055::getVector(adafruit_vector_type_t vector_type)
       xyz[2] = ((double)z)/16.0;
       break;
     case VECTOR_ACCELEROMETER:
+    /* not needed
+      xyz[0] = ((double)x)/16.0;
+      xyz[0] = ((double)y)/16.0;
+      xyz[0] = ((double)z)/16.0;  */
     case VECTOR_LINEARACCEL:
     case VECTOR_GRAVITY:
       /* 1m/s^2 = 100 LSB */
@@ -476,7 +524,7 @@ bool Adafruit_BNO055::getSensorOffsets(adafruit_bno055_offsets_t &offsets_type)
            +/-2g  = +/- 2000 mg
            +/-4g  = +/- 4000 mg
            +/-8g  = +/- 8000 mg
-           +/-1§g = +/- 16000 mg */
+           +/-16g = +/- 16000 mg */
         offsets_type.accel_offset_x = (read8(ACCEL_OFFSET_X_MSB_ADDR) << 8) | (read8(ACCEL_OFFSET_X_LSB_ADDR));
         offsets_type.accel_offset_y = (read8(ACCEL_OFFSET_Y_MSB_ADDR) << 8) | (read8(ACCEL_OFFSET_Y_LSB_ADDR));
         offsets_type.accel_offset_z = (read8(ACCEL_OFFSET_Z_MSB_ADDR) << 8) | (read8(ACCEL_OFFSET_Z_LSB_ADDR));
@@ -645,10 +693,58 @@ bool Adafruit_BNO055::write8(adafruit_bno055_reg_t reg, byte value)
 
 /**************************************************************************/
 /*!
+    @brief  Writes an 8 bit value over I2C
+*/
+/**************************************************************************/
+bool Adafruit_BNO055::write8(adafruit_bno055_reg2_t reg, byte value)
+{
+  Wire.beginTransmission(_address);
+  #if ARDUINO >= 100
+    Wire.write((uint8_t)reg);
+    Wire.write((uint8_t)value);
+  #else
+    Wire.send(reg);
+    Wire.send(value);
+  #endif
+  Wire.endTransmission();
+
+  /* ToDo: Check for error! */
+  return true;
+}
+
+
+/**************************************************************************/
+/*!
     @brief  Reads an 8 bit value over I2C
 */
 /**************************************************************************/
 byte Adafruit_BNO055::read8(adafruit_bno055_reg_t reg )
+{
+  byte value = 0;
+
+  Wire.beginTransmission(_address);
+  #if ARDUINO >= 100
+    Wire.write((uint8_t)reg);
+  #else
+    Wire.send(reg);
+  #endif
+  Wire.endTransmission();
+  Wire.requestFrom(_address, (byte)1);
+  #if ARDUINO >= 100
+    value = Wire.read();
+  #else
+    value = Wire.receive();
+  #endif
+
+  return value;
+}
+
+/**************************************************************************/
+/*!
+    @brief  Reads an 8 bit value over I2C
+*/
+/**************************************************************************/
+byte Adafruit_BNO055::read8(adafruit_bno055_reg2_t reg )
 {
   byte value = 0;
 

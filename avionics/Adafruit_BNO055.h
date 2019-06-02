@@ -213,6 +213,20 @@ class Adafruit_BNO055 : public Adafruit_Sensor
 
     typedef enum
     {
+      /* REGISTERS 0 - 6 RESERVED*/
+
+      /* Accel data register */
+      BNO055_ACC_CONF                                         = 0X08,
+      BNO055_MAG_CONF                                         = 0X09,
+      BNO055_GYR_CONF0                                        = 0X0A,
+      BNO055_GYR_CONF1                                        = 0X0B,
+      BNO055_ACC_SLEEP_CONF                                   = 0X0C,
+      BNO055_GYR_SLEEP_CONF                                   = 0X0D,
+
+    } adafruit_bno055_reg2_t;
+
+    typedef enum
+    {
       POWER_MODE_NORMAL                                       = 0X00,
       POWER_MODE_LOWPOWER                                     = 0X01,
       POWER_MODE_SUSPEND                                      = 0X02
@@ -315,8 +329,10 @@ class Adafruit_BNO055 : public Adafruit_Sensor
 
   private:
     byte  read8   ( adafruit_bno055_reg_t );
+    byte  read8 ( adafruit_bno055_reg2_t );
     bool  readLen ( adafruit_bno055_reg_t, byte* buffer, uint8_t len );
     bool  write8  ( adafruit_bno055_reg_t, byte value );
+    bool  write8 ( adafruit_bno055_reg2_t, byte value );
 
     uint8_t _address;
     int32_t _sensorID;
