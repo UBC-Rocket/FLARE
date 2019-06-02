@@ -76,6 +76,19 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include <SD.h>
 #include <string.h>
 
+/*Errors---------------------------------------------------------------*/
+#if defined NOSECONE && defined BODY
+    #error Only one of NOSECONE and BODY may be defined!
+#elif !(defined NOSECONE || defined BODY)
+    #error Define one of NOSECONE or BODY!
+#endif
+
+#if defined POW && defined SERVO
+    #error Only one of POW and SERVO may be defined!
+#elif !(defined POW || defined SERVO)
+    #error Define one of POW or SERVO!
+#endif
+
 /*Variables------------------------------------------------------------*/
 File radiolog;
 static InitStatus s_statusOfInit;
