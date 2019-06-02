@@ -60,7 +60,7 @@ The specific functions they can perform are as follows:
 | Log all sensor data | Log all sensor data |
 |                    | Communicate with SATCOM
 |                    | Utilize GPS
-| Uses `bodyTierX` radio functions| Uses `noseconeTierX` radio functions - a subset of data is sent |
+| Uses `body` radio functions| Uses `nosecone` radio functions - a subset of data is sent |
 |Runs state machine and controls deployment actuators (e.g. servos, ematch) | Runs state machine without control of actuators |
 | | Accepts unique nosecone commands from radio _(not implemented as of Mar 2)_ |
 
