@@ -26,6 +26,7 @@
 #include <math.h>
 #include <limits.h>
 
+#include "sensors.h"
 #include "Adafruit_BNO055.h"
 
 /***************************************************************************
@@ -108,41 +109,41 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode)
   delay(10);
   */
   #if defined BODY
-  byte check_reg;
+    byte check_reg;
 
-  write8(BNO055_PAGE_ID_ADDR, 0x01);
-  delay(10);
-  check_reg = read8(BNO055_ACC_CONF);
-  delay(10);
+    write8(BNO055_PAGE_ID_ADDR, 0x01);
+    delay(10);
+    check_reg = read8v2(BNO055_ACC_CONF);
+    delay(10);
 
-  #ifdef TESTING
-    SerialUSB.print("ACC_CONF = ");
+    #ifdef TESTING
+      SerialUSB.print("ACC_CONF = ");
+      SerialUSB.println(check_reg);
+    #endif
+
+    write8v2(BNO055_ACC_CONF, 0x0F);
+    delay(10);
+
+    check_reg = read8v2(BNO055_ACC_CONF);
+    #ifdef TESTING
     SerialUSB.println(check_reg);
-  #endif
+    #endif
+    write8(BNO055_PAGE_ID_ADDR, 0);
+    delay(10);
+    write8(BNO055_SYS_TRIGGER_ADDR, 0x0);
+    delay(10);
+    /* Set the requested operating mode (see section 3.3) */
+    setMode(mode);
+    delay(20);
 
-  write8(BNO055_ACC_CONF, 0x0F);
-  delay(10);
-
-  check_reg = read8v2(BNO055_ACC_CONF);
-  #ifdef TESTING
-  SerialUSB.println(check_reg);
-  #endif
-  write8(BNO055_PAGE_ID_ADDR, 0);
-  delay(10);
-  write8(BNO055_SYS_TRIGGER_ADDR, 0x0);
-  delay(10);
-  /* Set the requested operating mode (see section 3.3) */
-  setMode(mode);
-  delay(20);
-
-  write8(BNO055_PAGE_ID_ADDR, 0x01);
-  delay(10);
-  check_reg = read8(BNO055_ACC_CONF);
-  #ifdef TESTING
-  SerialUSB.println(check_reg);
-  #endif
-  write8(BNO055_PAGE_ID_ADDR, 0);
-  delay(10);
+    write8(BNO055_PAGE_ID_ADDR, 0x01);
+    delay(10);
+    check_reg = read8v2(BNO055_ACC_CONF);
+    #ifdef TESTING
+    SerialUSB.println(check_reg);
+    #endif
+    write8(BNO055_PAGE_ID_ADDR, 0);
+    delay(10);
 
   #elif defined NOSECONE
     write8(BNO055_PAGE_ID_ADDR, 0);
@@ -689,10 +690,58 @@ bool Adafruit_BNO055::write8(adafruit_bno055_reg_t reg, byte value)
 
 /**************************************************************************/
 /*!
+    @brief  Writes an 8 bit value over I2C
+*/
+/**************************************************************************/
+bool Adafruit_BNO055::write8v2(adafruit_bno055_reg2_t reg, byte value)
+{
+  Wire.beginTransmission(_address);
+  #if ARDUINO >= 100
+    Wire.write((uint8_t)reg);
+    Wire.write((uint8_t)value);
+  #else
+    Wire.send(reg);
+    Wire.send(value);
+  #endif
+  Wire.endTransmission();
+
+  /* ToDo: Check for error! */
+  return true;
+}
+
+
+/**************************************************************************/
+/*!
     @brief  Reads an 8 bit value over I2C
 */
 /**************************************************************************/
 byte Adafruit_BNO055::read8(adafruit_bno055_reg_t reg )
+{
+  byte value = 0;
+
+  Wire.beginTransmission(_address);
+  #if ARDUINO >= 100
+    Wire.write((uint8_t)reg);
+  #else
+    Wire.send(reg);
+  #endif
+  Wire.endTransmission();
+  Wire.requestFrom(_address, (byte)1);
+  #if ARDUINO >= 100
+    value = Wire.read();
+  #else
+    value = Wire.receive();
+  #endif
+
+  return value;
+}
+
+/**************************************************************************/
+/*!
+    @brief  Reads an 8 bit value over I2C
+*/
+/**************************************************************************/
+byte Adafruit_BNO055::read8v2(adafruit_bno055_reg2_t reg )
 {
   byte value = 0;
 

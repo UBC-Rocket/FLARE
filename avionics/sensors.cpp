@@ -560,6 +560,12 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
     gyroscope_data = IMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
     magnetometer_data = IMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
 
+    #ifdef TESTING
+    SerialUSB.println(accelerometer_data[0]);
+    SerialUSB.println(gyroscope_data[0]);
+    SerialUSB.println(magnetometer_data[0]);
+
+    #endif
     IMU_data[0] = accelerometer_data[0];
     IMU_data[1] = accelerometer_data[1];
     IMU_data[2] = accelerometer_data[2];
