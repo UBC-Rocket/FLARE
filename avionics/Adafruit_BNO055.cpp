@@ -90,16 +90,15 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode)
   delay(10);
 
   // write8(BNO055_PAGE_ID_ADDR, 0);
+  // delay(10);
 
   /* Set the output units */
-  /*
-  uint8_t unitsel = (0 << 7) | // Orientation = Android
-                    (0 << 4) | // Temperature = Celsius
-                    (0 << 2) | // Euler = Degrees
-                    (1 << 1) | // Gyro = Rads
-                    (0 << 0);  // Accelerometer = m/s^2
-  write8(BNO055_UNIT_SEL_ADDR, unitsel);
-  */
+  // uint8_t unitsel = (0 << 7) | // Orientation = Android
+  //                   (0 << 4) | // Temperature = Celsius
+  //                   (0 << 2) | // Euler = Degrees
+  //                   (1 << 1) | // Gyro = Rads
+  //                   (0 << 0);  // Accelerometer: 0 = m/s^2, 1 = mg
+  // write8(BNO055_UNIT_SEL_ADDR, unitsel);
 
   /* Configure axis mapping (see section 3.4) */
   /*
@@ -113,10 +112,10 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode)
 
     write8(BNO055_PAGE_ID_ADDR, 0x01);
     delay(10);
-    check_reg = read8v2(BNO055_ACC_CONF);
-    delay(10);
 
     #ifdef TESTING
+      check_reg = read8v2(BNO055_ACC_CONF);
+      delay(10);
       SerialUSB.print("ACC_CONF = ");
       SerialUSB.println(check_reg);
     #endif
@@ -124,30 +123,50 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode)
     write8v2(BNO055_ACC_CONF, 0x0F);
     delay(10);
 
-    check_reg = read8v2(BNO055_ACC_CONF);
     #ifdef TESTING
+    check_reg = read8v2(BNO055_ACC_CONF);
     SerialUSB.println(check_reg);
     #endif
+
     write8(BNO055_PAGE_ID_ADDR, 0);
     delay(10);
+
+    uint8_t unitsel = (0 << 7) | // Orientation = Android
+                    (0 << 4) | // Temperature = Celsius
+                    (0 << 2) | // Euler = Degrees
+                    (1 << 1) | // Gyro = Rads
+                    (1 << 0);  // Accelerometer: 0 = m/s^2, 1 = mg
+    write8(BNO055_UNIT_SEL_ADDR, unitsel);
+    delay(10);
+
     write8(BNO055_SYS_TRIGGER_ADDR, 0x0);
     delay(10);
+
     /* Set the requested operating mode (see section 3.3) */
     setMode(mode);
     delay(20);
 
-    write8(BNO055_PAGE_ID_ADDR, 0x01);
-    delay(10);
-    check_reg = read8v2(BNO055_ACC_CONF);
     #ifdef TESTING
-    SerialUSB.println(check_reg);
+      write8(BNO055_PAGE_ID_ADDR, 0x01);
+      delay(10);
+      check_reg = read8v2(BNO055_ACC_CONF);
+      SerialUSB.println(check_reg);
+      write8(BNO055_PAGE_ID_ADDR, 0);
+      delay(10);
     #endif
-    write8(BNO055_PAGE_ID_ADDR, 0);
-    delay(10);
 
   #elif defined NOSECONE
     write8(BNO055_PAGE_ID_ADDR, 0);
     delay(10);
+
+    uint8_t unitsel = (0 << 7) | // Orientation = Android
+                    (0 << 4) | // Temperature = Celsius
+                    (0 << 2) | // Euler = Degrees
+                    (1 << 1) | // Gyro = Rads
+                    (0 << 0);  // Accelerometer: 0 = m/s^2, 1 = mg
+    // write8(BNO055_UNIT_SEL_ADDR, unitsel);
+    delay(10);
+
     write8(BNO055_SYS_TRIGGER_ADDR, 0x0);
     delay(10);
     /* Set the requested operating mode (see section 3.3) */
