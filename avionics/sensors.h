@@ -29,6 +29,16 @@
 #define GPS_FIELD_LENGTH        20
 
 #define NUM_SENSORS 9
+
+#define FILE_STATUS_POSITION 0
+#define BATTERY_STATUS_POSITION 1
+#define ACCELEROMETER_STATUS_POSITION 2
+#define BAROMETER_STATUS_POSITION 3
+#define TEMPERATURE_STATUS_POSITION 4
+#define IMU_STATUS_POSITION 5
+#define EMATCH_STATUS_POSITION 6
+#define SATCOM_STATUS_POSITION 7
+#define THERMOCOUPLE_STATUS_POSITION 8
 /*Variables------------------------------------------------------------*/
 
 /*Error codes for initialization*/
