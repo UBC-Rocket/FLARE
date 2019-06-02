@@ -504,7 +504,7 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
                 SerialUSB.println(*thermocouple_data);
             }
             else
-                SerialUSB.print("Thermocouple ERROR");
+                SerialUSB.println("Thermocouple ERROR");
         #endif
     #endif
 
