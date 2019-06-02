@@ -178,7 +178,7 @@ void doCommand(char command, FlightStates *state, InitStatus *status, XBee* radi
                 // turn off cameras
                 stop_record();
             }
-            else if(*state == ARMED) {
+            else if(*state == STANDBY) {
                 msg = String("Already in STANDBY");
                 sendMessage(radio, txPacket, &msg);
             }
