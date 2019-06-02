@@ -83,7 +83,7 @@ void initSensors(InitStatus *status)
 
     /*init battery*/
     #ifdef TESTING
-    SerialUSB.println("Initializing battery");
+        SerialUSB.println("Initializing battery");
     #endif
 
     // if(powerbattery.getVoltage() <= LOW_BATTERY_VOLTAGE)
@@ -106,14 +106,14 @@ void initSensors(InitStatus *status)
     // }
 
     #ifdef TESTING
-    SerialUSB.print("Read voltage (V): ");
-    SerialUSB.println(powerbattery.getVoltage());
+        SerialUSB.print("Read voltage (V): ");
+        SerialUSB.println(powerbattery.getVoltage());
     #endif
 
     #ifdef BODY
     /* check ematch continuity */
     #ifdef TESTING
-    SerialUSB.println("Checking ematch continuity");
+        SerialUSB.println("Checking ematch continuity");
     #endif
 
     if (!continuityCheck()){
@@ -121,14 +121,14 @@ void initSensors(InitStatus *status)
         status->sensorNominal[EMATCH_STATUS_POSITION] = false;
 
         #ifdef TESTING
-        SerialUSB.println("ERROR: ematch continuity");
+            SerialUSB.println("ERROR: ematch continuity");
         #endif
     }
     #endif //to IFDEF BODY
 
     /*init SD card*/
     #ifdef TESTING
-    SerialUSB.println("Initializing SD card");
+        SerialUSB.println("Initializing SD card");
     #endif
     if (!SD.begin(BUILTIN_SDCARD)) {
         if(status->overview < NONCRITICAL_FAILURE)
@@ -137,7 +137,7 @@ void initSensors(InitStatus *status)
 
 
         #ifdef TESTING
-        SerialUSB.println("ERROR: SD card initialization failed!");
+            SerialUSB.println("ERROR: SD card initialization failed!");
         #endif
     } else {
         datalog = SD.open("datalog.txt", FILE_WRITE);
@@ -147,7 +147,7 @@ void initSensors(InitStatus *status)
             status->sensorNominal[FILE_STATUS_POSITION] = false;
 
             #ifdef TESTING
-            SerialUSB.println("ERROR: Opening file failed!");
+                SerialUSB.println("ERROR: Opening file failed!");
             #endif
         } else {
             #ifdef NOSECONE
@@ -155,21 +155,24 @@ void initSensors(InitStatus *status)
                 datalog.write("Time (ms), State, Battery Voltage (V),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
                 "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
                 "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
-                "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude,SatCom,Thermocouple (C)\n");
+                "IMU - Heading (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude,SatCom,Thermocouple (C)\n");
             #endif
             #ifdef BODY
                 datalog.write("BODY SENSOR LOG DATA\n");
                 datalog.write("Time (ms), State, Battery Voltage (V),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
                 "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
                 "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
-                "IMU - Yaw (°),IMU - Roll (°),IMU - Pitch (°),ematch\n");
+                "IMU - acceleration X (g),IMU - acceleration Y (g),IMU - acceleration Z (g),"
+                "IMU - gyroscope X (rad/s),IMU - gyroscope Y (rad/s),IMU - gyroscope Z (rad/s),"
+                "IMU - magnetometer X (mT),IMU - magnetometer Y (mT),IMU - magnetometer Z (mT),"
+                "ematch\n");
             #endif
         }
     }
 
     /*init accerlerometer*/
     #ifdef TESTING
-    SerialUSB.println("Initializing accelerometer");
+        SerialUSB.println("Initializing accelerometer");
     #endif
     accelerometer.setI2CAddr(ACCELEROMETER_ADDRESS);
     accelerometer.begin(LIS331::USE_I2C);
@@ -177,7 +180,7 @@ void initSensors(InitStatus *status)
 
     /*init barometer*/
     #ifdef TESTING
-    SerialUSB.println("Initializing barometer");
+        SerialUSB.println("Initializing barometer");
     #endif
     #ifdef TESTING
     if (!barometer.initializeMS_5803(true)) { //because one is verbose
@@ -193,30 +196,34 @@ void initSensors(InitStatus *status)
 
     /*init temp sensor*/
     #ifdef TESTING
-    SerialUSB.println("Initializing temperature sensor");
+        SerialUSB.println("Initializing temperature sensor");
     #endif
     temp_sensor.begin();
 
     /*init IMU*/
     #ifdef TESTING
-    SerialUSB.println("Initializing IMU");
+        SerialUSB.println("Initializing IMU");
     #endif
 
     delay(7);
-    if(!IMU.begin()){
-        if(status->overview < NONCRITICAL_FAILURE)
-            status->overview = NONCRITICAL_FAILURE;
-        status->sensorNominal[IMU_STATUS_POSITION] = false;
+    #if defined NOSECONE
+        if(!IMU.begin(Adafruit_BNO055::OPERATION_MODE_NDOF)){
+    #elif defined BODY
+        if(!IMU.begin(Adafruit_BNO055::OPERATION_MODE_AMG)){
+    #endif
+            if(status->overview < NONCRITICAL_FAILURE)
+                status->overview = NONCRITICAL_FAILURE;
+            status->sensorNominal[IMU_STATUS_POSITION] = false;
 
-        #ifdef TESTING
-        SerialUSB.println("ERROR: IMU initialization failed!");
-        #endif
-    }
+            #ifdef TESTING
+                SerialUSB.println("ERROR: IMU initialization failed!");
+            #endif
+        }
     IMU.setExtCrystalUse(true);
 
     /* Init Cameras */
     #ifdef TESTING
-    SerialUSB.println("Initializing the camera");
+        SerialUSB.println("Initializing the camera");
     #endif
     SerialCamera.begin(CameraBaud);
     while (!SerialCamera) {}
@@ -225,7 +232,7 @@ void initSensors(InitStatus *status)
     #ifdef NOSECONE
         /*init GPS*/
         #ifdef TESTING
-        SerialUSB.println("Initializing GPS");
+            SerialUSB.println("Initializing GPS");
         #endif
         SerialGPS.begin(9600);  //baud rate 9600 for the GP-20U7
         while (!SerialGPS) {}
@@ -293,13 +300,23 @@ void initSensors(InitStatus *status)
     else
         datalog.write("B,");
 
-    if(status->sensorNominal[IMU_STATUS_POSITION]) //Yaw, roll, pitch
-        datalog.write("G,G,G,");
-    else
-        datalog.write("B,B,B,");
+    if(status->sensorNominal[IMU_STATUS_POSITION]) { //Yaw, roll, pitch
+        #ifdef BODY
+            datalog.write("G,G,G,G,G,G,G,G,G,");
+        #else
+            datalog.write("G,G,G,");
+        #endif
+    }
+    else {
+        #ifdef BODY
+            datalog.write("B,B,B,B,B,B,B,B,B,");
+        #else
+            datalog.write("B,B,B,");
+        #endif
+    }
 
     #ifdef NOSECONE
-    datalog.write("X, X, X,");   //GPS no capability to test success
+        datalog.write("X, X, X,");   //GPS no capability to test success
     #endif
 
     #ifdef BODY
@@ -337,7 +354,7 @@ void initSensors(InitStatus *status)
 void displayStatus(InitStatus *status){
     if (status->overview == CRITICAL_FAILURE) {
         #ifdef TESTING
-        SerialUSB.println("Critical failure! >:-{");
+            SerialUSB.println("Critical failure! >:-{");
         #endif
 
         #ifdef TESTING //Only plays song once if testing, because it's annoying
@@ -351,7 +368,7 @@ void displayStatus(InitStatus *status){
     }
     else if (status->overview == NONCRITICAL_FAILURE){
         #ifdef TESTING
-        SerialUSB.println("Noncritical failure! :(");
+            SerialUSB.println("Noncritical failure! :(");
         #endif
         pinMode(LED_BUILTIN, OUTPUT);
 
@@ -366,7 +383,7 @@ void displayStatus(InitStatus *status){
     }
     else {
         #ifdef TESTING
-        SerialUSB.println("Initialization complete! :D");
+            SerialUSB.println("Initialization complete! :D");
         #endif
         pinMode(LED_BUILTIN,OUTPUT);
         digitalWrite(LED_BUILTIN,HIGH);
@@ -411,12 +428,12 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
     *timestamp = millis();
 
     #ifdef TESTING
-    SerialUSB.println("Measuring battery voltage");
+        SerialUSB.println("Measuring battery voltage");
     #endif
     *battery_voltage = powerbattery.getVoltage();
 
     #ifdef TESTING
-    SerialUSB.println("Polling accelerometer");
+        SerialUSB.println("Polling accelerometer");
     #endif
     accelerometer.readAxes(x, y, z);
     acc_data[0] = accelerometer.convertToG(ACCELEROMETER_SCALE, x);
@@ -424,7 +441,7 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
     acc_data[2] = accelerometer.convertToG(ACCELEROMETER_SCALE, z);
 
     #ifdef TESTING
-    SerialUSB.println("Polling barometer");
+        SerialUSB.println("Polling barometer");
     bool bar_flag = barometer.readSensor();
     if(!bar_flag)
         SerialUSB.println("BAROMETER FAILED READING");
@@ -439,22 +456,44 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
 
 
     #ifdef TESTING
-    SerialUSB.println("Polling temperature sensor");
+        SerialUSB.println("Polling temperature sensor");
     #endif
     *temp_sensor_data = temp_sensor.readTempC();
 
     #ifdef TESTING
-    SerialUSB.println("Polling IMU");
+        SerialUSB.println("Polling IMU");
     #endif
-    sensors_event_t event; //we don't know what this is but it works so
-    IMU.getEvent(&event);
-    IMU_data[0] = event.orientation.x;
-    IMU_data[1] = event.orientation.y;
-    IMU_data[2] = event.orientation.z;
+
+    #if defined NOSECONE
+        sensors_event_t event;
+        IMU.getEvent(&event);
+        IMU_data[0] = event.orientation.heading;
+        IMU_data[1] = event.orientation.roll;
+        IMU_data[2] = event.orientation.pitch;
+
+    #elif defined BODY
+        imu::Vector<3> accelerometer_data, gyroscope_data, magnetometer_data;
+
+        accelerometer_data = IMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+        gyroscope_data = IMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+        magnetometer_data = IMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+
+        IMU_data[0] = accelerometer_data[0];
+        IMU_data[1] = accelerometer_data[1];
+        IMU_data[2] = accelerometer_data[2];
+
+        IMU_data[3] = gyroscope_data[0];
+        IMU_data[4] = gyroscope_data[1];
+        IMU_data[5] = gyroscope_data[2];
+
+        IMU_data[6] = magnetometer_data[0];
+        IMU_data[7] = magnetometer_data[1];
+        IMU_data[8] = magnetometer_data[2];
+    #endif // NOSECONE elif BODY
 
     #ifdef NOSECONE
         #ifdef TESTING
-        SerialUSB.println("Polling GPS");
+            SerialUSB.println("Polling GPS");
         #endif
         if (updateGPS()) {
             getGPS(GPS_data);
@@ -472,9 +511,10 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
                 SerialUSB.println(*thermocouple_data);
             }
             else
-                SerialUSB.print("Thermocouple ERROR");
+                SerialUSB.println("Thermocouple ERROR");
         #endif
     #endif
+
 }
 
 /**
@@ -494,7 +534,7 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
 {
     /*write data to SD card*/
     #ifdef TESTING
-    SerialUSB.println("Writing to SD card");
+        SerialUSB.println("Writing to SD card");
     #endif
     datalog.print(*timestamp);
     datalog.print(",");
@@ -534,44 +574,68 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
 
     /*output data to serial*/
     #ifdef TESTING
-    SerialUSB.print("Time (ms):                          ");
-    SerialUSB.println(*timestamp);
-    SerialUSB.print("State:                              ");
-    SerialUSB.println(state);
-    SerialUSB.print("Battery voltage (V):                ");
-    SerialUSB.println(*battery_voltage);
-    SerialUSB.print("Accelerometer acceleration X (g):   ");
-    SerialUSB.println(acc_data[0]);
-    SerialUSB.print("Accelerometer acceleration Y (g):   ");
-    SerialUSB.println(acc_data[1]);
-    SerialUSB.print("Accelerometer acceleration Z (g):   ");
-    SerialUSB.println(acc_data[2]);
-    SerialUSB.print("Barometer pressure (mbar):          ");
-    SerialUSB.println(bar_data[0]);
-    SerialUSB.print("Barometer temperature (C):          ");
-    SerialUSB.println(bar_data[1]);
-    SerialUSB.print("Baseline Pressure (mbar):           ");
-    SerialUSB.println(baseline_pressure);
-    SerialUSB.print("Altitude (m):                       ");
-    SerialUSB.println(altitude);
-    SerialUSB.print("Temperature sensor temperature (C): ");
-    SerialUSB.println(*temp_sensor_data);
-    SerialUSB.print("IMU - Yaw:                          ");
-    SerialUSB.println(IMU_data[0]);
-    SerialUSB.print("IMU - Roll:                         ");
-    SerialUSB.println(IMU_data[1]);
-    SerialUSB.print("IMU - Pitch:                        ");
-    SerialUSB.println(IMU_data[2]);
-        #ifdef NOSECONE
-        SerialUSB.print("GPS latitude:                       ");
-        SerialUSB.println(GPS_data[0], 6);
-        SerialUSB.print("GPS longitude:                      ");
-        SerialUSB.println(GPS_data[1], 6);
-        SerialUSB.print("GPS altitude:                       ");
-        SerialUSB.println(GPS_data[2], 3);
-        SerialUSB.print("Thermocouple (C):                   ");
-        SerialUSB.println(thermocouple_data);
-        SerialUSB.println("");
+        SerialUSB.print("Time (ms):                          ");
+        SerialUSB.println(*timestamp);
+        SerialUSB.print("State:                              ");
+        SerialUSB.println(state);
+        SerialUSB.print("Battery voltage (V):                ");
+        SerialUSB.println(*battery_voltage);
+        SerialUSB.print("Accelerometer acceleration X (g):   ");
+        SerialUSB.println(acc_data[0]);
+        SerialUSB.print("Accelerometer acceleration Y (g):   ");
+        SerialUSB.println(acc_data[1]);
+        SerialUSB.print("Accelerometer acceleration Z (g):   ");
+        SerialUSB.println(acc_data[2]);
+        SerialUSB.print("Barometer pressure (mbar):          ");
+        SerialUSB.println(bar_data[0]);
+        SerialUSB.print("Barometer temperature (C):          ");
+        SerialUSB.println(bar_data[1]);
+        SerialUSB.print("Baseline Pressure (mbar):           ");
+        SerialUSB.println(baseline_pressure);
+        SerialUSB.print("Altitude (m):                       ");
+        SerialUSB.println(altitude);
+        SerialUSB.print("Temperature sensor temperature (C): ");
+        SerialUSB.println(*temp_sensor_data);
+
+        #if defined NOSECONE
+            SerialUSB.print("IMU - Heading:                      ");
+            SerialUSB.println(IMU_data[0]);
+            SerialUSB.print("IMU - Roll:                         ");
+            SerialUSB.println(IMU_data[1]);
+            SerialUSB.print("IMU - Pitch:                        ");
+            SerialUSB.println(IMU_data[2]);
+
+            SerialUSB.print("GPS latitude:                       ");
+            SerialUSB.println(GPS_data[0], 6);
+            SerialUSB.print("GPS longitude:                      ");
+            SerialUSB.println(GPS_data[1], 6);
+            SerialUSB.print("GPS altitude:                       ");
+            SerialUSB.println(GPS_data[2], 3);
+
+            SerialUSB.print("Thermocouple (C):                   ");
+            SerialUSB.println(thermocouple_data);
+
+        #elif defined BODY
+            SerialUSB.print("IMU - accelerometer X (g):          ");
+            SerialUSB.println(IMU_data[0]);
+            SerialUSB.print("IMU - accelerometer Y (g):          ");
+            SerialUSB.println(IMU_data[1]);
+            SerialUSB.print("IMU - accelerometer Z (g):          ");
+            SerialUSB.println(IMU_data[2]);
+            SerialUSB.print("IMU - gyroscope X (rad/s):          ");
+            SerialUSB.println(IMU_data[3]);
+            SerialUSB.print("IMU - gyroscope Y (rad/s):          ");
+            SerialUSB.println(IMU_data[4]);
+            SerialUSB.print("IMU - gyroscope Z (rad/s):          ");
+            SerialUSB.println(IMU_data[5]);
+            SerialUSB.print("IMU - magnetometer X (mT):          ");
+            SerialUSB.println(IMU_data[6]);
+            SerialUSB.print("IMU - magnetometer Y (mT):          ");
+            SerialUSB.println(IMU_data[7]);
+            SerialUSB.print("IMU - magnetometer Z (mT):          ");
+            SerialUSB.println(IMU_data[8]);
         #endif
+
+        SerialUSB.println("");
     #endif
 }
