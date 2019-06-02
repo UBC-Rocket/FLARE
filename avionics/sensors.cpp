@@ -293,10 +293,20 @@ void initSensors(InitStatus *status)
     else
         datalog.write("B,");
 
-    if(status->sensorNominal[IMU_STATUS_POSITION]) //Yaw, roll, pitch
-        datalog.write("G,G,G,");
-    else
-        datalog.write("B,B,B,");
+    if(status->sensorNominal[IMU_STATUS_POSITION]) { //Yaw, roll, pitch
+        #ifdef BODY
+            datalog.write("G,G,G,G,G,G,G,G,G,");
+        #else
+            datalog.write("G,G,G,");
+        #endif
+    }
+    else {
+        #ifdef BODY
+            datalog.write("B,B,B,B,B,B,B,B,B,");
+        #else
+            datalog.write("B,B,B,");
+        #endif
+    }
 
     #ifdef NOSECONE
     datalog.write("X, X, X,");   //GPS no capability to test success
