@@ -321,9 +321,9 @@ void initSensors(InitStatus *status)
 
     #ifdef NOSECONE
         if(status->sensorNominal[SATCOM_STATUS_POSITION])
-            datalog.write("G\n");
+            datalog.write("G,");
         else
-            datalog.write("B\n");
+            datalog.write("B,");
 
         if(status->sensorNominal[THERMOCOUPLE_STATUS_POSITION])
             datalog.write("G\n");
