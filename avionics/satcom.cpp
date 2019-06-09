@@ -15,14 +15,18 @@
 /*Includes------------------------------------------------------------*/
 #include "satcom.h"
 #include "sensors.h"
+#include "options.h"
 #include <string.h>
 #include <Arduino.h>
 #include "IridiumSBD.h"
 #include <HardwareSerial.h>
 
+/*Constants------------------------------------------------------------*/
+#define BUFSIZE 100
+
 /*Variables-------------------------------------------------------------*/
 // Declare the IridiumSBD object
-IridiumSBD modem(IridiumSerial);
+static IridiumSBD modem(IridiumSerial);
 
 /*Functions------------------------------------------------------------*/
 
@@ -101,7 +105,7 @@ int SatComQuality()
 
   #ifdef TESTING
   int err = modem.getSignalQuality(SignalQuality);
-  
+
   if (err != ISBD_SUCCESS)
   {
     SerialUSB.print("SignalQuality failed: error ");

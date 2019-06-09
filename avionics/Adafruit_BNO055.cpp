@@ -26,7 +26,7 @@
 #include <math.h>
 #include <limits.h>
 
-#include "sensors.h"
+#include "options.h"
 #include "Adafruit_BNO055.h"
 
 /***************************************************************************

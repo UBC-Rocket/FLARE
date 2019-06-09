@@ -7,28 +7,14 @@
 
 #include "statemachine.h"
 #include "Adafruit_BNO055.h"
-
+#include "options.h"
 
 /*Constants------------------------------------------------------------*/
-// #define NOSECONE //enable or disable nosecone-avionics specific functionality
-#define BODY //enable or disable body-avionics specific functionality
-// #define SERVO //if drogue release utilizes CO2 canister
-#define POW //if drogue release utilizes black powder charge
-// #define TESTING //enable or disable debug output
-// #define GROUND_TEST
-
 #define SerialUSB               Serial
 #define SerialGPS               Serial5
 #define SerialRadio             Serial2
+#define IridiumSerial           Serial4
 #define SPIThermo               SPI2
-
-#define EARTHS_GRAVITY          9.80665
-
-#define ACCELEROMETER_ADDRESS   0x18
-#define TEMP_SENSOR_ADDRESS     0x48
-#define IMU_ADDRESS             0x28
-#define ACCELEROMETER_SCALE     24
-#define BATTERY_SENSOR_PIN      9
 
 #define ACC_DATA_ARRAY_SIZE     3
 #define BAR_DATA_ARRAY_SIZE     2
@@ -41,6 +27,7 @@
 #define GPS_FIELD_LENGTH        20
 
 #define NUM_SENSORS 9
+
 #define FILE_STATUS_POSITION 0
 #define BATTERY_STATUS_POSITION 1
 #define ACCELEROMETER_STATUS_POSITION 2
@@ -50,7 +37,6 @@
 #define EMATCH_STATUS_POSITION 6
 #define SATCOM_STATUS_POSITION 7
 #define THERMOCOUPLE_STATUS_POSITION 8
-
 /*Variables------------------------------------------------------------*/
 
 /*Error codes for initialization*/
