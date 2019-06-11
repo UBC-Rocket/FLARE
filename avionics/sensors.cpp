@@ -140,7 +140,7 @@ void initSensors(InitStatus *status)
             SerialUSB.println("ERROR: SD card initialization failed!");
         #endif
     } else {
-        datalog = SD.open("datalog.txt", FILE_WRITE);
+        datalog = SD.open("datalog.csv", FILE_WRITE);
         if (!datalog) {
             if(status->overview < NONCRITICAL_FAILURE)
                 status->overview = NONCRITICAL_FAILURE;
