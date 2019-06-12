@@ -11,7 +11,7 @@
 
 /*Constants------------------------------------------------------------*/
 #define SerialUSB               Serial
-#define SerialGPS               Serial5
+#define SerialGPS               Serial1
 #define SerialRadio             Serial2
 #define IridiumSerial           Serial4
 #define SPIThermo               SPI2
