@@ -192,6 +192,12 @@ void doCommand(char command, float GPS_data[], FlightStates *state, InitStatus *
     unsigned char payload[2] = {'G'};
     payload[1] = command;
     String msg;
+            String latPrefix;
+            String latVal;
+            String longPrefix;
+            String longVal;
+            String altPrefix;
+            String altVal;
     switch (command){
         case ARM:
             if(*state == STANDBY) { //Don't want to switch out of drogue deploy or something into Armed
@@ -274,10 +280,15 @@ void doCommand(char command, float GPS_data[], FlightStates *state, InitStatus *
             break;
 
         case GPS_PING:
-            String latPrefix = String("Lat:")
-            String latVal = String()
-            msg = String("Lat:")
+            latPrefix = String("Lat:");
+            latVal = String(GPS_data[0], 3);
+            longPrefix = String("Lng:");
+            longVal = String(GPS_data[1], 3);
+            altPrefix = String("Alt:");
+            altVal = String(GPS_data[2],3);
+            msg = String(latPrefix + latVal + longPrefix + longVal + altPrefix + altVal);
             sendMessage(radio, txPacket, &msg);
+            break;
 
         case DO_NOTHING:
             break;
