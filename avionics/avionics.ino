@@ -189,7 +189,7 @@ void loop()
     static FlightStates state = STANDBY;
 
     static unsigned long radio_old_time = 0;
-    static unsigned long radio_time_interval = 400; //milliseconds
+    static unsigned long radio_time_interval = 500; //milliseconds
 
     #ifdef NOSECONE
         static bool mainDeploySatcomSent = false;
