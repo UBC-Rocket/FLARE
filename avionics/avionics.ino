@@ -202,7 +202,7 @@ void loop()
         state = WINTER_CONTINGENCY; //makes sure that even if it does somehow get accidentally changed, it gets reverted
 
     // if radio communications are received
-    resolveRadioRx(&s_radio, &s_txPacket, &state, &s_statusOfInit);
+    resolveRadioRx(GPS_data, &s_radio, &s_txPacket, &state, &s_statusOfInit);
 
     #ifdef NOSECONE
      /* send satcom data */
