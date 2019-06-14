@@ -40,12 +40,13 @@
 #define INIT_SERVO_POS  60
 #define FINAL_SERVO_POS 160
 
-#define IGNITOR_DELAY 15    // in milliseconds
+#define DROGUE_IGNITOR_DELAY 25    // in milliseconds
+#define IGNITOR_DELAY 20
 #define SERVO_DELAY 525    // in miliseconds
-#define CONTINUITY_CHECK_DELAY 40 // in microseconds!
+#define CONTINUITY_CHECK_DELAY 50 // in microseconds!
 
 // tested at 11.1V with a 2.2k/470 divider (606) or 1.3k/330 (642) or 1.33k/330 (629)
-#define DISCONTINUOUS_THRESHOLD 550 // threshold for a discontinuous ematch -> read voltage / 3.3 * 1023
+#define DISCONTINUOUS_THRESHOLD 650 // threshold for a discontinuous ematch -> read voltage / 3.3 * 1023
 
 /*Variables------------------------------------------------------------*/
 static Servo myServo;
@@ -143,7 +144,7 @@ void deployDrogue(void)
         SerialUSB.println("DROGUE IGNITER FIRED");
         #endif
 
-        delay(IGNITOR_DELAY);
+        delay(DROGUE_IGNITOR_DELAY);
         digitalWrite(DROGUE_IGNITOR_PIN, LOW);
     #endif // POW
 }
