@@ -281,13 +281,10 @@ void doCommand(char command, float GPS_data[], FlightStates *state, InitStatus *
 
         case GPS_PING:
             #ifdef NOSECONE
-                latPrefix = String("Lat:");
                 latVal = String(GPS_data[0], 4);
-                longPrefix = String("Lng:");
                 longVal = String(GPS_data[1], 4);
-                altPrefix = String("Alt:");
                 altVal = String(GPS_data[2]);
-                msg = String(latPrefix + latVal + longPrefix + longVal + altPrefix + altVal);
+                msg = String("Lat: " + latVal + " Long: " + longVal + " Alt: " + altVal);
                 sendMessage(radio, txPacket, &msg);
             #endif
             break;
