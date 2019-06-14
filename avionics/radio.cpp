@@ -192,12 +192,12 @@ void doCommand(char command, float GPS_data[], FlightStates *state, InitStatus *
     unsigned char payload[2] = {'G'};
     payload[1] = command;
     String msg;
-            String latPrefix;
-            String latVal;
-            String longPrefix;
-            String longVal;
-            String altPrefix;
-            String altVal;
+    String latPrefix;
+    String latVal;
+    String longPrefix;
+    String longVal;
+    String altPrefix;
+    String altVal;
     switch (command){
         case ARM:
             if(*state == STANDBY) { //Don't want to switch out of drogue deploy or something into Armed
