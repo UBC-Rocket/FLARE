@@ -129,24 +129,15 @@ int SatComQuality()
  */
 void SatComSendGPS(unsigned long *timestamp, float GPS_data[])
 {
-    int gps_array1[2];
-    int gps_array2[2];
     char sendbuf[BUFSIZE];
     String send_timestamp = String(*timestamp);
 
-    for (int i = 0; i < 2; i++){
-      gps_array1[i] = GPS_data[i];
-      gps_array2[i] = (GPS_data[i]-gps_array1[i]) * 100000;
-    }
-
-    String lat1 = String(gps_array1[0]);
-    String lat2 = String(gps_array2[0]);
-    String long1 = String(gps_array1[1]);
-    String long2 = String(gps_array2[1]);
-
+    String lat1 = String(GPS_data[0], 5);
+    String long1 = String(GPS_data[1], 5);
     String altitude = String(GPS_data[2]);
-    String satsend = String("timestamp: " + send_timestamp + " Lat: " + lat1 + "." + lat2 +
-                                      " Long: " + long1 + "." + long2 + " Alt: " + altitude);
+
+    String satsend = String("timestamp: " + send_timestamp + " Lat: " + lat1 +
+                                      " Long: " + long1 + " Alt: " + altitude);
 
     satsend.toCharArray(sendbuf, BUFSIZE);
     int err = modem.sendSBDText(sendbuf);
