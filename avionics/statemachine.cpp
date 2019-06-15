@@ -33,8 +33,8 @@
 #define LAND_CHECKS     6
 
 #define LAUNCH_THRESHOLD 50 // in meters
-#define MACH_THRESHOLD 260 //in meters per second
-#define MACH_LOCK_THRESHOLD 240 //in meters per second
+#define MACH_THRESHOLD 225 //in meters per second
+#define MACH_LOCK_THRESHOLD 220 //in meters per second
 #define FINAL_DESCENT_THRESHOLD 500 // 458 ~= 1500 feet for final
 #define LAND_VELOCITY_THRESHOLD 4  // meters per LANDING_TIME_INTERVAL
 
