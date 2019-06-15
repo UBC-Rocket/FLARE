@@ -64,6 +64,7 @@ const char UID_message = '"';
 #define STATUS 'S'
 #define STARTUP_BUZZER 'B'
 #define RECOVERY_BUZZER 'b'
+#define GPS_PING 'g'
 #define DO_NOTHING '\0'
 
 /* status bit flags */
@@ -152,7 +153,7 @@ void sendRadioNosecone(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
   * @param  char id - data identifier
   * @return void
   */
-void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, FlightStates *state, InitStatus *status)
+void resolveRadioRx(float GPS_data[], XBee* radio, ZBTxRequest* txPacket, FlightStates *state, InitStatus *status)
 {
     static ZBRxResponse rx = ZBRxResponse();
     static char command = '\0';
@@ -174,7 +175,7 @@ void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, FlightStates *state, Ini
         {
             radio->getResponse().getZBRxResponse(rx);
             command = *(rx.getData());
-            doCommand(command, state, status, radio, txPacket);
+            doCommand(command, GPS_data, state, status, radio, txPacket);
         }
         // else if(radio.getResponse().getApiId() == ZB_TX_STATUS_RESPONSE) {}
         // essentially an acknowledge of delivery status. may be useful later
@@ -183,17 +184,20 @@ void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, FlightStates *state, Ini
     }
 }
 
-/** void doCommand(char, FlightStates *state, InitStatus *status)
+/** void doCommand
   * @brief  Takes a radio command input and executes the command
-  * @param  char command - radio command input
-  * @param  FlightStates *state - current flight state
-  * @param  InitStatus *status - Sensor status structure
   * @return void
   */
-void doCommand(char command, FlightStates *state, InitStatus *status, XBee* radio, ZBTxRequest* txPacket){
+void doCommand(char command, float GPS_data[], FlightStates *state, InitStatus *status, XBee* radio, ZBTxRequest* txPacket){
     unsigned char payload[2] = {'G'};
     payload[1] = command;
     String msg;
+    String latPrefix;
+    String latVal;
+    String longPrefix;
+    String longVal;
+    String altPrefix;
+    String altVal;
     switch (command){
         case ARM:
             if(*state == STANDBY) { //Don't want to switch out of drogue deploy or something into Armed
@@ -273,6 +277,16 @@ void doCommand(char command, FlightStates *state, InitStatus *status, XBee* radi
         case PING:
             msg = String("Please help I'm stuck on a rocket");
             sendMessage(radio, txPacket, &msg);
+            break;
+
+        case GPS_PING:
+            #ifdef NOSECONE
+                latVal = String(GPS_data[0], 4);
+                longVal = String(GPS_data[1], 4);
+                altVal = String(GPS_data[2]);
+                msg = String("Lat: " + latVal + " Long: " + longVal + " Alt: " + altVal);
+                sendMessage(radio, txPacket, &msg);
+            #endif
             break;
 
         case DO_NOTHING:

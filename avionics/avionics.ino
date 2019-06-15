@@ -189,7 +189,7 @@ void loop()
     static FlightStates state = STANDBY;
 
     static unsigned long radio_old_time = 0;
-    static unsigned long radio_time_interval = 400; //milliseconds
+    static unsigned long radio_time_interval = 500; //milliseconds
 
     #ifdef NOSECONE
         static bool mainDeploySatcomSent = false;
@@ -202,7 +202,7 @@ void loop()
         state = WINTER_CONTINGENCY; //makes sure that even if it does somehow get accidentally changed, it gets reverted
 
     // if radio communications are received
-    resolveRadioRx(&s_radio, &s_txPacket, &state, &s_statusOfInit);
+    resolveRadioRx(GPS_data, &s_radio, &s_txPacket, &state, &s_statusOfInit);
 
     #ifdef NOSECONE
      /* send satcom data */
