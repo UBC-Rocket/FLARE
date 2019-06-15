@@ -73,6 +73,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
     float *ground_altitude, float ground_alt_arr[], FlightStates *state) {
     static int launch_count = 0, armed_count = 0, mach_count = 0, mach_lock_count = 0, apogee_count = 0,
         main_count = 0, land_count = 0, camera_toggle_count = 0;
+    static int base_alt_counter = 0;
     static uint32_t old_time_landed = millis(); //initialize on switching state
     static float old_altitude_landed = *altitude; //initialize on switching state
     static bool camera_toggle = true;
@@ -91,8 +92,12 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             }
             else{
                 launch_count = 0;
-                *baseline_pressure = groundAlt_update(&bar_data[0], ground_alt_arr);
-                *ground_altitude = 44330.0 * (1 - powf(*baseline_pressure / SEA_PRESSURE, 1 / 5.255));
+                base_alt_counter++;
+                if(base_alt_counter >= 20){
+                    *baseline_pressure = groundAlt_update(&bar_data[0], ground_alt_arr);
+                    *ground_altitude = 44330.0 * (1 - powf(*baseline_pressure / SEA_PRESSURE, 1 / 5.255));
+                    base_alt_counter = 0;
+                }
             }
             break;
 
