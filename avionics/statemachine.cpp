@@ -24,15 +24,15 @@
 #include <SD.h>
 
 /*Constants------------------------------------------------------------*/
-#define STANDBY_LAUNCH_CHECKS 3  // same as armed launch checks for backup standby to launch
-#define ARMED_LAUNCH_CHECKS 3
+#define STANDBY_LAUNCH_CHECKS 4  // same as armed launch checks for backup standby to launch
+#define ARMED_LAUNCH_CHECKS 4
 #define MACH_CHECKS 3
 #define APOGEE_CHECKS   5
 #define MACH_LOCK_CHECKS 20
 #define MAIN_CHECKS     10
 #define LAND_CHECKS     6
 
-#define LAUNCH_THRESHOLD 100 // in meters
+#define LAUNCH_THRESHOLD 50 // in meters
 #define MACH_THRESHOLD 260 //in meters per second
 #define MACH_LOCK_THRESHOLD 240 //in meters per second
 #define FINAL_DESCENT_THRESHOLD 500 // 458 ~= 1500 feet for final
