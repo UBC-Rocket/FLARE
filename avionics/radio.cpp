@@ -240,6 +240,7 @@ void doCommand(char command, float GPS_data[], FlightStates *state, InitStatus *
                 msg = String("!! ALREADY IN FLIGHT !!");
                 sendMessage(radio, txPacket, &msg);
             }
+
             break;
 
         case MAIN:

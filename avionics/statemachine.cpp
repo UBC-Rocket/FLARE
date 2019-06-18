@@ -185,6 +185,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 if (delta_altitude_landed <= LAND_VELOCITY_THRESHOLD) { // Landed threshold based on velocity alone
                     land_count++;
                     if (land_count >= LAND_CHECKS) {
+                        stop_record;
                         switchState(state, LANDED);
                         digitalWrite(FLIGHT_LED, LOW);
                         land_count = 0;
@@ -198,6 +199,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             }
             if((camera_toggle_count >= TOGGLE_CAMERA_INTERVAL) && (camera_toggle)){
                 stop_record();
+                delay(15);
                 start_record(); //toggles the camera so we won't lose the video in case it gets damaged during landing.
                 camera_toggle_count = 0;
                 camera_toggle = false;
