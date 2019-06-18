@@ -218,7 +218,7 @@ void doCommand(char command, float GPS_data[], FlightStates *state, InitStatus *
             break;
 
         case CAMERAS_ON:
-            start_record();
+            // start_record();
             break;
 
         case CAMERAS_OFF:
