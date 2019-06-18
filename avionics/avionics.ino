@@ -149,9 +149,6 @@ void setup()
     initSensors(&s_statusOfInit);
     radioStatus(&s_radio, &s_txPacket, &s_statusOfInit);
 
-    /*turn off cameras */
-    stop_record();
-
     /* init various arrays */
     baseline_pressure = barSensorInit(); /* for baseline pressure calculation */
     for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) // for moving average
