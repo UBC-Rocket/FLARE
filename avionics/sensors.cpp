@@ -227,6 +227,7 @@ void initSensors(InitStatus *status)
     #endif
     SerialCamera.begin(CameraBaud);
     while (!SerialCamera) {}
+    delay(2000);
     stop_record();
 
     #ifdef NOSECONE
