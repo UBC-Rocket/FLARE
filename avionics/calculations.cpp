@@ -35,7 +35,6 @@
  * @param  float *pressure_set - Set of pressure values.
  * @return void.
  */
-
 void calculateValues(float acc_data[], float bar_data[],
                     float* prev_altitude, float* altitude, float* delta_altitude,
                     float* prev_delta_altitude, float* baseline_pressure, unsigned long *delta_time, float *pressure_set)
@@ -52,7 +51,8 @@ void calculateValues(float acc_data[], float bar_data[],
 
 /*
 * @brief replaces oldest value in the average pressure set with a new piece of pressure data. All values
-*       initialized to zero, so run the initialization function
+*       in the set are default initialized to zero (as per c++ standard), so run the initialization function
+*       during startup
 * @param float* average_set - the working array of pressure data used to calculate the average pressure.
 *       This is mutated by replacing the oldest data as new readings come in.
 * @param float data - the new data to add to the set

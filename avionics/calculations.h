@@ -7,13 +7,9 @@
 #include "sensors.h"
 
 /*Constants------------------------------------------------------------*/
-
 #define PRESSURE_AVG_SET_SIZE   15
 
-/*Variables------------------------------------------------------------*/
-
 /*Functions------------------------------------------------------------*/
-
 void calculateValues(float*, float*, float*, float*, float*, float*, float*, unsigned long*, float*);
 void addToPressureSet(float*, float);
 float calculatePressureAverage(float*);

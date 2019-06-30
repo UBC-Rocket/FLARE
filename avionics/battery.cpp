@@ -31,11 +31,8 @@ Battery::Battery(byte batterySensorPin)
     m_divider = static_cast<float>(R2) /(R1 + R2);
     m_batterySensorPin = batterySensorPin;
 }
-/**
-  * @brief  Gets the battery voltage level. Maximum voltage readable is 11.0 volts; to adjust, change the resistors used in the voltage divider.
-  * @param  None
-  * @return float batteryVoltage - voltage of the battery, in volts.
-  */
+
+
 float Battery::getVoltage()
 {
     float inputValue = analogRead(m_batterySensorPin);
