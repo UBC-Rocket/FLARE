@@ -11,8 +11,6 @@
 
 #define MELODY_PIN 3 //required by buzzer
 
-/*Variables------------------------------------------------------------*/
-
 /*Functions------------------------------------------------------------*/
 void initPins(void);
 void deployDrogue(void);

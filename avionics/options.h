@@ -9,4 +9,5 @@
 // #define TESTING //enable or disable debug output
 // #define GROUND_TEST
 
+// Refer to README or the wiki for more information.
 #endif
