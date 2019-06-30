@@ -49,8 +49,8 @@ File statelog;
 
 /*Functions------------------------------------------------------------*/
 /* void switchState(FlightStates *, FlightStates){}
- * @brief  Switches state machine state.
- * @param  FlightStates *curr_state - Current state machine state.
+ * @brief  Switches state machine state. This is kept as a seperate function since other code uses it as well (e.g. radio)
+ * @param  FlightStates *curr_state - Pointer to current state machine state.
  * @param  FlightState new_state - State machine state to switch to.
  * @return void.
  */
@@ -80,7 +80,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
 
     switch (*state) {
         case STANDBY:
-            if (*altitude > LAUNCH_THRESHOLD) {
+            if (*altitude > LAUNCH_THRESHOLD) { //Standby to launch capability
                 launch_count++;
                 if (launch_count >= STANDBY_LAUNCH_CHECKS){
                     switchState(state, ASCENT);
@@ -92,6 +92,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             }
             else{
                 launch_count = 0;
+                //Measures base altitude once every second.
                 base_alt_counter++;
                 if(base_alt_counter >= 20){
                     *baseline_pressure = groundAlt_update(&bar_data[0], ground_alt_arr);
@@ -156,6 +157,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case PRESSURE_DELAY:
+            // Deals with potential sudden pressure spike after separation charge fires
             static unsigned long delay_start = millis();
             if((millis() - delay_start) >= APOGEE_DELAY)
             {
@@ -166,7 +168,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
 
         case INITIAL_DESCENT:
             if (*altitude < FINAL_DESCENT_THRESHOLD) {
-                main_count ++;
+                main_count++;
                 if (main_count >= MAIN_CHECKS) {
                     #ifdef BODY
                         deployMain();
@@ -186,6 +188,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
         case FINAL_DESCENT:
             camera_toggle_count++;
             if(millis() - old_time_landed >= LANDING_TIME_INTERVAL) {
+            //Having a long LANDING_TIME_INTERVAL acts as a filter
                 float delta_altitude_landed = abs(*altitude - old_altitude_landed);
                 if (delta_altitude_landed <= LAND_VELOCITY_THRESHOLD) { // Landed threshold based on velocity alone
                     land_count++;
@@ -202,6 +205,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
                 old_time_landed = millis();
                 old_altitude_landed = *altitude;
             }
+
             if((camera_toggle_count >= TOGGLE_CAMERA_INTERVAL) && (camera_toggle)){
                 stop_record();
                 delay(15);
@@ -212,7 +216,7 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             break;
 
         case LANDED:
-            stop_record();
+            stop_record(); //Camera file will not be saved if the SD runs out of space
             break;
 
         case WINTER_CONTINGENCY:
