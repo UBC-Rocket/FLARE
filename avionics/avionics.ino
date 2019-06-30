@@ -202,7 +202,7 @@ void loop()
         state = WINTER_CONTINGENCY; //makes sure that even if it does somehow get accidentally changed, it gets reverted
 
     // if radio communications are received
-    resolveRadioRx(GPS_data, &s_radio, &s_txPacket, &state, &s_statusOfInit);
+    resolveRadioRx(&s_radio, &s_txPacket, GPS_data, &state, &s_statusOfInit);
 
     #ifdef NOSECONE
      /* send satcom data */
@@ -239,7 +239,7 @@ void loop()
 
     if((new_time - radio_old_time) >= radio_time_interval) {
         #ifdef BODY
-            sendRadioBody(&s_radio, &s_txPacket, bar_data, state, altitude, &timestamp);
+            sendRadioBody(&s_radio, &s_txPacket, bar_data, state, &altitude, &timestamp);
         #endif  // def BODY
         #ifdef NOSECONE
             sendRadioNosecone(&s_radio, &s_txPacket, GPS_data, bar_data, acc_data, &temp_sensor_data, IMU_data);

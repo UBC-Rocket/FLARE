@@ -32,7 +32,13 @@
 #include <HardwareSerial.h>
 
 /*Constants------------------------------------------------------------*/
-/*radio data unique identifiers*/
+/*
+Radio data unique identifiers, for sending data to the ground station.
+Each identifier prefixes a value for the data that follows in the radio stream.
+For example, UID_time would be prefixing the uint_32 value for the timestamp.
+The exception is UID_message, which prefixes an arbitrary length string which gets printed
+    to the console
+*/
 const char UID_acc_acc_x  = 'X'; //Accelerometer - Acceleration X
 const char UID_acc_acc_y  = 'Y'; //Accelerometer - Acceleration Y
 const char UID_acc_acc_z  = 'Z'; //Accelerometer - Acceleration Z
@@ -53,7 +59,9 @@ const char UID_ground_altitude = 'g';//Ground Altitude
 const char UID_status = 'S';  //Status
 const char UID_message = '"';
 
-/* commands */
+/*
+Radio commands recieved from the ground station.
+*/
 #define ARM 'r'
 #define CAMERAS_ON 'C'
 #define CAMERAS_OFF 'O'
@@ -67,7 +75,10 @@ const char UID_message = '"';
 #define GPS_PING 'g'
 #define DO_NOTHING '\0'
 
-/* status bit flags */
+/*
+Status bit flags, for radio sending.
+The first bit (0x01) is reserved for identifing Nosecone vs Body
+*/
 #define BAROMETER_BIT_FLAG 0x02
 #define IMU_BIT_FLAG 0x04
 #ifdef BODY
@@ -84,13 +95,15 @@ const char UID_message = '"';
 
 /**
   * @brief  Send more essential data from the body over radio, pressure, state, altitude, timestamp
-  * @param  float bar_data - baramoeter data array
+  * @param  XBee* radio - class for the XBee radio
+  * @param  ZBTxRequest* txPacket - class for the XBee radio tx packet; gets reused to save memory
+  * @param  float bar_data - barometer data array. Only sending barometer pressure - not the barometer temperature
   * @param  FlightStates state - current state
-  * @param  float altitude - current calculated altitude
-  * @param  unsigned long *timestamp - address for the timestamp
+  * @param  float *altitude - current calculated altitude
+  * @param  unsigned long *timestamp - timestamp
   * @return void
   */
-void sendRadioBody(XBee* radio, ZBTxRequest* txPacket, float bar_data[], FlightStates state, float altitude, uint32_t *timestamp){
+void sendRadioBody(XBee* radio, ZBTxRequest* txPacket, float bar_data[], FlightStates state, float *altitude, uint32_t *timestamp){
     uint32_t stateAsInt = static_cast<uint32_t>(state);
     static uint8_t payload[20];
     payload[0] = UID_time;
@@ -98,7 +111,7 @@ void sendRadioBody(XBee* radio, ZBTxRequest* txPacket, float bar_data[], FlightS
     payload[5] = UID_bar_pres;
     memcpy(payload + 1 + 5, bar_data, sizeof(float));
     payload[10] = UID_altitude;
-    memcpy(payload + 1 + 10, &altitude, sizeof(float));
+    memcpy(payload + 1 + 10, altitude, sizeof(float));
     payload[15] = UID_state;
     memcpy(payload + 1 + 15, &stateAsInt, sizeof(float));
 
@@ -108,9 +121,14 @@ void sendRadioBody(XBee* radio, ZBTxRequest* txPacket, float bar_data[], FlightS
     radio->send(*txPacket);
 }
 /**
-  * @brief  Sends more essential data over radio from the nosecone, and GPS data
+  * @brief  Sends data over radio from the nosecone, and GPS data
+  * @param  XBee* radio - class for the XBee radio
+  * @param  ZBTxRequest* txPacket - class for the XBee radio tx packet; gets reused to save memory
   * @param  float GPS_data - gps data array
-  * @param  unsigned long *timestamp - address for the timestamp
+  * @param  float bar_data[] - barometer data array. Only sending barometer temperature, not pressure.
+  * @param  float acc_data[] - accelerometer data array
+  * @param  float *temp_sensor_data - data from temperature sensor
+  * @param  float IMU_data[] - data array from IMU (pitch, roll, yaw).
   * @return void
   */
 void sendRadioNosecone(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
@@ -149,11 +167,14 @@ void sendRadioNosecone(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
 
 /**
   * @brief  Deals with all received messages from the radio driver, including commands and status.
-  * @param  XBee radio
-  * @param  char id - data identifier
+  * @param  XBee* radio - class for the XBee radio
+  * @param  ZBTxRequest* txPacket - class for the XBee radio tx packet; gets reused to save memory
+  * @param  float GPS_data[] - GPS data array. Information to be passed through to doCommand
+  * @param  FlightStates *state - state. Information to be passed to doCommand
+  * @param  InitStatus *status - status information, to be passed to doCommand
   * @return void
   */
-void resolveRadioRx(float GPS_data[], XBee* radio, ZBTxRequest* txPacket, FlightStates *state, InitStatus *status)
+void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, float GPS_data[], FlightStates *state, InitStatus *status)
 {
     static ZBRxResponse rx = ZBRxResponse();
     static char command = '\0';
@@ -186,6 +207,12 @@ void resolveRadioRx(float GPS_data[], XBee* radio, ZBTxRequest* txPacket, Flight
 
 /** void doCommand
   * @brief  Takes a radio command input and executes the command
+  * @param  char command - Command identifier (see beginning of cpp file for definitions)
+  * @param  float GPS_data[] - GPS data array, for GPS_ping
+  * @param  FlightStates *state - state
+  * @param  InitStatus *status - status
+  * @param  XBee* radio - class for the XBee radio
+  * @param  ZBTxRequest* txPacket - class for the XBee radio tx packet; gets reused to save memory
   * @return void
   */
 void doCommand(char command, float GPS_data[], FlightStates *state, InitStatus *status, XBee* radio, ZBTxRequest* txPacket){

@@ -26,7 +26,7 @@ void sendRadioBody(XBee* radio, ZBTxRequest* txPacket, float*, FlightStates stat
 void sendRadioNosecone(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
                      float bar_data[], float acc_data[], float *temp_sensor_data, float IMU_data[]);
 
-void resolveRadioRx(float GPS_data[], XBee* radio, ZBTxRequest* txPacket, FlightStates *state, InitStatus *status);
+void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, float GPS_data[], FlightStates *state, InitStatus *status);
 void radioStatus(XBee* radio, ZBTxRequest* txPacket, InitStatus *status);
 void doCommand(char command, float GPS_data[], FlightStates *state, InitStatus *status, XBee* radio, ZBTxRequest* txPacket);
 void sendMessage(XBee* radio, ZBTxRequest* txPacket, String* msg);
