@@ -22,7 +22,7 @@
 // #define GROUND_STATION_ADDR_LSB 0x41678FB9
 
 /*Functions------------------------------------------------------------*/
-void sendRadioBody(XBee* radio, ZBTxRequest* txPacket, float*, FlightStates state, float altitude, uint32_t*);
+void sendRadioBody(XBee* radio, ZBTxRequest* txPacket, float*, FlightStates state, float *altitude, uint32_t*);
 void sendRadioNosecone(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
                      float bar_data[], float acc_data[], float *temp_sensor_data, float IMU_data[]);
 
