@@ -1,7 +1,11 @@
-/* @file    satcom.cpp
+/*
+ * SatCom Source
+ *
+ * @file    satcom.cpp
  * @author  UBC Rocket Avionics 2018/2019
  * @description   Initializes the satcom module.  Sends a message over SatCom when
- * the SatComSend function is called.
+ * the SatComSend function is called.  This source utilizes the IridiumSBD.cpp
+ * and .h files also included in this distro.
  *
  * @section LICENSE
  * This program is free software; you can redistribute it and/or

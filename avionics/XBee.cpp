@@ -1,7 +1,16 @@
-/**
- * Copyright (c) 2009 Andrew Rapp. All rights reserved.
+/*
+ * XBee Source
  *
- * This file is part of XBee-Arduino.
+ * @file    XBee.cpp
+ * @author  Andrew Rapp 2009 / UBC Rocket Avionics 2018/2019
+ * @description  This file is part of XBee-Arduino.
+ * Written by Andrew Rapp in 2009 and extended by UBC Rocket
+ * Avionics team in 2019.
+ *
+ * @section LICENSE
+ * GNU General Public License 3.0
+ * Copyright (c) 2009, Andrew Rapp
+ * All Rights Reserved
  *
  * XBee-Arduino is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,6 +24,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with XBee-Arduino.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * UBC Rocket Avionics Team:
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * Distributed as-is; no warranty is given.
  */
 
 #include "XBee.h"
@@ -1782,4 +1800,3 @@ uint8_t XBeeWithCallbacks::waitForStatus(uint8_t frameId, uint16_t timeout) {
 	} while (millis() - start < timeout);
 	return XBEE_WAIT_TIMEOUT ;
 }
-

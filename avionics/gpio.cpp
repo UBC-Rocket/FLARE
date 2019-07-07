@@ -1,4 +1,7 @@
-/* @file    gpio.cpp
+/*
+ * GPIO Source
+ *
+ * @file    gpio.cpp
  * @author  UBC Rocket Avionics 2018/2019
  * @description  Initializes gpio pins that enable us to control our
  *  drogue and main parachute releases, status LEDs, buzzer.

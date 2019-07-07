@@ -1,4 +1,7 @@
-/* @file    cameras.cpp
+/*
+ * Cameras Source
+ *
+ * @file    cameras.cpp
  * @author  UBC Rocket Avionics 2018/2019
  * @description  File that controls commanding the camera modules.
  *  Camera module:  Runcam Split 2S

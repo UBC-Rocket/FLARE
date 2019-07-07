@@ -1,4 +1,7 @@
-/* @file    sensors.cpp
+/*
+ * Sensors Source
+ *
+ * @file    sensors.cpp
  * @author  UBC Rocket Avionics 2018/2019
  * @description   Main sensor initialization and polling file.
  * Implements sensor initialization and error checking as well as

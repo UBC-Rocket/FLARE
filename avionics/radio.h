@@ -1,4 +1,21 @@
-/*Radio Header*/
+/*
+ * Radio Header
+ *
+ * @file    radio.h
+ * @author  UBC Rocket Avionics 2018/2019
+ * @description  Implements radio send functions and prioritizing
+ * sensor data to send over the radio.  This source utilizes the
+ * XBee.cpp and .h files also included in this distro.
+ *
+ * @section LICENSE
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * Distributed as-is; no warranty is given.
+ */
+
 #ifndef __RADIO_H__
 #define __RADIO_H__
 

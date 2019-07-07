@@ -1,4 +1,7 @@
-/* @file    buzzer.cpp
+/*
+ * Buzzer Source
+ *
+ * @file    buzzer.cpp
  * @author  UBC Rocket Avionics 2018/2019
  * @description   Initializes buzzer pins and plays melodies using
  *      the buzzer.  These are blocking functions.
