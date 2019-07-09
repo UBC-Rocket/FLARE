@@ -1,27 +1,39 @@
-/*	MS5803_14
- * 	An Arduino library for the Measurement Specialties MS5803 family
- * 	of pressure sensors. This library uses I2C to communicate with the
- * 	MS5803 using the Wire library from Arduino.
+/*
+ * MS5803 Barometer Header
  *
- *	This library only works with the MS5803-14BA model sensor. It DOES NOT
- *	work with the other pressure-range models such as the MS5803-30BA or
- *	MS5803-01BA. Those models will return incorrect pressure and temperature
- *	readings if used with this library. See http://github.com/millerlp for
- *	libraries for the other models.
+ * @file    MS5803_01.h
+ * @author  Luke Miller 2014 / UBC Rocket Avionics 2018/2019
+ * @description  An Arduino library for the Measurement Specialties MS5803 family
+ * of pressure sensors. This library uses I2C to communicate with the
+ * MS5803 using the Wire library from Arduino.
  *
- * 	No warranty is given or implied. You are responsible for verifying that
- *	the outputs are correct for your sensor. There are likely bugs in
- *	this code that could result in incorrect pressure readings, particularly
- *	due to variable overflows within some pressure ranges.
- * 	DO NOT use this code in a situation that could result in harm to you or
- * 	others because of incorrect pressure readings.
+ * This library only works with the MS5803-01BA model sensor. It DOES NOT
+ * work with the other pressure-range models such as the MS5803-30BA or
+ * MS5803-02BA. Those models will return incorrect pressure and temperature
+ * readings if used with this library. See http://github.com/millerlp for
+ * libraries for the other models.
  *
+ * This file was written by Luke Miller in 2014 and extended by the
+ * UBC Rocket Avionics Team in 2019.
  *
- * 	Licensed under the GPL v3 license.
- * 	Please see accompanying LICENSE.md file for details on reuse and
- * 	redistribution.
+ * @section LICENSE
+ * GNU GPL v3
+ * Copyright (c) April 1 2014, Luke Miller
  *
- * 	Copyright Luke Miller, April 1 2014
+ * No warranty is given or implied. You are responsible for verifying that
+ * the outputs are correct for your sensor. There are likely bugs in
+ * this code that could result in incorrect pressure readings, particularly
+ * due to variable overflows within some pressure ranges.
+ * DO NOT use this code in a situation that could result in harm to you or
+ * others because of incorrect pressure readings.
+ *
+ * UBC Rocket Avionics Team:
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * Distributed as-is; no warranty is given.
  */
 
 

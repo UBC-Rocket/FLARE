@@ -1,7 +1,11 @@
-/* @file    radio.cpp
+/*
+ * Radio Source
+ *
+ * @file    radio.cpp
  * @author  UBC Rocket Avionics 2018/2019
  * @description  Implements radio send functions and prioritizing
- * sensor data to send over the radio
+ * sensor data to send over the radio.  This source utilizes the
+ * XBee.cpp and .h files also included in this distro.
  *
  * @section LICENSE
  * This program is free software; you can redistribute it and/or

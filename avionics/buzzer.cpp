@@ -1,7 +1,10 @@
-/* @file    buzzer.cpp
+/*
+ * Buzzer Source
+ *
+ * @file    buzzer.cpp
  * @author  UBC Rocket Avionics 2018/2019
  * @description   Initializes buzzer pins and plays melodies using
- *      the buzzer.  These are blocking functions.
+ *     the buzzer.  These are blocking functions.
  *
  * @section LICENSE
  * This program is free software; you can redistribute it and/or

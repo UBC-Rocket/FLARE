@@ -1,4 +1,7 @@
-/* @file    battery.cpp
+/*
+ * Battery Check Source
+ *
+ * @file    battery.cpp
  * @author  UBC Rocket Avionics 2018/2019
  * @description   A battery voltage read function to check
  *  battery charge status.
