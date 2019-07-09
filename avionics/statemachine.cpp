@@ -1,4 +1,7 @@
-/* @file    statemachine.cpp
+/*
+ * State Machine Source
+ *
+ * @file    statemachine.cpp
  * @author  UBC Rocket Avionics 2018/2019
  * @description   Main state machine of the rocket's flight states.
  * Implements state switching and the rocket's state machine.

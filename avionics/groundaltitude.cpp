@@ -1,4 +1,7 @@
-/* @file    groundaltitude.cpp
+/*
+ * Ground Altitude Calculation Source
+ *
+ * @file    groundaltitude.cpp
  * @author  UBC Rocket Avionics 2018/2019
  * @description   Rolling average of barometer data to calculate and set ground altitude.
  * The three functions in this file initialize the ground altitude array,

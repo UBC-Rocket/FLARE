@@ -1,16 +1,18 @@
-/******************************************************************************
-SparkFun_LIS331.h
-SparkFun_LIS331 Library Header File
-
-This file implements all functions of the LIS331 class accelerometer.
-https://github.com/sparkfun/Triple_Axis_Accelerometer_Breakout-LIS331/tree/V_1.2
-
-Development environment specifics:
-	IDE: Arduino 1.6
-	Hardware Platform: Arduino Uno
-
-Distributed as-is; no warranty is given.
-******************************************************************************/
+/*
+ * SparkFun_LIS331 Library Header file
+ *
+ * @file    SparkFun_LIS331.h
+ * @author  SparkFun Electronics
+ * @description   This file implements all functions of the LIS331 class accelerometer.
+ * https://github.com/sparkfun/Triple_Axis_Accelerometer_Breakout-LIS331/tree/V_1.2
+ *
+ * Development environment specifics:
+ * 	IDE: Arduino 1.6
+ * 	Hardware Platform: Arduino Uno
+ *
+ * @section LICENSE
+ * Distributed as-is; no warranty is given.
+ */
 
 #ifndef __sparkfun_lis331_h__
 #define __sparkfun_lis331_h__

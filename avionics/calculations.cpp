@@ -1,4 +1,7 @@
-/* @file    calculations.cpp
+/*
+ * Calculations Source
+ *
+ * @file    calculations.cpp
  * @author  UBC Rocket Avionics 2018/2019
  * @description   Calculates usable flight data from the raw sensor outputs
  *

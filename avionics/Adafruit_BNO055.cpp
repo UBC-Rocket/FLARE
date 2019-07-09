@@ -1,21 +1,36 @@
-/***************************************************************************
-  This is a library for the BNO055 orientation sensor
-
-  Designed specifically to work with the Adafruit BNO055 Breakout.
-
-  Pick one up today in the adafruit shop!
-  ------> http://www.adafruit.com/products
-
-  These sensors use I2C to communicate, 2 pins are required to interface.
-
-  Adafruit invests time and resources providing this open source code,
-  please support Adafruit andopen-source hardware by purchasing products
-  from Adafruit!
-
-  Written by KTOWN for Adafruit Industries.
-
-  MIT license, all text above must be included in any redistribution
- ***************************************************************************/
+/*
+ * Adafruit BNO055 Driver Source
+ *
+ * @file    Adafruit_BNO055.cpp
+ * @author  KTOWN for Adafruit Industries / UBC Rocket Avionics 2018/2019
+ * @description   This is a library designed specifically to work with the
+ * Adafruit BNO055 Breakout.
+ *
+ * Pick one up today in te adafruit shop!
+ * ------> http://www.adafruit.com/products
+ *
+ * These sensors use I2C to communicate, 2 pins are required to interface.
+ *
+ * Adafruit invests time and resources providing this open source code,
+ * plesae support Adafruit and open-source hardware by purchasing products
+ * from Adafruit!
+ *
+ * Written by KTOWN for Adafruit Industries and extended in 2019 by the UBC
+ * Rocket Avionics Team.
+ *
+ * @section LICENSE
+ * KTOWN Adafruit:
+ * MIT License.
+ * All text above must be included in any redistribution.
+ *
+ * UBC Rocket Avionics Team:
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * Distributed as-is; no warranty is given.
+ */
 
 #if ARDUINO >= 100
  #include "Arduino.h"
