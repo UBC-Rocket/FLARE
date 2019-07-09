@@ -13,13 +13,8 @@
 
 /*Constants------------------------------------------------------------*/
 /* radio addressing */
-#define GROUND_STATION_ADDR_MSB 0x0013A200 //Ground Station - Body
-#define GROUND_STATION_ADDR_LSB 0x41678FC0
-
-//Don't use the nose - it has a glued on capacitor which is more sketchy than
-//the body
-// #define GROUND_STATION_ADDR_MSB 0x0013A200 //Ground Station - Nose
-// #define GROUND_STATION_ADDR_LSB 0x41678FB9
+#define GND_STN_ADDR_MSB 0x0013A200 //Ground Station - Body
+#define GND_STN_ADDR_LSB 0x41678FC0
 
 /*Functions------------------------------------------------------------*/
 void sendRadioBody(XBee* radio, ZBTxRequest* txPacket, float*, FlightStates state, float *altitude, uint32_t*);
