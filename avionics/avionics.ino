@@ -101,6 +101,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 File radiolog;
 static InitStatus s_statusOfInit;
 static float pressure_set[PRESSURE_AVG_SET_SIZE]; //set of pressure values for a floating average
+static unsigned long delta_time_set[PRESSURE_AVG_SET_SIZE]; //set of delta time values for the delta altitude
 static float baseline_pressure;
 static float ground_alt_arr[GROUND_ALT_SIZE]; //values for the baseline pressure calculation
 
@@ -157,6 +158,9 @@ void setup()
     for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++){ // for moving average
         pressure_set[i] = baseline_pressure;
     }
+    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++){ // for delta altitude
+        delta_time_set[i] = NOMINAL_POLLING_TIME_INTERVAL;
+    }
     for(i = 0; i < GROUND_ALT_SIZE; i++){
         ground_alt_arr[i] = baseline_pressure;
     }
@@ -184,8 +188,7 @@ void loop()
         IMU_data[IMU_DATA_ARRAY_SIZE], GPS_data[GPS_DATA_ARRAY_SIZE],
         thermocouple_data;
 
-    static float prev_altitude, altitude, delta_altitude, prev_delta_altitude,
-        ground_altitude;
+    static float prev_altitude, altitude, delta_altitude, ground_altitude;
 
     static FlightStates state = STANDBY;
 
@@ -220,8 +223,8 @@ void loop()
                     &thermocouple_data);
 
         calculateValues(acc_data, bar_data, &prev_altitude, &altitude,
-                        &delta_altitude, &prev_delta_altitude,
-                        &baseline_pressure, &delta_time, pressure_set);
+                        &delta_altitude, &baseline_pressure,
+                        &delta_time, pressure_set, delta_time_set);
 
         stateMachine(&altitude, &delta_altitude, &prev_altitude,
                     bar_data, &baseline_pressure, &ground_altitude,

@@ -25,8 +25,10 @@
 #define PRESSURE_AVG_SET_SIZE   15
 
 /*Functions------------------------------------------------------------*/
-void calculateValues(float*, float*, float*, float*, float*, float*, float*, unsigned long*, float*);
+void calculateValues(float*, float*, float*, float*, float*, float*, unsigned long*, float*, unsigned long*);
 void addToPressureSet(float*, float);
 float calculatePressureAverage(float*);
+void addToDeltaTimeSet(unsigned long*, unsigned long);
+float calculateDeltaTimeAverage(unsigned long*);
 
 #endif
