@@ -243,8 +243,6 @@ void initSensors(InitStatus *status)
 
     #endif
 
-
-
     #ifdef NOSECONE
         /*init satcom*/
         if (!SatComSetup()){
@@ -434,6 +432,18 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
     *timestamp = millis();
 
     #ifdef TESTING
+        SerialUSB.println("Polling barometer");
+        bool bar_flag = barometer.readSensor();
+        if(!bar_flag)
+            SerialUSB.println("BAROMETER FAILED READING");
+    #else
+        barometer.readSensor();
+    #endif
+
+    bar_data[0] = barometer.pressure();
+    bar_data[1] = barometer.temperature();
+
+    #ifdef TESTING
         SerialUSB.println("Measuring battery voltage");
     #endif
     *battery_voltage = powerbattery.getVoltage();
@@ -445,21 +455,6 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
     acc_data[0] = accelerometer.convertToG(ACCELEROMETER_SCALE, x);
     acc_data[1] = accelerometer.convertToG(ACCELEROMETER_SCALE, y);
     acc_data[2] = accelerometer.convertToG(ACCELEROMETER_SCALE, z);
-
-    #ifdef TESTING
-        SerialUSB.println("Polling barometer");
-    bool bar_flag = barometer.readSensor();
-    if(!bar_flag)
-        SerialUSB.println("BAROMETER FAILED READING");
-
-    #else
-
-    barometer.readSensor();
-    #endif
-
-    bar_data[0] = barometer.pressure();
-    bar_data[1] = barometer.temperature();
-
 
     #ifdef TESTING
         SerialUSB.println("Polling temperature sensor");
@@ -524,7 +519,7 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
 }
 
 /**
-  * @brief  Polls all the sensors
+  * @brief  Logs data on the SD card
   * @param  unsigned long *timestamp - pointer to store the timestamp value
   * @param  float *battery_voltage - Stores battery voltage
   * @param  float acc_data[] - array to store the accelerometer data; refer to sensors.h for array sizes

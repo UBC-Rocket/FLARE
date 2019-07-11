@@ -29,16 +29,16 @@
 /*Constants------------------------------------------------------------*/
 #define STANDBY_LAUNCH_CHECKS 4  // same as armed launch checks for backup standby to launch
 #define ARMED_LAUNCH_CHECKS 4
-#define MACH_CHECKS 3
+#define MACH_CHECKS 2
 #define APOGEE_CHECKS   5
-#define MACH_LOCK_CHECKS 20
+#define MACH_LOCK_CHECKS 25
 #define MAIN_CHECKS     10
 #define LAND_CHECKS     6
 
-#define LAUNCH_THRESHOLD 50 // in meters
-#define MACH_THRESHOLD 225 //in meters per second
-#define MACH_LOCK_THRESHOLD 220 //in meters per second
-#define FINAL_DESCENT_THRESHOLD 500 // 458 ~= 1500 feet for final
+#define LAUNCH_THRESHOLD 25 // in meters
+#define MACH_THRESHOLD 155 //in meters per second
+#define MACH_LOCK_THRESHOLD 150 //in meters per second
+#define FINAL_DESCENT_THRESHOLD 488 // 488 ~= 1600 feet for final
 #define LAND_VELOCITY_THRESHOLD 4  // meters per LANDING_TIME_INTERVAL
 
 #define SEA_PRESSURE 1013.25
@@ -116,6 +116,13 @@ void stateMachine(float *altitude, float *delta_altitude, float *prev_delta_alti
             }
             else{
                 armed_count = 0;
+                //Measures base altitude once every second.
+                base_alt_counter++;
+                if(base_alt_counter >= 20){
+                    *baseline_pressure = groundAlt_update(&bar_data[0], ground_alt_arr);
+                    *ground_altitude = 44330.0 * (1 - powf(*baseline_pressure / SEA_PRESSURE, 1 / 5.255));
+                    base_alt_counter = 0;
+                }
             }
             break;
 
