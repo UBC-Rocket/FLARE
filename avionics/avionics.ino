@@ -1,4 +1,4 @@
-/*Main Arduino Sketch*/
+/* Main Arduino Sketch */
 /*
 VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!
 
@@ -170,6 +170,7 @@ void setup()
   */
 void loop()
 {
+    /* List of constants */
     static uint32_t timestamp;
     static unsigned long old_time = 0; //ms
     static unsigned long new_time = 0; //ms
@@ -201,8 +202,8 @@ void loop()
     if(s_statusOfInit.overview == CRITICAL_FAILURE)
         state = WINTER_CONTINGENCY; //makes sure that even if it does somehow get accidentally changed, it gets reverted
 
-    // if radio communications are received
-    resolveRadioRx(GPS_data, &s_radio, &s_txPacket, &state, &s_statusOfInit);
+    // if radio communications are received, this addresses them
+    resolveRadioRx(&s_radio, &s_txPacket, GPS_data, &state, &s_statusOfInit);
 
     #ifdef NOSECONE
      /* send satcom data */
@@ -220,12 +221,14 @@ void loop()
 
     #endif //def NOSECONE
 
+    // Polling time intervals need to be variable, since in LANDED
+    // there's a lot of data that'll be recorded
     if (state == LANDED)
         time_interval = LANDED_POLLING_TIME_INTERVAL;
     else
         time_interval = NOMINAL_POLLING_TIME_INTERVAL;
 
-
+    //Core functionality of rocket - take data, process it, run the state machine, and log the data
     new_time = millis();
     if ((new_time - old_time) >= time_interval) {
         delta_time = new_time - old_time;
@@ -237,9 +240,10 @@ void loop()
         logData(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure, thermocouple_data);
     }
 
+    // Send logged data across radio (as backup/early access to data logged to SD card)
     if((new_time - radio_old_time) >= radio_time_interval) {
         #ifdef BODY
-            sendRadioBody(&s_radio, &s_txPacket, bar_data, state, altitude, &timestamp);
+            sendRadioBody(&s_radio, &s_txPacket, bar_data, state, &altitude, &timestamp);
         #endif  // def BODY
         #ifdef NOSECONE
             sendRadioNosecone(&s_radio, &s_txPacket, GPS_data, bar_data, acc_data, &temp_sensor_data, IMU_data);
@@ -247,6 +251,7 @@ void loop()
         radio_old_time = new_time;
     }
 
+    // A bit of code to make the LED blink in non-critical failure
     if (s_statusOfInit.overview == NONCRITICAL_FAILURE)
     {
         init_status_new_time = millis();
@@ -262,6 +267,6 @@ void loop()
     }
 
     #ifdef TESTING
-    delay(1000);
+    delay(1000); //So you can actually read the serial output
     #endif
 }

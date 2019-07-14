@@ -1,4 +1,7 @@
-/* @file    cameras.cpp
+/*
+ * Cameras Source
+ *
+ * @file    cameras.cpp
  * @author  UBC Rocket Avionics 2018/2019
  * @description  File that controls commanding the camera modules.
  *  Camera module:  Runcam Split 2S
@@ -33,7 +36,7 @@ void power_cameras(){
 /**
   * @brief  starts recording on both cameras
   * @param  None
-  * @return none/ should be changed to boolean if possible
+  * @return none
   */
 void start_record(){
     uint8_t startRecord_command[] = {0xCC,0x01,0x03,0x0}; // LEAVE THESE HERE
@@ -45,7 +48,7 @@ void start_record(){
 /**
   * @brief  stops recording on both cameras
   * @param  None
-  * @return none/ should be changed to boolean if possible
+  * @return none
   */
 void stop_record(){
     uint8_t stopRecord_command[] = {0xCC,0x01,0x04,0x0}; // LEAVE THESE HERE

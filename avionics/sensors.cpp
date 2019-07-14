@@ -1,4 +1,7 @@
-/* @file    sensors.cpp
+/*
+ * Sensors Source
+ *
+ * @file    sensors.cpp
  * @author  UBC Rocket Avionics 2018/2019
  * @description   Main sensor initialization and polling file.
  * Implements sensor initialization and error checking as well as
@@ -413,12 +416,14 @@ float barSensorInit(void){
 
 /**
   * @brief  Polls all the sensors
-  * @param  unsigned long timestamp - pointer to store the timestamp value
-  * @param  float acc_data[] - array to store the accelerometer data
-  * @param  float bar_data[] - array to store the barometer data
+  * @param  unsigned long *timestamp - pointer to store the timestamp value
+  * @param  float *battery_voltage - Stores battery voltage
+  * @param  float acc_data[] - array to store the accelerometer data; refer to sensors.h for array sizes
+  * @param  float bar_data[] - array to store the barometer data; refer to sensors.h for array sizes
   * @param  float* temp_sensor_data - pointer to store the temperature sensor data
-  * @param  float IMU_data[] - array to store the IMU data
-  * @param  char GPS_data[][] - 2D array to store the GPS data
+  * @param  float IMU_data[] - array to store the IMU data; refer to sensors.h for array sizes
+  * @param  char GPS_data[] - array to store the GPS data; refer to sensors.h for array sizes
+  * @param  *thermocouple_data - pointer to store thermocouple data.
   * @return None
   */
 void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_data[], float bar_data[],
@@ -519,14 +524,18 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
 }
 
 /**
-  * @brief  Logs all the sensor data
-  * @param  unsigned long timestamp - pointer to store the timestamp value
-  * @param  battery_voltage - pointer to store the voltage of the battery
-  * @param  float acc_data[] - array to store the accelerometer data
-  * @param  float bar_data[] - array to store the barometer data
+  * @brief  Polls all the sensors
+  * @param  unsigned long *timestamp - pointer to store the timestamp value
+  * @param  float *battery_voltage - Stores battery voltage
+  * @param  float acc_data[] - array to store the accelerometer data; refer to sensors.h for array sizes
+  * @param  float bar_data[] - array to store the barometer data; refer to sensors.h for array sizes
   * @param  float* temp_sensor_data - pointer to store the temperature sensor data
-  * @param  float IMU_data[] - array to store the IMU data
-  * @param  char GPS_data[][] - 2D array to store the GPS data
+  * @param  float IMU_data[] - array to store the IMU data; refer to sensors.h for array sizes
+  * @param  char GPS_data[] - array to store the GPS data; refer to sensors.h for array sizes
+  * @param  FlightStates state - rocket flight state
+  * @param  float altitude - Calculated rocket altitude, after filtering
+  * @param  float baseline_pressure - Pressure used as "ground level"
+  * @param  *thermocouple_data - pointer to store thermocouple data.
   * @return None
   */
 void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[], float bar_data[],

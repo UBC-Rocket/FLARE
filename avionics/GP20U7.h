@@ -1,4 +1,19 @@
-/*GPS GP-20U7 Driver Header*/
+/*
+ * GPS GP-20U7 Driver Header
+ *
+ * @file    GP20U7.h
+ * @author  UBC Rocket Avionics 2018/2019
+ * @description  File that receives GPS serial data and encodes it
+ * with a TinyGPS parsing library.
+ *
+ * @section LICENSE
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * Distributed as-is; no warranty is given.
+ */
 
 /*
 VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!

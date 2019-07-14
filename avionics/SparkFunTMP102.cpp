@@ -1,24 +1,26 @@
-/******************************************************************************
-SparkFunTMP102.cpp
-SparkFunTMP102 Library Source File
-Alex Wende @ SparkFun Electronics
-Original Creation Date: April 29, 2016
-https://github.com/sparkfun/Digital_Temperature_Sensor_Breakout_-_TMP102
+/*
+ * SparkFunTMP102 Library Source File
+ *
+ * @file    SparkFunTMP102.cpp
+ * @author  Alex Wende @ SparkFun Electronics - April 29, 2016
+ * @description   This file implements all functions of the TMP102 class.
+ * Functions here range from reading the temperature from the sensor, to
+ * reading and writing various settings in the sensor.
+ *
+ * https://github.com/sparkfun/Digital_Temperature_Sensor_Breakout_-_TMP102
+ *
+ * Development environment specifics:
+ * 	IDE: Arduino 1.6
+ * 	Hardware Platform: Arduino Uno
+ * 	LSM9DS1 Breakout Version: 1.0
+ *
+ * @section LICENSE
+ * This code is beerware; if you see me (or any other SparkFun employee) at the
+ * local, and you've found our code helpful, please buy us a round!
+ *
+ * Distributed as-is; no warranty is given.
+ */
 
-This file implements all functions of the TMP102 class. Functions here range
-from reading the temperature from the sensor, to reading and writing various
-settings in the sensor.
-
-Development environment specifics:
-	IDE: Arduino 1.6
-	Hardware Platform: Arduino Uno
-	LSM9DS1 Breakout Version: 1.0
-
-This code is beerware; if you see me (or any other SparkFun employee) at the
-local, and you've found our code helpful, please buy us a round!
-
-Distributed as-is; no warranty is given.
-******************************************************************************/
 #include "SparkFunTMP102.h"
 #include <i2c_t3.h>
 
