@@ -267,8 +267,8 @@ void initSensors(InitStatus *status)
             #endif
         }
         else{
-            if(status->overview < NONCRITICAL_FAILURE)
-                status->overview = NONCRITICAL_FAILURE;
+            // if(status->overview < NONCRITICAL_FAILURE)
+            //     status->overview = NONCRITICAL_FAILURE;
             status->sensorNominal[THERMOCOUPLE_STATUS_POSITION] = false;
             #ifdef TESTING
                 SerialUSB.println("Thermocouple failed to init");
