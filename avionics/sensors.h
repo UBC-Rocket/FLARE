@@ -45,7 +45,11 @@
 #define GPS_DATA_ARRAY_SIZE     3
 #define GPS_FIELD_LENGTH        20
 
-#define NUM_SENSORS 9
+#if defined THERMOCOUPLE
+    #define NUM_SENSORS 9
+#else
+    #define NUM_SENSORS 8
+#endif
 
 #define FILE_STATUS_POSITION 0
 #define BATTERY_STATUS_POSITION 1

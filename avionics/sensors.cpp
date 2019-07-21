@@ -260,28 +260,30 @@ void initSensors(InitStatus *status)
     #endif // NOSECONE
 
     /* init Thermocouple */
-    #ifdef NOSECONE
-        #ifdef TESTING
-            SerialUSB.println("Initializing thermocouple");
-        #endif
+    #ifdef THERMOCOUPLE
+        #ifdef NOSECONE
+            #ifdef TESTING
+                SerialUSB.println("Initializing thermocouple");
+            #endif
 
-        float thermo_temp = probe.readCJT();
-        if (!isnan(thermo_temp)) {
-            #ifdef TESTING
-                SerialUSB.print("Cold Junction Temperature is [C]: ");
-                SerialUSB.println(thermo_temp);
-                SerialUSB.println("Thermocouple initialized");
-            #endif
-        }
-        else{
-            // if(status->overview < NONCRITICAL_FAILURE)
-            //     status->overview = NONCRITICAL_FAILURE;
-            status->sensorNominal[THERMOCOUPLE_STATUS_POSITION] = false;
-            #ifdef TESTING
-                SerialUSB.println("Thermocouple failed to init");
-            #endif
-        }
-    #endif // NOSECONE
+            float thermo_temp = probe.readCJT();
+            if (!isnan(thermo_temp)) {
+                #ifdef TESTING
+                    SerialUSB.print("Cold Junction Temperature is [C]: ");
+                    SerialUSB.println(thermo_temp);
+                    SerialUSB.println("Thermocouple initialized");
+                #endif
+            }
+            else{
+                if(status->overview < NONCRITICAL_FAILURE)
+                    status->overview = NONCRITICAL_FAILURE;
+                status->sensorNominal[THERMOCOUPLE_STATUS_POSITION] = false;
+                #ifdef TESTING
+                    SerialUSB.println("Thermocouple failed to init");
+                #endif
+            }
+        #endif // NOSECONE
+    #endif  // THERMOCOUPLE
 
     /* log initialization status for each sensor */
     // 'X' for N/A, 'G' for good, 'B' for bad
@@ -342,11 +344,12 @@ void initSensors(InitStatus *status)
         else
             datalog.write("B,");
 
-        if(status->sensorNominal[THERMOCOUPLE_STATUS_POSITION])
-            datalog.write("G\n");
-        else
-            datalog.write("B\n");
-
+        #ifdef THERMOCOUPLE
+            if(status->sensorNominal[THERMOCOUPLE_STATUS_POSITION])
+                datalog.write("G\n");
+            else
+                datalog.write("B\n");
+        #endif  // THERMOCOUPLE
     #endif
 
     /* transmit sensor report */
@@ -515,19 +518,21 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage,
     #endif
 
     #ifdef NOSECONE
-        #ifdef TESTING
-            SerialUSB.println("Polling Thermocouple");
-        #endif
-        *thermocouple_data = probe.readTempC();
-        #ifdef TESTING
-            if (!isnan(*thermocouple_data)) {
-                SerialUSB.print("Temp[C]=");
-                SerialUSB.println(*thermocouple_data);
-            }
-            else
-                SerialUSB.println("Thermocouple ERROR");
-        #endif
-    #endif
+        #ifdef THERMOCOUPLE
+            #ifdef TESTING
+                SerialUSB.println("Polling Thermocouple");
+            #endif  // TESTING
+            *thermocouple_data = probe.readTempC();
+            #ifdef TESTING
+                if (!isnan(*thermocouple_data)) {
+                    SerialUSB.print("Temp[C]=");
+                    SerialUSB.println(*thermocouple_data);
+                }
+                else
+                    SerialUSB.println("Thermocouple ERROR");
+            #endif  // TESTING
+        #endif  // THERMOCOUPLE
+    #endif  // NOSECONE
 
 }
 
@@ -589,9 +594,11 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
             datalog.print(GPS_data[i], 6);
             datalog.print(",");
         }
-        datalog.print(",");
-        datalog.print(thermocouple_data);
-        datalog.print(",");
+        #ifdef THERMOCOUPLE
+            datalog.print(",");
+            datalog.print(thermocouple_data);
+            datalog.print(",");
+        #endif  // THERMOCOUPLE
     #endif
     datalog.print("\n");
     datalog.flush();
@@ -636,8 +643,10 @@ void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
             SerialUSB.print("GPS altitude:                       ");
             SerialUSB.println(GPS_data[2], 3);
 
-            SerialUSB.print("Thermocouple (C):                   ");
-            SerialUSB.println(thermocouple_data);
+            #ifdef THERMOCOUPLE
+                SerialUSB.print("Thermocouple (C):                   ");
+                SerialUSB.println(thermocouple_data);
+            #endif // THERMOCOUPLE
 
         #elif defined BODY
             SerialUSB.print("IMU - accelerometer X (g):          ");
