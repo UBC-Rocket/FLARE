@@ -6,9 +6,9 @@
  * @description  Initializes gpio pins that enable us to control our
  *  drogue and main parachute releases, status LEDs, buzzer.
  *
- *  The drogue servo control function and main parachute release functions are also contained
- *  here. There is a function that implements continuity testing of the
- *  ematch - required as per IREC regulations.
+ *  The drogue servo control function and main parachute release functions are
+ *  also contained here. There is a function that implements continuity testing
+ *  of the ematch - required as per IREC regulations.
  *
  * @section LICENSE
  * This program is free software; you can redistribute it and/or

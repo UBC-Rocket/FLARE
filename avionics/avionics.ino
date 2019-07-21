@@ -222,7 +222,7 @@ void loop()
                     &temp_sensor_data, IMU_data, GPS_data,
                     &thermocouple_data);
 
-        calculateValues(acc_data, bar_data, &prev_altitude, &altitude,
+        calculateValues(bar_data, &prev_altitude, &altitude,
                         &delta_altitude, &baseline_pressure,
                         &delta_time, pressure_set, delta_time_set);
 
