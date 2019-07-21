@@ -3,9 +3,9 @@
  *
  * @file    groundaltitude.cpp
  * @author  UBC Rocket Avionics 2018/2019
- * @description   Rolling average of barometer data to calculate and set ground altitude.
- * The three functions in this file initialize the ground altitude array,
- * returns the sum of that array, and updates the array.
+ * @description   Rolling average of barometer data to calculate and set ground
+ *      altitude. The three functions in this file initialize the ground
+ *      altitude array, returns the sum of that array, and updates the array.
  *
  * @section LICENSE
  * This program is free software; you can redistribute it and/or
@@ -39,11 +39,13 @@ float groundAlt_arr_sum(float ground_alt_arr[]){
 }
 
 /* float groundAlt_update(float *bar_data, float ground_alt_arr[]){}
- * @brief  Updates the ground altitude array with new barometer data, applies a moving average
- *      to the values, and averages the array with the new values.
+ * @brief  Updates the ground altitude array with new barometer data, applies a
+ *      moving average to the values, and averages the array with the new
+ *      values.
  * @param  *bar_data - Sensor data from the barometer in millibars.
  * @param  float ground_alt_arr[] - array to store ground altitude information.
- * @return float baseline_pressure_update - The updated moving average of the ground altitude array, in millibars.
+ * @return float baseline_pressure_update - The updated moving average of the
+ *          ground altitude array, in millibars.
  */
 float groundAlt_update(float *bar_data, float ground_alt_arr[]){
     static float prev_bar_data = ground_alt_arr[GROUND_ALT_SIZE-1];

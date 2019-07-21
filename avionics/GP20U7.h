@@ -68,6 +68,6 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 
 /*Functions------------------------------------------------------------*/
 bool updateGPS(void);
-void getGPS(float*);
+void getGPS(float* GPS_data);
 
 #endif

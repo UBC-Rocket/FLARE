@@ -6,9 +6,9 @@
  * @description  Initializes gpio pins that enable us to control our
  *  drogue and main parachute releases, status LEDs, buzzer.
  *
- *  The drogue servo control function and main parachute release functions are also contained
- *  here. There is a function that implements continuity testing of the
- *  ematch - required as per IREC regulations.
+ *  The drogue servo control function and main parachute release functions are
+ *  also contained here. There is a function that implements continuity testing
+ *  of the ematch - required as per IREC regulations.
  *
  * @section LICENSE
  * This program is free software; you can redistribute it and/or
@@ -48,8 +48,10 @@
 #define SERVO_DELAY 525    // in miliseconds
 #define CONTINUITY_CHECK_DELAY 50 // in microseconds!
 
-// tested at 11.1V with a 2.2k/470 divider (606) or 1.3k/330 (642) or 1.33k/330 (629)
-#define DISCONTINUOUS_THRESHOLD 650 // threshold for a discontinuous ematch -> read voltage / 3.3 * 1023
+//tested at 11.1V with a 2.2k/470 divider (606) or 1.3k/330 (642)
+//  or 1.33k/330 (629)
+// threshold for a discontinuous ematch -> read voltage / 3.3 * 1023
+#define DISCONTINUOUS_THRESHOLD 650
 
 /*Variables------------------------------------------------------------*/
 static Servo myServo;

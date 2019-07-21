@@ -71,8 +71,8 @@ Adafruit_BNO055 IMU(-1, IMU_ADDRESS);
 /**
   * @brief  Initializes all the sensors
   * @param  InitStatus *status - Status variable containing information on status.
-  *                         Note: All values in *status will be overwritten; status
-  *                         values can be then extracted.
+  *                     Note: All values in *status will be overwritten; status
+  *                     values can be then extracted.
   * @return void
   */
 
