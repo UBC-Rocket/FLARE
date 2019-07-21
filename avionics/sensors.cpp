@@ -120,7 +120,8 @@ void initSensors(InitStatus *status)
     #endif
 
     if (!continuityCheck()){
-        status->overview = CRITICAL_FAILURE;     //Critical failure if the ignitor is broken
+        //Critical failure if the ignitor is broken
+        status->overview = CRITICAL_FAILURE;
         status->sensorNominal[EMATCH_STATUS_POSITION] = false;
 
         #ifdef TESTING
@@ -154,22 +155,28 @@ void initSensors(InitStatus *status)
             #endif
         } else {
             #ifdef NOSECONE
-                datalog.write("NOSECONE SENSOR LOG DATA\n");
-                datalog.write("Time (ms), State, Battery Voltage (V),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
-                "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
-                "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
-                "IMU - Heading (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,GPS - longitude,GPS - altitude,SatCom,Thermocouple (C)\n");
-            #endif
+            datalog.write("NOSECONE SENSOR LOG DATA\n");
+            datalog.write("Time (ms), State, Battery Voltage (V),"
+            "Accelerometer - Accel X (g),Accelerometer - Accel Y (g),"
+            "Accelerometer - Accel Z (g),Barometer - Pressure (mbar),"
+            "Barometer - Temperature (C), Our - Baseline Pressure (mbar),"
+            "Our - Altitude (m),Temperature Sensor - Temperature (C),"
+            "IMU - Heading (°),IMU - Roll (°),IMU - Pitch (°),GPS - latitude,"
+            "GPS - longitude,GPS - altitude,SatCom,Thermocouple (C)\n");
+            #endif //NOSECONE
             #ifdef BODY
-                datalog.write("BODY SENSOR LOG DATA\n");
-                datalog.write("Time (ms), State, Battery Voltage (V),Accelerometer - Acceleration X (g),Accelerometer - Acceleration Y (g),"
-                "Accelerometer - Acceleration Z (g),Barometer - Pressure (mbar),Barometer - Temperature (C),"
-                "Our - Baseline Pressure (mbar),Our - Altitude (m),Temperature Sensor - Temperature (C),"
-                "IMU - acceleration X (m/s^2),IMU - acceleration Y (m/s^2),IMU - acceleration Z (m/s^2),"
-                "IMU - gyroscope X (rad/s),IMU - gyroscope Y (rad/s),IMU - gyroscope Z (rad/s),"
-                "IMU - magnetometer X (mT),IMU - magnetometer Y (mT),IMU - magnetometer Z (mT),"
-                "ematch\n");
-            #endif
+            datalog.write("BODY SENSOR LOG DATA\n");
+            datalog.write("Time (ms), State, Battery Voltage (V),"
+            "Accelerometer - Accel X (g),Accelerometer - Accel Y (g),"
+            "Accelerometer - Accel Z (g),Barometer - Pressure (mbar),"
+            "Barometer - Temperature (C), Our - Baseline Pressure (mbar),"
+            "Our - Altitude (m),Temperature Sensor - Temperature (C),"
+            "IMU - acceleration X (m/s^2),IMU - acceleration Y (m/s^2),"
+            "IMU - acceleration Z (m/s^2), IMU - gyroscope X (rad/s),"
+            "IMU - gyroscope Y (rad/s),IMU - gyroscope Z (rad/s),"
+            "IMU - magnetometer X (mT),IMU - magnetometer Y (mT),"
+            "IMU - magnetometer Z (mT), ematch\n");
+            #endif //BODY
         }
     }
 
@@ -290,7 +297,8 @@ void initSensors(InitStatus *status)
     else
         datalog.write("B,B,B,");
 
-    if(status->sensorNominal[BAROMETER_STATUS_POSITION]) //barom pressure & temperature
+    //barom pressure & temperature
+    if(status->sensorNominal[BAROMETER_STATUS_POSITION])
         datalog.write("G,G,");
     else
         datalog.write("B,B,");
@@ -318,11 +326,11 @@ void initSensors(InitStatus *status)
     }
 
     #ifdef NOSECONE
-        datalog.write("X, X, X,");   //GPS no capability to test success
+        datalog.write("X, X, X,"); //GPS, no capability to test success
     #endif
 
     #ifdef BODY
-        if(status->sensorNominal[EMATCH_STATUS_POSITION])   //ematch continuity
+        if(status->sensorNominal[EMATCH_STATUS_POSITION]) //ematch continuity
             datalog.write("G\n");
         else
             datalog.write("B\n");
@@ -342,7 +350,6 @@ void initSensors(InitStatus *status)
     #endif
 
     /* transmit sensor report */
-
     displayStatus(status);
     return;
 }
@@ -416,16 +423,22 @@ float barSensorInit(void){
   * @brief  Polls all the sensors
   * @param  unsigned long *timestamp - pointer to store the timestamp value
   * @param  float *battery_voltage - Stores battery voltage
-  * @param  float acc_data[] - array to store the accelerometer data; refer to sensors.h for array sizes
-  * @param  float bar_data[] - array to store the barometer data; refer to sensors.h for array sizes
-  * @param  float* temp_sensor_data - pointer to store the temperature sensor data
-  * @param  float IMU_data[] - array to store the IMU data; refer to sensors.h for array sizes
-  * @param  char GPS_data[] - array to store the GPS data; refer to sensors.h for array sizes
+  * @param  float acc_data[] - array to store the accelerometer data;
+  *             refer to sensors.h for array sizes
+  * @param  float bar_data[] - array to store the barometer data;
+  *             refer to sensors.h for array sizes
+  * @param  float* temp_sensor_data - pointer to store the temperature
+  *             sensor data
+  * @param  float IMU_data[] - array to store the IMU data;
+  *             refer to sensors.h for array sizes
+  * @param  char GPS_data[] - array to store the GPS data;
+  *             refer to sensors.h for array sizes
   * @param  *thermocouple_data - pointer to store thermocouple data.
   * @return None
   */
-void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_data[], float bar_data[],
-                float *temp_sensor_data, float IMU_data[], float GPS_data[], float *thermocouple_data)
+void pollSensors(unsigned long *timestamp, float *battery_voltage,
+        float acc_data[], float bar_data[], float *temp_sensor_data,
+        float IMU_data[], float GPS_data[], float *thermocouple_data)
 {
     int16_t x, y, z;
 
@@ -522,20 +535,26 @@ void pollSensors(unsigned long *timestamp, float *battery_voltage, float acc_dat
   * @brief  Logs data on the SD card
   * @param  unsigned long *timestamp - pointer to store the timestamp value
   * @param  float *battery_voltage - Stores battery voltage
-  * @param  float acc_data[] - array to store the accelerometer data; refer to sensors.h for array sizes
-  * @param  float bar_data[] - array to store the barometer data; refer to sensors.h for array sizes
-  * @param  float* temp_sensor_data - pointer to store the temperature sensor data
-  * @param  float IMU_data[] - array to store the IMU data; refer to sensors.h for array sizes
-  * @param  char GPS_data[] - array to store the GPS data; refer to sensors.h for array sizes
+  * @param  float acc_data[] - array to store the accelerometer data;
+  *             refer to sensors.h for array sizes
+  * @param  float bar_data[] - array to store the barometer data;
+  *             refer to sensors.h for array sizes
+  * @param  float* temp_sensor_data - pointer to store the temperature
+  *             sensor data
+  * @param  float IMU_data[] - array to store the IMU data;
+  *             refer to sensors.h for array sizes
+  * @param  char GPS_data[] - array to store the GPS data;
+  *             refer to sensors.h for array sizes
   * @param  FlightStates state - rocket flight state
   * @param  float altitude - Calculated rocket altitude, after filtering
   * @param  float baseline_pressure - Pressure used as "ground level"
   * @param  *thermocouple_data - pointer to store thermocouple data.
   * @return None
   */
-void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[], float bar_data[],
-            float *temp_sensor_data, float IMU_data[], float GPS_data[],
-            FlightStates state, float altitude, float baseline_pressure, float thermocouple_data)
+void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
+        float bar_data[], float *temp_sensor_data, float IMU_data[],
+        float GPS_data[], FlightStates state, float altitude,
+        float baseline_pressure, float thermocouple_data)
 {
     /*write data to SD card*/
     #ifdef TESTING

@@ -115,7 +115,8 @@ void addToDeltaTimeSet(unsigned long* average_set, unsigned long data){
 
 /*
 * @brief Calculates average time change
-* @param unsigned long* average_set - the array of delta time data actively being used
+* @param unsigned long* average_set - the array of delta time data actively
+*           being used
 * @return float - the average of average set
 */
 float calculateDeltaTimeAverage(unsigned long* average_set){
