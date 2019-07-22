@@ -40,8 +40,11 @@ float Battery::getVoltage()
 {
     float inputValue = analogRead(m_batterySensorPin);
     // map it to the range the analog out:
-    float teensyVoltage = map(inputValue, 0, 1023, 0, 3300); // maps input voltage 0-1023 to 0-3300 scale. Max 3300mV = 3.3V is the highest voltage Teensy can read.
-    float batteryVoltage = (teensyVoltage / m_divider) / 1000; // converts output value from mV to V and divides by voltage divider value to calculate battery input voltage.
+    // 3300mV is the highest voltage Teensy can read.
+    float teensyVoltage = map(inputValue, 0, 1023, 0, 3300);
+    // converts output value from mV to V and divides by voltage divider
+    // value to calculate battery input voltage.
+    float batteryVoltage = (teensyVoltage / m_divider) / 1000;
     return batteryVoltage;
 }
 

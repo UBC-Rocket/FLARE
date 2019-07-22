@@ -169,25 +169,26 @@ void sing(SongTypes song) {
     }
 }
 
-/* void buzz(int, long, long){}
+/* void buzz(int targetPin, long frequency, long length){}
  * @brief  Creates a buzzer note at a specified frequency and duration
  * @param  int targetPin - the buzzer control pin
  * @param  long frequency - frequency of the note to be played
- * @param  long length - length of note to be played. to calculate the note duration, take one second
- *            divided by the note type. e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+ * @param  long length - length of note to be played. To calculate the note
+ *          duration, take one second divided by the note type.
+ *          e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
  * @return void.
  */
 void buzz(int targetPin, long frequency, long length) {
-    long delayValue = 1000000 / frequency / 2; // calculate the delay value between transitions
-    //// 1 second's worth of microseconds, divided by the frequency, then split in half since
-    //// there are two phases to each cycle
-    long numCycles = frequency * length / 1000; // calculate the number of cycles for proper timing
-    //// multiply frequency, which is really cycles per second, by the number of seconds to
-    //// get the total number of cycles to produce
-    for (long i = 0; i < numCycles; i++) { // for the calculated length of time...
-        digitalWrite(targetPin, HIGH); // write the buzzer pin high to push out the diaphram
+    long delayValue = 1000000 / frequency / 2; //delay between transitions
+    // 1 000 000 microseconds, divided by the frequency, divided by 2 b/c
+    // there are two phases to each cycle
+    long numCycles = frequency * length / 1000; // #of cycles for proper timing
+    // multiply frequency = cycles per second, by the number of seconds to
+    // get the total number of cycles to produce
+    for (long i = 0; i < numCycles; i++) { // for the calculated length of time
+        digitalWrite(targetPin, HIGH); // write high to push out the diaphram
         delayMicroseconds(delayValue); // wait for the calculated delay value
-        digitalWrite(targetPin, LOW); // write the buzzer pin low to pull back the diaphram
-        delayMicroseconds(delayValue); // wait again or the calculated delay value
+        digitalWrite(targetPin, LOW); // write low to pull back the diaphram
+        delayMicroseconds(delayValue); // wait for the calculated delay value
     }
 }

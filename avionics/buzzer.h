@@ -24,15 +24,15 @@
 
 /*Variables------------------------------------------------------------*/
 enum SongTypes{
-  SongTypes_SUCCESS,
-  SongTypes_NONCRITFAIL,
-  SongTypes_CRITICALFAIL
+    SongTypes_SUCCESS,
+    SongTypes_NONCRITFAIL,
+    SongTypes_CRITICALFAIL
 };
 
 /*Functions------------------------------------------------------------*/
 void initBuzzer();
 void startBuzzer();
 void sing(SongTypes song);
-void buzz(int, long, long);
+void buzz(int targetPin, long frequency, long length);
 
 #endif

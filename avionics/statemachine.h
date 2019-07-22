@@ -41,7 +41,9 @@ enum FlightStates {
 
 /*Functions------------------------------------------------------------*/
 void switchState(FlightStates *curr_state, FlightStates new_state);
-void stateMachine(float*, float*, float*, float*, float*, float*, float*, FlightStates*);
+void stateMachine(float *altitude, float *delta_altitude,
+    float *prev_delta_altitude, float bar_data[], float *baseline_pressure,
+    float *ground_altitude, float ground_alt_arr[], FlightStates *state);
 
 
 #endif
