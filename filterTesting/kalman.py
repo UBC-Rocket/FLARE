@@ -127,6 +127,8 @@ while True:
     PNew = (np.identity(2) - K) * PPred
 
     # Print out xNew because I want to have something available dammit
+    print("Measured alt: ")
+    print(presToAlt(csvData[1]))
     print("State vector: ")
     print(xNew)
     print()
