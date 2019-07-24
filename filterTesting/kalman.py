@@ -1,13 +1,18 @@
 # Main code. Feeds data to Arduino. Hit any button to exit program.
 
 import time #for timing
-import msvcrt #console stuff
 import sys #to be able to exit
 import csv #for access to the pressure data set
-import random # for random value generation
-import numpy as np # for the linear algebra
+import os # for files
 import math # for logarithms
-import os
+import random # for random value generation
+
+import matplotlib.pyplot as plt #plotting
+import numpy as np # for the linear algebra
+
+
+
+
 
 # ---------------------  Constants  --------------------------
 FILE_NAME = 'SkyPilot_IREC_2019_Dataset_Post_Motor_Burnout.csv'
@@ -36,12 +41,14 @@ except Exception as e:
     input()
     sys.exit()
 
-time.sleep(1) # let file settle
+time.sleep(0.5) # let file settle
 
 print("File opened. Press any key to begin...")
 input()
 
-#state vectors
+#Filtering variables -----------------------------------
+
+#state vectors - [position, velocity]
 xOld = np.empty((2, 1))
 xNew = np.empty((2, 1))
 
@@ -68,7 +75,9 @@ R = np.array([
     [0, 0.9*2/0.05] # I think that's how propagation of uncertainty works for velocity calc?
 ])
 
-# Measurement &
+
+
+# Setup file -------------------------------
 
 # Version 1: First row is version number.
 # 2nd row contains initial altitude, velocity, covariance matrix,
@@ -80,7 +89,7 @@ try:
     csvData = next(testDataReader) #Collect data from 2nd row
     xNew = np.reshape(csvData[0:2], (2,1))
     PNew = np.reshape(csvData[2:6], (2,2))
-    oldTime = csvData[6]
+    tOld = csvData[6]
     CONST_BASE_PRESSURE = csvData[7]
 
 
@@ -98,12 +107,13 @@ presToAlt = lambda pres : CONST_R * CONST_T / CONST_g * math.log(CONST_BASE_PRES
 
 apogeeCount = 0
 
-#main loop -------------
+# Plotting variables ----------------------------------
+tPlot = []
+measPlot = []
+xPlot = []
+vPlot = []
+#main loop ------------------------------------
 while True:
-    xOld = xNew
-    POld = PNew
-    oldTime = csvData[0]
-
     try: #Pull next set of data
         csvData = next(testDataReader)
     except StopIteration:
@@ -111,7 +121,12 @@ while True:
         input()
         sys.exit()
 
-    dt = (csvData[0] - oldTime) / 1000
+    tNew = csvData[0] / 1000
+    dt = tNew - tOld
+
+    xOld = xNew
+    POld = PNew
+    tOld = csvData[0] / 1000
 
     #Propagation, assuming constant velocity
     F = np.array(
@@ -133,15 +148,11 @@ while True:
     xNew = xPred + K @ y
     PNew = (np.identity(2) - K) * PPred
 
-    # Print out xNew because I want to have something available dammit
-    print("Measured alt: ")
-    print(presToAlt(csvData[1]))
-    print("State vector: ")
-    print(xNew)
-    print()
-    print("State covariance: ")
-    print(PNew)
-    print("\n\n")
+    # Save for plotting
+    tPlot.append(tNew)
+    xPlot.append(xNew[0])
+    vPlot.append(xNew[1])
+    measPlot.append(presToAlt(csvData[1]))
 
     if (xNew[0] < xOld[0]):
         apogeeCount += 1
@@ -149,12 +160,16 @@ while True:
         apogeeCount = 0
 
     if apogeeCount >= CONST_APOGEE_CHECKS:
-        print("Reached apogee at time {}".format(csvData[0]/1000))
-        input()
+        print("Reached apogee at time {}".format(tNew))
+        break
 
 
-    if (msvcrt.kbhit() and msvcrt.getche().decode("utf-8") == "q"): #Program exit sequence
-        print("Exiting")
-        time.sleep(0.5)
-        sys.exit()
 
+#Reached apogee; plot results
+plt.subplot(121)
+plt.plot(tPlot, xPlot, tPlot, measPlot)
+plt.subplot(122)
+plt.plot(tPlot, vPlot)
+plt.show()
+
+input()
