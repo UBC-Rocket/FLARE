@@ -19,6 +19,7 @@ CONST_R = 287.058
 CONST_T = 30 + 273.15
 CONST_g = 9.81
 
+CONST_APOGEE_CHECKS = 5
 # # -------------------------------------------- --------
 # print(__file__)
 # input()
@@ -36,6 +37,9 @@ except Exception as e:
     sys.exit()
 
 time.sleep(1) # let file settle
+
+print("File opened. Press any key to begin...")
+input()
 
 #state vectors
 xOld = np.empty((2, 1))
@@ -92,10 +96,13 @@ except AssertionError:
 # https://en.wikipedia.org/wiki/Hypsometric_equation
 presToAlt = lambda pres : CONST_R * CONST_T / CONST_g * math.log(CONST_BASE_PRESSURE / pres)
 
+apogeeCount = 0
+
 #main loop -------------
 while True:
     xOld = xNew
     POld = PNew
+    oldTime = csvData[0]
 
     try: #Pull next set of data
         csvData = next(testDataReader)
@@ -135,7 +142,15 @@ while True:
     print("State covariance: ")
     print(PNew)
     print("\n\n")
-    input()
+
+    if (xNew[0] < xOld[0]):
+        apogeeCount += 1
+    else:
+        apogeeCount = 0
+
+    if apogeeCount >= CONST_APOGEE_CHECKS:
+        print("Reached apogee at time {}".format(csvData[0]/1000))
+        input()
 
 
     if (msvcrt.kbhit() and msvcrt.getche().decode("utf-8") == "q"): #Program exit sequence
