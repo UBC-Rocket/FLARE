@@ -25,6 +25,7 @@ CONST_T = 30 + 273.15
 CONST_g = 9.81
 
 CONST_APOGEE_CHECKS = 5
+CONST_PRES_AVG_SET_SIZE = 15
 # # -------------------------------------------- --------
 # print(__file__)
 # input()
@@ -76,7 +77,6 @@ R = np.array([
 ])
 
 
-
 # Setup file -------------------------------
 
 # Version 1: First row is version number.
@@ -112,6 +112,17 @@ tPlot = []
 measPlot = []
 xPlot = []
 vPlot = []
+
+# Moving average filter -----------------
+movAvgAltSet = [xNew[0]] * CONST_PRES_AVG_SET_SIZE
+movAvgTimeSet = [0.05] * CONST_PRES_AVG_SET_SIZE
+movAvgOldAlt = xNew[0]
+movAvgApogeeCount = 0
+
+
+kalmanApogee = False
+movAvgApogee = False
+
 #main loop ------------------------------------
 while True:
     try: #Pull next set of data
@@ -159,10 +170,31 @@ while True:
     else:
         apogeeCount = 0
 
-    if apogeeCount >= CONST_APOGEE_CHECKS:
-        print("Reached apogee at time {}".format(tNew))
-        break
+    if apogeeCount >= CONST_APOGEE_CHECKS and not kalmanApogee:
+        print("Kalman filter detected apogee at time {}".format(tNew))
+        kalmanApogee = True
 
+    #Moving average filter --------------
+    del movAvgAltSet[0]
+    del movAvgTimeSet[0]
+    movAvgAltSet.append(presToAlt(csvData[1]))
+    movAvgTimeSet.append(dt)
+
+    movAvgNewAlt = np.mean(movAvgAltSet)
+    movAvgVel = (movAvgNewAlt - movAvgOldAlt) / np.mean(movAvgTimeSet)
+    movAvgOldAlt = movAvgNewAlt
+
+    if movAvgVel < 0:
+        movAvgApogeeCount += 1
+    else:
+        movAvgApogeeCount = 0
+
+    if movAvgApogeeCount >= CONST_APOGEE_CHECKS and not movAvgApogee:
+        print("Moving average detected apogee at time {}".format(tNew))
+        movAvgApogee = True
+
+    if kalmanApogee and movAvgApogee:
+        break
 
 
 #Reached apogee; plot results
