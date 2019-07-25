@@ -24,11 +24,14 @@
 class Battery
 {
     public:  // public functions
-        // Constructor. batterySensorPin is the pin for battery sensor (i.e. output of the voltage divider)
+        // Constructor. batterySensorPin is the pin for battery sensor
+        // (i.e. output of the voltage divider)
         Battery(byte batterySensorPin);
 
         /**
-         * @brief  Gets the battery voltage level. Maximum voltage readable is 11.0 volts; to adjust, change the resistors used in the voltage divider.
+         * @brief  Gets the battery voltage level. Maximum voltage readable
+         *          is 11.0 volts; to adjust, change the resistors used
+         *          in the voltage divider.
          * @param  None
          * @return float batteryVoltage - voltage of the battery, in volts.
          */

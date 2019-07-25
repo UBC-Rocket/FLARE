@@ -101,14 +101,18 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 File radiolog;
 static InitStatus s_statusOfInit;
 static float pressure_set[PRESSURE_AVG_SET_SIZE]; //set of pressure values for a floating average
+static unsigned long delta_time_set[PRESSURE_AVG_SET_SIZE]; //set of delta time values for the delta altitude
 static float baseline_pressure;
 static float ground_alt_arr[GROUND_ALT_SIZE]; //values for the baseline pressure calculation
 
 static XBee s_radio = XBee();
-static XBeeAddress64 s_groundAddress = XBeeAddress64(GROUND_STATION_ADDR_MSB, GROUND_STATION_ADDR_LSB);
+static XBeeAddress64 s_gndAddr = XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB);
 static ZBTxRequest s_txPacket = ZBTxRequest();
 
 /*Functions------------------------------------------------------------*/
+
+inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp);
+
 /**
   * @brief  The Arduino setup function
   * @param  None
@@ -135,14 +139,14 @@ void setup()
     SerialRadio.begin(921600);
     while (!SerialRadio) {}
     s_radio.setSerial(SerialRadio);
-    s_txPacket.setAddress64(s_groundAddress);
+    s_txPacket.setAddress64(s_gndAddr);
 
     // Comms to camera serial port
     SerialCamera.begin(CameraBaud);
     while (!SerialCamera) {}
 
-    /*init I2C bus*/
-    Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400); //400kHz
+    /*init I2C bus @ 400 kHz */
+    Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
     Wire.setDefaultTimeout(100000); //100ms
 
     /*init sensors and report status in many ways*/
@@ -150,17 +154,16 @@ void setup()
     radioStatus(&s_radio, &s_txPacket, &s_statusOfInit);
 
     /* init various arrays */
-    baseline_pressure = barSensorInit(); /* for baseline pressure calculation */
-    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) // for moving average
-    {
+    baseline_pressure = barSensorInit(); // for baseline pressure calculation
+    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++){ // for moving average
         pressure_set[i] = baseline_pressure;
     }
-
-    for(i = 0; i < GROUND_ALT_SIZE; i++)
-    {
+    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++){ // for delta altitude
+        delta_time_set[i] = NOMINAL_POLLING_TIME_INTERVAL;
+    }
+    for(i = 0; i < GROUND_ALT_SIZE; i++){
         ground_alt_arr[i] = baseline_pressure;
     }
-
 }
 
 /**
@@ -177,49 +180,29 @@ void loop()
     unsigned long delta_time;
     static uint16_t time_interval = NOMINAL_POLLING_TIME_INTERVAL; //ms
 
-    static unsigned long init_status_old_time = 0;
-    static unsigned long init_status_new_time = 0;
-    static const uint16_t init_status_time_interval = 500;
-    static uint16_t init_status_indicator = 0;
+    static unsigned long radio_old_time = 0;
+    static unsigned long radio_time_interval = 500; //ms
 
-    static float battery_voltage, acc_data[ACC_DATA_ARRAY_SIZE], bar_data[BAR_DATA_ARRAY_SIZE],
-        temp_sensor_data, IMU_data[IMU_DATA_ARRAY_SIZE], GPS_data[GPS_DATA_ARRAY_SIZE], thermocouple_data;
+    static float battery_voltage, acc_data[ACC_DATA_ARRAY_SIZE],
+        bar_data[BAR_DATA_ARRAY_SIZE], temp_sensor_data,
+        IMU_data[IMU_DATA_ARRAY_SIZE], GPS_data[GPS_DATA_ARRAY_SIZE],
+        thermocouple_data;
 
-    static float prev_altitude, altitude, delta_altitude, prev_delta_altitude, ground_altitude;
+    static float prev_altitude, altitude, delta_altitude, ground_altitude;
 
     static FlightStates state = STANDBY;
 
-    static unsigned long radio_old_time = 0;
-    static unsigned long radio_time_interval = 500; //milliseconds
-
-    #ifdef NOSECONE
-        static bool mainDeploySatcomSent = false;
-        static int landedSatcomSentCount = 0;
-        static uint16_t satcomMsgOldTime = millis();
-    #endif
-
-
+    //makes sure that even if it does somehow get accidentally changed,
+    //it gets reverted
     if(s_statusOfInit.overview == CRITICAL_FAILURE)
-        state = WINTER_CONTINGENCY; //makes sure that even if it does somehow get accidentally changed, it gets reverted
+        state = WINTER_CONTINGENCY;
 
     // if radio communications are received, this addresses them
     resolveRadioRx(&s_radio, &s_txPacket, GPS_data, &state, &s_statusOfInit);
 
-    #ifdef NOSECONE
-     /* send satcom data */
-    if(state == FINAL_DESCENT && !mainDeploySatcomSent)
-    {
-        mainDeploySatcomSent = true;
-        SatComSendGPS(&timestamp, GPS_data);
-    }
-    else if(state == LANDED && landedSatcomSentCount < NUM_SATCOM_SENDS_ON_LANDED && millis() - satcomMsgOldTime >= SATCOM_LANDED_TIME_INTERVAL)
-    { //sends Satcom total of NUM_SATCOM_SENDS_ON_LANDED times, once every SATCOM_LANDED_TIME_INTERVAL
-        landedSatcomSentCount++;
-        SatComSendGPS(&timestamp, GPS_data);
-        satcomMsgOldTime = millis();
-    }
-
-    #endif //def NOSECONE
+    #ifdef NOSECONE // send satcom data
+        sendSatcomMsg(state, GPS_data, timestamp);
+    #endif
 
     // Polling time intervals need to be variable, since in LANDED
     // there's a lot of data that'll be recorded
@@ -228,45 +211,95 @@ void loop()
     else
         time_interval = NOMINAL_POLLING_TIME_INTERVAL;
 
-    //Core functionality of rocket - take data, process it, run the state machine, and log the data
+    //Core functionality of rocket - take data, process it,
+    //run the state machine, and log the data
     new_time = millis();
     if ((new_time - old_time) >= time_interval) {
         delta_time = new_time - old_time;
         old_time = new_time;
 
-        pollSensors(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, &thermocouple_data);
-        calculateValues(acc_data, bar_data, &prev_altitude, &altitude, &delta_altitude, &prev_delta_altitude, &baseline_pressure, &delta_time, pressure_set);
-        stateMachine(&altitude, &delta_altitude, &prev_altitude, bar_data, &baseline_pressure, &ground_altitude, ground_alt_arr, &state);
-        logData(&timestamp, &battery_voltage, acc_data, bar_data, &temp_sensor_data, IMU_data, GPS_data, state, altitude, baseline_pressure, thermocouple_data);
+        pollSensors(&timestamp, &battery_voltage, acc_data, bar_data,
+                    &temp_sensor_data, IMU_data, GPS_data,
+                    &thermocouple_data);
+
+        calculateValues(bar_data, &prev_altitude, &altitude,
+                        &delta_altitude, &baseline_pressure,
+                        &delta_time, pressure_set, delta_time_set);
+
+        stateMachine(&altitude, &delta_altitude, &prev_altitude,
+                    bar_data, &baseline_pressure, &ground_altitude,
+                    ground_alt_arr, &state);
+
+        logData(&timestamp, &battery_voltage, acc_data, bar_data,
+                &temp_sensor_data, IMU_data, GPS_data, state,
+                altitude, baseline_pressure, thermocouple_data);
     }
 
-    // Send logged data across radio (as backup/early access to data logged to SD card)
+    // Send logged data across radio (as backup/early access to SD card logs)
     if((new_time - radio_old_time) >= radio_time_interval) {
         #ifdef BODY
-            sendRadioBody(&s_radio, &s_txPacket, bar_data, state, &altitude, &timestamp);
+            sendRadioBody(&s_radio, &s_txPacket, bar_data, state, &altitude,
+                            &timestamp);
         #endif  // def BODY
         #ifdef NOSECONE
-            sendRadioNosecone(&s_radio, &s_txPacket, GPS_data, bar_data, acc_data, &temp_sensor_data, IMU_data);
+            sendRadioNosecone(&s_radio, &s_txPacket, GPS_data, bar_data,
+                              acc_data, &temp_sensor_data, IMU_data);
         #endif  //def NOSECONE
         radio_old_time = new_time;
     }
 
-    // A bit of code to make the LED blink in non-critical failure
-    if (s_statusOfInit.overview == NONCRITICAL_FAILURE)
-    {
-        init_status_new_time = millis();
-        if ( (init_status_new_time - init_status_old_time) > init_status_time_interval ){
-            init_status_old_time = init_status_new_time;
-            init_status_indicator++;
-
-            if(init_status_indicator % 2 == 1)
-                digitalWrite(LED_BUILTIN, HIGH);
-            else
-                digitalWrite(LED_BUILTIN, LOW);
-        }
-    }
+    //LED blinks in non-critical failure
+    blinkStatusLED();
 
     #ifdef TESTING
     delay(1000); //So you can actually read the serial output
     #endif
+}
+
+/**
+  * @brief  Helper function for satcom
+  * @param  FlightStates state - flight state of the rocket
+  * @param  float GPS_data[]
+  * @param  float timestamp - time in ms
+  * @return None
+  */
+inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp)
+{
+    static bool mainDeploySatcomSent = false;
+    static int landedSatcomSentCount = 0;
+    static uint16_t satcomMsgOldTime = millis();
+
+    if(state == FINAL_DESCENT && !mainDeploySatcomSent){
+        mainDeploySatcomSent = true;
+        SatComSendGPS(&timestamp, GPS_data);
+    } else if (state == LANDED && landedSatcomSentCount < NUM_SATCOM_SENDS_ON_LANDED
+                    && millis() - satcomMsgOldTime >= SATCOM_LANDED_TIME_INTERVAL){
+        //sends Satcom total of NUM_SATCOM_SENDS_ON_LANDED times,
+        //once every SATCOM_LANDED_TIME_INTERVAL
+        landedSatcomSentCount++;
+        SatComSendGPS(&timestamp, GPS_data);
+        satcomMsgOldTime = millis();
+    }
+}
+
+/**
+  * @brief  Helper function for LED blinking
+  * @return None
+  */
+inline void blinkStatusLED()
+{
+    static unsigned long init_st_old_time = 0;
+    static const uint16_t init_st_time_interval = 500;
+    static bool init_st_indicator = false;
+
+    if (s_statusOfInit.overview == NONCRITICAL_FAILURE
+                && millis() - init_st_old_time > init_st_time_interval){
+        init_st_old_time = millis();
+        init_st_indicator = !init_st_indicator;
+
+        if(init_st_indicator)
+            digitalWrite(LED_BUILTIN, HIGH);
+        else
+            digitalWrite(LED_BUILTIN, LOW);
+    }
 }

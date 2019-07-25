@@ -27,5 +27,7 @@
 // #define TESTING //enable or disable debug output
 // #define GROUND_TEST
 
+// #define THERMOCOUPLE    // if thermocouple is utilized or not
+
 // Refer to README or the wiki for more information.
 #endif

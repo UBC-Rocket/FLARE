@@ -40,8 +40,8 @@
 Radio data unique identifiers, for sending data to the ground station.
 Each identifier prefixes a value for the data that follows in the radio stream.
 For example, UID_time would be prefixing the uint_32 value for the timestamp.
-The exception is UID_message, which prefixes an arbitrary length string which gets printed
-    to the console
+The exception is UID_message, which prefixes an arbitrary length string which
+    gets printed to the console
 */
 const char UID_acc_acc_x  = 'X'; //Accelerometer - Acceleration X
 const char UID_acc_acc_y  = 'Y'; //Accelerometer - Acceleration Y
@@ -98,16 +98,21 @@ The first bit (0x01) is reserved for identifing Nosecone vs Body
 /*Functions------------------------------------------------------------*/
 
 /**
-  * @brief  Send more essential data from the body over radio, pressure, state, altitude, timestamp
+  * @brief  Send more essential data from the body over radio, pressure, state,
+  *             altitude, timestamp
   * @param  XBee* radio - class for the XBee radio
-  * @param  ZBTxRequest* txPacket - class for the XBee radio tx packet; gets reused to save memory
-  * @param  float bar_data - barometer data array. Only sending barometer pressure - not the barometer temperature
+  * @param  ZBTxRequest* txPacket - class for the XBee radio tx packet; gets
+  *             reused to save memory
+  * @param  float bar_data - barometer data array. Only sending barometer
+  *             pressure - not the barometer temperature
   * @param  FlightStates state - current state
   * @param  float *altitude - current calculated altitude
   * @param  unsigned long *timestamp - timestamp
   * @return void
   */
-void sendRadioBody(XBee* radio, ZBTxRequest* txPacket, float bar_data[], FlightStates state, float *altitude, uint32_t *timestamp){
+void sendRadioBody(XBee* radio, ZBTxRequest* txPacket, float bar_data[],
+            FlightStates state, float *altitude, uint32_t *timestamp)
+{
     uint32_t stateAsInt = static_cast<uint32_t>(state);
     static uint8_t payload[20];
     payload[0] = UID_time;
@@ -127,17 +132,20 @@ void sendRadioBody(XBee* radio, ZBTxRequest* txPacket, float bar_data[], FlightS
 /**
   * @brief  Sends data over radio from the nosecone, and GPS data
   * @param  XBee* radio - class for the XBee radio
-  * @param  ZBTxRequest* txPacket - class for the XBee radio tx packet; gets reused to save memory
+  * @param  ZBTxRequest* txPacket - class for the XBee radio tx packet; gets
+  *             reused to save memory
   * @param  float GPS_data - gps data array
-  * @param  float bar_data[] - barometer data array. Only sending barometer temperature, not pressure.
+  * @param  float bar_data[] - barometer data array. Only sending barometer
+  *             temperature, not pressure.
   * @param  float acc_data[] - accelerometer data array
   * @param  float *temp_sensor_data - data from temperature sensor
   * @param  float IMU_data[] - data array from IMU (pitch, roll, yaw).
   * @return void
   */
 void sendRadioNosecone(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
-                     float bar_data[], float acc_data[], float *temp_sensor_data, float IMU_data[]){
-
+            float bar_data[], float acc_data[], float *temp_sensor_data,
+            float IMU_data[])
+{
     static uint8_t payload[55];
 
     payload[0] = UID_GPS_lat;
@@ -170,34 +178,36 @@ void sendRadioNosecone(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
 }
 
 /**
-  * @brief  Deals with all received messages from the radio driver, including commands and status.
+  * @brief  Deals with all received messages from the radio driver, including
+  *             commands and status.
   * @param  XBee* radio - class for the XBee radio
-  * @param  ZBTxRequest* txPacket - class for the XBee radio tx packet; gets reused to save memory
-  * @param  float GPS_data[] - GPS data array. Information to be passed through to doCommand
+  * @param  ZBTxRequest* txPacket - class for the XBee radio tx packet; gets
+  *             reused to save memory
+  * @param  float GPS_data[] - GPS data array. Information to be passed through
+  *             to doCommand
   * @param  FlightStates *state - state. Information to be passed to doCommand
   * @param  InitStatus *status - status information, to be passed to doCommand
   * @return void
   */
-void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, float GPS_data[], FlightStates *state, InitStatus *status)
+void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, float GPS_data[],
+        FlightStates *state, InitStatus *status)
 {
     static ZBRxResponse rx = ZBRxResponse();
     static char command = '\0';
 
     radio->readPacket();
-    while(radio->getResponse().isAvailable() || radio->getResponse().isError()) //goes through all radio packets in buffer
-    {
+    while(radio->getResponse().isAvailable() || radio->getResponse().isError()){
+        //goes through all radio packets in buffer
         #ifdef TESTING
             //SerialUSB.println("Radio received something")
         #endif
 
-        if(radio->getResponse().isError()) //will we use this?
-        {
+        if(radio->getResponse().isError()) { //will we use this?
             // #ifdef TESTING
             //     SerialUSB.println("Radio error");
             // #endif
-        }
-        else if(radio->getResponse().getApiId() == ZB_RX_RESPONSE) //received command from radio
-        {
+        } else if(radio->getResponse().getApiId() == ZB_RX_RESPONSE) {
+            //received command from radio
             radio->getResponse().getZBRxResponse(rx);
             command = *(rx.getData());
             doCommand(command, GPS_data, state, status, radio, txPacket);
@@ -211,15 +221,19 @@ void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, float GPS_data[], Flight
 
 /** void doCommand
   * @brief  Takes a radio command input and executes the command
-  * @param  char command - Command identifier (see beginning of cpp file for definitions)
+  * @param  char command - Command identifier (see beginning of cpp file for
+  *             definitions)
   * @param  float GPS_data[] - GPS data array, for GPS_ping
   * @param  FlightStates *state - state
   * @param  InitStatus *status - status
   * @param  XBee* radio - class for the XBee radio
-  * @param  ZBTxRequest* txPacket - class for the XBee radio tx packet; gets reused to save memory
+  * @param  ZBTxRequest* txPacket - class for the XBee radio tx packet; gets
+  *             reused to save memory
   * @return void
   */
-void doCommand(char command, float GPS_data[], FlightStates *state, InitStatus *status, XBee* radio, ZBTxRequest* txPacket){
+void doCommand(char command, float GPS_data[], FlightStates *state,
+        InitStatus *status, XBee* radio, ZBTxRequest* txPacket)
+{
     unsigned char payload[2] = {'G'};
     payload[1] = command;
     String msg;
@@ -228,17 +242,16 @@ void doCommand(char command, float GPS_data[], FlightStates *state, InitStatus *
     String altVal;
     switch (command){
         case ARM:
-            if(*state == STANDBY) { //Don't want to switch out of drogue deploy or something into Armed
+            if(*state == STANDBY) {
+                //Don't want to switch out of drogue deploy etc. into Armed
                 switchState(state, ARMED);
                 digitalWrite(FLIGHT_LED, HIGH);
                 // turn on cameras
                 start_record();
-            }
-            else if(*state == ARMED) {
+            } else if(*state == ARMED) {
                 msg = String("Already in ARMED");
                 sendMessage(radio, txPacket, &msg);
-            }
-            else{
+            } else {
                 msg = String("!! ALREADY IN FLIGHT !!");
                 sendMessage(radio, txPacket, &msg);
             }
@@ -254,17 +267,16 @@ void doCommand(char command, float GPS_data[], FlightStates *state, InitStatus *
             break;
 
         case RESET:
-            if(*state == ARMED) { //Don't want to switch out of drogue deploy or something into standby
+            if(*state == ARMED) {
+                //Don't want to switch out of drogue deploy etc. into standby
                 switchState(state, STANDBY);
                 digitalWrite(FLIGHT_LED, LOW);
                 // turn off cameras
                 stop_record();
-            }
-            else if(*state == STANDBY) {
+            } else if(*state == STANDBY) {
                 msg = String("Already in STANDBY");
                 sendMessage(radio, txPacket, &msg);
-            }
-            else{
+            } else {
                 msg = String("!! ALREADY IN FLIGHT !!");
                 sendMessage(radio, txPacket, &msg);
             }
@@ -282,9 +294,9 @@ void doCommand(char command, float GPS_data[], FlightStates *state, InitStatus *
 
         case DROGUE:
             #ifdef GROUND_TEST
-            //testing purposes!
-            digitalWrite(FLIGHT_LED, LOW);
-            deployDrogue();
+                //testing purposes!
+                digitalWrite(FLIGHT_LED, LOW);
+                deployDrogue();
             #else
                 msg = String("!! DROGUE PARACHUTE COMMAND RECEIVED, NO ACTION TAKEN !!");
                 sendMessage(radio, txPacket, &msg);
@@ -312,7 +324,8 @@ void doCommand(char command, float GPS_data[], FlightStates *state, InitStatus *
                 latVal = String(GPS_data[0], 4);
                 longVal = String(GPS_data[1], 4);
                 altVal = String(GPS_data[2]);
-                msg = String("Lat: " + latVal + " Long: " + longVal + " Alt: " + altVal);
+                msg = String("Lat: " + latVal + " Long: " + longVal +
+                    " Alt: " + altVal);
                 sendMessage(radio, txPacket, &msg);
             #endif
             break;
@@ -358,9 +371,10 @@ void radioStatus(XBee* radio, ZBTxRequest* txPacket, InitStatus *status)
     #ifdef BODY
         if( !(status->sensorNominal[EMATCH_STATUS_POSITION]) )
             statusByte |= EMATCH_0_BIT_FLAG;
-        // if( !(status->sensorNominal[EMATCH_1_STATUS_POSITION]) ) //Resolve once 2nd ematch is implemented
+        //Resolve once 2nd ematch is implemented
+        // if( !(status->sensorNominal[EMATCH_1_STATUS_POSITION]) )
         //     statusByte |= EMATCH_1_BIT_FLAG;
-    #else
+    #else //NOSECONE
         if( !(status->sensorNominal[THERMOCOUPLE_STATUS_POSITION]) )
             statusByte |= THERMOCOUPLE_BIT_FLAG;
         if( !(status->sensorNominal[SATCOM_STATUS_POSITION]) )
@@ -388,6 +402,7 @@ void sendMessage(XBee* radio, ZBTxRequest* txPacket, String* msg)
     String payload = String(UID_message);
     payload.concat(*msg);
     txPacket->setPayloadLength(payload.length()+1);
-    txPacket->setPayload( reinterpret_cast<unsigned char*>( const_cast<char*>( payload.c_str() ) ) );
+    txPacket->setPayload( //???
+        reinterpret_cast<unsigned char*>( const_cast<char*>( payload.c_str())));
     radio->send(*txPacket);
 }
