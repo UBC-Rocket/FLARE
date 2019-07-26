@@ -26,6 +26,8 @@ CONST_g = 9.81
 
 CONST_APOGEE_CHECKS = 5
 CONST_PRES_AVG_SET_SIZE = 15
+
+CONST_NUM_POST_APOGEE_VALS = 20*30 #30 seconds
 # # -------------------------------------------- --------
 # print(__file__)
 # input()
@@ -112,6 +114,7 @@ tPlot = []
 measPlot = []
 xPlot = []
 vPlot = []
+movAvgXPlot = []
 
 # Moving average filter -----------------
 movAvgAltSet = [xNew[0]] * CONST_PRES_AVG_SET_SIZE
@@ -122,6 +125,8 @@ movAvgApogeeCount = 0
 
 kalmanApogee = False
 movAvgApogee = False
+
+numPostApogeeVals = 0
 
 #main loop ------------------------------------
 while True:
@@ -184,6 +189,8 @@ while True:
     movAvgVel = (movAvgNewAlt - movAvgOldAlt) / np.mean(movAvgTimeSet)
     movAvgOldAlt = movAvgNewAlt
 
+    movAvgXPlot.append(movAvgNewAlt)
+
     if movAvgVel < 0:
         movAvgApogeeCount += 1
     else:
@@ -194,12 +201,14 @@ while True:
         movAvgApogee = True
 
     if kalmanApogee and movAvgApogee:
-        break
+        numPostApogeeVals += 1
 
+    if numPostApogeeVals > CONST_NUM_POST_APOGEE_VALS:
+        break
 
 #Reached apogee; plot results
 plt.subplot(121)
-plt.plot(tPlot, xPlot, tPlot, measPlot)
+plt.plot(tPlot, measPlot, 'g', tPlot, xPlot, 'b', tPlot, movAvgXPlot, 'r')
 plt.subplot(122)
 plt.plot(tPlot, vPlot)
 plt.show()
