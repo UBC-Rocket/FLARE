@@ -11,7 +11,44 @@ import matplotlib.pyplot as plt #plotting
 import numpy as np # for the linear algebra
 
 
+class kf: # Kalman Filter
+    def __init__(self, xInit, PInit, tInit):
+        self.xNew = xInit
+        self.PNew = PInit
+        self.xOld = xInit
+        self.POld = PInit
+        self.tOld = tInit
+        self.R = np.array([
+                [0.9, 0], #0.9 in upper left is uncertainty of barometer
+                [0, 0.9*2/0.05] # I think that's how propagation of uncertainty works for velocity calc?
+            ])
 
+    def nextData(self, tNew, zMeas, PMeas):
+        dt = tNew - self.tOld
+
+        self.xOld = xNew
+        self.POld = PNew
+        self.tOld = csvData[0] / 1000
+
+        F = np.array(
+            [[1, dt],
+            [0, 1]]
+        )
+
+        #Control vector to incorporate effects of gravity
+        kalmanB = np.array(
+            [-0.5*CONST_g * dt ** 2, -CONST_g * dt],
+            ndmin = 2)
+
+        xPred = (F @ xOld) + kalmanB.T
+        PPred = F @ POld @ F.T + Q
+
+        y = zMeas - xPred
+        S = PPred + R
+
+        K = PPred @ np.linalg.inv(S)
+        self.xNew = xPred + K @ y
+        self.PNew = (np.identity(2) - K) * PPred
 
 
 # ---------------------  Constants  --------------------------
@@ -47,7 +84,7 @@ except Exception as e:
 time.sleep(0.5) # let file settle
 
 print("File opened. Press any key to begin...")
-# input()
+input()
 
 #Filtering variables -----------------------------------
 
@@ -68,9 +105,9 @@ F = np.empty((2,2))
 # A = 0.022 m^2, m = 23.5 kg, you get about 4 mm/s^2 of acceleration, which is smaller than the amount of
 # graviational variation between ground and apogee.
 # I'm going to unjustifiably choose 0.1 m/s^2 of unknown acceleration
-# Over 0.05 s, velocity changes by 0.05 m/s,
-# Error in position is  (1/2 * a * t^2)
-Q = np.array([0.5*0.1*0.05 ** 2, 0.05])
+# Over 0.05 s, velocity changes by 0.005 m/s,
+# Error in position is  (0.5 * a * t^2, since x = v0 * t + 0.5*a*t^2
+Q = np.array([0.5*0.1*0.005 ** 2, 0.005])
 
 #innovation vector & covariance
 y = np.empty((2, 1))
