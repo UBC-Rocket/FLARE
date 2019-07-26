@@ -22,7 +22,7 @@ FILE_NAME = 'SkyPilot_IREC_2019_Dataset_Post_Motor_Burnout.csv'
 
 CONST_R = 287.058
 CONST_T = 30 + 273.15
-CONST_g = 9.81
+CONST_g = 9.8
 
 CONST_APOGEE_CHECKS = 5
 CONST_PRES_AVG_SET_SIZE = 15
@@ -47,7 +47,7 @@ except Exception as e:
 time.sleep(0.5) # let file settle
 
 print("File opened. Press any key to begin...")
-input()
+# input()
 
 #Filtering variables -----------------------------------
 
@@ -63,9 +63,14 @@ PNew = np.empty((2,2))
 F = np.empty((2,2))
 
 #process noise
-# At 20 m/s^2 acceleration, over 0.05 s, velocity changes by 1 m/s,
-# error in position is 0.025 (1/2 * a * t^2)
-Q = np.array([0.025, 1])
+# Including gravity leaves us with only drag. Near apogee, velocity is close to zero.
+# Assume v = 10 m/s, cD = 0.2, rho = 0.4135 (https://www.engineeringtoolbox.com/standard-atmosphere-d_604.html),
+# A = 0.022 m^2, m = 23.5 kg, you get about 4 mm/s^2 of acceleration, which is smaller than the amount of
+# graviational variation between ground and apogee.
+# I'm going to unjustifiably choose 0.1 m/s^2 of unknown acceleration
+# Over 0.05 s, velocity changes by 0.05 m/s,
+# Error in position is  (1/2 * a * t^2)
+Q = np.array([0.5*0.1*0.05 ** 2, 0.05])
 
 #innovation vector & covariance
 y = np.empty((2, 1))
@@ -149,8 +154,10 @@ while True:
         [[1, dt],
          [0, 1]]
     )
+    kalmanB = np.array([-0.5*CONST_g * dt ** 2, -CONST_g * dt], ndmin = 2) #Control vector to incorporate effects of gravity
 
-    xPred = F @ xOld
+
+    xPred = (F @ xOld) + kalmanB.T
     PPred = F @ POld @ F.T + Q
 
     #Take in "measurement"
