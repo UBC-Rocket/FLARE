@@ -30,7 +30,7 @@ class kalFilt: # Kalman Filter
         # graviational variation between ground and apogee.
 
         # Error in position is  (0.5 * a * t^2, since x = v0 * t + 0.5*a*t^2
-        self.Q = np.array([0.5*0.1*0.05**2,0.1*0.05])
+        self.Q = np.array([0.5*0.1*0.05 ** 2,0.005])
 
         self.apogeeCount = 0
         self.atApogee = False
@@ -66,7 +66,7 @@ class kalFilt: # Kalman Filter
 
         K = PPred @ np.linalg.inv(S)
         self.xNew = xPred + K @ y
-        self.PNew = (np.identity(2) - K) * PPred
+        self.PNew = (np.identity(2) - K) @ PPred
 
         if (self.xNew[0] < self.xOld[0]):
             self.apogeeCount += 1
