@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt #plotting
 import numpy as np # for the linear algebra
 
 
-class kf: # Kalman Filter
-    def __init__(self, xInit, PInit, tInit):
+class kalFilt: # Kalman Filter
+    def __init__(self, tInit, xInit, PInit):
         self.xNew = xInit
         self.PNew = PInit
         self.xOld = xInit
@@ -22,13 +22,28 @@ class kf: # Kalman Filter
                 [0.9, 0], #0.9 in upper left is uncertainty of barometer
                 [0, 0.9*2/0.05] # I think that's how propagation of uncertainty works for velocity calc?
             ])
+        #process noise
+        # Including gravity leaves us with only drag. Near apogee, velocity is close to zero.
+        # Assume v = 10 m/s, cD = 0.2, rho = 0.4135 (https://www.engineeringtoolbox.com/standard-atmosphere-d_604.html),
+        # A = 0.022 m^2, m = 23.5 kg, you get about 4 mm/s^2 of acceleration, which is smaller than the amount of
+        # graviational variation between ground and apogee.
+        # I'm going to unjustifiably choose 0.1 m/s^2 of unknown acceleration
+        # Over 0.05 s, velocity changes by 0.005 m/s,
+        # Error in position is  (0.5 * a * t^2, since x = v0 * t + 0.5*a*t^2
+        self.Q = np.array([0.5*0.1*0.005 ** 2, 0.005])
 
-    def nextData(self, tNew, zMeas, PMeas):
+        self.R = np.array([
+            [0.9, 0], #0.9 in upper left is uncertainty of barometer
+            [0, 0.9*2/0.05] # I think that's how propagation of uncertainty works for velocity calc?
+        ])
+
+
+    def nextData(self, tNew, zMeas):
         dt = tNew - self.tOld
 
         self.xOld = xNew
         self.POld = PNew
-        self.tOld = csvData[0] / 1000
+        self.tOld = tNew
 
         F = np.array(
             [[1, dt],
@@ -40,29 +55,51 @@ class kf: # Kalman Filter
             [-0.5*CONST_g * dt ** 2, -CONST_g * dt],
             ndmin = 2)
 
-        xPred = (F @ xOld) + kalmanB.T
-        PPred = F @ POld @ F.T + Q
+        xPred = (F @ self.xOld) + kalmanB.T
+        PPred = F @ self.POld @ F.T + self.Q
 
         y = zMeas - xPred
-        S = PPred + R
+        S = PPred + self.R
 
         K = PPred @ np.linalg.inv(S)
         self.xNew = xPred + K @ y
         self.PNew = (np.identity(2) - K) * PPred
 
+        return((self.xNew, self.PNew))
+
+class movAvgFilt:
+    CONST_PRES_AVG_SET_SIZE = 15
+
+    def __init__(self, tInit, altInit):
+        self.altSet = [altInit] * self.CONST_PRES_AVG_SET_SIZE
+        self.timeSet = [0.05] * self.CONST_PRES_AVG_SET_SIZE
+        self.tOld = tInit
+        self.altOld = altInit
+
+    def nextData(self, tNew, zMeas):
+        dt = tNew - tOld
+        tOld = tNew
+
+        del altSet[0]
+        del timeSet[0]
+        movAvgAltSet.append(presToAlt(csvData[1]))
+        movAvgTimeSet.append(dt)
+
+        self.altNew = np.mean(movAvgAltSet)
+        return(altNew, (altNew - altOld) / np.mean(timeSet))
+        self.altOld = self.altNew
 
 # ---------------------  Constants  --------------------------
 FILE_NAME = 'SkyPilot_IREC_2019_Dataset_Post_Motor_Burnout.csv'
 # Available file names:
 # SkyPilot_IREC_2019_Dataset_Post_Motor_Burnout.csv
 
-
 CONST_R = 287.058
 CONST_T = 30 + 273.15
 CONST_g = 9.8
 
 CONST_APOGEE_CHECKS = 5
-CONST_PRES_AVG_SET_SIZE = 15
+
 
 CONST_NUM_POST_APOGEE_VALS = 20*30 #30 seconds
 # # -------------------------------------------- --------
@@ -85,41 +122,6 @@ time.sleep(0.5) # let file settle
 
 print("File opened. Press any key to begin...")
 input()
-
-#Filtering variables -----------------------------------
-
-#state vectors - [position, velocity]
-xOld = np.empty((2, 1))
-xNew = np.empty((2, 1))
-
-#State covariances
-POld = np.empty((2,2))
-PNew = np.empty((2,2))
-
-#propagation matrix
-F = np.empty((2,2))
-
-#process noise
-# Including gravity leaves us with only drag. Near apogee, velocity is close to zero.
-# Assume v = 10 m/s, cD = 0.2, rho = 0.4135 (https://www.engineeringtoolbox.com/standard-atmosphere-d_604.html),
-# A = 0.022 m^2, m = 23.5 kg, you get about 4 mm/s^2 of acceleration, which is smaller than the amount of
-# graviational variation between ground and apogee.
-# I'm going to unjustifiably choose 0.1 m/s^2 of unknown acceleration
-# Over 0.05 s, velocity changes by 0.005 m/s,
-# Error in position is  (0.5 * a * t^2, since x = v0 * t + 0.5*a*t^2
-Q = np.array([0.5*0.1*0.005 ** 2, 0.005])
-
-#innovation vector & covariance
-y = np.empty((2, 1))
-S = np.empty((2, 2))
-
-#measurement vector & covariance
-z = np.empty((2, 1))
-R = np.array([
-    [0.9, 0], #0.9 in upper left is uncertainty of barometer
-    [0, 0.9*2/0.05] # I think that's how propagation of uncertainty works for velocity calc?
-])
-
 
 # Setup file -------------------------------
 
@@ -146,6 +148,9 @@ except AssertionError:
     input()
     sys.exit()
 
+kf = kalFilt(tOld, xNew, PNew)
+mvavg = movAvgFilt(tOld, xNew[0])
+
 # https://en.wikipedia.org/wiki/Hypsometric_equation
 presToAlt = lambda pres : CONST_R * CONST_T / CONST_g * math.log(CONST_BASE_PRESSURE / pres)
 
@@ -159,9 +164,6 @@ vPlot = []
 movAvgXPlot = []
 
 # Moving average filter -----------------
-movAvgAltSet = [xNew[0]] * CONST_PRES_AVG_SET_SIZE
-movAvgTimeSet = [0.05] * CONST_PRES_AVG_SET_SIZE
-movAvgOldAlt = xNew[0]
 movAvgApogeeCount = 0
 
 
@@ -179,34 +181,14 @@ while True:
         input()
         sys.exit()
 
+    #Take in measurement
     tNew = csvData[0] / 1000
-    dt = tNew - tOld
-
-    xOld = xNew
-    POld = PNew
-    tOld = csvData[0] / 1000
-
-    #Propagation, assuming constant velocity
-    F = np.array(
-        [[1, dt],
-         [0, 1]]
-    )
-    kalmanB = np.array([-0.5*CONST_g * dt ** 2, -CONST_g * dt], ndmin = 2) #Control vector to incorporate effects of gravity
-
-
-    xPred = (F @ xOld) + kalmanB.T
-    PPred = F @ POld @ F.T + Q
-
-    #Take in "measurement"
     z[0] =  presToAlt(csvData[1])
     z[1] = (z[0] - xOld[0]) / dt
-    y = z - xPred
-    S = PPred + R
 
-    # Update step
-    K = PPred @ np.linalg.inv(S)
-    xNew = xPred + K @ y
-    PNew = (np.identity(2) - K) * PPred
+    #update filters
+    kf.nextData(tNew, z)
+
 
     # Save for plotting
     tPlot.append(tNew)
@@ -224,14 +206,7 @@ while True:
         kalmanApogee = True
 
     #Moving average filter --------------
-    del movAvgAltSet[0]
-    del movAvgTimeSet[0]
-    movAvgAltSet.append(presToAlt(csvData[1]))
-    movAvgTimeSet.append(dt)
 
-    movAvgNewAlt = np.mean(movAvgAltSet)
-    movAvgVel = (movAvgNewAlt - movAvgOldAlt) / np.mean(movAvgTimeSet)
-    movAvgOldAlt = movAvgNewAlt
 
     movAvgXPlot.append(movAvgNewAlt)
 
