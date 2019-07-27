@@ -18,31 +18,34 @@ class kalFilt: # Kalman Filter
         self.xOld = xInit
         self.POld = PInit
         self.tOld = tInit
+        self.altOld = xInit[0]
         self.R = np.array([
                 [0.9, 0], #0.9 in upper left is uncertainty of barometer
                 [0, 0.9*2/0.05] # I think that's how propagation of uncertainty works for velocity calc?
             ])
         #process noise
         # Including gravity leaves us with only drag. Near apogee, velocity is close to zero.
-        # Assume v = 10 m/s, cD = 0.2, rho = 0.4135 (https://www.engineeringtoolbox.com/standard-atmosphere-d_604.html),
-        # A = 0.022 m^2, m = 23.5 kg, you get about 4 mm/s^2 of acceleration, which is smaller than the amount of
+        # Assume v = 10 m/s, cD = 0.4, rho = 0.4135 (https://www.engineeringtoolbox.com/standard-atmosphere-d_604.html),
+        # A = 0.022 m^2, m = 23.5 kg, you get about 8 mm/s^2 of acceleration, which is smaller than the amount of
         # graviational variation between ground and apogee.
-        # I'm going to unjustifiably choose 0.1 m/s^2 of unknown acceleration
-        # Over 0.05 s, velocity changes by 0.005 m/s,
+
         # Error in position is  (0.5 * a * t^2, since x = v0 * t + 0.5*a*t^2
-        self.Q = np.array([0.5*0.1*0.005 ** 2, 0.005])
+        self.Q = np.array([0.5*0.1*0.05**2,0.1*0.05])
 
-        self.R = np.array([
-            [0.9, 0], #0.9 in upper left is uncertainty of barometer
-            [0, 0.9*2/0.05] # I think that's how propagation of uncertainty works for velocity calc?
-        ])
+        self.apogeeCount = 0
+        self.atApogee = False
 
-
-    def nextData(self, tNew, zMeas):
+    def nextData(self, tNew, altNew):
         dt = tNew - self.tOld
 
-        self.xOld = xNew
-        self.POld = PNew
+        zMeas = np.empty([2,1])
+        zMeas[0] = altNew
+        zMeas[1] = (altNew - self.altOld) / dt
+
+        self.altOld = altNew
+
+        self.xOld = self.xNew
+        self.POld = self.PNew
         self.tOld = tNew
 
         F = np.array(
@@ -65,6 +68,15 @@ class kalFilt: # Kalman Filter
         self.xNew = xPred + K @ y
         self.PNew = (np.identity(2) - K) * PPred
 
+        if (self.xNew[0] < self.xOld[0]):
+            self.apogeeCount += 1
+        else:
+            self.apogeeCount = 0
+
+        if self.apogeeCount >= CONST_APOGEE_CHECKS and not self.atApogee:
+            print("Kalman filter detected apogee at time {}".format(tNew))
+            self.atApogee = True
+
         return((self.xNew, self.PNew))
 
 class movAvgFilt:
@@ -75,19 +87,33 @@ class movAvgFilt:
         self.timeSet = [0.05] * self.CONST_PRES_AVG_SET_SIZE
         self.tOld = tInit
         self.altOld = altInit
+        self.apogeeCount = 0
+        self.atApogee = False
 
-    def nextData(self, tNew, zMeas):
-        dt = tNew - tOld
-        tOld = tNew
+    def nextData(self, tNew, altMeas):
+        dt = tNew - self.tOld
+        self.tOld = tNew
 
-        del altSet[0]
-        del timeSet[0]
-        movAvgAltSet.append(presToAlt(csvData[1]))
-        movAvgTimeSet.append(dt)
+        del self.altSet[0]
+        del self.timeSet[0]
+        self.altSet.append(altMeas)
+        self.timeSet.append(dt)
 
-        self.altNew = np.mean(movAvgAltSet)
-        return(altNew, (altNew - altOld) / np.mean(timeSet))
+        self.altNew = np.mean(self.altSet)
+        v = (self.altNew - self.altOld) / np.mean(self.timeSet)
         self.altOld = self.altNew
+
+        if v < 0:
+            self.apogeeCount += 1
+        else:
+            self.apogeeCount = 0
+
+        if self.apogeeCount >= CONST_APOGEE_CHECKS and not self.atApogee:
+            print("Moving average detected apogee at time {}".format(tNew))
+            self.atApogee = True
+
+        return(self.altNew, v)
+
 
 # ---------------------  Constants  --------------------------
 FILE_NAME = 'SkyPilot_IREC_2019_Dataset_Post_Motor_Burnout.csv'
@@ -100,11 +126,7 @@ CONST_g = 9.8
 
 CONST_APOGEE_CHECKS = 5
 
-
 CONST_NUM_POST_APOGEE_VALS = 20*30 #30 seconds
-# # -------------------------------------------- --------
-# print(__file__)
-# input()
 
 
 print("Opening file")
@@ -120,8 +142,8 @@ except Exception as e:
 
 time.sleep(0.5) # let file settle
 
-print("File opened. Press any key to begin...")
-input()
+print("File opened.")
+# input()
 
 # Setup file -------------------------------
 
@@ -133,9 +155,9 @@ try:
     assert(csvData[0] == 1) #only have version 1 so far
 
     csvData = next(testDataReader) #Collect data from 2nd row
-    xNew = np.reshape(csvData[0:2], (2,1))
-    PNew = np.reshape(csvData[2:6], (2,2))
-    tOld = csvData[6]
+    xInit = np.reshape(csvData[0:2], (2,1))
+    PInit = np.reshape(csvData[2:6], (2,2))
+    tInit = csvData[6]
     CONST_BASE_PRESSURE = csvData[7]
 
 
@@ -148,13 +170,12 @@ except AssertionError:
     input()
     sys.exit()
 
-kf = kalFilt(tOld, xNew, PNew)
-mvavg = movAvgFilt(tOld, xNew[0])
+kf = kalFilt(tInit, xInit, PInit)
+mvavg = movAvgFilt(tInit, xInit[0])
 
 # https://en.wikipedia.org/wiki/Hypsometric_equation
 presToAlt = lambda pres : CONST_R * CONST_T / CONST_g * math.log(CONST_BASE_PRESSURE / pres)
 
-apogeeCount = 0
 
 # Plotting variables ----------------------------------
 tPlot = []
@@ -163,15 +184,8 @@ xPlot = []
 vPlot = []
 movAvgXPlot = []
 
-# Moving average filter -----------------
-movAvgApogeeCount = 0
-
-
-kalmanApogee = False
-movAvgApogee = False
 
 numPostApogeeVals = 0
-
 #main loop ------------------------------------
 while True:
     try: #Pull next set of data
@@ -183,43 +197,24 @@ while True:
 
     #Take in measurement
     tNew = csvData[0] / 1000
-    z[0] =  presToAlt(csvData[1])
-    z[1] = (z[0] - xOld[0]) / dt
+    altNew = presToAlt(csvData[1])
 
     #update filters
-    kf.nextData(tNew, z)
-
+    kf.nextData(tNew, altNew)
+    mvavg.nextData(tNew, altNew)
 
     # Save for plotting
     tPlot.append(tNew)
-    xPlot.append(xNew[0])
-    vPlot.append(xNew[1])
+
     measPlot.append(presToAlt(csvData[1]))
+    xPlot.append(kf.xNew[0])
+    movAvgXPlot.append(mvavg.altNew)
 
-    if (xNew[0] < xOld[0]):
-        apogeeCount += 1
-    else:
-        apogeeCount = 0
-
-    if apogeeCount >= CONST_APOGEE_CHECKS and not kalmanApogee:
-        print("Kalman filter detected apogee at time {}".format(tNew))
-        kalmanApogee = True
-
-    #Moving average filter --------------
+    vPlot.append(kf.xNew[1])
 
 
-    movAvgXPlot.append(movAvgNewAlt)
 
-    if movAvgVel < 0:
-        movAvgApogeeCount += 1
-    else:
-        movAvgApogeeCount = 0
-
-    if movAvgApogeeCount >= CONST_APOGEE_CHECKS and not movAvgApogee:
-        print("Moving average detected apogee at time {}".format(tNew))
-        movAvgApogee = True
-
-    if kalmanApogee and movAvgApogee:
+    if kf.atApogee and mvavg.atApogee:
         numPostApogeeVals += 1
 
     if numPostApogeeVals > CONST_NUM_POST_APOGEE_VALS:
