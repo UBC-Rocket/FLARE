@@ -30,7 +30,7 @@ class kalFilt: # Kalman Filter
     def nextData(self, tNew, altNew):
         dt = tNew - self.tOld
 
-        zMeas = np.empty([2,1])
+        zMeas = np.empty(2)
         zMeas[0] = altNew
 
         # Pick one
@@ -50,8 +50,7 @@ class kalFilt: # Kalman Filter
 
         #Control vector to incorporate effects of gravity
         kalmanB = np.array(
-            [-0.5*CONST_g * dt ** 2, -CONST_g * dt],
-            ndmin = 2)
+            [-0.5*CONST_g * dt ** 2, -CONST_g * dt])
 
         xPred = (F @ self.xOld) + kalmanB.T
         PPred = F @ self.POld @ F.T + self.Q

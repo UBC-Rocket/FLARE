@@ -1,3 +1,6 @@
+from fileName import FILE_NAME
+import filters
+
 import time #for timing
 import sys #to be able to exit
 import csv #for access to the pressure data set
@@ -9,10 +12,6 @@ import matplotlib.pyplot as plt #plotting
 import numpy as np # for the linear algebra
 
 # ---------------------  Constants  --------------------------
-FILE_NAME = 'SkyPilot_IREC_2019_Dataset_Post_Motor_Burnout.csv'
-# Available file names:     
-# SkyPilot_IREC_2019_Dataset_Post_Motor_Burnout.csv
-
 CONST_R = 287.058
 CONST_T = 30 + 273.15
 CONST_g = 9.8
@@ -63,8 +62,8 @@ except AssertionError:
     input()
     sys.exit()
 
-kf = kalFilt(tInit, xInit, PInit)
-mvavg = movAvgFilt(tInit, xInit[0])
+kf = filters.kalFilt(tInit, xInit, PInit)
+mvavg = filters.movAvgFilt(tInit, xInit[0])
 
 # https://en.wikipedia.org/wiki/Hypsometric_equation
 presToAlt = lambda pres : CONST_R * CONST_T / CONST_g * math.log(CONST_BASE_PRESSURE / pres)
