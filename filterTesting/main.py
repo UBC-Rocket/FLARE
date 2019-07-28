@@ -40,7 +40,10 @@ class kalFilt: # Kalman Filter
 
         zMeas = np.empty([2,1])
         zMeas[0] = altNew
-        zMeas[1] = (altNew - self.altOld) / dt
+
+        # Pick one
+        zMeas[1] = (altNew - self.xOld[0]) / dt
+        # zMeas[1] = (altNew - self.altOld) / dt
 
         self.altOld = altNew
 
