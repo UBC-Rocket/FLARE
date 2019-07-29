@@ -1,3 +1,4 @@
 .vscode/**
 filterTesting/*.csv
 filterTesting/fileName.py
+*__pycache__/

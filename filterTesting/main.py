@@ -49,7 +49,7 @@ try:
     csvData = next(testDataReader) #Collect data from 2nd row
     xInit = np.reshape(csvData[0:2], (2))
     PInit = np.reshape(csvData[2:6], (2,2))
-    tInit = csvData[6]
+    tInit = csvData[6] / 1000
     CONST_BASE_PRESSURE = csvData[7]
 
 

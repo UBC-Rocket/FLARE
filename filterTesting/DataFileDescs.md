@@ -8,7 +8,9 @@ into pressure and time data. Data has been adjusted to match the 20 Hz polling
 speed.
 
 ### Sim 1
-Adds a uniform random value between -2.5 and 2.5 mbar to each pressure value
-(these are the limits given on the datasheet), and rounds to the nearest
+Adds a random Gaussian distribution each pressure value (std.dev of 0.04 mbar,
+typical is 0.035), and rounds to the nearest
 0.027 mbar to simulate quantization error (this is the resolution of the value
-returned from the barometer on each read).
+returned from the barometer on each read). Initial values are intentionally
+inaccurate, as a test for how well data converges. Data starts around 10 seconds
+before apogee.
