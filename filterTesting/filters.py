@@ -1,5 +1,9 @@
-import numpy as np # for the linear algebra]
+import numpy as np # for the linear algebra
 
+CONST_BAROM_UNCER = np.array([
+        [0.9, 0], #0.9 in upper left is uncertainty of barometer
+        [0, 0.9*2/0.05] # I think that's how propagation of uncertainty works for velocity calc?
+    ])
 CONST_APOGEE_CHECKS = 5
 CONST_g = 9.8
 
@@ -11,10 +15,7 @@ class kalFilt: # Kalman Filter
         self.POld = PInit
         self.tOld = tInit
         self.altOld = xInit[0]
-        self.R = np.array([
-                [0.9, 0], #0.9 in upper left is uncertainty of barometer
-                [0, 0.9*2/0.05] # I think that's how propagation of uncertainty works for velocity calc?
-            ])
+        self.R = CONST_BAROM_UNCER
         #process noise
         # Including gravity leaves us with only drag. Near apogee, velocity is close to zero.
         # Assume v = 10 m/s, cD = 0.4, rho = 0.4135 (https://www.engineeringtoolbox.com/standard-atmosphere-d_604.html),
