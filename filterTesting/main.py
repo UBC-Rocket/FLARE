@@ -103,6 +103,8 @@ mvavg = filters.movAvgFilt(tInit, xInit[0])
 tPlot = []
 measPlot = []
 xPlot = []
+xUncerPlot = []
+vUncerPlot = []
 vPlot = []
 movAvgXPlot = []
 
@@ -130,6 +132,10 @@ while True:
 
     measPlot.append(presToAlt(csvData[1]))
     xPlot.append(kf.xNew[0])
+
+    # Take square root to get standard deviation, and multiply by 2 for 95% range
+    xUncerPlot.append( kf.PNew[0][0]**0.5 * 2)
+    vUncerPlot.append(kf.PNew[1][1]**0.5 * 2)
     movAvgXPlot.append(mvavg.altNew)
 
     vPlot.append(kf.xNew[1])
@@ -142,9 +148,11 @@ while True:
 
 # Reached apogee; plot results
 plt.subplot(121)
-plt.plot(tPlot, measPlot, 'g', tPlot, xPlot, 'b', tPlot, movAvgXPlot, 'r')
+plt.plot(tPlot, measPlot, 'g', tPlot, movAvgXPlot, 'r')
+plt.errorbar(tPlot, xPlot, yerr = xUncerPlot, fmt = 'b')
+
 plt.subplot(122)
-plt.plot(tPlot, vPlot)
+plt.errorbar(tPlot, vPlot, yerr = vUncerPlot)
 plt.show()
 
 input()
