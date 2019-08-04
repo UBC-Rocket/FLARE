@@ -13,7 +13,7 @@ CONST_BAROM_UNCER = np.array([
 
 CONST_APOGEE_CHECKS = 5
 CONST_g = 9.8
-CONST_VEL_LEN = 1  # If 1, equivalent to measuring every timestep.
+CONST_VEL_LEN = 3  # If 1, equivalent to measuring every timestep.
 
 
 class kalFilt:  # Kalman Filter
@@ -48,9 +48,7 @@ class kalFilt:  # Kalman Filter
 
         self.vCounter -= 1
         if(self.vCounter <= 0):
-            zMeas[1] = (altNew - self.altOld) / dt
-            self.altOld = altNew
-            self.vCounter = CONST_VEL_LEN
+            zMeas[1] = (altNew - self.altOld) / (dt * CONST_VEL_LEN)
             self.R[1][1] = 0.9*2/(CONST_VEL_LEN * 0.05)
         else:
             zMeas[1] = self.xOld[1]
@@ -78,6 +76,10 @@ class kalFilt:  # Kalman Filter
         K = PPred @ np.linalg.inv(S)
         self.xNew = xPred + K @ y
         self.PNew = (np.identity(2) - K) @ PPred
+
+        if (self.vCounter <= 0):
+            self.altOld = self.xNew[0]
+            self.vCounter = CONST_VEL_LEN
 
         if (self.xNew[0] < self.xOld[0]):
             self.apogeeCount += 1
