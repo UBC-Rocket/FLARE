@@ -17,7 +17,7 @@ CONST_VEL_LEN = 3  # If 1, equivalent to measuring every timestep.
 
 
 class kalFilt:  # Kalman Filter
-    def __init__(self, tInit, xInit, PInit):
+    def __init__(self, tInit, xInit, PInit, quiet=True):
         self.xNew = xInit
         self.PNew = PInit
         self.xOld = xInit
@@ -38,6 +38,8 @@ class kalFilt:  # Kalman Filter
         self.atApogee = False
 
         self.vCounter = CONST_VEL_LEN
+
+        self.quiet = quiet
 
     def nextData(self, tNew, altNew):
         dt = tNew - self.tOld
@@ -87,7 +89,9 @@ class kalFilt:  # Kalman Filter
             self.apogeeCount = 0
 
         if self.apogeeCount >= CONST_APOGEE_CHECKS and not self.atApogee:
-            print("Kalman filter detected apogee at time {}".format(tNew))
+            if not self.quiet:
+                print("Kalman filter detected apogee at time {}".format(tNew))
+
             self.apogeeTime = tNew
             self.apogeeHeight = self.xNew[0]
             self.atApogee = True
@@ -98,7 +102,7 @@ class kalFilt:  # Kalman Filter
 class movAvgFilt:
     CONST_PRES_AVG_SET_SIZE = 15
 
-    def __init__(self, tInit, altInit):
+    def __init__(self, tInit, altInit, quiet=True):
         self.altSet = [altInit] * self.CONST_PRES_AVG_SET_SIZE
         self.timeSet = [0.05] * self.CONST_PRES_AVG_SET_SIZE
         self.tOld = tInit
@@ -106,6 +110,8 @@ class movAvgFilt:
         self.apogeeCount = 0
         self.atApogee = False
         self.xNew = np.empty(2)
+
+        self.quiet = quiet
 
     def nextData(self, tNew, altMeas):
         dt = tNew - self.tOld
@@ -126,10 +132,12 @@ class movAvgFilt:
             self.apogeeCount = 0
 
         if self.apogeeCount >= CONST_APOGEE_CHECKS and not self.atApogee:
-            print("Moving average detected apogee at time {}".format(tNew))
+            if not self.quiet:
+                print("Moving average detected apogee at time {}".format(tNew))
+
             self.apogeeTime = tNew
             self.apogeeHeight = self.altNew
             self.atApogee = True
 
         self.xNew[0] = self.altNew
-        return(self.altNew, v)
+        return (self.altNew, v)

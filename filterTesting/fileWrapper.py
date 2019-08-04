@@ -41,7 +41,8 @@ def setupFile(fileName, debug=False):
 
     time.sleep(0.5)  # let file settle
 
-    print("File opened.")
+    if debug:
+        print("File opened.")
 
     try:
         # First row is reserved for version
