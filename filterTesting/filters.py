@@ -105,6 +105,7 @@ class movAvgFilt:
         self.altOld = altInit
         self.apogeeCount = 0
         self.atApogee = False
+        self.xNew = np.empty(2)
 
     def nextData(self, tNew, altMeas):
         dt = tNew - self.tOld
@@ -130,4 +131,5 @@ class movAvgFilt:
             self.apogeeHeight = self.altNew
             self.atApogee = True
 
+        self.xNew[0] = self.altNew
         return(self.altNew, v)
