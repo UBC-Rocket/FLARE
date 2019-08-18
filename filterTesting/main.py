@@ -43,6 +43,10 @@ for files in FILE_NAME:
     rawTimes = [kf.apogeeTime, mvavg.apogeeTime]
     getScores(rawTimes, scores)
 
+ind = np.arange(2)
+plt.bar(ind, scores)
+plt.show()
 print(scores)
+
 
 input()
