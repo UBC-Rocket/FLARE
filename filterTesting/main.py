@@ -38,7 +38,7 @@ for files in FILE_NAME:
     kf.reset(tInit, xInit, PInit)
     mvavg.reset(tInit, xInit[0])
 
-    fileWrapper.runFile(testDataReader, CONST_BASE_PRESSURE, False, kf, mvavg)
+    fileWrapper.runFile(testDataReader, CONST_BASE_PRESSURE, [kf, mvavg], False)
 
     rawTimes = [kf.apogeeTime, mvavg.apogeeTime]
     getScores(rawTimes, scores)

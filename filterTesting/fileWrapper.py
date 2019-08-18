@@ -94,13 +94,13 @@ def setupFile(fileName, debug=False):
     return testDataReader, basePressure, tInit, xInit, PInit
 
 
-def runFile(testDataReader, basePressure, plot=True, *args):
+def runFile(testDataReader, basePressure, filts, plot=True):
     if plot:
         # Plotting variables ----------------------------------
         tPlot = []
         measPlot = []
 
-        xPlots = [list() for x in range(len(args))]
+        xPlots = [list() for x in range(len(filts))]
         # vPlots = []
 
         # xUncerPlot = []
@@ -126,7 +126,7 @@ def runFile(testDataReader, basePressure, plot=True, *args):
 
         # update filters
         allApogeed = True
-        for filt in args:
+        for filt in filts:
             filt.nextData(tNew, altNew)
             if not filt.atApogee:
                 allApogeed = False
@@ -139,7 +139,7 @@ def runFile(testDataReader, basePressure, plot=True, *args):
             tPlot.append(tNew)
             measPlot.append(presToAlt(csvData[1], basePressure))
 
-            for count, filt in enumerate(args):
+            for count, filt in enumerate(filts):
                 xPlots[count].append(filt.xNew[0])
 
             # Take square root to get standard deviation, and multiply by 2 for 95% range
@@ -161,7 +161,7 @@ def runFile(testDataReader, basePressure, plot=True, *args):
         # Reached apogee; plot results
         # plt.subplot(121)
         plt.plot(tPlot, measPlot, 'g')
-        for count, filt in enumerate(args):
+        for count, filt in enumerate(filts):
             plt.plot(tPlot, xPlots[count])
             plt.scatter(filt.apogeeTime, filt.apogeeHeight, s=200, marker='x')
 
