@@ -17,7 +17,8 @@ CONST_VEL_LEN = 3  # If 1, equivalent to measuring every timestep.
 
 
 class kalFilt:  # Kalman Filter
-    def __init__(self, tInit, xInit, PInit, quiet=True):
+    def reset(self, tInit, xInit, PInit, quiet=True):
+        self.quiet = quiet
         self.xNew = xInit
         self.PNew = PInit
         self.xOld = xInit
@@ -39,7 +40,9 @@ class kalFilt:  # Kalman Filter
 
         self.vCounter = CONST_VEL_LEN
 
-        self.quiet = quiet
+        # clean up reporting variables
+        self.apogeeTime = None
+        self.apogeeHeight = None
 
     def nextData(self, tNew, altNew):
         dt = tNew - self.tOld
@@ -102,7 +105,7 @@ class kalFilt:  # Kalman Filter
 class movAvgFilt:
     CONST_PRES_AVG_SET_SIZE = 15
 
-    def __init__(self, tInit, altInit, quiet=True):
+    def reset(self, tInit, altInit, quiet=True):
         self.altSet = [altInit] * self.CONST_PRES_AVG_SET_SIZE
         self.timeSet = [0.05] * self.CONST_PRES_AVG_SET_SIZE
         self.tOld = tInit
