@@ -1,5 +1,4 @@
 import numpy as np  # for the linear algebra
-import queue
 
 CONST_BAROM_RAW_UNCER = 0.9
 CONST_BAROM_UNCER = np.array([
@@ -53,11 +52,15 @@ class kalFilt:  # Kalman Filter
 
         if self._vSkip:
             self._vCounter = self._vLen
+        else:
+            self._vtList = []
+            self._vxList = []
 
         # clean up reporting variables
         self.apogeeTime = None
         self.apogeeHeight = None
 
+    # Helper for velocity calculations
     # returns (v measurement, v uncertainty)
     def _calcV(self, tNew, altNew):
 
@@ -68,23 +71,36 @@ class kalFilt:  # Kalman Filter
                 vMeas = (altNew - self._altOld) / (tNew - self._vtOld)
                 vUncer = 0.9 * 2 / (self._vLen * 0.05)
                 self._vtOld = tNew
+                self._vCounter = self._vLen
+                self._altOld = self._xOld[0]
             else:
                 vMeas = self._xOld[1]
                 vUncer = 10000000
-            return (vMeas, vUncer)
 
-        else:
-            pass
+        else:  # not _vSkip
+            # I'm like 70 % sure that this makes sense
+            self._vtList.append(tNew)
+            self._vxList.append(self._xOld[0])
+
+            if (len(self._vtList) > self._vLen):
+                tOld = self._vtList.pop(0)
+                altOld = self._vxList.pop(0)
+
+                vMeas = (altNew - altOld) / (tNew - tOld)
+                vUncer = 0.9 * 2 / (self._vLen * 0.05)
+            else:
+                vMeas = self._xOld[1]
+                vUncer = 10000000
+
+        return vMeas, vUncer
 
     # use to get next data value
     def nextData(self, tNew, altNew):
         dt = tNew - self._tOld
 
         zMeas = np.empty(2)
-
         zMeas[0] = altNew
-
-        zMeas[0], self._R[1][1] = self._calcV(tNew, altNew)
+        zMeas[1], self._R[1][1] = self._calcV(tNew, altNew)
 
         self._xOld = self.xNew
         self._POld = self.PNew
@@ -108,10 +124,6 @@ class kalFilt:  # Kalman Filter
         K = PPred @ np.linalg.inv(S)
         self.xNew = xPred + K @ y
         self.PNew = (np.identity(2) - K) @ PPred
-
-        if (self._vCounter <= 0):
-            self._altOld = self.xNew[0]
-            self._vCounter = self._vLen
 
         if (self.xNew[0] < self._xOld[0]):
             self._apogeeCount += 1
