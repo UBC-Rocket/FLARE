@@ -63,7 +63,7 @@ def setupFile(fileName, debug=False):
         # Version 2:
         # Only the baseline pressure is provided, in position 7 (index from 0) for compatibility with previous versions. Remaining values are ignored (replace with zeros for new file).
         #
-        # This would be equivalent to a hard transition between moving average and Kalman filter (no information is passed between the two filters).
+        # This would be equivalent to a hard transition between moving average and Kalman filter (no information is passed between the two filters.
         else:
             csvData = next(testDataReader)
             basePressure = csvData[7]

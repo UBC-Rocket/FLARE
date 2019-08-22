@@ -1,4 +1,5 @@
 import numpy as np  # for the linear algebra
+import queue
 
 CONST_BAROM_RAW_UNCER = 0.9
 CONST_BAROM_UNCER = np.array([
@@ -10,22 +11,33 @@ CONST_BAROM_UNCER = np.array([
 #     [0.9, 0],
 #     [0, 10000000]
 # ])
-
+``
 CONST_APOGEE_CHECKS = 5
 CONST_g = 9.8
-CONST_VEL_LEN = 3  # If 1, equivalent to measuring every timestep.
 
 
 class kalFilt:  # Kalman Filter
+    def __init__(self, vLen=1, vSkip=True, vDetect=0):
+        # Setup default values
+
+        # Timesteps between measuring velocity. If 1, equivalent to measuring every timestep. If 2, uses data point 2 timesteps ago instead of 1, etc.
+        self._vLen = vLen
+
+        # Whether to measure velocity at every time. If true, it will measure velocity once every self.vLen data points; if false it will measure velocity every  measurements, comparing self.vLen datapoints back
+        self._vSkip = vSkip
+
+        # Will start counting
+        self._vDetect = vDetect
+
     def reset(self, tInit, xInit, PInit, quiet=True):
-        self.quiet = quiet
+        self._quiet = quiet
         self.xNew = xInit
         self.PNew = PInit
-        self.xOld = xInit
-        self.POld = PInit
-        self.tOld = tInit
-        self.altOld = xInit[0]
-        self.R = CONST_BAROM_UNCER
+        self._xOld = xInit
+        self._POld = PInit
+        self._tOld = tInit
+        self._altOld = xInit[0]
+        self._R = CONST_BAROM_UNCER
         # process noise
         # Including gravity leaves us with only drag. Near apogee, velocity is close to zero.
         # Assume v = 10 m/s, cD = 0.4, rho = 0.4135 (https://www.engineeringtoolbox.com/standard-atmosphere-d_604.html),
@@ -33,35 +45,48 @@ class kalFilt:  # Kalman Filter
         # graviational variation between ground and apogee.
 
         # Error in position is  (0.5 * a * t^2, since x = v0 * t + 0.5*a*t^2
-        self.Q = np.array([0.5*0.1*0.05 ** 2, 0.005])
+        self._Q = np.array([0.5*0.1*0.05 ** 2, 0.005])
 
-        self.apogeeCount = 0
+        self._apogeeCount = 0
         self.atApogee = False
 
-        self.vCounter = CONST_VEL_LEN
+        if self._vSkip:
+            self._vCounter = self._vLen
 
         # clean up reporting variables
         self.apogeeTime = None
         self.apogeeHeight = None
 
+    # returns (v measurement, v uncertainty)
+    def _calcV(self, tNew, altNew):
+
+        if (self._vSkip):
+            # Use existing implementation
+            self._vCounter -= 1
+            if(self._vCounter <= 0):
+                vMeas = (altNew - self._altOld) / (dt * self._vLen)
+                vUncer = 0.9*2/(self._vLen * 0.05)
+            else:
+                vMeas = self._xOld[1]
+                vUncer = 10000000
+            return (vMeas, vUncer)
+
+        else:
+            pass
+
+    # use to get next data value
     def nextData(self, tNew, altNew):
-        dt = tNew - self.tOld
+        dt = tNew - self._tOld
 
         zMeas = np.empty(2)
 
         zMeas[0] = altNew
 
-        self.vCounter -= 1
-        if(self.vCounter <= 0):
-            zMeas[1] = (altNew - self.altOld) / (dt * CONST_VEL_LEN)
-            self.R[1][1] = 0.9*2/(CONST_VEL_LEN * 0.05)
-        else:
-            zMeas[1] = self.xOld[1]
-            self.R[1][1] = 10000000
+        zMeas[0], self._R[1][1] = self._calcV(tNew, altNew)
 
-        self.xOld = self.xNew
-        self.POld = self.PNew
-        self.tOld = tNew
+        self._xOld = self.xNew
+        self._POld = self.PNew
+        self._tOld = tNew
 
         F = np.array(
             [[1, dt],
@@ -72,27 +97,27 @@ class kalFilt:  # Kalman Filter
         kalmanB = np.array(
             [-0.5*CONST_g * dt ** 2, -CONST_g * dt])
 
-        xPred = (F @ self.xOld) + kalmanB.T
-        PPred = F @ self.POld @ F.T + self.Q
+        xPred = (F @ self._xOld) + kalmanB.T
+        PPred = F @ self._POld @ F.T + self._Q
 
         y = zMeas - xPred
-        S = PPred + self.R
+        S = PPred + self._R
 
         K = PPred @ np.linalg.inv(S)
         self.xNew = xPred + K @ y
         self.PNew = (np.identity(2) - K) @ PPred
 
-        if (self.vCounter <= 0):
-            self.altOld = self.xNew[0]
-            self.vCounter = CONST_VEL_LEN
+        if (self._vCounter <= 0):
+            self._altOld = self.xNew[0]
+            self._vCounter = self._vLen
 
-        if (self.xNew[0] < self.xOld[0]):
-            self.apogeeCount += 1
+        if (self.xNew[0] < self._xOld[0]):
+            self._apogeeCount += 1
         else:
-            self.apogeeCount = 0
+            self._apogeeCount = 0
 
-        if self.apogeeCount >= CONST_APOGEE_CHECKS and not self.atApogee:
-            if not self.quiet:
+        if self._apogeeCount >= CONST_APOGEE_CHECKS and not self.atApogee:
+            if not self._quiet:
                 print("Kalman filter detected apogee at time {}".format(tNew))
 
             self.apogeeTime = tNew
@@ -106,36 +131,36 @@ class movAvgFilt:
     CONST_PRES_AVG_SET_SIZE = 15
 
     def reset(self, tInit, altInit, quiet=True):
-        self.altSet = [altInit] * self.CONST_PRES_AVG_SET_SIZE
-        self.timeSet = [0.05] * self.CONST_PRES_AVG_SET_SIZE
-        self.tOld = tInit
-        self.altOld = altInit
-        self.apogeeCount = 0
+        self._altSet = [altInit] * self.CONST_PRES_AVG_SET_SIZE
+        self._timeSet = [0.05] * self.CONST_PRES_AVG_SET_SIZE
+        self._tOld = tInit
+        self._altOld = altInit
+        self._apogeeCount = 0
         self.atApogee = False
         self.xNew = np.empty(2)
 
-        self.quiet = quiet
+        self._quiet = quiet
 
     def nextData(self, tNew, altMeas):
-        dt = tNew - self.tOld
-        self.tOld = tNew
+        dt = tNew - self._tOld
+        self._tOld = tNew
 
-        del self.altSet[0]
-        del self.timeSet[0]
-        self.altSet.append(altMeas)
-        self.timeSet.append(dt)
+        del self._altSet[0]
+        del self._timeSet[0]
+        self._altSet.append(altMeas)
+        self._timeSet.append(dt)
 
-        self.altNew = np.mean(self.altSet)
-        v = (self.altNew - self.altOld) / np.mean(self.timeSet)
-        self.altOld = self.altNew
+        self.altNew = np.mean(self._altSet)
+        v = (self.altNew - self._altOld) / np.mean(self._timeSet)
+        self._altOld = self.altNew
 
         if v < 0:
-            self.apogeeCount += 1
+            self._apogeeCount += 1
         else:
-            self.apogeeCount = 0
+            self._apogeeCount = 0
 
-        if self.apogeeCount >= CONST_APOGEE_CHECKS and not self.atApogee:
-            if not self.quiet:
+        if self._apogeeCount >= CONST_APOGEE_CHECKS and not self.atApogee:
+            if not self._quiet:
                 print("Moving average detected apogee at time {}".format(tNew))
 
             self.apogeeTime = tNew

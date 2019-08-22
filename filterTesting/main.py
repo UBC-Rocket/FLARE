@@ -1,4 +1,4 @@
-from fileName import FILE_NAME
+from fileName import FILE_NAMES
 import fileWrapper
 import filters
 
@@ -31,9 +31,9 @@ mvavg = filters.movAvgFilt()
 
 
 # Run all filters through all files
-for files in FILE_NAME:
+for files in FILE_NAMES:
     testDataReader, CONST_BASE_PRESSURE, tInit, xInit, PInit  \
-        = fileWrapper.setupFile(FILE_NAME[0])
+        = fileWrapper.setupFile(FILE_NAMES[0])
 
     kf.reset(tInit, xInit, PInit)
     mvavg.reset(tInit, xInit[0])
