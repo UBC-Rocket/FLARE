@@ -11,7 +11,7 @@ CONST_BAROM_UNCER = np.array([
 #     [0.9, 0],
 #     [0, 10000000]
 # ])
-``
+
 CONST_APOGEE_CHECKS = 5
 CONST_g = 9.8
 
@@ -36,6 +36,7 @@ class kalFilt:  # Kalman Filter
         self._xOld = xInit
         self._POld = PInit
         self._tOld = tInit
+        self._vtOld = tInit
         self._altOld = xInit[0]
         self._R = CONST_BAROM_UNCER
         # process noise
@@ -64,8 +65,9 @@ class kalFilt:  # Kalman Filter
             # Use existing implementation
             self._vCounter -= 1
             if(self._vCounter <= 0):
-                vMeas = (altNew - self._altOld) / (dt * self._vLen)
-                vUncer = 0.9*2/(self._vLen * 0.05)
+                vMeas = (altNew - self._altOld) / (tNew - self._vtOld)
+                vUncer = 0.9 * 2 / (self._vLen * 0.05)
+                self._vtOld = tNew
             else:
                 vMeas = self._xOld[1]
                 vUncer = 10000000

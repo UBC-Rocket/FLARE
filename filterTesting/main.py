@@ -26,7 +26,7 @@ CONST_APOGEE_CHECKS = 5
 scores = [None] * 2    # 2 filts, currently
 
 # define filters
-kf = filters.kalFilt()
+kf = filters.kalFilt(3)
 mvavg = filters.movAvgFilt()
 
 
