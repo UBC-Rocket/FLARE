@@ -131,9 +131,6 @@ def runFile(testDataReader, basePressure, filts, plot=True):
             if not filt.atApogee:
                 allApogeed = False
 
-        # kf.nextData(tNew, altNew)
-        # mvavg.nextData(tNew, altNew)
-
         if plot:
             # Save for plotting
             tPlot.append(tNew)

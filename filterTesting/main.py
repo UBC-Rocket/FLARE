@@ -23,28 +23,35 @@ def getScores(rawTimes, scores):
 
 #  ---------------------  Constants  --------------------------
 CONST_APOGEE_CHECKS = 5
-scores = [None] * 2    # 2 filts, currently
 
 # define filters
-kf = filters.kalFilt(3)
-mvavg = filters.movAvgFilt()
+kf = filters.kalFilt(2, True)
+kf.name = "Kevin"
+kf2 = filters.kalFilt(30, True)
+kf2.name = "Martha"
+# mvavg = filters.movAvgFilt()
 
+filts = [kf, kf2]
+scores = [None] * len(filts)
 
 # Run all filters through all files
 for files in FILE_NAMES:
     testDataReader, CONST_BASE_PRESSURE, tInit, xInit, PInit  \
         = fileWrapper.setupFile(FILE_NAMES[0])
 
-    kf.reset(tInit, xInit, PInit)
-    mvavg.reset(tInit, xInit[0])
+    for filt in filts:
+        filt.reset(tInit, xInit, PInit)
 
-    fileWrapper.runFile(testDataReader, CONST_BASE_PRESSURE, [kf, mvavg], False)
+    # fileWrapper.runFile(testDataReader, CONST_BASE_PRESSURE, filts, True)
+    fileWrapper.runFile(testDataReader, CONST_BASE_PRESSURE, filts, False)
 
-    rawTimes = [kf.apogeeTime, mvavg.apogeeTime]
+    rawTimes = [filt.apogeeTime for filt in filts]
     getScores(rawTimes, scores)
 
-ind = np.arange(2)
-plt.bar(ind, scores)
+filtNames = [filt.name for filt in filts]
+
+ind = np.arange(len(filts))
+plt.bar(ind, scores, tick_label=filtNames)
 plt.show()
 print(scores)
 

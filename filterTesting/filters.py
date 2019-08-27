@@ -28,6 +28,8 @@ class kalFilt:  # Kalman Filter
         # Will start counting
         self._vDetect = vDetect
 
+        self.name = None
+
     def reset(self, tInit, xInit, PInit, quiet=True):
         self._quiet = quiet
         self.xNew = xInit
@@ -53,8 +55,8 @@ class kalFilt:  # Kalman Filter
         if self._vSkip:
             self._vCounter = self._vLen
         else:
-            self._vtList = []
-            self._vxList = []
+            self._vtList = [tInit]
+            self._vxList = [xInit[0]]
 
         # clean up reporting variables
         self.apogeeTime = None
@@ -63,7 +65,6 @@ class kalFilt:  # Kalman Filter
     # Helper for velocity calculations
     # returns (v measurement, v uncertainty)
     def _calcV(self, tNew, altNew):
-
         if (self._vSkip):
             # Use existing implementation
             self._vCounter -= 1
@@ -72,15 +73,13 @@ class kalFilt:  # Kalman Filter
                 vUncer = 0.9 * 2 / (self._vLen * 0.05)
                 self._vtOld = tNew
                 self._vCounter = self._vLen
-                self._altOld = self._xOld[0]
             else:
                 vMeas = self._xOld[1]
                 vUncer = 10000000
 
         else:  # not _vSkip
             # I'm like 70 % sure that this makes sense
-            self._vtList.append(tNew)
-            self._vxList.append(self._xOld[0])
+            # Should be converted into circular buffer
 
             if (len(self._vtList) > self._vLen):
                 tOld = self._vtList.pop(0)
@@ -110,10 +109,8 @@ class kalFilt:  # Kalman Filter
             [[1, dt],
              [0, 1]]
         )
-
         # Control vector to incorporate effects of gravity
-        kalmanB = np.array(
-            [-0.5*CONST_g * dt ** 2, -CONST_g * dt])
+        kalmanB = np.array([-0.5*CONST_g * dt ** 2, -CONST_g * dt])
 
         xPred = (F @ self._xOld) + kalmanB.T
         PPred = F @ self._POld @ F.T + self._Q
@@ -125,6 +122,18 @@ class kalFilt:  # Kalman Filter
         self.xNew = xPred + K @ y
         self.PNew = (np.identity(2) - K) @ PPred
 
+        if self._vSkip:
+            self._altOld = self.xNew[0]
+        else:
+            self._vtList.append(tNew)
+            self._vxList.append(self.xNew[0])
+
+        self.addressApogee(tNew)
+
+        return self.xNew, self.PNew
+
+    # Helper function to deal with apogee detection and the related reporting (time/altitude recording, debug statements)
+    def addressApogee(self, tNew):
         if (self.xNew[0] < self._xOld[0]):
             self._apogeeCount += 1
         else:
@@ -137,8 +146,6 @@ class kalFilt:  # Kalman Filter
             self.apogeeTime = tNew
             self.apogeeHeight = self.xNew[0]
             self.atApogee = True
-
-        return((self.xNew, self.PNew))
 
 
 class movAvgFilt:
