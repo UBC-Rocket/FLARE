@@ -68,7 +68,8 @@ class kalFilt:  # Kalman Filter
         if (self._vSkip):
             # Use existing implementation
             self._vCounter -= 1
-            if(self._vCounter <= 0):
+            if (self._vCounter <= 0):
+                self._altOld = self.xNew[0]  # There hasn't been a new xNew
                 vMeas = (altNew - self._altOld) / (tNew - self._vtOld)
                 vUncer = 0.9 * 2 / (self._vLen * 0.05)
                 self._vtOld = tNew
@@ -80,6 +81,8 @@ class kalFilt:  # Kalman Filter
         else:  # not _vSkip
             # I'm like 70 % sure that this makes sense
             # Should be converted into circular buffer
+            self._vtList.append(self._tOld)
+            self._vxList.append(self.xNew[0])
 
             if (len(self._vtList) > self._vLen):
                 tOld = self._vtList.pop(0)
@@ -122,11 +125,11 @@ class kalFilt:  # Kalman Filter
         self.xNew = xPred + K @ y
         self.PNew = (np.identity(2) - K) @ PPred
 
-        if self._vSkip:
-            self._altOld = self.xNew[0]
-        else:
-            self._vtList.append(tNew)
-            self._vxList.append(self.xNew[0])
+        # if self._vSkip:
+        #     self._altOld = self.xNew[0]  # unaffected by loopover
+        # else:
+        #     self._vtList.append(tNew)  # by now, equal to self._tOld
+        #     self._vxList.append(self.xNew[0])  # unaffected by loopover
 
         self.addressApogee(tNew)
 

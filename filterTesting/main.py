@@ -25,9 +25,9 @@ def getScores(rawTimes, scores):
 CONST_APOGEE_CHECKS = 5
 
 # define filters
-kf = filters.kalFilt(2, True)
+kf = filters.kalFilt(5, False)
 kf.name = "Kevin"
-kf2 = filters.kalFilt(30, True)
+kf2 = filters.kalFilt(1, False)
 kf2.name = "Martha"
 # mvavg = filters.movAvgFilt()
 
