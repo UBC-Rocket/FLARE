@@ -54,9 +54,9 @@ class kalFilt:  # Kalman Filter
 
         if self._vSkip:
             self._vCounter = self._vLen
-        else:
-            self._vtList = [tInit]
-            self._vxList = [xInit[0]]
+        else:  # First initialization is automatically done by the way calcV is setup
+            self._vtList = []
+            self._vxList = []
 
         # clean up reporting variables
         self.apogeeTime = None
@@ -69,11 +69,10 @@ class kalFilt:  # Kalman Filter
             # Use existing implementation
             self._vCounter -= 1
             if (self._vCounter <= 0):
-                self._altOld = self.xNew[0]  # There hasn't been a new xNew
                 vMeas = (altNew - self._altOld) / (tNew - self._vtOld)
                 vUncer = 0.9 * 2 / (self._vLen * 0.05)
                 self._vtOld = tNew
-                self._vCounter = self._vLen
+
             else:
                 vMeas = self._xOld[1]
                 vUncer = 10000000
@@ -84,7 +83,7 @@ class kalFilt:  # Kalman Filter
             self._vtList.append(self._tOld)
             self._vxList.append(self.xNew[0])
 
-            if (len(self._vtList) > self._vLen):
+            if (len(self._vtList) >= self._vLen):
                 tOld = self._vtList.pop(0)
                 altOld = self._vxList.pop(0)
 
@@ -125,11 +124,10 @@ class kalFilt:  # Kalman Filter
         self.xNew = xPred + K @ y
         self.PNew = (np.identity(2) - K) @ PPred
 
-        # if self._vSkip:
-        #     self._altOld = self.xNew[0]  # unaffected by loopover
-        # else:
-        #     self._vtList.append(tNew)  # by now, equal to self._tOld
-        #     self._vxList.append(self.xNew[0])  # unaffected by loopover
+        # Needs to be done at end since 1. we want the nice, corrected xNew data and the easiest way is to measure _vCounter
+        if self._vSkip and self._vCounter <= 0:
+            self._altOld = self.xNew[0]
+            self._vCounter = self._vLen
 
         self.addressApogee(tNew)
 
