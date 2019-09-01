@@ -9,7 +9,7 @@ import numpy as np  # for the linear algebra
 
 def updateScores(scores, rawTimes, apogeeTime):
     #scores: lower is better
-    correctedTimes = [abs(time - apogeeTime/1000) for time in rawTimes]
+    correctedTimes = [(time - apogeeTime/1000) ** 2 for time in rawTimes]
     if scores == []:
         return correctedTimes
     else:
@@ -20,13 +20,16 @@ def updateScores(scores, rawTimes, apogeeTime):
 CONST_APOGEE_CHECKS = 5
 
 # define filters
-kf = filters.kalFilt(1000, False)
-kf.name = "Kevin"
-kf2 = filters.kalFilt(1, False)
-kf2.name = "Martha"
-# mvavg = filters.movAvgFilt()
+filtSkips = [filters.kalFilt(i) for i in range(1, 20)]
+for i, filt in enumerate(filtSkips):
+    filt.name = "Skip" + str(i)
 
-filts = [kf, kf2]
+filtNoSkips = [filters.kalFilt(i, False) for i in range(1, 20)]
+for i, filt in enumerate(filtNoSkips):
+    filt.name = "NoSkip" + str(i)
+filts = filtSkips + filtNoSkips
+
+
 scores = []
 
 # Run all filters through all files
