@@ -7,46 +7,40 @@ import matplotlib.pyplot as plt  # plotting
 import numpy as np  # for the linear algebra
 
 
-def getScores(rawTimes, scores):
-    typ = statistics.median(rawTimes)  # typical value
-    for index, rawTime in enumerate(rawTimes):
-        score = typ - rawTime  # the earlier, the better
-        if score > 3:
-            # crude determiner that the score is too high
-            score *= 2
-
-        try:  # is this how EAFP works
-            scores[index] += score
-        except TypeError:
-            scores[index] = score
+def updateScores(scores, rawTimes, apogeeTime):
+    #scores: lower is better
+    correctedTimes = [abs(time - apogeeTime/1000) for time in rawTimes]
+    if scores == []:
+        return correctedTimes
+    else:
+        return [sum(x) for x in zip(scores, correctedTimes)]
 
 
 #  ---------------------  Constants  --------------------------
 CONST_APOGEE_CHECKS = 5
 
 # define filters
-kf = filters.kalFilt(5, False)
+kf = filters.kalFilt(1000, False)
 kf.name = "Kevin"
 kf2 = filters.kalFilt(1, False)
 kf2.name = "Martha"
 # mvavg = filters.movAvgFilt()
 
 filts = [kf, kf2]
-scores = [None] * len(filts)
+scores = []
 
 # Run all filters through all files
-for files in FILE_NAMES:
-    testDataReader, CONST_BASE_PRESSURE, tInit, xInit, PInit  \
-        = fileWrapper.setupFile(FILE_NAMES[0])
+for fileName in FILE_NAMES:
+    fileDict = fileWrapper.setupFile(fileName)
 
     for filt in filts:
-        filt.reset(tInit, xInit, PInit)
+        filt.reset(fileDict['datInit'])
 
-    # fileWrapper.runFile(testDataReader, CONST_BASE_PRESSURE, filts, True)
-    fileWrapper.runFile(testDataReader, CONST_BASE_PRESSURE, filts, False)
+    fileWrapper.runFile(fileDict['dataReader'],
+                        fileDict['basePressure'], filts, True)
 
     rawTimes = [filt.apogeeTime for filt in filts]
-    getScores(rawTimes, scores)
+    scores = updateScores(scores, rawTimes, fileDict['apogeeTime'])
 
 filtNames = [filt.name for filt in filts]
 

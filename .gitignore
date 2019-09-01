@@ -1,4 +1,5 @@
 .vscode/**
 filterTesting/*.csv
+filterTesting/datasets/
 filterTesting/fileName.py
 *__pycache__/

@@ -30,7 +30,8 @@ class kalFilt:  # Kalman Filter
 
         self.name = None
 
-    def reset(self, tInit, xInit, PInit, quiet=True):
+    def reset(self, dataInit, quiet=True):
+        tInit, xInit, PInit = dataInit
         self._quiet = quiet
         self.xNew = xInit
         self.PNew = PInit

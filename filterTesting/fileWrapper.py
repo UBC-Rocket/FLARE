@@ -17,14 +17,12 @@ CONST_NUM_POST_APOGEE_VALS = 20 * 30  # 20 Hz * 30 seconds
 
 
 # https://en.wikipedia.org/wiki/Hypsometric_equation
-def presToAlt(pres, basePres): return CONST_R * CONST_T / CONST_g * \
-    math.log(basePres / pres)
+def presToAlt(pres, basePres): return CONST_R * CONST_T / \
+    CONST_g * math.log(basePres / pres)
+
 
 # Setup file -------------------------------
-
-
 def setupFile(fileName, debug=False):
-
     if debug:
         print("Opening file {}".format(fileName))
 
@@ -39,15 +37,15 @@ def setupFile(fileName, debug=False):
         input()
         sys.exit()
 
-    time.sleep(0.5)  # let file settle
-
     if debug:
         print("File opened.")
+
+    retDict = dict()
 
     try:
         # First row is reserved for version
         csvData = next(testDataReader)
-        assert(csvData[0] <= 2)
+        assert(csvData[0] <= 3)
 
         # Version 1:
         # 2nd row contains initial altitude, velocity, covariance matrix,
@@ -64,9 +62,30 @@ def setupFile(fileName, debug=False):
         # Only the baseline pressure is provided, in position 7 (index from 0) for compatibility with previous versions. Remaining values are ignored (replace with zeros for new file).
         #
         # This would be equivalent to a hard transition between moving average and Kalman filter (no information is passed between the two filters.
-        else:
+        elif(csvData[0] == 2):
             csvData = next(testDataReader)
             basePressure = csvData[7]
+
+            # Pull next two values to initialize data
+            initData1 = next(testDataReader)
+            initData2 = next(testDataReader)
+
+            tInit = initData2[0] / 1000
+            initAlt1 = presToAlt(initData1[1], basePressure)
+            initAlt2 = presToAlt(initData2[1], basePressure)
+
+            xInit = np.array((initAlt2,
+                              (initAlt2 - initAlt1) /
+                              (initData2[0] - initData1[0])
+                              ))
+            PInit = filters.CONST_BAROM_UNCER
+
+        # Version 3:
+        # Baseline pressure and apogee time (ms) are provided, in that order, starting in position 0. This version is not backwards compatible with previous versions. The apogee time is provided for ease of testing/benchmarking.
+        else:
+            csvData = next(testDataReader)
+            basePressure = csvData[0]
+            retDict['apogeeTime'] = csvData[1]
 
             # Pull next two values to initialize data
             initData1 = next(testDataReader)
@@ -91,7 +110,9 @@ def setupFile(fileName, debug=False):
         input()
         sys.exit()
 
-    return testDataReader, basePressure, tInit, xInit, PInit
+    retDict.update(dataReader=testDataReader, basePressure=basePressure, datInit=(tInit, xInit, PInit))
+    # return testDataReader, basePressure, tInit, xInit, PInit
+    return retDict
 
 
 def runFile(testDataReader, basePressure, filts, plot=True):
