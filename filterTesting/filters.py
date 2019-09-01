@@ -138,8 +138,8 @@ class kalFilt:  # Kalman Filter
     def addressApogee(self, tNew):
         if (self.xNew[0] < self._xOld[0]):
             self._apogeeCount += 1
-        else:
-            self._apogeeCount = 0
+        elif self._apogeeCount > 0:
+            self._apogeeCount -= 1
 
         if self._apogeeCount >= CONST_APOGEE_CHECKS and not self.atApogee:
             if not self._quiet:

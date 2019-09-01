@@ -37,7 +37,7 @@ for fileName in FILE_NAMES:
         filt.reset(fileDict['datInit'])
 
     fileWrapper.runFile(fileDict['dataReader'],
-                        fileDict['basePressure'], filts, True)
+                        fileDict['basePressure'], filts, False)
 
     rawTimes = [filt.apogeeTime for filt in filts]
     scores = updateScores(scores, rawTimes, fileDict['apogeeTime'])
