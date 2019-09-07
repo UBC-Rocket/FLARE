@@ -13,7 +13,7 @@ CONST_R = 287.058
 CONST_T = 30 + 273.15
 CONST_g = 9.8
 
-CONST_NUM_POST_APOGEE_VALS = 20 * 30  # 20 Hz * 30 seconds
+CONST_NUM_POST_APOGEE_VALS = 20 * 20  # 20 Hz * 30 seconds
 
 
 # https://en.wikipedia.org/wiki/Hypsometric_equation
@@ -131,15 +131,19 @@ def runFile(testDataReader, basePressure, filts, plot=True):
         totalPostApVals = CONST_NUM_POST_APOGEE_VALS
 
     allApogeed = False
+    tNew = None
 
     # main loop ------------------------------------
     while True:
         try:  # Pull next set of data
             csvData = next(testDataReader)
         except StopIteration:
-            print("Reached end of file. Press any key to exit.")
-            input()
-            sys.exit()
+            print("WARNING: End of file reached.")
+            for filt in filts:
+                if not filt.atApogee:
+                    filt.atApogee = True
+                    filt.apogeeTime = tNew + 20
+            break
 
         #Take in measurement
         tNew = csvData[0] / 1000
@@ -180,7 +184,7 @@ def runFile(testDataReader, basePressure, filts, plot=True):
         # plt.subplot(121)
         plt.plot(tPlot, measPlot, 'g')
         for count, filt in enumerate(filts):
-            plt.plot(tPlot, xPlots[count])
+            plt.plot(tPlot, xPlots[count], label=filt.name)
             plt.scatter(filt.apogeeTime, filt.apogeeHeight, s=200, marker='x')
 
         # plt.errorbar(tPlot, xPlot, yerr=xUncerPlot, fmt='b')  # Kalman

@@ -16,7 +16,11 @@ CONST_g = 9.8
 
 
 class kalFilt:  # Kalman Filter
+    # @param vLen Timespan over which velocity is measured
+    # @param vSkip If true, filter will measure velocity once every vLen data points, and ignore the intermediate times. If not, filter will measure velocity at every point, using the data from vLen measurements ago as the base.
+    # @param vDetect The velocity under which the filter will consider is apogee. E.g. if vDetect is +10, then the rocket will consider apogee to be when it is moving 10 m/s upwards.
     def __init__(self, vLen=1, vSkip=True, vDetect=0):
+
         # Setup default values
 
         # Timesteps between measuring velocity. If 1, equivalent to measuring every timestep. If 2, uses data point 2 timesteps ago instead of 1, etc.
