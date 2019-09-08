@@ -110,12 +110,15 @@ def setupFile(fileName, debug=False):
         input()
         sys.exit()
 
-    retDict.update(dataReader=testDataReader, basePressure=basePressure, datInit=(tInit, xInit, PInit))
+    retDict.update(dataReader=testDataReader,
+                   basePressure=basePressure, datInit=(tInit, xInit, PInit))
     # return testDataReader, basePressure, tInit, xInit, PInit
     return retDict
 
 
-def runFile(testDataReader, basePressure, filts, plot=True):
+def runFile(fileDict, filts, plot=True):
+    reader = fileDict['dataReader']
+    basePressure = fileDict['basePressure']
     if plot:
         # Plotting variables ----------------------------------
         tPlot = []
@@ -136,7 +139,7 @@ def runFile(testDataReader, basePressure, filts, plot=True):
     # main loop ------------------------------------
     while True:
         try:  # Pull next set of data
-            csvData = next(testDataReader)
+            csvData = next(reader)
         except StopIteration:
             print("WARNING: End of file reached.")
             for filt in filts:
@@ -181,13 +184,11 @@ def runFile(testDataReader, basePressure, filts, plot=True):
 
     if plot:
         # Reached apogee; plot results
-        # plt.subplot(121)
-        plt.plot(tPlot, measPlot, 'g')
+        plt.plot(tPlot, measPlot, 'b', label='Source')
+        plt.axvline(fileDict['apogeeTime']/1000, color='b', linewidth=0.5)
         for count, filt in enumerate(filts):
             plt.plot(tPlot, xPlots[count], label=filt.name)
             plt.scatter(filt.apogeeTime, filt.apogeeHeight, s=200, marker='x')
 
-        # plt.errorbar(tPlot, xPlot, yerr=xUncerPlot, fmt='b')  # Kalman
-        # plt.subplot(122)
-        # plt.errorbar(tPlot, vPlot, yerr=vUncerPlot)
+        plt.legend()
         plt.show()
