@@ -1,0 +1,3 @@
+C:/UBC Rocket Code/Sky-Pilot/avionics/build/CMakeFiles/Sky_Pilot.dir
+C:/UBC Rocket Code/Sky-Pilot/avionics/build/CMakeFiles/edit_cache.dir
+C:/UBC Rocket Code/Sky-Pilot/avionics/build/CMakeFiles/rebuild_cache.dir

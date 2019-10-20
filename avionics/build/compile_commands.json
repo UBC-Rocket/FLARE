@@ -1,0 +1,7 @@
+[
+{
+  "directory": "C:/UBC Rocket Code/Sky-Pilot/avionics/build",
+  "command": "C:\\MinGW\\bin\\c++.exe   -I../src -I../include -I../src/utility -I../test  -g   -std=gnu++14 -o CMakeFiles\\Sky_Pilot.dir\\test\\test_main.cpp.obj -c \"C:\\UBC Rocket Code\\Sky-Pilot\\avionics\\test\\test_main.cpp\"",
+  "file": "C:/UBC Rocket Code/Sky-Pilot/avionics/test/test_main.cpp"
+}
+]
