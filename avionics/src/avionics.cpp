@@ -57,7 +57,14 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
  * Distributed as-is; no warranty is given.
  */
 
-/*Includes------------------------------------------------------------*/
+/* Includes------------------------------------------------------------*/
+#include <Arduino.h>
+#include <HardwareSerial.h>
+#include <i2c_t3.h>
+#include <SD.h>
+#include <SPI.h>
+#include <string.h>
+
 #include "buzzer.h"
 #include "calculations.h"
 #include "cameras.h"
@@ -68,16 +75,9 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "satcom.h"
 #include "sensors.h"
 #include "statemachine.h"
-#include "xbee.h"
+#include "XBee.h"
 
-#include <Arduino.h>
-#include <HardwareSerial.h>
-#include <i2c_t3.h>
-#include <SD.h>
-#include <SPI.h>
-#include <string.h>
-
-/*Errors---------------------------------------------------------------*/
+/* Errors---------------------------------------------------------------*/
 #if defined NOSECONE && defined BODY
     #error Only one of NOSECONE and BODY may be defined!
 #elif !(defined NOSECONE || defined BODY)
@@ -97,7 +97,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
     #warning GROUND_TEST is defined! Do not fly this code
 #endif
 
-/*Variables------------------------------------------------------------*/
+/* Variables------------------------------------------------------------*/
 File radiolog;
 static InitStatus s_statusOfInit;
 static float pressure_set[PRESSURE_AVG_SET_SIZE]; //set of pressure values for a floating average
@@ -109,9 +109,10 @@ static XBee s_radio = XBee();
 static XBeeAddress64 s_gndAddr = XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB);
 static ZBTxRequest s_txPacket = ZBTxRequest();
 
-/*Functions------------------------------------------------------------*/
+/* Functions------------------------------------------------------------*/
 
 inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp);
+void blinkStatusLED();
 
 /**
   * @brief  The Arduino setup function
