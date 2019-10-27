@@ -1,27 +1,24 @@
-#ifndef sensor-interface
-#define sensor-interface
+#ifndef SENSOR_INTERFACE_H
+#define SENSOR_INTERFACE_H
 
-class ISensor
-{
-    public:
-
-    /** 
-      * @brief reads sensor data
-      */
-    virtual void read() = 0;
-
-    /**
-      * @brief returns read data
-      * @return sensor data as length 3 array
-      */ 
-    float* getData() {
-        return data;
-    }
-
-    private:
-
-    //data
-    float data[3];
+enum SensorStatus {
+    NOMINAL,
+    NONCRITICAL_FAILURE,
+    CRITICAL_FAILURE
 };
 
+class ISensor {
+    public:
+    /**
+      * @brief  Initialize sensor
+      * @return SensorStatus 
+      */
+    virtual SensorStatus initSensor() = 0;
+
+    /** 
+      * @brief  Reads sensor data and store to float* data
+      * @return SensorStatus
+      */
+    virtual SensorStatus readData(float* data) = 0;
+};
 #endif
