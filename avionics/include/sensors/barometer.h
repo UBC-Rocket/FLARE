@@ -11,6 +11,7 @@
 
 /*Constants------------------------------------------------------------*/
 #define BAROMETER_STATUS_POSITION 3
+#define BAROMETER_DATA_ARRAY_SIZE 2
 
 class Barometer : public ISensor {
 public:
