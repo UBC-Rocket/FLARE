@@ -2,7 +2,7 @@
 #define BAROMETER_H
 
 /**
-  * Accelerometer Sensor Class
+  * Barometer Sensor Class
   */
 
 /*Includes------------------------------------------------------------*/
