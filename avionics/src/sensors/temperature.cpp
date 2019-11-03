@@ -10,7 +10,7 @@ SensorStatus Temperature::initSensor() {
     #endif
     temp_sensor->begin();
 
-    return NOMINAL;
+    return SensorStatus::NOMINAL;
 }
 
 SensorStatus Temperature::readData(float* data) {
@@ -21,7 +21,7 @@ SensorStatus Temperature::readData(float* data) {
     temp = temp_sensor->readTempC();
     data[0] = temp;
 
-    return NOMINAL;
+    return SensorStatus::NOMINAL;
 }
 
 uint8_t Temperature::dataLength() {

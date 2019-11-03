@@ -10,7 +10,7 @@ SensorStatus Accelerometer::initSensor() {
     accelerometer.begin(LIS331::USE_I2C);
     accelerometer.setFullScale(LIS331::HIGH_RANGE);
 
-    return NOMINAL;
+    return SensorStatus::NOMINAL;
 }
 
 SensorStatus Accelerometer::readData(float* data) {
@@ -22,7 +22,7 @@ SensorStatus Accelerometer::readData(float* data) {
     data[1] = accelerometer.convertToG(ACCELEROMETER_SCALE, y);
     data[2] = accelerometer.convertToG(ACCELEROMETER_SCALE, z);
 
-    return NOMINAL;
+    return SensorStatus::NOMINAL;
 }
 
 uint8_t Accelerometer::dataLength() {

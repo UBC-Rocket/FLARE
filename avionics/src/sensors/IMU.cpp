@@ -16,7 +16,7 @@ SensorStatus IMU::initSensor() {
     #elif defined BODY
         if(!IMU_Sensor.begin(Adafruit_BNO055::OPERATION_MODE_AMG)){
     #endif
-            return NONCRITICAL_FAILURE;
+            return SensorStatus::NONCRITICAL_FAILURE;
 
             #ifdef TESTING
                 SerialUSB.println("ERROR: IMU initialization failed!");
@@ -24,7 +24,7 @@ SensorStatus IMU::initSensor() {
         }
     IMU_Sensor.setExtCrystalUse(true);
 
-    return NOMINAL;
+    return SensorStatus::NOMINAL;
 }
 
 SensorStatus IMU::readData(float* data) {
@@ -62,7 +62,7 @@ SensorStatus IMU::readData(float* data) {
         data[8] = magnetometer_data[2];
     #endif // NOSECONE elif BODY
 
-    return NOMINAL;
+    return SensorStatus::NOMINAL;
 }
 
 uint8_t IMU::dataLength() {

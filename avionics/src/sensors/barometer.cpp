@@ -14,11 +14,11 @@ SensorStatus Barometer::initSensor() {
     }
     #else
     if (!barometer->initializeMS_5803(false)) {
-        return CRITICAL_FAILURE;
+        return SensorStatus::CRITICAL_FAILURE;
     }
     #endif
 
-    return NOMINAL;
+    return SensorStatus::NOMINAL;
 }
 
 SensorStatus Barometer::readData(float* data) {
@@ -36,7 +36,7 @@ SensorStatus Barometer::readData(float* data) {
     data[0] = barometer->pressure();
     data[1] = barometer->temperature();
 
-    return NOMINAL;
+    return SensorStatus::NOMINAL;
 }
 
 uint8_t Barometer::dataLength() {

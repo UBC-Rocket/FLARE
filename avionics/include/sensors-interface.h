@@ -1,7 +1,7 @@
 #ifndef SENSOR_INTERFACE_H
 #define SENSOR_INTERFACE_H
 
-enum SensorStatus {
+enum class SensorStatus {
     NOMINAL,
     NONCRITICAL_FAILURE,
     CRITICAL_FAILURE
@@ -36,6 +36,6 @@ class ISensor {
     /**
      * @brief Returns the length of the data array the sensor requires
      */
-    virtual uint8_t dataLength() = 0;
+    //virtual uint8_t dataLength() = 0;
 };
 #endif

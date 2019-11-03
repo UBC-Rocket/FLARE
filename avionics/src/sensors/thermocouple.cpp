@@ -25,10 +25,10 @@ SensorStatus Thermocouple::initSensor() {
         #endif
     }
     else{
-        return NONCRITICAL_FAILURE;
+        return SensorStatus::NONCRITICAL_FAILURE;
     }
 
-    return NOMINAL;
+    return SensorStatus::NOMINAL;
 }
 
 SensorStatus Thermocouple::readData(float* data) {
@@ -45,7 +45,7 @@ SensorStatus Thermocouple::readData(float* data) {
             SerialUSB.println("Thermocouple ERROR");
     #endif  // TESTING
 
-    return NOMINAL;
+    return SensorStatus::NOMINAL;
 }
 
 uint8_t Thermocouple::dataLength() {
