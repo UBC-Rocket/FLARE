@@ -88,12 +88,17 @@ const uint8_t GPS_set_update_rate[] =
 
 /*Functions------------------------------------------------------------*/
 void initSensors(InitStatus* status);
+
 float barSensorInit(void);
 
 void displayStatus(InitStatus *status);
+
+// TODO: Remove dependency of sensors.h for MAX31855k.cpp/.h and GP20U7.cpp/.h
+
 void pollSensors(unsigned long *timestamp, float *battery_voltage,
         float acc_data[], float bar_data[], float *temp_sensor_data,
         float IMU_data[], float GPS_data[], float *thermocouple_data);
+
 void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
         float bar_data[], float *temp_sensor_data, float IMU_data[],
         float GPS_data[], FlightStates state, float altitude,
