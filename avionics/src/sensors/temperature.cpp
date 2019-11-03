@@ -23,3 +23,7 @@ SensorStatus Temperature::readData(float* data) {
 
     return NOMINAL;
 }
+
+uint8_t Temperature::dataLength() {
+    return TEMPERATURE_DATA_ARRAY_SIZE;
+}

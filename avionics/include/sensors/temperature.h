@@ -18,6 +18,7 @@ class Temperature : public ISensor {
 public:
 SensorStatus initSensor();
 SensorStatus readData(float* data);
+uint8_t dataLength();
 
 private:
 TMP102* temp_sensor;

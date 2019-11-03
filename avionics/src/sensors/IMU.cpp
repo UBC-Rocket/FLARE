@@ -64,3 +64,7 @@ SensorStatus IMU::readData(float* data) {
 
     return NOMINAL;
 }
+
+uint8_t IMU::dataLength() {
+    return IMU_DATA_ARRAY_SIZE;
+}

@@ -38,3 +38,7 @@ SensorStatus Barometer::readData(float* data) {
 
     return NOMINAL;
 }
+
+uint8_t Barometer::dataLength() {
+    return BAROMETER_DATA_ARRAY_SIZE;
+}

@@ -17,6 +17,7 @@ class Barometer : public ISensor {
 public:
 SensorStatus initSensor();
 SensorStatus readData(float* data);
+uint8_t dataLength();
 
 private:
 MS_5803* barometer;

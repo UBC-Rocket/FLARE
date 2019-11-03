@@ -19,6 +19,7 @@ class Accelerometer : public ISensor {
   public:
   SensorStatus initSensor();
   SensorStatus readData(float* data);
+  uint8_t dataLength();
 
   private:
   LIS331 accelerometer;

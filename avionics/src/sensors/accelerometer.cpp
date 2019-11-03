@@ -24,3 +24,7 @@ SensorStatus Accelerometer::readData(float* data) {
 
     return NOMINAL;
 }
+
+uint8_t Accelerometer::dataLength() {
+    return ACCELEROMETER_DATA_ARRAY_SIZE;
+}

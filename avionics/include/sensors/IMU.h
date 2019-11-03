@@ -8,6 +8,7 @@
 /*Includes------------------------------------------------------------*/
 #include "sensors-interface.h"
 #include "Adafruit_BNO055.h"
+#include "options.h"
 
 /*Constants------------------------------------------------------------*/
 #define IMU_STATUS_POSITION 5
@@ -22,6 +23,7 @@ class IMU : public ISensor {
     public:
     SensorStatus initSensor();
     SensorStatus readData(float* data);
+    uint8_t dataLength();
 };
 
 #endif

@@ -32,5 +32,10 @@ class ISensor {
       * @return SensorStatus
       */
     virtual SensorStatus readData(float* data) = 0;
+
+    /**
+     * @brief Returns the length of the data array the sensor requires
+     */
+    virtual uint8_t dataLength() = 0;
 };
 #endif
