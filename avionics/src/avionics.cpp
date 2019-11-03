@@ -114,7 +114,7 @@ static ZBTxRequest s_txPacket = ZBTxRequest();
 
 inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp);
 void blinkStatusLED();
-void pollSensors();
+void pollSensors() {}
 
 /**
   * @brief  The Arduino setup function
