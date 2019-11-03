@@ -69,7 +69,7 @@ SensorStatus GPS::initSensor() {
         SerialGPS.begin(9600);  //baud rate 9600 for the GP-20U7
         while (!SerialGPS) {}
 
-    return NOMINAL;
+    return SensorStatus::NOMINAL;
 }
 
 SensorStatus GPS::readData(float* data) {
@@ -85,14 +85,14 @@ SensorStatus GPS::readData(float* data) {
     }
 
     if(!gpsSuccess) {
-        return NONCRITICAL_FAILURE;
+        return SensorStatus::NONCRITICAL_FAILURE;
     }
 
     unsigned long fix_age;
     gps.f_get_position(&data[0], &data[1], &fix_age);
     data[2] = gps.f_altitude();
 
-    return NOMINAL;
+    return SensorStatus::NOMINAL;
 }
 
 uint8_t GPS::dataLength() {
