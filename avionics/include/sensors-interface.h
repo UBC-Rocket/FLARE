@@ -7,6 +7,18 @@ enum SensorStatus {
     CRITICAL_FAILURE
 };
 
+/**
+ * @brief enum of all sensors
+ */
+enum SensorType {
+    ACCELEROMETER,
+    BAROMETER,
+    THERMOMETER,
+    IMU,
+    GPS,
+    THERMOCOUPLE
+};
+
 class ISensor {
     public:
     /**
