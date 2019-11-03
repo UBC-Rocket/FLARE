@@ -64,6 +64,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include <SD.h>
 #include <SPI.h>
 #include <string.h>
+#include <TeensyThreads.h>
 
 #include "buzzer.h"
 #include "calculations.h"
@@ -113,17 +114,19 @@ static ZBTxRequest s_txPacket = ZBTxRequest();
 
 inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp);
 void blinkStatusLED();
+void pollSensors();
 
 /**
   * @brief  The Arduino setup function
   * @param  None
   * @return None
   */
-void setup()
-{
+void setup() {
     int i;
 
     initPins();
+
+    threads.addThread(pollSensors, 1);
 
     /* Setup all UART comms */
     // Serial comms to computer
@@ -156,13 +159,13 @@ void setup()
 
     /* init various arrays */
     baseline_pressure = barSensorInit(); // for baseline pressure calculation
-    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++){ // for moving average
+    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) { // for moving average
         pressure_set[i] = baseline_pressure;
     }
-    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++){ // for delta altitude
+    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) { // for delta altitude
         delta_time_set[i] = NOMINAL_POLLING_TIME_INTERVAL;
     }
-    for(i = 0; i < GROUND_ALT_SIZE; i++){
+    for(i = 0; i < GROUND_ALT_SIZE; i++) {
         ground_alt_arr[i] = baseline_pressure;
     }
 }
@@ -172,8 +175,7 @@ void setup()
   * @param  None
   * @return None
   */
-void loop()
-{
+void loop() {
     /* List of constants */
     static uint32_t timestamp;
     static unsigned long old_time = 0; //ms
@@ -264,17 +266,16 @@ void loop()
   * @param  float timestamp - time in ms
   * @return None
   */
-inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp)
-{
+inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp) {
     static bool mainDeploySatcomSent = false;
     static int landedSatcomSentCount = 0;
     static uint16_t satcomMsgOldTime = millis();
 
-    if(state == FINAL_DESCENT && !mainDeploySatcomSent){
+    if(state == FINAL_DESCENT && !mainDeploySatcomSent) {
         mainDeploySatcomSent = true;
         SatComSendGPS(&timestamp, GPS_data);
     } else if (state == LANDED && landedSatcomSentCount < NUM_SATCOM_SENDS_ON_LANDED
-                    && millis() - satcomMsgOldTime >= SATCOM_LANDED_TIME_INTERVAL){
+                    && millis() - satcomMsgOldTime >= SATCOM_LANDED_TIME_INTERVAL) {
         //sends Satcom total of NUM_SATCOM_SENDS_ON_LANDED times,
         //once every SATCOM_LANDED_TIME_INTERVAL
         landedSatcomSentCount++;
@@ -287,14 +288,13 @@ inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timesta
   * @brief  Helper function for LED blinking
   * @return None
   */
-inline void blinkStatusLED()
-{
+inline void blinkStatusLED() {
     static unsigned long init_st_old_time = 0;
     static const uint16_t init_st_time_interval = 500;
     static bool init_st_indicator = false;
 
     if (s_statusOfInit.overview == NONCRITICAL_FAILURE
-                && millis() - init_st_old_time > init_st_time_interval){
+                && millis() - init_st_old_time > init_st_time_interval) {
         init_st_old_time = millis();
         init_st_indicator = !init_st_indicator;
 
