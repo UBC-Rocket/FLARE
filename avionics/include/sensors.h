@@ -23,7 +23,9 @@
 
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
+#include <map>
 
+#include "sensors-interface.h"
 #include "statemachine.h"
 #include "Adafruit_BNO055.h"
 #include "options.h"
@@ -35,73 +37,22 @@
 #define IridiumSerial           Serial4
 #define SPIThermo               SPI2
 
-#define ACC_DATA_ARRAY_SIZE     3
-#define BAR_DATA_ARRAY_SIZE     2
-#if defined NOSECONE
-    #define IMU_DATA_ARRAY_SIZE     3
-#elif defined BODY
-    #define IMU_DATA_ARRAY_SIZE     9
-#endif
-#define GPS_DATA_ARRAY_SIZE     3
-#define GPS_FIELD_LENGTH        20
-
-#if defined THERMOCOUPLE
-    #define NUM_SENSORS 9
-#else
-    #define NUM_SENSORS 8
-#endif
-
-#define FILE_STATUS_POSITION 0
-#define BATTERY_STATUS_POSITION 1
-#define ACCELEROMETER_STATUS_POSITION 2
-#define BAROMETER_STATUS_POSITION 3
-#define TEMPERATURE_STATUS_POSITION 4
-#define IMU_STATUS_POSITION 5
-#define EMATCH_STATUS_POSITION 6
-#define SATCOM_STATUS_POSITION 7
-#define THERMOCOUPLE_STATUS_POSITION 8
 /*Variables------------------------------------------------------------*/
-
-/*Error codes for initialization*/
-enum OverallError {
-    NOMINAL,
-    NONCRITICAL_FAILURE,
-    CRITICAL_FAILURE
-};
-
-struct InitStatus {
-    OverallError overview;
-    bool sensorNominal[NUM_SENSORS];
-};
-
-/*GPS initialization commands*/
-const uint8_t GPS_reset_defaults[] =
-    {0xA0, 0xA1, 0x00, 0x02, 0x04, 0x00, 0x04, 0x0D, 0x0A};
-const uint8_t GPS_set_baud_rate[] =
-    {0xA0, 0xA1, 0x00, 0x04, 0x05, 0x00, 0x00, 0x00, 0x05, 0x0D, 0x0A}; //4800
-const uint8_t GPS_set_NMEA_message[] =
-    {0xA0, 0xA1, 0x00, 0x09, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
-     0x00, 0x00, 0x09, 0x0D, 0x0A}; //GPGGA
-const uint8_t GPS_set_update_rate[] =
-    {0xA0, 0xA1, 0x00, 0x03, 0x0E, 0x01, 0x00, 0x0F, 0x0D, 0x0A}; //1 Hz
 
 
 /*Functions------------------------------------------------------------*/
-void initSensors(InitStatus* status);
 
-float barSensorInit(void);
+void initSensors(std::map<ISensor, SensorStatus, float*> sensors);
 
-void displayStatus(InitStatus *status);
+void displayStatus(std::map<ISensor, SensorStatus, float*> sensors);
 
 // TODO: Remove dependency of sensors.h for MAX31855k.cpp/.h and GP20U7.cpp/.h
 
-void pollSensors(unsigned long *timestamp, float *battery_voltage,
-        float acc_data[], float bar_data[], float *temp_sensor_data,
-        float IMU_data[], float GPS_data[], float *thermocouple_data);
+void pollSensors(unsigned long *timestamp,
+        std::map<ISensor, SensorStatus, float*> sensors);
 
-void logData(unsigned long *timestamp, float *battery_voltage, float acc_data[],
-        float bar_data[], float *temp_sensor_data, float IMU_data[],
-        float GPS_data[], FlightStates state, float altitude,
-        float baseline_pressure, float thermocouple_data);
+void logData(unsigned long *timestamp,
+    std::map<ISensor, SensorStatus, float*> sensors, FlightStates state,
+    float altitude, float baseline_pressure);
 
 #endif
