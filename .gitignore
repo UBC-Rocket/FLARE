@@ -1,4 +1,4 @@
 /avionics/.pio/*
-/avionics/.vscode/*
+**/.vscode/*
 /avionics/build/*
 *.DS_Store
