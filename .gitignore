@@ -1,4 +1,9 @@
-.vscode/**
+**/.vscode/*
+
+/avionics/.pio/*
+/avionics/build/*
+*.DS_Store
+
 filterTesting/*.csv
 filterTesting/datasets/
 filterTesting/fileName.py
