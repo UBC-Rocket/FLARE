@@ -3,8 +3,7 @@
 
 enum class SensorStatus {
     NOMINAL,
-    NONCRITICAL_FAILURE,
-    CRITICAL_FAILURE
+    FAILURE
 };
 
 /**
@@ -28,14 +27,25 @@ class ISensor {
     virtual SensorStatus initSensor() = 0;
 
     /** 
-      * @brief  Reads sensor data and store to float* data
-      * @return SensorStatus
+      * @brief  Reads sensor data
       */
-    virtual SensorStatus readData(float* data) = 0;
+    virtual void readData() = 0;
 
     /**
      * @brief Returns the length of the data array the sensor requires
      */
     virtual uint8_t dataLength() = 0;
+
+    /**
+     * @brief Returns data read during readData()
+     * @return the data
+     */
+    virtual float* getData() = 0;
+
+    /**
+     * @brief returns the current status of the snesor
+     * @return the current sensor status
+     */
+    virtual SensorStatus getStatus() = 0;
 };
 #endif
