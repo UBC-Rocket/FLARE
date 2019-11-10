@@ -19,33 +19,38 @@ enum SensorType {
 };
 
 class ISensor {
-    public:
+public:
     /**
-      * @brief  Initialize sensor
-      * @return SensorStatus 
-      */
-    virtual SensorStatus initSensor() = 0;
+     * @brief  Initialize sensor
+     * @return SensorStatus 
+     */
+    virtual void initSensor() = 0;
 
     /** 
-      * @brief  Reads sensor data
-      */
+     * @brief  Reads sensor data
+     */
     virtual void readData() = 0;
 
     /**
-     * @brief Returns the length of the data array the sensor requires
+     * @brief  Returns the length of the data array the sensor requires
      */
     virtual uint8_t dataLength() = 0;
 
     /**
-     * @brief Returns data read during readData()
+     * @brief  Returns data read during readData()
      * @return the data
      */
-    virtual float* getData() = 0;
+    virtual float *getData() = 0;
 
     /**
      * @brief returns the current status of the snesor
      * @return the current sensor status
      */
-    virtual SensorStatus getStatus() = 0;
+    SensorStatus getStatus() {
+        return status;
+    }
+
+protected:
+    SensorStatus status;
 };
 #endif
