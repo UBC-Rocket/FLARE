@@ -23,7 +23,7 @@
 
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
-#include <map>
+#include <vector>
 
 #include "sensors-interface.h"
 #include "statemachine.h"
@@ -42,17 +42,14 @@
 
 /*Functions------------------------------------------------------------*/
 
-void initSensors(std::map<ISensor, SensorStatus, float*> sensors);
+void initSensors(std::vector<ISensor> sensors);
 
-void displayStatus(std::map<ISensor, SensorStatus, float*> sensors);
+void displayStatus(std::vector<ISensor> sensors);
 
 // TODO: Remove dependency of sensors.h for MAX31855k.cpp/.h and GP20U7.cpp/.h
 
-void pollSensors(unsigned long *timestamp,
-        std::map<ISensor, SensorStatus, float*> sensors);
+void pollSensors(unsigned long *timestamp, std::vector<ISensor> sensors);
 
-void logData(unsigned long *timestamp,
-    std::map<ISensor, SensorStatus, float*> sensors, FlightStates state,
-    float altitude, float baseline_pressure);
+void logData(unsigned long *timestamp, std::vector<ISensor> sensors,                    FlightStates state, float altitude, float baseline_pressure);
 
 #endif
