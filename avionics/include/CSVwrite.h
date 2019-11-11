@@ -21,6 +21,10 @@ class CSVWrite {
             datalog = SD.open(filename, FILE_WRITE);
         }
 
+        if(!datalog) {
+            return false;
+        }
+
         return success;
     }
 

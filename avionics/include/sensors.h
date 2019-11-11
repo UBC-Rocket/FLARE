@@ -22,15 +22,25 @@
 #define SENSORS_H
 
 /*Includes------------------------------------------------------------*/
-#include <stdint.h>
+// #include <stdint.h>
 #include <vector>
 
 #include "sensors-interface.h"
+#include "hw-interface.h"
 #include "statemachine.h"
-#include "Adafruit_BNO055.h"
 #include "options.h"
 
+#include "sensors/accelerometer.h"
+#include "sensors/barometer.h"
+#include "sensors/GPS.h"
+#include "sensors/IMU.h"
+#include "sensors/temperature.h"
+#include "sensors/thermocouple.h"
+
+#include "CSVwrite.h"
+
 /*Constants------------------------------------------------------------*/
+//TODO: put these somehwere
 #define SerialUSB               Serial
 #define SerialGPS               Serial1
 #define SerialRadio             Serial2
@@ -38,13 +48,19 @@
 #define SPIThermo               SPI2
 
 /*Variables------------------------------------------------------------*/
-
+enum class Status {
+    NOMINAL,
+    NONCRITICAL_FAILURE,
+    CRITICAL_FAILURE
+};
 
 /*Functions------------------------------------------------------------*/
 
-void initSensors(std::vector<ISensor> sensors);
+void initSensors(std::vector<ISensor> sensors, std::vector<IHardware> hardware);
 
-void displayStatus(std::vector<ISensor> sensors);
+void displayStatus(std::vector<ISensor> sensors, std::vector<IHardware> hardware);
+
+Status getStatus(std::vector<ISensor> sensors, std::vector<IHardware> hardware);
 
 // TODO: Remove dependency of sensors.h for MAX31855k.cpp/.h and GP20U7.cpp/.h
 

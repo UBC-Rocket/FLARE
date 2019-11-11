@@ -11,7 +11,7 @@ enum class HardwareStatus {
 };
 
 class IHardware {
-public:
+    public:
     /**
      * @brief initializes hardware
      */
@@ -30,7 +30,7 @@ public:
      */
     virtual void activate() = 0;
 
-    private:
+    protected:
     HardwareStatus status;
 };
 #endif
