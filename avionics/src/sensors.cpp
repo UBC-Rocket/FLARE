@@ -182,7 +182,7 @@ void logData(unsigned long *timestamp, std::vector<ISensor> sensors,
     /*write data to SD card*/
     datalog.write(timestamp);
     for (ISensor &sensor : sensors) {
-        float* data = sensor.getData;
+        float* data = sensor.getData();
         for (int i = 0; i < sensor.dataLength(); i++) {
             datalog.write(data[i]);
         }
