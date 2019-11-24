@@ -35,7 +35,7 @@ class CSVWrite {
     template<typename T>
     void write(T t) {
         datalog.print(t);
-        datalog.printf(',');
+        datalog.print(",");
     }
 
     /**
