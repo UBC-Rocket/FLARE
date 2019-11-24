@@ -1,6 +1,8 @@
 #ifndef SENSOR_INTERFACE_H
 #define SENSOR_INTERFACE_H
 
+#include <cstdint>
+
 enum class SensorStatus {
     NOMINAL,
     FAILURE
