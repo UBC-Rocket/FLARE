@@ -22,8 +22,8 @@
 #include "sensors.h"
 #include "options.h"
 #include "battery.h"
-#include "satcom.h"                 //SATCOM
-#include "buzzer.h"                 //for buzzer response on startup
+#include "satcom.h" //SATCOM
+#include "buzzer.h" //for buzzer response on startup
 #include "cameras.h"
 #include "radio.h"
 #include "statemachine.h"
@@ -43,8 +43,7 @@ CSVWrite datalog;
   * @return void
   */
 
-void initSensors(std::vector<ISensor> sensors, std::vector<IHardware> hardware)
-{
+void initSensors(std::vector<ISensor> sensors, std::vector<IHardware> hardware) {
     // if(powerbattery.getVoltage() <= LOW_BATTERY_VOLTAGE)
     // { //TODO: Uncomment once the battery sensor is implemented
     //     status->sensorNominal[BATTERY_STATUS_POSITION] = false;
@@ -69,30 +68,31 @@ void initSensors(std::vector<ISensor> sensors, std::vector<IHardware> hardware)
 
     /* Init Cameras */
     SerialCamera.begin(CameraBaud);
-    while (!SerialCamera) {}
+    while (!SerialCamera) {
+    }
     delay(2000);
     stop_record();
 
     /*init hardware*/
-    for(IHardware &hw : hardware) {
+    for (IHardware &hw : hardware) {
         hw.init();
     }
 
     /*init sensors*/
-    for(ISensor &sensor : sensors) {
+    for (ISensor &sensor : sensors) {
         sensor.initSensor();
     }
 
-    // TODO: figure out what to do with satcom
-    #ifdef NOSECONE
-        /*init satcom*/
-        if (!SatComSetup()){
-            if(status->overview < NONCRITICAL_FAILURE)
-                status->overview = NONCRITICAL_FAILURE;
-            status->sensorNominal[SATCOM_STATUS_POSITION] = false;
-        }
-    #endif // NOSECONE
-    
+// TODO: figure out what to do with satcom
+#ifdef NOSECONE
+    /*init satcom*/
+    if (!SatComSetup()) {
+        if (status->overview < NONCRITICAL_FAILURE)
+            status->overview = NONCRITICAL_FAILURE;
+        status->sensorNominal[SATCOM_STATUS_POSITION] = false;
+    }
+#endif // NOSECONE
+
     /* transmit sensor report */
     displayStatus(sensors, hardware);
 }
@@ -103,32 +103,33 @@ void initSensors(std::vector<ISensor> sensors, std::vector<IHardware> hardware)
  * @return void
  */
 void displayStatus(std::vector<ISensor> sensors,
-    std::vector<IHardware> hardware) {
-    //TODO: change this function to discern which sensors constitute a critical fail
+                   std::vector<IHardware> hardwares) {
+    // TODO: change this function to discern which sensors constitute a critical fail
+    /*
     if (status->overview == CRITICAL_FAILURE) {
         #ifdef TESTING
             SerialUSB.println("Critical failure! >:-{");
         #endif
 
         #ifdef TESTING //Only plays song once if testing, because it's annoying
-        for(int i = 1; i <= 1; i++){
+        for(int i = 1; i <= 1; i++) {
         #else
-        for(int i = 1; i <= 5; i++){
+        for(int i = 1; i <= 5; i++) {
         #endif
             sing(SongTypes_CRITICALFAIL);
             delay(400);
         }
     }
-    else if (status->overview == NONCRITICAL_FAILURE){
+    else if (status->overview == NONCRITICAL_FAILURE) {
         #ifdef TESTING
             SerialUSB.println("Noncritical failure! :(");
         #endif
         pinMode(LED_BUILTIN, OUTPUT);
 
         #ifdef TESTING
-        for(int i = 1; i <= 1; i++){
+        for(int i = 1; i <= 1; i++) {
         #else
-        for(int i = 1; i <= 5; i++){
+        for(int i = 1; i <= 5; i++) {
         #endif
             sing(SongTypes_NONCRITFAIL);
             delay(400);
@@ -142,9 +143,9 @@ void displayStatus(std::vector<ISensor> sensors,
         digitalWrite(LED_BUILTIN,HIGH);
 
         #ifdef TESTING
-        for(int i = 1; i <= 1; i++){
+        for(int i = 1; i <= 1; i++) {
         #else
-        for(int i = 1; i <= 5; i++){
+        for(int i = 1; i <= 5; i++) {
         #endif
             sing(SongTypes_SUCCESS);
             delay(400);
@@ -152,6 +153,39 @@ void displayStatus(std::vector<ISensor> sensors,
     }
 
     return;
+    */
+    for (ISensor &sensor : sensors) {
+        if (sensor.getStatus() == SensorStatus::FAILURE) {
+            #ifdef TESTING
+            SerialUSB.println("Critical failure in one of a Sensor! >:-{");
+            #endif
+
+            #ifdef TESTING //Only plays song once if testing, because it's annoying
+            for(int i = 1; i <= 1; i++) {
+            #else
+            for(int i = 1; i <= 5; i++) {
+            #endif
+                sing(SongTypes_CRITICALFAIL);
+                delay(400);
+            }
+            return;
+        }
+    }
+
+    #ifdef TESTING
+    SerialUSB.println("Initialization complete! :D");
+    #endif
+    pinMode(LED_BUILTIN,OUTPUT);
+    digitalWrite(LED_BUILTIN,HIGH);
+
+    #ifdef TESTING
+    for(int i = 1; i <= 1; i++) {
+    #else
+    for(int i = 1; i <= 5; i++) {
+    #endif
+        sing(SongTypes_SUCCESS);
+        delay(400);
+    }
 }
 
 /**
@@ -162,7 +196,7 @@ void displayStatus(std::vector<ISensor> sensors,
 void pollSensors(unsigned long *timestamp, std::vector<ISensor> sensors) {
     *timestamp = millis();
 
-    for(ISensor &sensor : sensors) {
+    for (ISensor &sensor : sensors) {
         sensor.readData();
     }
 
@@ -178,12 +212,14 @@ void pollSensors(unsigned long *timestamp, std::vector<ISensor> sensors) {
   * @param baseline_pressure Pressure used as "ground level"
   */
 void logData(unsigned long *timestamp, std::vector<ISensor> sensors,
-        FlightStates state, float altitude, float baseline_pressure) {
+             FlightStates state, float altitude, float baseline_pressure) {
     /*write data to SD card*/
     datalog.write(timestamp);
-    for (ISensor &sensor : sensors) {
-        float* data = sensor.getData();
-        for (int i = 0; i < sensor.dataLength(); i++) {
+    for (ISensor &sensor : sensors)
+    {
+        float *data = sensor.getData();
+        for (int i = 0; i < sensor.dataLength(); i++)
+        {
             datalog.write(data[i]);
         }
     }
