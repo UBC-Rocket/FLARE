@@ -64,7 +64,6 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include <SD.h>
 #include <SPI.h>
 #include <string.h>
-#include <TeensyThreads.h>
 
 #include "buzzer.h"
 #include "calculations.h"
@@ -100,7 +99,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 
 /* Variables------------------------------------------------------------*/
 File radiolog;
-static InitStatus s_statusOfInit;
+static Status s_statusOfInit;
 static float pressure_set[PRESSURE_AVG_SET_SIZE]; //set of pressure values for a floating average
 static unsigned long delta_time_set[PRESSURE_AVG_SET_SIZE]; //set of delta time values for the delta altitude
 static float baseline_pressure;
@@ -109,6 +108,16 @@ static float ground_alt_arr[GROUND_ALT_SIZE]; //values for the baseline pressure
 static XBee s_radio = XBee();
 static XBeeAddress64 s_gndAddr = XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB);
 static ZBTxRequest s_txPacket = ZBTxRequest();
+
+std::vector<ISensor> sensors;       // Sensors
+std::vector<IHardware> hardwares;   // Hardwares
+
+Accelerometer accelerometer;
+Barometer barometer;
+GPS gps;
+IMU imu;
+Temperature temperature;
+Thermocouple thermocouple;
 
 /* Functions------------------------------------------------------------*/
 
@@ -123,10 +132,7 @@ void pollSensors() {}
   */
 void setup() {
     int i;
-
     initPins();
-
-    threads.addThread(pollSensors, 1);
 
     /* Setup all UART comms */
     // Serial comms to computer
@@ -151,14 +157,22 @@ void setup() {
 
     /*init I2C bus @ 400 kHz */
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
-    Wire.setDefaultTimeout(100000); //100ms
+    Wire.setDefaultTimeout(100000); // 100ms
 
-    /*init sensors and report status in many ways*/
-    initSensors(&s_statusOfInit);
+    /* Add all the sensors inside sensor vector */
+    sensors.push_back(accelerometer);
+    sensors.push_back(barometer);
+    sensors.push_back(gps);
+    sensors.push_back(imu);
+    sensors.push_back(temperature);
+    sensors.push_back(thermocouple);
+
+    /* init sensors and report status in many ways */
+    initSensors(sensors, hardwares);
     radioStatus(&s_radio, &s_txPacket, &s_statusOfInit);
 
     /* init various arrays */
-    baseline_pressure = barSensorInit(); // for baseline pressure calculation
+    baseline_pressure = barometer.getData()[0]; // for baseline pressure calculation
     for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) { // for moving average
         pressure_set[i] = baseline_pressure;
     }
