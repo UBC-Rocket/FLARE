@@ -60,11 +60,12 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 /* Includes------------------------------------------------------------*/
 #include <Arduino.h>
 #include <HardwareSerial.h>
-#include <i2c_t3.h>
 #include <SD.h>
 #include <SPI.h>
+#include <i2c_t3.h>
 #include <string.h>
 
+#include "XBee.h"
 #include "buzzer.h"
 #include "calculations.h"
 #include "cameras.h"
@@ -75,42 +76,41 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "satcom.h"
 #include "sensors.h"
 #include "statemachine.h"
-#include "XBee.h"
 
 /* Errors---------------------------------------------------------------*/
 #if defined NOSECONE && defined BODY
-    #error Only one of NOSECONE and BODY may be defined!
+#error Only one of NOSECONE and BODY may be defined!
 #elif !(defined NOSECONE || defined BODY)
-    #error Define one of NOSECONE or BODY!
+#error Define one of NOSECONE or BODY!
 #endif
 
 #if defined POW && defined SERVO
-    #error Only one of POW and SERVO may be defined!
+#error Only one of POW and SERVO may be defined!
 #elif !(defined POW || defined SERVO)
-    #error Define one of POW or SERVO!
+#error Define one of POW or SERVO!
 #endif
 
 #if defined TESTING
-    #warning TESTING is defined! Do not fly this code
+#warning TESTING is defined! Do not fly this code
 #endif
 #if defined GROUND_TEST
-    #warning GROUND_TEST is defined! Do not fly this code
+#warning GROUND_TEST is defined! Do not fly this code
 #endif
 
 /* Variables------------------------------------------------------------*/
 File radiolog;
 static Status s_statusOfInit;
-static float pressure_set[PRESSURE_AVG_SET_SIZE]; //set of pressure values for a floating average
-static unsigned long delta_time_set[PRESSURE_AVG_SET_SIZE]; //set of delta time values for the delta altitude
+static float pressure_set[PRESSURE_AVG_SET_SIZE];            //set of pressure values for a floating average
+static unsigned long delta_time_set[PRESSURE_AVG_SET_SIZE];  //set of delta time values for the delta altitude
 static float baseline_pressure;
-static float ground_alt_arr[GROUND_ALT_SIZE]; //values for the baseline pressure calculation
+static float ground_alt_arr[GROUND_ALT_SIZE];  //values for the baseline pressure calculation
 
 static XBee s_radio = XBee();
 static XBeeAddress64 s_gndAddr = XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB);
 static ZBTxRequest s_txPacket = ZBTxRequest();
 
-std::vector<ISensor> sensors;       // Sensors
-std::vector<IHardware> hardwares;   // Hardwares
+std::vector<ISensor> sensors;      // Sensors
+std::vector<IHardware> hardwares;  // Hardwares
 
 Accelerometer accelerometer;
 Barometer barometer;
@@ -134,30 +134,33 @@ void setup() {
     int i;
     initPins();
 
-    /* Setup all UART comms */
-    // Serial comms to computer
-    #ifdef TESTING
+/* Setup all UART comms */
+// Serial comms to computer
+#ifdef TESTING
     SerialUSB.begin(9600);
-    while (!SerialUSB) {}
+    while (!SerialUSB) {
+    }
     SerialUSB.println("Initializing...");
-    #endif
+#endif
 
-    // Comms to radio serial port
-    #ifdef TESTING
+// Comms to radio serial port
+#ifdef TESTING
     SerialUSB.println("Initializing radio");
-    #endif
+#endif
     SerialRadio.begin(921600);
-    while (!SerialRadio) {}
+    while (!SerialRadio) {
+    }
     s_radio.setSerial(SerialRadio);
     s_txPacket.setAddress64(s_gndAddr);
 
     // Comms to camera serial port
     SerialCamera.begin(CameraBaud);
-    while (!SerialCamera) {}
+    while (!SerialCamera) {
+    }
 
     /*init I2C bus @ 400 kHz */
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
-    Wire.setDefaultTimeout(100000); // 100ms
+    Wire.setDefaultTimeout(100000);  // 100ms
 
     /* Add all the sensors inside sensor vector */
     sensors.push_back(accelerometer);
@@ -172,14 +175,15 @@ void setup() {
     radioStatus(&s_radio, &s_txPacket, &s_statusOfInit);
 
     /* init various arrays */
-    baseline_pressure = barometer.getData()[0]; // for baseline pressure calculation
-    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) { // for moving average
+    barometer.readData();
+    baseline_pressure = barometer.getData()[0];    // for baseline pressure calculation
+    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) {  // for moving average
         pressure_set[i] = baseline_pressure;
     }
-    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) { // for delta altitude
+    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) {  // for delta altitude
         delta_time_set[i] = NOMINAL_POLLING_TIME_INTERVAL;
     }
-    for(i = 0; i < GROUND_ALT_SIZE; i++) {
+    for (i = 0; i < GROUND_ALT_SIZE; i++) {
         ground_alt_arr[i] = baseline_pressure;
     }
 }
@@ -192,18 +196,15 @@ void setup() {
 void loop() {
     /* List of constants */
     static uint32_t timestamp;
-    static unsigned long old_time = 0; //ms
-    static unsigned long new_time = 0; //ms
+    static unsigned long old_time = 0;  //ms
+    static unsigned long new_time = 0;  //ms
     unsigned long delta_time;
-    static uint16_t time_interval = NOMINAL_POLLING_TIME_INTERVAL; //ms
+    static uint16_t time_interval = NOMINAL_POLLING_TIME_INTERVAL;  //ms
 
     static unsigned long radio_old_time = 0;
-    static unsigned long radio_time_interval = 500; //ms
+    static unsigned long radio_time_interval = 500;  //ms
 
-    static float battery_voltage, acc_data[ACC_DATA_ARRAY_SIZE],
-        bar_data[BAR_DATA_ARRAY_SIZE], temp_sensor_data,
-        IMU_data[IMU_DATA_ARRAY_SIZE], GPS_data[GPS_DATA_ARRAY_SIZE],
-        thermocouple_data;
+    float *battery_voltage, *acc_data, *bar_data, *temp_sensor_data, *IMU_data, *GPS_data, *thermocouple_data;
 
     static float prev_altitude, altitude, delta_altitude, ground_altitude;
 
@@ -211,15 +212,15 @@ void loop() {
 
     //makes sure that even if it does somehow get accidentally changed,
     //it gets reverted
-    if(s_statusOfInit.overview == CRITICAL_FAILURE)
+    if (s_statusOfInit == Status::CRITICAL_FAILURE)
         state = WINTER_CONTINGENCY;
 
     // if radio communications are received, this addresses them
     resolveRadioRx(&s_radio, &s_txPacket, GPS_data, &state, &s_statusOfInit);
 
-    #ifdef NOSECONE // send satcom data
-        sendSatcomMsg(state, GPS_data, timestamp);
-    #endif
+#ifdef NOSECONE  // send satcom data
+    sendSatcomMsg(state, GPS_data, timestamp);
+#endif
 
     // Polling time intervals need to be variable, since in LANDED
     // there's a lot of data that'll be recorded
@@ -235,42 +236,58 @@ void loop() {
         delta_time = new_time - old_time;
         old_time = new_time;
 
+        /*
         pollSensors(&timestamp, &battery_voltage, acc_data, bar_data,
                     &temp_sensor_data, IMU_data, GPS_data,
                     &thermocouple_data);
+        */
+
+        pollSensors(&timestamp, sensors);
+
+        // Store sensors in all fields
+        acc_data = accelerometer.getData();
+        bar_data = barometer.getData();
+        temp_sensor_data = temperature.getData();
+        IMU_data = imu.getData();
+        GPS_data = gps.getData();
+        thermocouple_data = thermocouple.getData();
 
         calculateValues(bar_data, &prev_altitude, &altitude,
                         &delta_altitude, &baseline_pressure,
                         &delta_time, pressure_set, delta_time_set);
 
         stateMachine(&altitude, &delta_altitude, &prev_altitude,
-                    bar_data, &baseline_pressure, &ground_altitude,
-                    ground_alt_arr, &state);
+                     bar_data, &baseline_pressure, &ground_altitude,
+                     ground_alt_arr, &state);
 
+        /*
         logData(&timestamp, &battery_voltage, acc_data, bar_data,
                 &temp_sensor_data, IMU_data, GPS_data, state,
                 altitude, baseline_pressure, thermocouple_data);
+        */
+
+        logData(&timestamp, sensors, state, altitude, baseline_pressure);
     }
 
     // Send logged data across radio (as backup/early access to SD card logs)
-    if((new_time - radio_old_time) >= radio_time_interval) {
-        #ifdef BODY
-            sendRadioBody(&s_radio, &s_txPacket, bar_data, state, &altitude,
-                            &timestamp);
-        #endif  // def BODY
-        #ifdef NOSECONE
-            sendRadioNosecone(&s_radio, &s_txPacket, GPS_data, bar_data,
-                              acc_data, &temp_sensor_data, IMU_data);
-        #endif  //def NOSECONE
+    if ((new_time - radio_old_time) >= radio_time_interval) {
+#ifdef BODY
+        sendRadioBody(&s_radio, &s_txPacket, bar_data, state, &altitude,
+                      &timestamp);
+#endif  // def BODY
+#ifdef NOSECONE
+        sendRadioNosecone(&s_radio, &s_txPacket, GPS_data, bar_data,
+                          acc_data, &temp_sensor_data, IMU_data);
+#endif  //def NOSECONE
         radio_old_time = new_time;
     }
 
     //LED blinks in non-critical failure
     blinkStatusLED();
 
-    #ifdef TESTING
-    delay(1000); //So you can actually read the serial output
-    #endif
+#ifdef TESTING
+    delay(1000);  //So you can actually read the serial output
+#endif
 }
 
 /**
@@ -285,11 +302,10 @@ inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timesta
     static int landedSatcomSentCount = 0;
     static uint16_t satcomMsgOldTime = millis();
 
-    if(state == FINAL_DESCENT && !mainDeploySatcomSent) {
+    if (state == FINAL_DESCENT && !mainDeploySatcomSent) {
         mainDeploySatcomSent = true;
         SatComSendGPS(&timestamp, GPS_data);
-    } else if (state == LANDED && landedSatcomSentCount < NUM_SATCOM_SENDS_ON_LANDED
-                    && millis() - satcomMsgOldTime >= SATCOM_LANDED_TIME_INTERVAL) {
+    } else if (state == LANDED && landedSatcomSentCount < NUM_SATCOM_SENDS_ON_LANDED && millis() - satcomMsgOldTime >= SATCOM_LANDED_TIME_INTERVAL) {
         //sends Satcom total of NUM_SATCOM_SENDS_ON_LANDED times,
         //once every SATCOM_LANDED_TIME_INTERVAL
         landedSatcomSentCount++;
@@ -307,12 +323,11 @@ inline void blinkStatusLED() {
     static const uint16_t init_st_time_interval = 500;
     static bool init_st_indicator = false;
 
-    if (s_statusOfInit.overview == NONCRITICAL_FAILURE
-                && millis() - init_st_old_time > init_st_time_interval) {
+    if (s_statusOfInit == Status::NONCRITICAL_FAILURE && millis() - init_st_old_time > init_st_time_interval) {
         init_st_old_time = millis();
         init_st_indicator = !init_st_indicator;
 
-        if(init_st_indicator)
+        if (init_st_indicator)
             digitalWrite(LED_BUILTIN, HIGH);
         else
             digitalWrite(LED_BUILTIN, LOW);
