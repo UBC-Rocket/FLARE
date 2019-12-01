@@ -115,7 +115,7 @@ std::vector<IHardware> hardwares;  // Hardwares
 Accelerometer accelerometer;
 Barometer barometer;
 GPS gps;
-IMU imu;
+IMU imuSensor;
 Temperature temperature;
 Thermocouple thermocouple;
 
@@ -166,7 +166,7 @@ void setup() {
     sensors.push_back(accelerometer);
     sensors.push_back(barometer);
     sensors.push_back(gps);
-    sensors.push_back(imu);
+    sensors.push_back(imuSensor);
     sensors.push_back(temperature);
     sensors.push_back(thermocouple);
 
@@ -248,7 +248,7 @@ void loop() {
         acc_data = accelerometer.getData();
         bar_data = barometer.getData();
         temp_sensor_data = temperature.getData();
-        IMU_data = imu.getData();
+        IMU_data = imuSensor.getData();
         GPS_data = gps.getData();
         thermocouple_data = thermocouple.getData();
 
