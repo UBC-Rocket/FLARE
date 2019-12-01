@@ -190,7 +190,7 @@ void sendRadioNosecone(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
   * @return void
   */
 void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, float GPS_data[],
-        FlightStates *state, InitStatus *status)
+        FlightStates *state, Status *status)
 {
     static ZBRxResponse rx = ZBRxResponse();
     static char command = '\0';
@@ -232,7 +232,7 @@ void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, float GPS_data[],
   * @return void
   */
 void doCommand(char command, float GPS_data[], FlightStates *state,
-        InitStatus *status, XBee* radio, ZBTxRequest* txPacket)
+        Status *status, XBee* radio, ZBTxRequest* txPacket)
 {
     unsigned char payload[2] = {'G'};
     payload[1] = command;
@@ -353,7 +353,7 @@ void doCommand(char command, float GPS_data[], FlightStates *state,
  * @param  InitStatus *status - status of initialization
  * @return void
  */
-void radioStatus(XBee* radio, ZBTxRequest* txPacket, InitStatus *status)
+void radioStatus(XBee* radio, ZBTxRequest* txPacket, Status *status)
 {
     #ifdef NOSECONE
     static char statusByte = 0x00; //NOSECONE INDICATOR
