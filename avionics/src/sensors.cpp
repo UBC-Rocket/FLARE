@@ -83,15 +83,15 @@ void initSensors(std::vector<ISensor> sensors, std::vector<IHardware> hardware) 
         sensor.initSensor();
     }
 
-// TODO: figure out what to do with satcom
-#ifdef NOSECONE
+    // TODO: figure out what to do with satcom
+    #ifdef NOSECONE
     /*init satcom*/
     if (!SatComSetup()) {
         if (status->overview < NONCRITICAL_FAILURE)
             status->overview = NONCRITICAL_FAILURE;
         status->sensorNominal[SATCOM_STATUS_POSITION] = false;
     }
-#endif // NOSECONE
+    #endif // NOSECONE
 
     /* transmit sensor report */
     displayStatus(sensors, hardware);
@@ -103,7 +103,7 @@ void initSensors(std::vector<ISensor> sensors, std::vector<IHardware> hardware) 
  * @return void
  */
 void displayStatus(std::vector<ISensor> sensors,
-                   std::vector<IHardware> hardwares) {
+                   std::vector<IHardware> hardware) {
     // TODO: change this function to discern which sensors constitute a critical fail
     /*
     if (status->overview == CRITICAL_FAILURE) {
@@ -188,6 +188,23 @@ void displayStatus(std::vector<ISensor> sensors,
     }
 }
 
+Status getStatus(std::vector<ISensor> sensors, std::vector<IHardware> hardware) {
+    Status status = Status::NOMINAL;
+    for (ISensor &sensor : sensors) {
+        if (sensor.getStatus() == SensorStatus::FAILURE) {
+            status = Status::CRITICAL_FAILURE;
+            return status;
+        }
+    }
+
+    for (IHardware &hw : hardware) {
+        if (hw.getStatus() == HardwareStatus::FAILURE) {
+            status = Status::CRITICAL_FAILURE;
+            return status;
+        }
+    }
+}
+
 /**
   * @brief Polls all the sensors
   * @param timestamp pointer to store the timestamp value
@@ -215,11 +232,9 @@ void logData(unsigned long *timestamp, std::vector<ISensor> sensors,
              FlightStates state, float altitude, float baseline_pressure) {
     /*write data to SD card*/
     datalog.write(timestamp);
-    for (ISensor &sensor : sensors)
-    {
+    for (ISensor &sensor : sensors) {
         float *data = sensor.getData();
-        for (int i = 0; i < sensor.dataLength(); i++)
-        {
+        for (int i = 0; i < sensor.dataLength(); i++) {
             datalog.write(data[i]);
         }
     }
