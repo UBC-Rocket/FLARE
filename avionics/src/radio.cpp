@@ -189,7 +189,7 @@ void sendRadioNosecone(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
   * @param  InitStatus *status - status information, to be passed to doCommand
   * @return void
   */
-void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, float GPS_data[],
+void resolveRadioRx(XBee* radio, ZBTxRequest* txPacket, float* GPS_data,
         FlightStates *state, Status *status)
 {
     static ZBRxResponse rx = ZBRxResponse();
