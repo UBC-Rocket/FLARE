@@ -11,7 +11,7 @@ enum class SensorStatus {
 /**
  * @brief enum of all sensors
  */
-enum SensorType {
+enum class SensorType {
     ACCELEROMETER,
     BAROMETER,
     THERMOMETER,
