@@ -3,12 +3,13 @@
 
 #include "state_input_struct.h"
 
-enum class State{
+enum class StateId{
     STANDBY,
     ARMED,
     POWERED_ASCENT,
     PRE_AIR_START_COAST_TIMED,
     ASCENT_TO_APOGEE,
+    MACH_LOCK,
     PRESSURE_DELAY,
     DROGUE_DESCENT,
     MAIN_DESCENT,
@@ -20,15 +21,16 @@ enum class State{
 class IState {
 public:
     /*
-    * @brief Return the assigned enumeration code based in
-    * @return Enumeration.
+    * @brief Return the assigned enumeration code.
+    * @return Enumeration code.
     */
-    virtual State getStateEnum(void) = 0;
+    virtual StateId getStateEnum(void) = 0;
 
     /*
-    * @brief Retern the next state, based on input data (mostly from filtered sensor data)
+    * @brief Return the next state, based on input data (mostly from filtered sensor data)
+    * @return State enumeration code, to be passed into the std::map between codes and used states. Note that the returned code may be the same state.
     */
-    virtual State getNewState(StateInput data) = 0;
-}
+    virtual StateId getNewState(StateInput data) = 0;
+};
 
 #endif
