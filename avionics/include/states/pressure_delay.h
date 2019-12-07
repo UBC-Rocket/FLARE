@@ -9,12 +9,13 @@ namespace State {
 
     class PressureDelay : IState {
     public:
+        PressureDelay();
 
         /*
         * @brief Return the assigned enumeration code.
         * @return Enumeration code.
         */
-        StateId getStateEnum(void);
+        StateId getStateEnum(void){ return State::PressureDelay; }
 
         /*
         * @brief Return the next state, based on input data (mostly from filtered sensor data)

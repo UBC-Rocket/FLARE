@@ -1,10 +1,14 @@
 #include "states/standby.h"
 
-StateId StateObjects::Standby::getStateEnum(void){
+State::Standby::Standby() {
+
+}
+
+StateId State::Standby::getStateEnum(void){
     return State::STANDBY;
 }
 
-StateId StateObjects::Standby::getNewState(StateInput data){
+StateId State::Standby::getNewState(StateInput data){
 
 }
 

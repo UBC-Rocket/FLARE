@@ -1,10 +1,14 @@
 #include "states/landed.h"
 
-StateId StateObjects::Landed::getStateEnum(void){
+State::Landed::Landed() {
+
+}
+
+StateId State::Landed::getStateEnum(void){
     return State::LANDED;
 }
 
-StateId StateObjects::Landed::getNewState(StateInput data){
+StateId State::Landed::getNewState(StateInput data){
 
 }
 

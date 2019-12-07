@@ -1,10 +1,14 @@
 #include "states/main_descent.h"
 
-StateId StateObjects::MainDescent::getStateEnum(void){
+State::MainDescent::MainDescent() {
+
+}
+
+StateId State::MainDescent::getStateEnum(void){
     return State::MAIN_DESCENT;
 }
 
-StateId StateObjects::MainDescent::getNewState(StateInput data){
+StateId State::MainDescent::getNewState(StateInput data){
 
 }
 

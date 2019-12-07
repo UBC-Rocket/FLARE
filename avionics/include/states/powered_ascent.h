@@ -9,12 +9,13 @@ namespace State {
 
     class PoweredAscent : IState {
     public:
+        PoweredAscent();
 
         /*
         * @brief Return the assigned enumeration code.
         * @return Enumeration code.
         */
-        StateId getStateEnum(void);
+        StateId getStateEnum(void){ return State::PoweredAscent; }
 
         /*
         * @brief Return the next state, based on input data (mostly from filtered sensor data)

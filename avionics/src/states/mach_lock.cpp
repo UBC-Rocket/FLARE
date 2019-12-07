@@ -1,10 +1,14 @@
 #include "states/mach_lock.h"
 
-StateId StateObjects::MachLock::getStateEnum(void){
+State::MachLock::MachLock() {
+
+}
+
+StateId State::MachLock::getStateEnum(void){
     return State::MACH_LOCK;
 }
 
-StateId StateObjects::MachLock::getNewState(StateInput data){
+StateId State::MachLock::getNewState(StateInput data){
 
 }
 

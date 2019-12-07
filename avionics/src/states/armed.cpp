@@ -1,10 +1,14 @@
 #include "states/armed.h"
 
-StateId StateObjects::Armed::getStateEnum(void){
+State::Armed::Armed() {
+
+}
+
+StateId State::Armed::getStateEnum(void){
     return State::ARMED;
 }
 
-StateId StateObjects::Armed::getNewState(StateInput data){
+StateId State::Armed::getNewState(StateInput data){
 
 }
 

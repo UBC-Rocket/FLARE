@@ -9,12 +9,13 @@ namespace State {
 
     class MachLock : IState {
     public:
+        MachLock();
 
         /*
         * @brief Return the assigned enumeration code.
         * @return Enumeration code.
         */
-        StateId getStateEnum(void);
+        StateId getStateEnum(void){ return State::MachLock; }
 
         /*
         * @brief Return the next state, based on input data (mostly from filtered sensor data)

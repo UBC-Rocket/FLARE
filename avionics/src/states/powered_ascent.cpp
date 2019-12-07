@@ -1,10 +1,14 @@
 #include "states/powered_ascent.h"
 
-StateId StateObjects::PoweredAscent::getStateEnum(void){
+State::PoweredAscent::PoweredAscent() {
+
+}
+
+StateId State::PoweredAscent::getStateEnum(void){
     return State::POWERED_ASCENT;
 }
 
-StateId StateObjects::PoweredAscent::getNewState(StateInput data){
+StateId State::PoweredAscent::getNewState(StateInput data){
 
 }
 

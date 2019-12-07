@@ -9,12 +9,13 @@ namespace State {
 
     class WinterContingency : IState {
     public:
+        WinterContingency();
 
         /*
         * @brief Return the assigned enumeration code.
         * @return Enumeration code.
         */
-        StateId getStateEnum(void);
+        StateId getStateEnum(void){ return State::WinterContingency; }
 
         /*
         * @brief Return the next state, based on input data (mostly from filtered sensor data)

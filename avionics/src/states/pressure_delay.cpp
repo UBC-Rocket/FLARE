@@ -1,10 +1,14 @@
 #include "states/pressure_delay.h"
 
-StateId StateObjects::PressureDelay::getStateEnum(void){
+State::PressureDelay::PressureDelay() {
+
+}
+
+StateId State::PressureDelay::getStateEnum(void){
     return State::PRESSURE_DELAY;
 }
 
-StateId StateObjects::PressureDelay::getNewState(StateInput data){
+StateId State::PressureDelay::getNewState(StateInput data){
 
 }
 

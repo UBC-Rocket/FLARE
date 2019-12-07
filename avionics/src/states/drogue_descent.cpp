@@ -1,10 +1,14 @@
 #include "states/drogue_descent.h"
 
-StateId StateObjects::DrogueDescent::getStateEnum(void){
+State::DrogueDescent::DrogueDescent() {
+
+}
+
+StateId State::DrogueDescent::getStateEnum(void){
     return State::DROGUE_DESCENT;
 }
 
-StateId StateObjects::DrogueDescent::getNewState(StateInput data){
+StateId State::DrogueDescent::getNewState(StateInput data){
 
 }
 
