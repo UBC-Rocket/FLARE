@@ -4,11 +4,7 @@ State::Armed::Armed() {
 
 }
 
-StateId State::Armed::getStateEnum(void){
-    return State::ARMED;
-}
-
-StateId State::Armed::getNewState(StateInput data){
+StateId State::Armed::getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux){
 
 }
 

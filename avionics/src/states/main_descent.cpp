@@ -4,11 +4,7 @@ State::MainDescent::MainDescent() {
 
 }
 
-StateId State::MainDescent::getStateEnum(void){
-    return State::MAIN_DESCENT;
-}
-
-StateId State::MainDescent::getNewState(StateInput data){
+StateId State::MainDescent::getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux){
 
 }
 

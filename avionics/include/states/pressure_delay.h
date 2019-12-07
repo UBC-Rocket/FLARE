@@ -15,13 +15,13 @@ namespace State {
         * @brief Return the assigned enumeration code.
         * @return Enumeration code.
         */
-        StateId getStateEnum(void){ return State::PressureDelay; }
+        StateId getStateEnum(void){ return StateId::PRESSURE_DELAY; }
 
         /*
         * @brief Return the next state, based on input data (mostly from filtered sensor data)
         * @return State enumeration code, to be passed into the std::map between codes and used states. Note that the returned code may be the same state.
         */
-        StateId getNewState(StateInput data);
+        StateId getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux);
     }
 
 }

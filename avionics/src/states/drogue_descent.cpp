@@ -4,11 +4,7 @@ State::DrogueDescent::DrogueDescent() {
 
 }
 
-StateId State::DrogueDescent::getStateEnum(void){
-    return State::DROGUE_DESCENT;
-}
-
-StateId State::DrogueDescent::getNewState(StateInput data){
+StateId State::DrogueDescent::getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux){
 
 }
 

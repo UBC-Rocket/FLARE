@@ -2,9 +2,12 @@
 #define STATE_INPUT_STRUCT_H
 
 struct StateInput {
-    bool inAbort = false;
-    bool ignitorGood = false;
+    bool ignitor_good = false;
     float altitude;
 };
+
+struct StateAuxilliaryInfo {
+    bool in_abort = false;
+}
 
 #endif

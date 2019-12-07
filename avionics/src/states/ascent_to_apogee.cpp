@@ -4,11 +4,7 @@ State::AscentToApogee::AscentToApogee() {
 
 }
 
-StateId State::AscentToApogee::getStateEnum(void){
-    return State::ASCENT_TO_APOGEE;
-}
-
-StateId State::AscentToApogee::getNewState(StateInput data){
+StateId State::AscentToApogee::getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux){
 
 }
 

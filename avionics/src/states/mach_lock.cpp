@@ -4,11 +4,7 @@ State::MachLock::MachLock() {
 
 }
 
-StateId State::MachLock::getStateEnum(void){
-    return State::MACH_LOCK;
-}
-
-StateId State::MachLock::getNewState(StateInput data){
+StateId State::MachLock::getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux){
 
 }
 

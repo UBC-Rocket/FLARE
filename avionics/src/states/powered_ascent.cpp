@@ -4,11 +4,7 @@ State::PoweredAscent::PoweredAscent() {
 
 }
 
-StateId State::PoweredAscent::getStateEnum(void){
-    return State::POWERED_ASCENT;
-}
-
-StateId State::PoweredAscent::getNewState(StateInput data){
+StateId State::PoweredAscent::getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux){
 
 }
 

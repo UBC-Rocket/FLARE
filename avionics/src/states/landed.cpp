@@ -4,11 +4,7 @@ State::Landed::Landed() {
 
 }
 
-StateId State::Landed::getStateEnum(void){
-    return State::LANDED;
-}
-
-StateId State::Landed::getNewState(StateInput data){
+StateId State::Landed::getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux){
 
 }
 

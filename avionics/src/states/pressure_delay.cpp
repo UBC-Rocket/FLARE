@@ -4,11 +4,7 @@ State::PressureDelay::PressureDelay() {
 
 }
 
-StateId State::PressureDelay::getStateEnum(void){
-    return State::PRESSURE_DELAY;
-}
-
-StateId State::PressureDelay::getNewState(StateInput data){
+StateId State::PressureDelay::getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux){
 
 }
 

@@ -4,11 +4,7 @@ State::WinterContingency::WinterContingency() {
 
 }
 
-StateId State::WinterContingency::getStateEnum(void){
-    return State::WINTER_CONTINGENCY;
-}
-
-StateId State::WinterContingency::getNewState(StateInput data){
+StateId State::WinterContingency::getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux){
 
 }
 
