@@ -9,7 +9,8 @@ namespace State {
 
     class AscentToApogee : IState {
     public:
-        AscentToApogee();
+        AscentToApogee(int8_t const apogee_checks) :
+            M_APOGEE_CHECKS(apogee_checks){}
 
         /*
         * @brief Return the assigned enumeration code.
@@ -22,6 +23,9 @@ namespace State {
         * @return State enumeration code, to be passed into the std::map between codes and used states. Note that the returned code may be the same state.
         */
         StateId getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux);
+
+    private:
+        int8_t M_APOGEE_CHECKS;
     }
 
 }

@@ -42,6 +42,11 @@ namespace State {
         float M_MIN_ACCEPT_VERTICAL_ACCEL;
         float M_MAX_ACCEPT_ANGLE_FROM_VERTICAL;
 
+        /*
+        * @brief Does the heavy lifting of checking whether flight is nominal
+        * @param &input Reference to the input data structure
+        * @return boolean true if everything is fine; false if something is not right
+        */
         bool flightNominal(const StateInput &input);
     }
 

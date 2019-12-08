@@ -11,7 +11,7 @@ StateId State::PoweredAscent::getNewState(const StateInput &input, StateAuxillia
         burnout_checks = 0;
     }
 
-    if (burnout_checks > M_BURNOUT_CHECKS){
+    if (burnout_checks >= M_BURNOUT_CHECKS){
         return m_post_ascent_id;
     } else {
         return StateId::POWERED_ASCENT;

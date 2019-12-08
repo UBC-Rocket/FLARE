@@ -9,7 +9,7 @@ StateId State::Armed::getNewState(const StateInput &input, StateAuxilliaryInfo &
         armed_count = 0;
     }
 
-    if (armed_count > M_ARMED_CHECKS){
+    if (armed_count >= M_ARMED_CHECKS){
         return m_ascent_id;
     } else {
         return StateId::ARMED;

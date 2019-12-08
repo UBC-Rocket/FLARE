@@ -9,7 +9,7 @@ StateId State::Standby::getNewState(const StateInput &input, StateAuxilliaryInfo
         check_count = 0;
     }
 
-    if (check_count > M_STANDBY_CHECKS){
+    if (check_count >= M_STANDBY_CHECKS){
         return m_ascent_id;
     } else {
         return StateId::STANDBY;
