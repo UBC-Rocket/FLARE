@@ -9,7 +9,15 @@ namespace State {
 
     class MainDescent : IState {
     public:
-        MainDescent();
+        /*
+        * @param float LANDED_TIME_INTERVAL time between each landed check, in seconds
+        * @param uint8_t LANDED_CHECKS number of checks to perform
+        * @param float LANDED_VELOCITY maximum velocity to be considered as landed
+        */
+        MainDescent(float LANDED_TIME_INTERVAL, uint8_t LANDED_CHECKS, float LANDED_VELOCITY) :
+            M_LANDED_TIME_INTERVAL(LANDED_TIME_INTERVAL),
+            M_LANDED_CHECKS(LANDED_CHECKS),
+            M_LANDED_VELOCITY(LANDED_VELOCITY) {}
 
         /*
         * @brief Return the assigned enumeration code.
@@ -22,6 +30,12 @@ namespace State {
         * @return State enumeration code, to be passed into the std::map between codes and used states. Note that the returned code may be the same state.
         */
         StateId getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux);
+
+    private:
+        float M_LANDED_TIME_INTERVAL;
+        uint8_t M_LANDED_CHECKS;
+        float M_LANDED_VELOCITY;
+
     }
 
 }
