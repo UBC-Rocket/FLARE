@@ -9,7 +9,9 @@ namespace State {
 
     class MachLock : IState {
     public:
-        MachLock();
+        MachLock(uint8_t MACH_UNLOCK_CHECKS, float MACH_UNLOCK_VELOCITY) :
+            M_MACH_UNLOCK_CHECKS(MACH_UNLOCK_CHECKS),
+            M_MACH_UNLOCK_VELOCITY(MACH_UNLOCK_VELOCITY) {}
 
         /*
         * @brief Return the assigned enumeration code.
@@ -22,8 +24,11 @@ namespace State {
         * @return State enumeration code, to be passed into the std::map between codes and used states. Note that the returned code may be the same state.
         */
         StateId getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux);
-    }
 
+    private:
+        uint8_t M_MACH_UNLOCK_CHECKS;
+        float M_MACH_UNLOCK_VELOCITY;
+    }
 }
 #endif
 

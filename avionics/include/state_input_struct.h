@@ -6,6 +6,7 @@
 struct StateInput {
     bool ignitor_good = false;
     float altitude; //metres
+    float velocity_vertical; //metres, vertical
     Eigen::Vector3f accel_rocket; // m/s^2
     Eigen::Vector3f accel_ground; // m/s^2
     /*
