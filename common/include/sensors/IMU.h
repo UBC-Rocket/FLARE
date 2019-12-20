@@ -14,16 +14,21 @@
 #define IMU_STATUS_POSITION 5
 #define IMU_ADDRESS 0x28
 #if defined NOSECONE
-    #define IMU_DATA_ARRAY_SIZE 3
+#define IMU_DATA_ARRAY_SIZE 3
 #elif defined BODY
-    #define IMU_DATA_ARRAY_SIZE 9
+#define IMU_DATA_ARRAY_SIZE 9
 #endif
 
 class IMU : public ISensor {
-    public:
-    SensorStatus initSensor();
-    SensorStatus readData(float* data);
+public:
+    void initSensor();
+    void readData();
     uint8_t dataLength();
+    float *getData();
+    SensorStatus getStatus();
+
+private:
+    float data[IMU_DATA_ARRAY_SIZE];
 };
 
 #endif

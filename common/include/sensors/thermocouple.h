@@ -14,12 +14,14 @@
 
 class Thermocouple : public ISensor {
 public:
-SensorStatus initSensor();
-SensorStatus readData(float* data);
-uint8_t dataLength();
+    void initSensor();
+    void readData();
+    uint8_t dataLength();
+    float *getData();
+    SensorStatus getStatus();
 
 private:
-
+    float data[THERMOCOUPLE_DATA_ARRAY_SIZE];
 };
 
 #endif

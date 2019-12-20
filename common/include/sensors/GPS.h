@@ -1,7 +1,7 @@
 /*
  * GPS GP-20U7 Driver Header
  *
- * @file    GPS.cpp
+ * @file    GPS.h
  * @author  UBC Rocket Avionics 2018/2019
  * @description  File that receives GPS serial data and encodes it
  * with a TinyGPS parsing library.
@@ -59,42 +59,47 @@ THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
 VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!
 */
 
+#ifndef GPS_H
+#define GPS_H
+
+/**
+  * Thermocouple Sensor Class
+  */
+
 /*Includes------------------------------------------------------------*/
-#include "sensors/GPS.h"
+#include "sensors-interface.h"
+#include <HardwareSerial.h>
+#include <TinyGPS.h>
 
-SensorStatus GPS::initSensor() {
-    #ifdef TESTING
-            SerialUSB.println("Initializing GPS");
-        #endif
-        SerialGPS.begin(9600);  //baud rate 9600 for the GP-20U7
-        while (!SerialGPS) {}
+/*Constants------------------------------------------------------------*/
+#define SerialGPS               Serial1
+#define GPS_DATA_ARRAY_SIZE     3
+#define GPS_FIELD_LENGTH        20
+#define GPS_TIMEOUT     100
 
-    return SensorStatus::NOMINAL;
-}
+/*Variables------------------------------------------------------------*/
+/*GPS initialization commands*/
+const uint8_t GPS_reset_defaults[] =
+    {0xA0, 0xA1, 0x00, 0x02, 0x04, 0x00, 0x04, 0x0D, 0x0A};
+const uint8_t GPS_set_baud_rate[] =
+    {0xA0, 0xA1, 0x00, 0x04, 0x05, 0x00, 0x00, 0x00, 0x05, 0x0D, 0x0A}; //4800
+const uint8_t GPS_set_NMEA_message[] =
+    {0xA0, 0xA1, 0x00, 0x09, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x09, 0x0D, 0x0A}; //GPGGA
+const uint8_t GPS_set_update_rate[] =
+    {0xA0, 0xA1, 0x00, 0x03, 0x0E, 0x01, 0x00, 0x0F, 0x0D, 0x0A}; //1 Hz
 
-SensorStatus GPS::readData(float* data) {
+class GPS : public ISensor {
+public:
+    void initSensor();
+    void readData();
+    uint8_t dataLength();
+    float *getData();
+    SensorStatus getStatus();
 
-    boolean gpsSuccess = false;
-    elapsedMillis timeout;
-    while(SerialGPS.available() && (timeout < GPS_TIMEOUT)) {
-        char c = SerialGPS.read();
-        if (gps.encode(c)) {
-            gpsSuccess = true;
-            break;
-        }
-    }
+private:
+    static TinyGPS gps;
+    float data[GPS_DATA_ARRAY_SIZE];
+};
 
-    if(!gpsSuccess) {
-        return SensorStatus::NONCRITICAL_FAILURE;
-    }
-
-    unsigned long fix_age;
-    gps.f_get_position(&data[0], &data[1], &fix_age);
-    data[2] = gps.f_altitude();
-
-    return SensorStatus::NOMINAL;
-}
-
-uint8_t GPS::dataLength() {
-    return GPS_DATA_ARRAY_SIZE;
-}
+#endif

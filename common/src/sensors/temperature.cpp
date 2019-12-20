@@ -1,7 +1,7 @@
 /*Includes------------------------------------------------------------*/
 #include "sensors/temperature.h"
 
-SensorStatus Temperature::initSensor() {
+void Temperature::initSensor() {
     temp_sensor = new TMP102(TEMP_SENSOR_ADDRESS);
 
     /*init temp sensor*/
@@ -10,20 +10,22 @@ SensorStatus Temperature::initSensor() {
     #endif
     temp_sensor->begin();
 
-    return SensorStatus::NOMINAL;
+    status = SensorStatus::NOMINAL;
 }
 
-SensorStatus Temperature::readData(float* data) {
+void Temperature::readData() {
     #ifdef TESTING
         SerialUSB.println("Polling temperature sensor");
     #endif
 
     temp = temp_sensor->readTempC();
     data[0] = temp;
-
-    return SensorStatus::NOMINAL;
 }
 
 uint8_t Temperature::dataLength() {
     return TEMPERATURE_DATA_ARRAY_SIZE;
+}
+
+float *Temperature::getData() {
+    return data;
 }
