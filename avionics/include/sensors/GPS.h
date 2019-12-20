@@ -90,13 +90,16 @@ const uint8_t GPS_set_update_rate[] =
     {0xA0, 0xA1, 0x00, 0x03, 0x0E, 0x01, 0x00, 0x0F, 0x0D, 0x0A}; //1 Hz
 
 class GPS : public ISensor {
-    public:
-        SensorStatus initSensor();
-        SensorStatus readData(float* data);
-        uint8_t dataLength();
+public:
+    void initSensor();
+    void readData();
+    uint8_t dataLength();
+    float *getData();
+    SensorStatus getStatus();
 
-    private:
-        static TinyGPS gps;
+private:
+    static TinyGPS gps;
+    float data[GPS_DATA_ARRAY_SIZE];
 };
 
 #endif

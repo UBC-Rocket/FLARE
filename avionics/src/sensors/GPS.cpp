@@ -62,17 +62,17 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 /*Includes------------------------------------------------------------*/
 #include "sensors/GPS.h"
 
-SensorStatus GPS::initSensor() {
+void GPS::initSensor() {
     #ifdef TESTING
             SerialUSB.println("Initializing GPS");
         #endif
         SerialGPS.begin(9600);  //baud rate 9600 for the GP-20U7
         while (!SerialGPS) {}
 
-    return SensorStatus::NOMINAL;
+    status = SensorStatus::NOMINAL;
 }
 
-SensorStatus GPS::readData(float* data) {
+void GPS::readData() {
 
     boolean gpsSuccess = false;
     elapsedMillis timeout;
@@ -85,16 +85,20 @@ SensorStatus GPS::readData(float* data) {
     }
 
     if(!gpsSuccess) {
-        return SensorStatus::NONCRITICAL_FAILURE;
+        status = SensorStatus::FAILURE;
     }
 
     unsigned long fix_age;
     gps.f_get_position(&data[0], &data[1], &fix_age);
     data[2] = gps.f_altitude();
 
-    return SensorStatus::NOMINAL;
+    status = SensorStatus::NOMINAL;
 }
 
 uint8_t GPS::dataLength() {
     return GPS_DATA_ARRAY_SIZE;
+}
+
+float *GPS::getData() {
+    return data;
 }
