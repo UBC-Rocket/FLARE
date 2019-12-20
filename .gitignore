@@ -1,4 +1,5 @@
-/common/.pio/*
+.pio/*
 **/.vscode/*
 /common/build/*
 *.DS_Store
+
