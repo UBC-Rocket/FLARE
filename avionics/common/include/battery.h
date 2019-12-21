@@ -42,7 +42,8 @@ class Battery
          * @param  None
          * @return OverallError - battery status
          */
-        OverallError getStatus();
+        // TODO: Commented out since it's not used and keeping it in leads to a compile error - this should get properly refactored at some point
+        // OverallError getStatus();
 
     private:
         float m_divider;
