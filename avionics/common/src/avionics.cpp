@@ -174,7 +174,9 @@ void setup() {
 
     /* init sensors and report status in many ways */
     initSensors(sensors, hardware);
-    radioStatus(&s_radio, &s_txPacket, &s_statusOfInit);
+
+    //TODO - build this out
+    // radioStatus(&s_radio, &s_txPacket, &s_statusOfInit);
 
     /* init various arrays */
     barometer.readData();
