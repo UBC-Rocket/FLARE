@@ -43,7 +43,7 @@ CSVWrite datalog;
   * @return void
   */
 
-void initSensors(std::vector<ISensor> sensors, std::vector<IHardware> hardware) {
+void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware) {
     // if(powerbattery.getVoltage() <= LOW_BATTERY_VOLTAGE)
     // { //TODO: Uncomment once the battery sensor is implemented
     //     status->sensorNominal[BATTERY_STATUS_POSITION] = false;
@@ -74,13 +74,13 @@ void initSensors(std::vector<ISensor> sensors, std::vector<IHardware> hardware) 
     stop_record();
 
     /*init hardware*/
-    for (IHardware &hw : hardware) {
-        hw.init();
+    for (auto hw : hardware) {
+        hw.get().init();
     }
 
     /*init sensors*/
-    for (ISensor &sensor : sensors) {
-        sensor.initSensor();
+    for (auto sensor : sensors) {
+        sensor.get().initSensor();
     }
 
     // TODO: figure out what to do with satcom
@@ -102,8 +102,7 @@ void initSensors(std::vector<ISensor> sensors, std::vector<IHardware> hardware) 
  * @param  InitStatus *status - status of initialization.
  * @return void
  */
-void displayStatus(std::vector<ISensor> sensors,
-                   std::vector<IHardware> hardware) {
+void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware) {
     // TODO: change this function to discern which sensors constitute a critical fail
     /*
     if (status->overview == CRITICAL_FAILURE) {
@@ -154,8 +153,8 @@ void displayStatus(std::vector<ISensor> sensors,
 
     return;
     */
-    for (ISensor &sensor : sensors) {
-        if (sensor.getStatus() == SensorStatus::FAILURE) {
+    for (auto sensor : sensors) {
+        if (sensor.get().getStatus() == SensorStatus::FAILURE) {
             #ifdef TESTING
             SerialUSB.println("Critical failure in one of a Sensor! >:-{");
             #endif
@@ -188,17 +187,17 @@ void displayStatus(std::vector<ISensor> sensors,
     }
 }
 
-Status getStatus(std::vector<ISensor> sensors, std::vector<IHardware> hardware) {
+Status getStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware) {
     Status status = Status::NOMINAL;
-    for (ISensor &sensor : sensors) {
-        if (sensor.getStatus() == SensorStatus::FAILURE) {
+    for (auto sensor : sensors) {
+        if (sensor.get().getStatus() == SensorStatus::FAILURE) {
             status = Status::CRITICAL_FAILURE;
             return status;
         }
     }
 
-    for (IHardware &hw : hardware) {
-        if (hw.getStatus() == HardwareStatus::FAILURE) {
+    for (auto hw : hardware) {
+        if (hw.get().getStatus() == HardwareStatus::FAILURE) {
             status = Status::CRITICAL_FAILURE;
             return status;
         }
@@ -210,11 +209,11 @@ Status getStatus(std::vector<ISensor> sensors, std::vector<IHardware> hardware) 
   * @param timestamp pointer to store the timestamp value
   * @param sensors the sensors to poll
   */
-void pollSensors(unsigned long *timestamp, std::vector<ISensor> sensors) {
+void pollSensors(unsigned long *timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors) {
     *timestamp = millis();
 
-    for (ISensor &sensor : sensors) {
-        sensor.readData();
+    for (auto sensor : sensors) {
+        sensor.get().readData();
     }
 
     // *battery_voltage = powerbattery.getVoltage();
@@ -228,13 +227,14 @@ void pollSensors(unsigned long *timestamp, std::vector<ISensor> sensors) {
   * @param altitude Calculated rocket altitude, after filtering
   * @param baseline_pressure Pressure used as "ground level"
   */
-void logData(unsigned long timestamp, std::vector<ISensor> sensors,
+void logData(unsigned long timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors,
              FlightStates state, float altitude, float baseline_pressure) {
+
     /*write data to SD card*/
     datalog.write(timestamp);
-    for (ISensor &sensor : sensors) {
-        float *data = sensor.getData();
-        for (int i = 0; i < sensor.dataLength(); i++) {
+    for (auto sensor : sensors) {
+        float *data = sensor.get().getData();
+        for (int i = 0; i < sensor.get().dataLength(); i++) {
             datalog.write(data[i]);
         }
     }

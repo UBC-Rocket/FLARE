@@ -58,6 +58,8 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
  */
 
 /* Includes------------------------------------------------------------*/
+#include <functional> //for std::reference_wrapper
+
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <SD.h>
@@ -109,8 +111,8 @@ static XBee s_radio = XBee();
 static XBeeAddress64 s_gndAddr = XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB);
 static ZBTxRequest s_txPacket = ZBTxRequest();
 
-std::vector<ISensor> sensors;      // Sensors
-std::vector<IHardware> hardwares;  // Hardwares
+std::vector<std::reference_wrapper<ISensor> > sensors;      // Sensors
+std::vector<std::reference_wrapper<IHardware> > hardware;  // Hardwares
 
 Accelerometer accelerometer;
 Barometer barometer;
@@ -123,7 +125,7 @@ Thermocouple thermocouple;
 
 inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp);
 void blinkStatusLED();
-void pollSensors() {}
+void pollSensors() {} //??
 
 /**
   * @brief  The Arduino setup function
@@ -171,7 +173,7 @@ void setup() {
     sensors.push_back(thermocouple);
 
     /* init sensors and report status in many ways */
-    initSensors(sensors, hardwares);
+    initSensors(sensors, hardware);
     radioStatus(&s_radio, &s_txPacket, &s_statusOfInit);
 
     /* init various arrays */

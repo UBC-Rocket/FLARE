@@ -23,6 +23,7 @@
 
 /*Includes------------------------------------------------------------*/
 // #include <stdint.h>
+#include <functional> //for std::reference_wrapper
 #include <vector>
 
 #include "sensors-interface.h"
@@ -56,16 +57,16 @@ enum class Status {
 
 /*Functions------------------------------------------------------------*/
 
-void initSensors(std::vector<ISensor> sensors, std::vector<IHardware> hardware);
+void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware);
 
-void displayStatus(std::vector<ISensor> sensors, std::vector<IHardware> hardware);
+void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware);
 
-Status getStatus(std::vector<ISensor> sensors, std::vector<IHardware> hardware);
+Status getStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware);
 
 // TODO: Remove dependency of sensors.h for MAX31855k.cpp/.h and GP20U7.cpp/.h
 
-void pollSensors(unsigned long *timestamp, std::vector<ISensor> sensors);
+void pollSensors(unsigned long *timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors);
 
-void logData(unsigned long timestamp, std::vector<ISensor> sensors,                    FlightStates state, float altitude, float baseline_pressure);
+void logData(unsigned long timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors,                    FlightStates state, float altitude, float baseline_pressure);
 
 #endif
