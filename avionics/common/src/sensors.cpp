@@ -202,6 +202,7 @@ Status getStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::ve
             return status;
         }
     }
+    return status;
 }
 
 /**

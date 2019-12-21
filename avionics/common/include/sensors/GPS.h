@@ -59,8 +59,8 @@ THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
 VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!
 */
 
-#ifndef GPS_H
-#define GPS_H
+#ifndef SENSORS__GPS_H
+#define SENSORS__GPS_H
 
 /**
   * Thermocouple Sensor Class
@@ -98,7 +98,7 @@ public:
     SensorStatus getStatus();
 
 private:
-    static TinyGPS gps;
+    TinyGPS gps;
     float data[GPS_DATA_ARRAY_SIZE];
 };
 
