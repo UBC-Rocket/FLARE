@@ -266,7 +266,7 @@ void loop() {
                 altitude, baseline_pressure, thermocouple_data);
         */
 
-        logData(&timestamp, sensors, state, altitude, baseline_pressure);
+        logData(timestamp, sensors, state, altitude, baseline_pressure);
     }
 
     // Send logged data across radio (as backup/early access to SD card logs)

@@ -66,6 +66,6 @@ Status getStatus(std::vector<ISensor> sensors, std::vector<IHardware> hardware);
 
 void pollSensors(unsigned long *timestamp, std::vector<ISensor> sensors);
 
-void logData(unsigned long *timestamp, std::vector<ISensor> sensors,                    FlightStates state, float altitude, float baseline_pressure);
+void logData(unsigned long timestamp, std::vector<ISensor> sensors,                    FlightStates state, float altitude, float baseline_pressure);
 
 #endif

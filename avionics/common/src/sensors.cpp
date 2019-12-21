@@ -228,7 +228,7 @@ void pollSensors(unsigned long *timestamp, std::vector<ISensor> sensors) {
   * @param altitude Calculated rocket altitude, after filtering
   * @param baseline_pressure Pressure used as "ground level"
   */
-void logData(unsigned long *timestamp, std::vector<ISensor> sensors,
+void logData(unsigned long timestamp, std::vector<ISensor> sensors,
              FlightStates state, float altitude, float baseline_pressure) {
     /*write data to SD card*/
     datalog.write(timestamp);
