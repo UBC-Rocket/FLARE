@@ -74,7 +74,7 @@ void GPS::initSensor() {
 
 void GPS::readData() {
 
-    boolean gpsSuccess = false;
+    bool gpsSuccess = false;
     elapsedMillis timeout;
     while(SerialGPS.available() && (timeout < GPS_TIMEOUT)) {
         char c = SerialGPS.read();
