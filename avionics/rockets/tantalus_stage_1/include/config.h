@@ -10,6 +10,7 @@
 #include "states/pre_air_start_coast_timed.h"
 #include "states/mach_lock.h"
 #include "states/ascent_to_apogee.h"
+#include "states/pressure_delay.h"
 #include "states/drogue_descent.h"
 #include "states/main_descent.h"
 #include "states/landed.h"
@@ -29,9 +30,9 @@ static State::PreAirStartCoastTimed state_prestage_coast = State::PreAirStartCoa
         PRESTAGE_MAX_ACCEPT_ANGLE_FROM_VERTICAL
     );
 
-static State::AscentToApogee state_coast = State::AscentToApogee(APOGEE_CHECKS, MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY);
+static State::AscentToApogee state_coast = State::AscentToApogee(APOGEE_CHECKS, MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD);
 
-static State::MachLock state_mach_lock = State::MachLock(MACH_UNLOCK_CHECKS, MACH_UNLOCK_THRESHOLD);
+static State::MachLock state_mach_lock = State::MachLock(MACH_UNLOCK_CHECKS, MACH_UNLOCK_VELOCITY_THRESHOLD);
 
 static State::PressureDelay state_pres_delay = State::PressureDelay(APOGEE_PRESSURE_DELAY);
 

@@ -24,7 +24,7 @@ namespace State {
         StateId getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux) {
             return StateId::LANDED;
         }
-    }
+    };
 
 }
 #endif

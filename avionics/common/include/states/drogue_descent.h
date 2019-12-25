@@ -20,7 +20,7 @@ namespace State {
         * @brief Return the assigned enumeration code.
         * @return Enumeration code.
         */
-        StateId getStateEnum(void) const {
+        StateId getStateEnum(void) {
             return StateId::DROGUE_DESCENT;
         }
 
@@ -33,7 +33,7 @@ namespace State {
     private:
         float const M_MAIN_DEPLOY_ALTITUDE;
         int8_t const M_DEPLOY_CHECKS;
-    }
+    };
 
 }
 #endif

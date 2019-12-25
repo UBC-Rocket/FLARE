@@ -36,7 +36,7 @@ namespace State {
         StateId m_ascent_id;
         int M_ARMED_CHECKS;
         int M_LAUNCH_THRESHOLD;
-    }
+    };
 
 }
 #endif

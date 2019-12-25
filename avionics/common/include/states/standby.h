@@ -15,7 +15,7 @@ namespace State {
         * @param STANDBY_CHECKS Number of checks to make in a row before determining that rocket has launched.
         * @param LAUNCH_THRESHOLD Altitude (AGL) above which launch detection starts checking.
         */
-        StateId(const StateId ascent_id, uint8_t const STANDBY_CHECKS, float const LAUNCH_THRESHOLD) :
+        Standby(StateId const ascent_id, uint8_t const STANDBY_CHECKS, float const LAUNCH_THRESHOLD) :
               m_ascent_id(ascent_id)
             , M_STANDBY_CHECKS(STANDBY_CHECKS)
             , M_LAUNCH_THRESHOLD(LAUNCH_THRESHOLD) {}
@@ -36,7 +36,7 @@ namespace State {
         StateId m_ascent_id;
         int M_STANDBY_CHECKS;
         float M_LAUNCH_THRESHOLD;
-    }
+    };
 }
 #endif
 

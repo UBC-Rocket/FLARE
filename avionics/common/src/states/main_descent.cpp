@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "states/main_descent.h"
 
 StateId State::MainDescent::getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux){
@@ -16,7 +17,7 @@ StateId State::MainDescent::getNewState(const StateInput &input, StateAuxilliary
         if (num_checks < M_LANDED_CHECKS) {
             return StateId::MAIN_DESCENT;
         }
-        prev_time = curr_time
+        prev_time = curr_time;
     }
 
     return StateId::LANDED;

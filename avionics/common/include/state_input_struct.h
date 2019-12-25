@@ -2,6 +2,7 @@
 #define STATE_INPUT_STRUCT_H
 
 #include "Eigen/Core"
+#include "Eigen/Geometry"
 
 struct StateInput {
     bool ignitor_good = false;
@@ -16,6 +17,6 @@ struct StateInput {
 
 struct StateAuxilliaryInfo {
     bool in_abort = false;
-}
+};
 
 #endif

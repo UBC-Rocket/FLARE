@@ -28,7 +28,7 @@ namespace State {
     private:
         uint8_t M_MACH_UNLOCK_CHECKS;
         float M_MACH_UNLOCK_VELOCITY;
-    }
+    };
 }
 #endif
 

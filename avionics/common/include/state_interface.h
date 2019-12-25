@@ -30,7 +30,7 @@ public:
     * @brief Return the next state, based on input data (mostly from filtered sensor data)
     * @return State enumeration code, to be passed into the std::map between codes and used states. Note that the returned code may be the same state.
     */
-    virtual StateId getNewState(StateInput data) = 0;
+    virtual StateId getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux) = 0;
 };
 
 #endif

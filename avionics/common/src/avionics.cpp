@@ -79,6 +79,8 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "sensors.h"
 #include "statemachine.h"
 
+#include "config.h"
+
 /* Errors---------------------------------------------------------------*/
 #if defined NOSECONE && defined BODY
 #error Only one of NOSECONE and BODY may be defined!

@@ -36,7 +36,7 @@ namespace State {
         uint8_t M_LANDED_CHECKS;
         float M_LANDED_VELOCITY;
 
-    }
+    };
 
 }
 #endif

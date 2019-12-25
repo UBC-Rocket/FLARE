@@ -11,7 +11,7 @@ namespace State {
     public:
         AscentToApogee(uint8_t const APOGEE_CHECKS, uint8_t const MACH_LOCK_CHECKS, float MACH_LOCK_VELOCITY) :
             M_APOGEE_CHECKS(APOGEE_CHECKS),
-            M_MACH_LOCK_CHECKS(MACH_LOCK_CHECKS)
+            M_MACH_LOCK_CHECKS(MACH_LOCK_CHECKS),
             M_MACH_LOCK_VELOCITY(MACH_LOCK_VELOCITY) {}
 
         /*
@@ -30,7 +30,7 @@ namespace State {
         uint8_t M_APOGEE_CHECKS;
         uint8_t M_MACH_LOCK_CHECKS;
         float M_MACH_LOCK_VELOCITY;
-    }
+    };
 
 }
 #endif

@@ -51,7 +51,7 @@ namespace State {
         * @return boolean true if everything is fine; false if something is not right
         */
         bool flightNominal(const StateInput &input);
-    }
+    };
 
 }
 #endif

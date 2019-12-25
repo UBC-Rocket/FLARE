@@ -27,7 +27,7 @@ namespace State {
     private:
         StateId m_post_ascent_id;
         int M_BURNOUT_CHECKS;
-    }
+    };
 
 }
 #endif

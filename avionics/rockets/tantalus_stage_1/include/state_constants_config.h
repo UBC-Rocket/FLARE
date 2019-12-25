@@ -19,8 +19,8 @@ constexpr float PRESTAGE_MIN_ACCEPT_VERTICAL_ACCEL = -50; //m/s^2
 constexpr float PRESTAGE_MAX_ACCEPT_ANGLE_FROM_VERTICAL = 1.57; //radians
 
 constexpr float LAUNCH_THRESHOLD = 25; //m
-constexpr float MACH_THRESHOLD = 155; //m/s
-constexpr float MACH_UNLOCK_THRESHOLD = 150; //m/s
+constexpr float MACH_LOCK_VELOCITY_THRESHOLD = 155; //m/s
+constexpr float MACH_UNLOCK_VELOCITY_THRESHOLD = 150; //m/s
 constexpr float MAIN_DEPLOY_ALTITUDE = 488; //m - converted from 1500 ft
 
 constexpr uint32_t LAND_CHECK_TIME_INTERVAL = 10000; //ms
