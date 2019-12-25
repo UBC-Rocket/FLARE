@@ -9,6 +9,9 @@ namespace State {
 
     class PreAirStartCoastTimed : IState {
     public:
+        /**
+         * @brief Constructor. Altitudes are in metres above ground level (AGL), accelerations in m/s^2. Angle is in radians.
+         */
         PreAirStartCoastTimed(
             uint32_t const DELAY_TIME_MS,
             float MAX_ACCEPT_ALTITUDE,
@@ -22,7 +25,7 @@ namespace State {
             M_MIN_ACCEPT_VERTICAL_ACCEL(MIN_ACCEPT_VERTICAL_ACCEL),
             M_MAX_ACCEPT_ANGLE_FROM_VERTICAL(MAX_ACCEPT_ANGLE_FROM_VERTICAL) {}
 
-        /*
+        /**
         * @brief Return the assigned enumeration code.
         * @return Enumeration code.
         */

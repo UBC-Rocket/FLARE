@@ -9,7 +9,13 @@ namespace State {
 
     class Armed : IState {
     public:
-        Armed(const ascent_id, int const ARMED_CHECKS, int const LAUNCH_THRESHOLD) :
+        /**
+        * @brief Constructor
+        * @param ascent_id State to go to if launch is detected in standby.
+        * @param ARMED_CHECKS Number of checks to make in a row before determining that rocket has launched.
+        * @param LAUNCH_THRESHOLD Altitude (AGL) above which launch detection starts checking.
+        */
+        Armed(StateId const ascent_id, int const ARMED_CHECKS, int const LAUNCH_THRESHOLD) :
               m_ascent_id(ascent_id)
             , M_ARMED_CHECKS(ARMED_CHECKS)
             , M_LAUNCH_THRESHOLD(LAUNCH_THRESHOLD) {}
