@@ -177,6 +177,14 @@ void setup() {
     /* init sensors and report status in many ways */
     initSensors(sensors, hardware);
 
+    /* TODO - make this not constant */
+    state_input.ignitor_good = true;
+    state_input.altitude = 5;
+    state_input.velocity_vertical = 0;
+    state_input.accel_ground = (Eigen::Vector3f() << 10.0f, 0.0f, 0.0f).finished();
+    state_input.accel_rocket = (Eigen::Vector3f() << 10.0f, 0.0f, 0.0f).finished();
+    state_input.orientation = Eigen::Quaternionf().Identity();
+
     //TODO - build this out
     // radioStatus(&s_radio, &s_txPacket, &s_statusOfInit);
 
@@ -262,10 +270,11 @@ void loop() {
                         &delta_altitude, &baseline_pressure,
                         &delta_time, pressure_set, delta_time_set);
 
-        stateMachine(&altitude, &delta_altitude, &prev_altitude,
-                     bar_data, &baseline_pressure, &ground_altitude,
-                     ground_alt_arr, &state);
+        // stateMachine(&altitude, &delta_altitude, &prev_altitude,
+        //              bar_data, &baseline_pressure, &ground_altitude,
+        //              ground_alt_arr, &state);
 
+        current_state = state_hash_map[current_state]->getNewState(state_input, state_aux);
         /*
         logData(&timestamp, &battery_voltage, acc_data, bar_data,
                 &temp_sensor_data, IMU_data, GPS_data, state,
