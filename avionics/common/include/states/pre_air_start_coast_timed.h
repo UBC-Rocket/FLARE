@@ -7,7 +7,7 @@
 
 namespace State {
 
-    class PreAirStartCoastTimed : IState {
+    class PreAirStartCoastTimed : public IState {
     public:
         /**
          * @brief Constructor. Altitudes are in metres above ground level (AGL), accelerations in m/s^2. Angle is in radians.

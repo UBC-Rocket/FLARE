@@ -7,7 +7,7 @@
 
 namespace State {
 
-    class Landed : IState {
+    class Landed : public IState {
     public:
         Landed(){}
 

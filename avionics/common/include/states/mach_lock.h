@@ -7,7 +7,7 @@
 
 namespace State {
 
-    class MachLock : IState {
+    class MachLock : public IState {
     public:
         MachLock(uint8_t MACH_UNLOCK_CHECKS, float MACH_UNLOCK_VELOCITY) :
             M_MACH_UNLOCK_CHECKS(MACH_UNLOCK_CHECKS),

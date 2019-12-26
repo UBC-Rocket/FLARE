@@ -7,7 +7,7 @@
 
 namespace State {
 
-    class PoweredAscent : IState {
+    class PoweredAscent : public IState {
     public:
         PoweredAscent(StateId const post_ascent_id, int const BURNOUT_CHECKS) : m_post_ascent_id(post_ascent_id),
             M_BURNOUT_CHECKS(BURNOUT_CHECKS) {}

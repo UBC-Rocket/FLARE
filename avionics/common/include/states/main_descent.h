@@ -7,7 +7,7 @@
 
 namespace State {
 
-    class MainDescent : IState {
+    class MainDescent : public IState {
     public:
         /**
         * @param LANDED_TIME_INTERVAL time between each landed check, in milliseconds

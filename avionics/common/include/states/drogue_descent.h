@@ -7,7 +7,7 @@
 
 namespace State {
 
-    class DrogueDescent : IState {
+    class DrogueDescent : public IState {
     public:
         /*
         * @param MAIN_DEPLOY_ALTITUDE altitude to deploy main parachute at, in metres

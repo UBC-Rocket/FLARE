@@ -7,7 +7,7 @@
 
 namespace State {
 
-    class Standby : IState {
+    class Standby : public IState {
     public:
         /**
         * @brief Constructor

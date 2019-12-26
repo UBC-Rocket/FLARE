@@ -7,7 +7,7 @@
 
 namespace State {
 
-    class PressureDelay : IState {
+    class PressureDelay : public IState {
     public:
         PressureDelay(uint32_t const DELAY_TIME_MS):
             M_DELAY_TIME_MS(DELAY_TIME_MS) {}

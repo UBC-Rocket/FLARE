@@ -7,7 +7,7 @@
 
 namespace State {
 
-    class WinterContingency : IState {
+    class WinterContingency : public IState {
     public:
         WinterContingency(){}
 

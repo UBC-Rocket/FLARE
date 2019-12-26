@@ -7,7 +7,7 @@
 
 namespace State {
 
-    class Armed : IState {
+    class Armed : public IState {
     public:
         /**
         * @brief Constructor

@@ -7,7 +7,7 @@
 
 namespace State {
 
-    class AscentToApogee : IState {
+    class AscentToApogee : public IState {
     public:
         AscentToApogee(uint8_t const APOGEE_CHECKS, uint8_t const MACH_LOCK_CHECKS, float MACH_LOCK_VELOCITY) :
             M_APOGEE_CHECKS(APOGEE_CHECKS),
