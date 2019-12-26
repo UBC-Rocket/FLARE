@@ -135,7 +135,7 @@ void pollSensors() {} //??
   * @return None
   */
 void setup() {
-    int i;
+    int i; //used as loop variable
     initPins();
 
 /* Setup all UART comms */

@@ -1,6 +1,7 @@
 #ifndef STATE_INTERFACE_H
 #define STATE_INTERFACE_H
 
+#include <functional> //for std::hash specialization (need to specialize)
 #include "state_input_struct.h"
 
 enum class StateId{
@@ -17,6 +18,12 @@ enum class StateId{
     WINTER_CONTINGENCY
 };
 
+//Need to specify hash for StateId, since they scoped enums allowed as hash keys until C++14
+template <> struct std::hash<StateId> {
+    std::size_t operator()(const StateId& t) const {
+        return std::hash<int>{}(static_cast<int>(t));
+    }
+};
 
 class IState {
 public:

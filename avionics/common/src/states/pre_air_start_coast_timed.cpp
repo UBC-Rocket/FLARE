@@ -15,7 +15,7 @@ bool State::PreAirStartCoastTimed::flightNominal(const StateInput &input){
         || input.altitude < M_MIN_ACCEPT_ALTITUDE
         || input.accel_ground(0) > M_MAX_ACCEPT_VERTICAL_ACCEL
         || input.accel_ground(0) < M_MIN_ACCEPT_VERTICAL_ACCEL
-        || !input.ignitor_good {
+        || !input.ignitor_good ){
         return false;
     }
 

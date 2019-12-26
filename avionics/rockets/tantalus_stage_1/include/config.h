@@ -4,6 +4,7 @@
 #include <unordered_map> //for std::unordered_map (hash map)
 
 #include "state_constants_config.h"
+
 #include "states/standby.h"
 #include "states/armed.h"
 #include "states/powered_ascent.h"
@@ -54,6 +55,7 @@ static std::unordered_map<StateId, IState*> state_hash_map = {
     {StateId::MAIN_DESCENT, &state_main},
     {StateId::LANDED, &state_landed}
 };
+
 
 static StateId current_state = StateId::STANDBY;
 
