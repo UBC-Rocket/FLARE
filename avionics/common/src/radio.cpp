@@ -119,6 +119,13 @@ SubPktPtr RadioQueue::popFront() {
     return tmp;
 }
 
+void RadioController::addSubpacket(SubPktPtr dat) {
+    m_tx_q.push(std::move(dat));
+}
+
+void RadioController::listenAndAct(){
+    //TODO - fill out.
+}
 
 
 

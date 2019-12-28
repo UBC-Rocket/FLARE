@@ -33,8 +33,9 @@
 
 /*Constants------------------------------------------------------------*/
 /* radio addressing */
-#define GND_STN_ADDR_MSB 0x0013A200 //Ground Station - Body
-#define GND_STN_ADDR_LSB 0x41678FC0
+constexpr uint64_t GND_STN_ADDR_MSB = 0x0013A200; //Ground Station - Body
+constexpr uint64_t GND_STN_ADDR_LSB = 0x41678FC0;
+constexpr uint32_t RADIO_BAUD_RATE = 921600;
 
 /*Classes--------------------------------------------------------------*/
 
@@ -42,7 +43,7 @@ typedef std::unique_ptr<std::vector<int>> SubPktPtr;
 
 class RadioQueue {
 public:
-    RadioQueue(unsigned short const MAX_BYTES = 800) : M_MAX_BYTES(MAX_BYTES) {}
+    RadioQueue(unsigned short const MAX_BYTES) : M_MAX_BYTES(MAX_BYTES) {}
 
     /**
      * @brief Push a subpacket to the queue. If the pointer is a null pointer or the size is too large, it will silently fail.
@@ -71,6 +72,42 @@ private:
     static constexpr unsigned short MAX_SUBPACKET_SIZE = 255;
 };
 
+class RadioController {
+public:
+    /**
+     * @brief Constructor.
+     * @param MAX_QUEUED_BYTES Maximum number of subpacket data bytes to queue before dropping the oldest subpackets.
+     * @param SERIAL_RADIO Uninitialized HardwareSerial used for radio (e.g. SerialRadio)
+     */
+    RadioController(HardwareSerial &serial_radio,
+            unsigned short const MAX_QUEUED_BYTES = 800) :
+        m_gnd_addr(XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB)),
+        m_tx_q(MAX_QUEUED_BYTES) {
+
+        serial_radio.begin(RADIO_BAUD_RATE);
+        while (!SerialRadio);
+        m_xbee.setSerial(serial_radio);
+        m_tx_packet.setAddress64(m_gnd_addr);
+    }
+
+    /**
+     * Add a subpacket to the queue to be sent. Note that this is a rather low-level utility; there should also be a helper method for any given subpacket that will build up the specific format this needs that you should use instead.
+     * @param dat A SubPktPtr (refer to typedef) containing the data.
+     */
+    void addSubpacket(SubPktPtr dat);
+
+    /**
+     * @brief Meat of the action - listens for any incoming packets, then transmits data and performs rocket actions as necessary.
+     */
+    void listenAndAct();
+
+private:
+    XBee m_xbee;
+    XBeeAddress64 m_gnd_addr;
+    ZBTxRequest m_tx_packet;
+
+    RadioQueue m_tx_q;
+};
 
 
 /*Functions------------------------------------------------------------*/
