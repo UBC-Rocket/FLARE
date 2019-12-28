@@ -18,6 +18,7 @@
 
 /*Includes------------------------------------------------------------*/
 #include <utility> //for std::move
+#include <algorithm> //for std::copy
 
 #include "radio.h"
 
@@ -102,10 +103,12 @@ The first bit (0x01) is reserved for identifing Nosecone vs Body
 void RadioQueue::push(SubPktPtr subpacket) {
     if(!subpacket) //check for null pointer
         return;
-    if(subpacket->size() > MAX_SUBPACKET_SIZE)
+    if(subpacket->size() > RADIO_MAX_SUBPACKET_SIZE)
         return;
 
+    m_subpacket_q.push_back(std::move(subpacket));
     m_byte_count += subpacket->size();
+
     while (m_byte_count > M_MAX_BYTES){
         popFront();
     }
@@ -114,9 +117,42 @@ void RadioQueue::push(SubPktPtr subpacket) {
 
 SubPktPtr RadioQueue::popFront() {
     SubPktPtr tmp = std::move(m_subpacket_q.front());
-    m_subpacket_q.pop();
+    m_subpacket_q.pop_front();
     m_byte_count -= tmp->size();
     return tmp;
+}
+
+uint8_t RadioQueue::fillPayload(uint8_t *payload){
+    if (m_byte_count <= RADIO_MAX_SUBPACKET_SIZE){
+        //Can fit everything in queue into payload.
+        return dumpAllIntoPayload(payload);
+    } else {
+        return dispenseIntoPayload(payload);
+    }
+}
+
+uint8_t RadioQueue::dumpAllIntoPayload(uint8_t *payload){
+    uint8_t start_byte_count = m_byte_count;
+    for (SubPktPtr &i : m_subpacket_q) {
+        payload = std::copy(i->begin(), i->end(), payload);
+    }
+    m_byte_count = 0;
+    m_subpacket_q.clear();
+    return start_byte_count;
+}
+
+uint8_t RadioQueue::dispenseIntoPayload(uint8_t *payload){
+    unsigned short used = 0;
+    SubPktPtr i;
+    while(true){
+        if (used + m_subpacket_q.front()->size() <= RADIO_MAX_SUBPACKET_SIZE){
+            i = popFront();
+            payload = std::copy(i->begin(), i->end(), payload);
+            used += m_subpacket_q.front()->size();
+        } else {
+            return used; //implicit break
+        }
+    }
 }
 
 void RadioController::addSubpacket(SubPktPtr dat) {
@@ -125,8 +161,15 @@ void RadioController::addSubpacket(SubPktPtr dat) {
 
 void RadioController::listenAndAct(){
     //TODO - fill out.
+    if(false) { //TODO - replace with check on whether received TxStatus.
+        send();
+    }
 }
 
+void RadioController::send(){
+    m_tx_packet.setPayloadLength( m_tx_q.fillPayload(m_payload) );
+    m_xbee.send(m_tx_packet);
+}
 
 
 /*Functions------------------------------------------------------------*/
