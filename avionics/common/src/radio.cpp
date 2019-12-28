@@ -160,9 +160,25 @@ void RadioController::addSubpacket(SubPktPtr dat) {
 }
 
 void RadioController::listenAndAct(){
-    //TODO - fill out.
-    if(false) { //TODO - replace with check on whether received TxStatus.
-        send();
+    m_xbee.readPacket();
+    while(m_xbee.getResponse().isAvailable() || m_xbee.getResponse().isError()){
+        //goes through all m_xbee packets in buffer
+
+        if(m_xbee.getResponse().isError()) { //will we use this?
+            // #ifdef TESTING
+            //     SerialUSB.println("m_Xbee error");
+            // #endif
+        } else if(m_xbee.getResponse().getApiId() == ZB_RX_RESPONSE) {
+            //received command from m_xbee
+            m_xbee.getResponse().getZBRxResponse(rx);
+            // command = *(rx.getData());
+            //TODO - do something with the command
+
+        } else if(m_xbee.getResponse().getApiId() == ZB_TX_STATUS_RESPONSE) {
+            send();
+        }
+
+        m_xbee.readPacket();
     }
 }
 

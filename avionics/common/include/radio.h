@@ -125,6 +125,7 @@ private:
     XBee m_xbee;
     XBeeAddress64 m_gnd_addr;
     ZBTxRequest m_tx_packet;
+    ZBRxResponse rx;
 
     RadioQueue m_tx_q;
 
