@@ -17,6 +17,8 @@
  */
 
 /*Includes------------------------------------------------------------*/
+#include <utility> //for std::move
+
 #include "radio.h"
 
 #include "options.h"
@@ -94,6 +96,31 @@ The first bit (0x01) is reserved for identifing Nosecone vs Body
     #define SATCOM_BIT_FLAG 0x10
 #endif
 #define FILE_BIT_FLAG 0x20
+
+//recall:
+//typedef SubPktPtr std::unique_ptr<std::vector<int>>;
+void RadioQueue::push(SubPktPtr subpacket) {
+    if(!subpacket) //check for null pointer
+        return;
+    if(subpacket->size() > MAX_SUBPACKET_SIZE)
+        return;
+
+    m_byte_count += subpacket->size();
+    while (m_byte_count > M_MAX_BYTES){
+        popFront();
+    }
+    return;
+}
+
+SubPktPtr RadioQueue::popFront() {
+    SubPktPtr tmp = std::move(m_subpacket_q.front());
+    m_subpacket_q.pop();
+    m_byte_count -= tmp->size();
+    return tmp;
+}
+
+
+
 
 /*Functions------------------------------------------------------------*/
 
