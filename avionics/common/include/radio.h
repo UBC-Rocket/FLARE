@@ -23,9 +23,8 @@
 #include <Arduino.h>
 #include <stdint.h>
 #include <deque> // for std::deque
-#include <memory> // for std::unique_ptr
 
-
+#include "radio_interface.h"
 #include "statemachine.h"
 #include "sensors.h"
 #include "options.h"
@@ -37,9 +36,8 @@ constexpr uint64_t GND_STN_ADDR_MSB = 0x0013A200; //Ground Station - Body
 constexpr uint64_t GND_STN_ADDR_LSB = 0x41678FC0;
 constexpr uint32_t RADIO_BAUD_RATE = 921600;
 constexpr unsigned short RADIO_MAX_SUBPACKET_SIZE = 255;
-/*Classes--------------------------------------------------------------*/
 
-typedef std::unique_ptr<std::vector<int>> SubPktPtr;
+/*Classes--------------------------------------------------------------*/
 
 class RadioQueue {
 public:
@@ -91,7 +89,7 @@ private:
     uint8_t dispenseIntoPayload(uint8_t *payload);
 };
 
-class RadioController {
+class RadioController : public IRadioController {
 public:
     /**
      * @brief Constructor.
