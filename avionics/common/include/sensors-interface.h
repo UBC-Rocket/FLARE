@@ -2,6 +2,8 @@
 #define SENSOR_INTERFACE_H
 
 #include <cstdint>
+#include <vector> //for std::vector
+#include <functional> //for std::reference_wrapper
 
 enum class SensorStatus {
     NOMINAL,
@@ -55,5 +57,7 @@ public:
 protected:
     SensorStatus status;
 };
+
+typedef std::vector<std::reference_wrapper<ISensor>> SensorSet;
 
 #endif

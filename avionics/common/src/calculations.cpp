@@ -43,6 +43,12 @@
  * @param  float *pressure_set - Set of pressure values.
  * @return void.
  */
+
+
+void Calculator::calculateValues(SensorSet sensors, StateId state, StateInput state_input) {
+    //TODO - fill out
+}
+
 void calculateValues(float bar_data[], float* prev_altitude, float* altitude,
             float* delta_altitude, float* baseline_pressure,
             unsigned long *delta_time, float pressure_set[],

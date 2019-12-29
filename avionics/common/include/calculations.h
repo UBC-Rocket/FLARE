@@ -20,9 +20,24 @@
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
 #include "sensors.h"
+#include "sensors-interface.h"
+#include "state_interface.h"
+#include "CalcHelpers/exponential_moving_avg.h"
 
 /*Constants------------------------------------------------------------*/
 #define PRESSURE_AVG_SET_SIZE   15
+
+
+/*Classes--------------------------------------------------------------*/
+
+class Calculator {
+public:
+    void calculateValues(SensorSet sensors, StateId state, StateInput state_input);
+
+private:
+
+};
+
 
 /*Functions------------------------------------------------------------*/
 void calculateValues(float bar_data[], float* prev_altitude, float* altitude,
