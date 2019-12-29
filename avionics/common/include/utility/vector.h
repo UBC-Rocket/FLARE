@@ -24,7 +24,8 @@
 
 #include <string.h>
 #include <stdint.h>
-#include <math.h>
+// #include <math.h>
+#include <cmath>
 
 
 namespace imu
@@ -92,7 +93,7 @@ public:
     void normalize()
     {
         double mag = magnitude();
-        if (isnan(mag) || mag == 0.0)
+        if (std::isnan(mag) || mag == 0.0)
             return;
 
         for (int i = 0; i < N; i++)

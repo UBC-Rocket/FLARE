@@ -26,7 +26,7 @@
 #include "buzzer.h" //for buzzer response on startup
 #include "cameras.h"
 #include "radio.h"
-#include "statemachine.h"
+#include "state_interface.h"
 
 #include <Arduino.h>
 
@@ -229,7 +229,7 @@ void pollSensors(unsigned long *timestamp, std::vector<std::reference_wrapper<IS
   * @param baseline_pressure Pressure used as "ground level"
   */
 void logData(unsigned long timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors,
-             FlightStates state, float altitude, float baseline_pressure) {
+             StateId state, float altitude, float baseline_pressure) {
 
     /*write data to SD card*/
     datalog.write(timestamp);

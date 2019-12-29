@@ -24,11 +24,11 @@ class ISensor {
 public:
     /**
      * @brief  Initialize sensor
-     * @return SensorStatus 
+     * @return SensorStatus
      */
     virtual void initSensor() = 0;
 
-    /** 
+    /**
      * @brief  Reads sensor data
      */
     virtual void readData() = 0;
@@ -55,4 +55,5 @@ public:
 protected:
     SensorStatus status;
 };
+
 #endif

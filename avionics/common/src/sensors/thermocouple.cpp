@@ -1,6 +1,7 @@
 /*Includes------------------------------------------------------------*/
 #include "MAX31855k.h"
 #include "sensors/thermocouple.h"
+#include <cmath>
 
 /*Variables------------------------------------------------------------*/
 #ifdef TESTING
@@ -17,7 +18,7 @@ void Thermocouple::initSensor() {
 #endif
 
     float thermo_temp = probe.readCJT();
-    if (!isnan(thermo_temp)) {
+    if (!std::isnan(thermo_temp)) {
 #ifdef TESTING
         SerialUSB.print("Cold Junction Temperature is [C]: ");
         SerialUSB.println(thermo_temp);
@@ -37,7 +38,7 @@ void Thermocouple::readData() {
 #endif // TESTING
     data[0] = probe.readTempC();
 #ifdef TESTING
-    if (!isnan(*thermocouple_data)) {
+    if (!std::isnan(*thermocouple_data)) {
         SerialUSB.print("Temp[C]=");
         SerialUSB.println(*thermocouple_data);
     }

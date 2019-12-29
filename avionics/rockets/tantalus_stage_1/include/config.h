@@ -57,7 +57,7 @@ static std::unordered_map<StateId, IState*> state_hash_map = {
 };
 
 
-static StateId current_state = StateId::STANDBY;
+static StateId state = StateId::STANDBY;
 
 /* TODO - MAKE THIS NOT A CONSTANT*/
 #include "state_input_struct.h"
