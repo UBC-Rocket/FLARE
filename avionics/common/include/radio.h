@@ -22,7 +22,6 @@
 /*Includes------------------------------------------------------------*/
 #include <Arduino.h>
 #include <stdint.h>
-#include <deque> // for std::deque
 
 #include "radio_interface.h"
 #include "statemachine.h"
@@ -35,59 +34,6 @@
 constexpr uint64_t GND_STN_ADDR_MSB = 0x0013A200; //Ground Station - Body
 constexpr uint64_t GND_STN_ADDR_LSB = 0x41678FC0;
 constexpr uint32_t RADIO_BAUD_RATE = 921600;
-constexpr unsigned short RADIO_MAX_SUBPACKET_SIZE = 255;
-
-/*Classes--------------------------------------------------------------*/
-
-class RadioQueue {
-public:
-    RadioQueue(unsigned short const MAX_BYTES) : M_MAX_BYTES(MAX_BYTES) {}
-
-    /**
-     * @brief Push a subpacket to the queue. If the pointer is a null pointer or the size is too large, it will silently fail.
-     * @param subpacket SubPktPtr to data.
-     * */
-    void push(SubPktPtr subpacket);
-
-    /**
-     * @brief Returns the next SubPktPtr in the queue (i.e. the oldest element), popping that element. If SubPktPtr is empty, behaviour is undefined.
-     */
-    SubPktPtr popFront();
-
-    /**
-     * @brief Test whether container is empty.
-     */
-    bool empty() const {return m_subpacket_q.empty();}
-
-    /**
-     * @brief Get number of bytes of subpacket data queued up. Note that this is not the same as the number of subpackets that are queued.
-     * */
-    unsigned short getByteCount() const {return m_byte_count;}
-
-    /**
-     * @brief Fills payload pointer as full as possible (i.e. at most RADIO_MAX_SUBPACKET_SIZE bytes)
-     * @param payload Pointer to payload array.
-     * @return Size of payload data filled in.
-     */
-    uint8_t fillPayload(uint8_t *payload);
-
-private:
-    std::deque<SubPktPtr> m_subpacket_q; //subpacket_queue, but the ueue is silent
-    unsigned short m_byte_count = 0;
-    unsigned short const M_MAX_BYTES;
-
-    /**
-     * @brief Dump entire queue into payload. Must check that payload is large enough and queue is small enough that this works (i.e. m_byte_count < payload array size); otherwise this is undefined behaviour
-     * @return Size of payload data filled in (= m_byte_count before this starts).
-     */
-    uint8_t dumpAllIntoPayload(uint8_t *payload);
-
-    /**
-     * @brief Dispenses at most RADIO_MAX_SUBPACKET_SIZE (255) bytes worth of subpackets into payload.
-     * @return Size of payload data filled in.
-     */
-    uint8_t dispenseIntoPayload(uint8_t *payload);
-};
 
 class RadioController : public IRadioController {
 public:
@@ -98,8 +44,9 @@ public:
      */
     RadioController(HardwareSerial &serial_radio,
             unsigned short const MAX_QUEUED_BYTES = 800) :
-        m_gnd_addr(XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB)),
-        m_tx_q(MAX_QUEUED_BYTES) {
+        IRadioController(MAX_QUEUED_BYTES),
+        m_gnd_addr(XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB))
+         {
 
         serial_radio.begin(RADIO_BAUD_RATE);
         while (!SerialRadio);
@@ -124,8 +71,6 @@ private:
     XBeeAddress64 m_gnd_addr;
     ZBTxRequest m_tx_packet;
     ZBRxResponse rx;
-
-    RadioQueue m_tx_q;
 
     uint8_t m_payload[RADIO_MAX_SUBPACKET_SIZE];
 
