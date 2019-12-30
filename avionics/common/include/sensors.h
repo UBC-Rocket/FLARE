@@ -29,6 +29,7 @@
 #include "sensors-interface.h"
 #include "hw-interface.h"
 #include "statemachine.h"
+#include "state_interface.h"
 #include "options.h"
 
 #include "sensors/accelerometer.h"
@@ -67,6 +68,6 @@ Status getStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::ve
 
 void pollSensors(unsigned long *timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors);
 
-void logData(unsigned long timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors,                    FlightStates state, float altitude, float baseline_pressure);
+void logData(unsigned long timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors,                    StateId state, float altitude, float baseline_pressure);
 
 #endif

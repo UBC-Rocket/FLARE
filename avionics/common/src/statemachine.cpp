@@ -68,6 +68,7 @@ void switchState(FlightStates *curr_state, FlightStates new_state)
     //don't want to switch out of WINTER_CONTINGENCY accidentally
     if(*curr_state != WINTER_CONTINGENCY)
         *curr_state = new_state;
+    
 }
 
 /* void stateMachine(float *altitude, float *delta_altitude,

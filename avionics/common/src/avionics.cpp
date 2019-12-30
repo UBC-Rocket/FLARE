@@ -79,6 +79,8 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "sensors.h"
 #include "statemachine.h"
 
+#include "config.h"
+
 /* Errors---------------------------------------------------------------*/
 #if defined NOSECONE && defined BODY
 #error Only one of NOSECONE and BODY may be defined!
@@ -133,7 +135,7 @@ void pollSensors() {} //??
   * @return None
   */
 void setup() {
-    int i;
+    int i; //used as loop variable
     initPins();
 
 /* Setup all UART comms */
@@ -175,6 +177,14 @@ void setup() {
     /* init sensors and report status in many ways */
     initSensors(sensors, hardware);
 
+    /* TODO - make this not constant */
+    state_input.ignitor_good = true;
+    state_input.altitude = 5;
+    state_input.velocity_vertical = 0;
+    state_input.accel_ground = (Eigen::Vector3f() << 10.0f, 0.0f, 0.0f).finished();
+    state_input.accel_rocket = (Eigen::Vector3f() << 10.0f, 0.0f, 0.0f).finished();
+    state_input.orientation = Eigen::Quaternionf().Identity();
+
     //TODO - build this out
     // radioStatus(&s_radio, &s_txPacket, &s_statusOfInit);
 
@@ -212,15 +222,15 @@ void loop() {
 
     static float prev_altitude, altitude, delta_altitude, ground_altitude;
 
-    static FlightStates state = STANDBY;
+    // static FlightStates state = STANDBY;
 
     //makes sure that even if it does somehow get accidentally changed,
     //it gets reverted
     if (s_statusOfInit == Status::CRITICAL_FAILURE)
-        state = WINTER_CONTINGENCY;
+        state = StateId::WINTER_CONTINGENCY;
 
     // if radio communications are received, this addresses them
-    resolveRadioRx(&s_radio, &s_txPacket, GPS_data, &state, &s_statusOfInit);
+    // resolveRadioRx(&s_radio, &s_txPacket, GPS_data, &state, &s_statusOfInit);
 
 #ifdef NOSECONE  // send satcom data
     sendSatcomMsg(state, GPS_data, timestamp);
@@ -228,7 +238,7 @@ void loop() {
 
     // Polling time intervals need to be variable, since in LANDED
     // there's a lot of data that'll be recorded
-    if (state == LANDED)
+    if (state == StateId::LANDED)
         time_interval = LANDED_POLLING_TIME_INTERVAL;
     else
         time_interval = NOMINAL_POLLING_TIME_INTERVAL;
@@ -260,10 +270,11 @@ void loop() {
                         &delta_altitude, &baseline_pressure,
                         &delta_time, pressure_set, delta_time_set);
 
-        stateMachine(&altitude, &delta_altitude, &prev_altitude,
-                     bar_data, &baseline_pressure, &ground_altitude,
-                     ground_alt_arr, &state);
+        // stateMachine(&altitude, &delta_altitude, &prev_altitude,
+        //              bar_data, &baseline_pressure, &ground_altitude,
+        //              ground_alt_arr, &state);
 
+        state = state_hash_map[state]->getNewState(state_input, state_aux);
         /*
         logData(&timestamp, &battery_voltage, acc_data, bar_data,
                 &temp_sensor_data, IMU_data, GPS_data, state,
@@ -274,17 +285,17 @@ void loop() {
     }
 
     // Send logged data across radio (as backup/early access to SD card logs)
-    if ((new_time - radio_old_time) >= radio_time_interval) {
-#ifdef BODY
-        sendRadioBody(&s_radio, &s_txPacket, bar_data, state, &altitude,
-                      &timestamp);
-#endif  // def BODY
-#ifdef NOSECONE
-        sendRadioNosecone(&s_radio, &s_txPacket, GPS_data, bar_data,
-                          acc_data, &temp_sensor_data, IMU_data);
-#endif  //def NOSECONE
-        radio_old_time = new_time;
-    }
+//     if ((new_time - radio_old_time) >= radio_time_interval) {
+// #ifdef BODY
+//         sendRadioBody(&s_radio, &s_txPacket, bar_data, state, &altitude,
+//                       &timestamp);
+// #endif  // def BODY
+// #ifdef NOSECONE
+//         sendRadioNosecone(&s_radio, &s_txPacket, GPS_data, bar_data,
+//                           acc_data, &temp_sensor_data, IMU_data);
+// #endif  //def NOSECONE
+//         radio_old_time = new_time;
+//     }
 
     //LED blinks in non-critical failure
     blinkStatusLED();
