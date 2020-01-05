@@ -2,6 +2,7 @@
 #define CALCULATIONS_H_62A4726C965C45AAA01550CD5DF18D99
 
 #include <cmath> //std::abs
+#include "Eigen/Geometry" //quaternions
 
 #include "calculations_interface.h"
 #include "state_input_struct.h"
@@ -11,14 +12,23 @@
 #include "sensors/barometer.h"
 #include "sensors/IMU.h"
 
+
 //following recomendation for alpha = 2/(2N + 1)
 constexpr float BAROMETER_MOVING_AVERAGE_ALPHA = 2.0f / (2 * 40 + 1);
 
 class Calculator : public ICalculator{
 public:
-    Calculator(Barometer const *baro, IMU const *imu) : m_baro(baro), m_imu(imu)m_base_alt(baro->get_data()){}
+    Calculator(Barometer const *baro, IMU const *imu) : m_baro(baro), m_imu(imu){
+        baro->readData();
+        m_base_alt = pressureToAltitude(baro->get_data());
+        m_last_t = millis();
+        m_last_alt = m_base_alt;
+    }
 
-    void calculateValues(StateId const state, StateInput &out_state_input) {
+    void calculateValues(StateId const state, StateInput &out_state_input, uint32_t t_ms) {
+        StateInput &out = out_state_input; //alias
+
+        /* Update altitude average and calculate altitude*/
         const float alt = pressureToAltitude(baro->get_data());
         const float diff = std::abs(m_base_alt.getAverage() - alt);
 
@@ -27,14 +37,48 @@ public:
         ){
             m_base_alt.addValue(alt);
         }
-        out_state_input.altitude = m_base_alt.getAverage();
+        out.altitude = alt - m_base_alt.getAverage();
 
+        /* Do some math to figure out orientation & acceleration in relevant frames*/
+        // TODO - check state to only do these calculations when necessary
+        //There may be some really clever way to do this with pointers, or at least use comma initialization
+        out.accel_rocket(0) = m_imu->getData1[0]; //? TODO - make sure these are aligned
+        out.accel_rocket(1) = m_imu->getData1[1]; //?
+        out.accel_rocket(2) = m_imu->getData1[2]; //?
+
+        Quaternionf meas_orient();
+        //TODO - initialize measured orientation with m_imu's quaternion data
+
+        //conjugate is equal to the inverse for unit quaternion
+        out.orientation = (meas_orient * m_gnd_quat.conjugate()).normalize();
+
+        //convert into quaternion for operation
+        Quaternionf const xl_rocket_quat(0, out.accel_rocket(0), out.accel_rocket(1), out.accel_rocket(2)); //There may be some really clever way to do this with more pointers
+
+        //conjugate to rotate
+        Quaternionf const xl_gnd_quat = out.orientation.conjugate() * xl_rocket_quat * out.orientation;
+
+        //turn back into vector
+        out.accel_ground << xl_gnd_quat.x(),  xl_gnd_quat.y(), xl_gnd_quat.z();
+
+
+        /* Do velocity calculations */
+        constexpr MILLISECONDS_PER_SECOND = 1000;
+        out.velocity_vertical = (out.altitude - m_last_alt) / (t_ms - m_last_t) * MILLISECONDS_PER_SECOND;
+
+        m_last_alt = out.altitude; //in preparation for next loop
+        m_last_t = t_ms;
     }
 
 private:
     ExponentialMovingAvg<float> m_base_alt;
     Barometer *m_baro;
     IMU *m_imu;
+
+    Quaternionf m_gnd_quat;
+
+    float m_last_alt;
+    uint32_t m_last_t;
 }
 
 #endif
