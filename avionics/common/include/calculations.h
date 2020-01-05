@@ -28,15 +28,7 @@
 #define PRESSURE_AVG_SET_SIZE   15
 
 
-/*Classes--------------------------------------------------------------*/
 
-class Calculator {
-public:
-    void calculateValues(SensorSet sensors, StateId state, StateInput state_input);
-
-private:
-
-};
 
 
 /*Functions------------------------------------------------------------*/
