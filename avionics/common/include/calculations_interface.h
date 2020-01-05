@@ -11,7 +11,7 @@ public:
      * @param StateId Current state.
      * @param out_state_input StateInput out-variable that gets filled in during calculation.
      */
-    virtual void calculateValues(StateId state, StateInput &out_state_input) = 0;
+    virtual void calculateValues(StateId state, StateInput &out_state_input, uint32_t t_ms) = 0;
 };
 
 #endif

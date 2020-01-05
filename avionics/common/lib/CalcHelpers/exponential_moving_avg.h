@@ -18,6 +18,8 @@ public:
         reset(init, var, alpha);
     }
 
+    ExponentialMovingAvg(){} //Dummy constructor that doesn't do anything - must call reset later.
+
     /**
      * @brief Resets the averager, reinitializing all relevant variables
      * @param init Initial value
@@ -41,6 +43,7 @@ public:
         m_avg = m_avg + m_alpha * delta;
         m_var = (1 - m_alpha) * (m_var + m_alpha * delta * delta);
         m_SD = std::sqrt(m_var);
+        return m_avg;
     }
 
     /**
