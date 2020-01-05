@@ -5,12 +5,12 @@
 
 class IRadioController {
 public:
+    IRadioController(unsigned short const MAX_QUEUED_BYTES = 800) : m_tx_q(MAX_QUEUED_BYTES){}
+ 
     /**
      * Add a subpacket to the queue to be sent. Note that this is a rather low-level utility; there should also be a helper method for any given subpacket that will build up the specific format this needs that you should use instead.
      * @param dat A SubPktPtr (refer to typedef) containing the data.
      */
-    IRadioController(unsigned short const MAX_QUEUED_BYTES = 800) : m_tx_q(MAX_QUEUED_BYTES){}
-
     void addSubpacket(SubPktPtr dat){
         m_tx_q.push(std::move(dat));
     }

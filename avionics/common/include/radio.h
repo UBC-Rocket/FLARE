@@ -43,9 +43,10 @@ public:
      * @param SERIAL_RADIO Uninitialized HardwareSerial used for radio (e.g. SerialRadio)
      */
     RadioController(HardwareSerial &serial_radio,
-            unsigned short const MAX_QUEUED_BYTES = 800) :
+            unsigned short const MAX_QUEUED_BYTES = 800, uint8_t MAX_PACKETS_PER_RX_LOOP = 8) :
         IRadioController(MAX_QUEUED_BYTES),
-        m_gnd_addr(XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB))
+        m_gnd_addr(XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB)),
+        M_MAX_PACKETS_PER_RX_LOOP(MAX_PACKETS_PER_RX_LOOP)
          {
 
         serial_radio.begin(RADIO_BAUD_RATE);
@@ -68,6 +69,7 @@ private:
 
     uint8_t m_payload[RADIO_MAX_SUBPACKET_SIZE];
 
+    uint8_t M_MAX_PACKETS_PER_RX_LOOP;
     void send();
 };
 

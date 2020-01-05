@@ -100,7 +100,8 @@ The first bit (0x01) is reserved for identifing Nosecone vs Body
 
 void RadioController::listenAndAct(){
     m_xbee.readPacket();
-    while(m_xbee.getResponse().isAvailable() || m_xbee.getResponse().isError()){
+    uint8_t i = 0;
+    while(i < M_MAX_PACKETS_PER_RX_LOOP && (m_xbee.getResponse().isAvailable() || m_xbee.getResponse().isError())){
         //goes through all m_xbee packets in buffer
 
         if(m_xbee.getResponse().isError()) { //will we use this?
@@ -118,6 +119,8 @@ void RadioController::listenAndAct(){
         }
 
         m_xbee.readPacket();
+
+        i++;
     }
 }
 
