@@ -17,6 +17,9 @@
  */
 
 /*Includes------------------------------------------------------------*/
+#include <utility> //for std::move
+#include <algorithm> //for std::copy
+
 #include "radio.h"
 
 #include "options.h"
@@ -94,6 +97,38 @@ The first bit (0x01) is reserved for identifing Nosecone vs Body
     #define SATCOM_BIT_FLAG 0x10
 #endif
 #define FILE_BIT_FLAG 0x20
+
+void RadioController::listenAndAct(){
+    m_xbee.readPacket();
+    uint8_t i = 0;
+    while(i < M_MAX_PACKETS_PER_RX_LOOP && (m_xbee.getResponse().isAvailable() || m_xbee.getResponse().isError())){
+        //goes through all m_xbee packets in buffer
+
+        if(m_xbee.getResponse().isError()) { //will we use this?
+            // #ifdef TESTING
+            //     SerialUSB.println("m_Xbee error");
+            // #endif
+        } else if(m_xbee.getResponse().getApiId() == ZB_RX_RESPONSE) {
+            //received command from m_xbee
+            m_xbee.getResponse().getZBRxResponse(rx);
+            // command = *(rx.getData());
+            //TODO - do something with the command
+
+        } else if(m_xbee.getResponse().getApiId() == ZB_TX_STATUS_RESPONSE) {
+            send();
+        }
+
+        m_xbee.readPacket();
+
+        i++;
+    }
+}
+
+void RadioController::send(){
+    m_tx_packet.setPayloadLength( m_tx_q.fillPayload(m_payload) );
+    m_xbee.send(m_tx_packet);
+}
+
 
 /*Functions------------------------------------------------------------*/
 

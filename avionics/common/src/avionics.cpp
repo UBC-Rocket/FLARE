@@ -109,9 +109,11 @@ static unsigned long delta_time_set[PRESSURE_AVG_SET_SIZE];  //set of delta time
 static float baseline_pressure;
 static float ground_alt_arr[GROUND_ALT_SIZE];  //values for the baseline pressure calculation
 
-static XBee s_radio = XBee();
-static XBeeAddress64 s_gndAddr = XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB);
-static ZBTxRequest s_txPacket = ZBTxRequest();
+/* Radio */
+static RadioController radio = RadioController(SerialRadio);
+// static XBee s_radio = XBee();
+// static XBeeAddress64 s_gndAddr = XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB);
+// static ZBTxRequest s_txPacket = ZBTxRequest();
 
 std::vector<std::reference_wrapper<ISensor> > sensors;      // Sensors
 std::vector<std::reference_wrapper<IHardware> > hardware;  // Hardwares
@@ -147,15 +149,14 @@ void setup() {
     SerialUSB.println("Initializing...");
 #endif
 
-// Comms to radio serial port
-#ifdef TESTING
-    SerialUSB.println("Initializing radio");
-#endif
-    SerialRadio.begin(921600);
-    while (!SerialRadio) {
-    }
-    s_radio.setSerial(SerialRadio);
-    s_txPacket.setAddress64(s_gndAddr);
+// Radio
+// #ifdef TESTING
+//     SerialUSB.println("Initializing radio");
+// #endif
+
+    // s_radio.setSerial(SerialRadio);
+    // s_txPacket.setAddress64(s_gndAddr);
+
 
     // Comms to camera serial port
     SerialCamera.begin(CameraBaud);
@@ -215,8 +216,8 @@ void loop() {
     unsigned long delta_time;
     static uint16_t time_interval = NOMINAL_POLLING_TIME_INTERVAL;  //ms
 
-    static unsigned long radio_old_time = 0;
-    static unsigned long radio_time_interval = 500;  //ms
+    // static unsigned long radio_old_time = 0;
+    // static unsigned long radio_time_interval = 500;  //ms
 
     float *battery_voltage, *acc_data, *bar_data, *temp_sensor_data, *IMU_data, *GPS_data, *thermocouple_data;
 
@@ -229,7 +230,8 @@ void loop() {
     if (s_statusOfInit == Status::CRITICAL_FAILURE)
         state = StateId::WINTER_CONTINGENCY;
 
-    // if radio communications are received, this addresses them
+
+    radio.listenAndAct();
     // resolveRadioRx(&s_radio, &s_txPacket, GPS_data, &state, &s_statusOfInit);
 
 #ifdef NOSECONE  // send satcom data
@@ -284,6 +286,7 @@ void loop() {
         logData(timestamp, sensors, state, altitude, baseline_pressure);
     }
 
+    /* Now done all together with radio.listenAndAct */
     // Send logged data across radio (as backup/early access to SD card logs)
 //     if ((new_time - radio_old_time) >= radio_time_interval) {
 // #ifdef BODY
