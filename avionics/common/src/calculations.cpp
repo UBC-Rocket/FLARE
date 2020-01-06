@@ -43,6 +43,7 @@
  * @param  float *pressure_set - Set of pressure values.
  * @return void.
  */
+
 void calculateValues(float bar_data[], float* prev_altitude, float* altitude,
             float* delta_altitude, float* baseline_pressure,
             unsigned long *delta_time, float pressure_set[],

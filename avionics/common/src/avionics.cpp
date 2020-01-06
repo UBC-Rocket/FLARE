@@ -115,15 +115,8 @@ static RadioController radio = RadioController(SerialRadio);
 // static XBeeAddress64 s_gndAddr = XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB);
 // static ZBTxRequest s_txPacket = ZBTxRequest();
 
-std::vector<std::reference_wrapper<ISensor> > sensors;      // Sensors
 std::vector<std::reference_wrapper<IHardware> > hardware;  // Hardwares
 
-Accelerometer accelerometer;
-Barometer barometer;
-GPS gps;
-IMU imuSensor;
-Temperature temperature;
-Thermocouple thermocouple;
 
 /* Functions------------------------------------------------------------*/
 
@@ -168,12 +161,12 @@ void setup() {
     Wire.setDefaultTimeout(100000);  // 100ms
 
     /* Add all the sensors inside sensor vector */
-    sensors.push_back(accelerometer);
-    sensors.push_back(barometer);
-    sensors.push_back(gps);
-    sensors.push_back(imuSensor);
-    sensors.push_back(temperature);
-    sensors.push_back(thermocouple);
+    // sensors.push_back(accelerometer);
+    // sensors.push_back(barometer);
+    // sensors.push_back(gps);
+    // sensors.push_back(imuSensor);
+    // sensors.push_back(temperature);
+    // sensors.push_back(thermocouple);
 
     /* init sensors and report status in many ways */
     initSensors(sensors, hardware);
@@ -213,15 +206,15 @@ void loop() {
     static uint32_t timestamp;
     static unsigned long old_time = 0;  //ms
     static unsigned long new_time = 0;  //ms
-    unsigned long delta_time;
+    // unsigned long delta_time;
     static uint16_t time_interval = NOMINAL_POLLING_TIME_INTERVAL;  //ms
 
     // static unsigned long radio_old_time = 0;
     // static unsigned long radio_time_interval = 500;  //ms
 
-    float *battery_voltage, *acc_data, *bar_data, *temp_sensor_data, *IMU_data, *GPS_data, *thermocouple_data;
+    // float *battery_voltage, *acc_data, *bar_data, *temp_sensor_data, *IMU_data, *GPS_data, *thermocouple_data;
 
-    static float prev_altitude, altitude, delta_altitude, ground_altitude;
+    static float altitude;
 
     // static FlightStates state = STANDBY;
 
@@ -249,7 +242,6 @@ void loop() {
     //run the state machine, and log the data
     new_time = millis();
     if ((new_time - old_time) >= time_interval) {
-        delta_time = new_time - old_time;
         old_time = new_time;
 
         /*
@@ -260,17 +252,12 @@ void loop() {
 
         pollSensors(&timestamp, sensors);
 
-        // Store sensors in all fields
-        acc_data = accelerometer.getData();
-        bar_data = barometer.getData();
-        temp_sensor_data = temperature.getData();
-        IMU_data = imuSensor.getData();
-        GPS_data = gps.getData();
-        thermocouple_data = thermocouple.getData();
+        calc.calculateValues(state, state_input, timestamp);
+        altitude = state_input.altitude; //TODO - This is temporary fix for logData; should instead do something else.
 
-        calculateValues(bar_data, &prev_altitude, &altitude,
-                        &delta_altitude, &baseline_pressure,
-                        &delta_time, pressure_set, delta_time_set);
+        // calculateValues(bar_data, &prev_altitude, &altitude,
+        //                 &delta_altitude, &baseline_pressure,
+        //                 &delta_time, pressure_set, delta_time_set);
 
         // stateMachine(&altitude, &delta_altitude, &prev_altitude,
         //              bar_data, &baseline_pressure, &ground_altitude,
