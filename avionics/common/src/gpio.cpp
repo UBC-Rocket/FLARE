@@ -73,8 +73,6 @@ void initPins(void)
     pinMode(FLIGHT_LED, OUTPUT);
     digitalWrite(FLIGHT_LED, LOW);
 
-    initBuzzer();
-
     #ifdef BODY
         /*init main ignitor*/
         pinMode(IGNITOR_PIN, OUTPUT);

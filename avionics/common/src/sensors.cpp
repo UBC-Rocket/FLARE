@@ -43,7 +43,7 @@ CSVWrite datalog;
   * @return void
   */
 
-void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware) {
+void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware, Buzzer buzzer) {
     // if(powerbattery.getVoltage() <= LOW_BATTERY_VOLTAGE)
     // { //TODO: Uncomment once the battery sensor is implemented
     //     status->sensorNominal[BATTERY_STATUS_POSITION] = false;
@@ -94,7 +94,7 @@ void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::ve
     #endif // NOSECONE
 
     /* transmit sensor report */
-    displayStatus(sensors, hardware);
+    displayStatus(sensors, hardware, buzzer);
 }
 
 /**
@@ -102,7 +102,7 @@ void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::ve
  * @param  InitStatus *status - status of initialization.
  * @return void
  */
-void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware) {
+void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware, Buzzer buzzer) {
     // TODO: change this function to discern which sensors constitute a critical fail
     /*
     if (status->overview == CRITICAL_FAILURE) {
@@ -164,7 +164,7 @@ void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::
             #else
             for(int i = 1; i <= 5; i++) {
             #endif
-                sing(SongTypes_CRITICALFAIL);
+                buzzer.sing(SongTypes_CRITICALFAIL);
                 delay(400);
             }
             return;
@@ -182,7 +182,7 @@ void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::
     #else
     for(int i = 1; i <= 5; i++) {
     #endif
-        sing(SongTypes_SUCCESS);
+        buzzer.sing(SongTypes_SUCCESS);
         delay(400);
     }
 }

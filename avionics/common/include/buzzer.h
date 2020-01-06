@@ -19,7 +19,8 @@
 #define BUZZER_H
 
 /*Includes------------------------------------------------------------*/
-#include <Arduino.h>
+// #include <Arduino.h>
+#include "Utility/time.h"
 #include "gpio.h"
 
 /*Variables------------------------------------------------------------*/
@@ -29,10 +30,39 @@ enum SongTypes{
     SongTypes_CRITICALFAIL
 };
 
+/*Classes--------------------------------------------------------------*/
+class Buzzer {
+public:
+    /**
+     * @brief constructor
+     * @param MELODY_PIN I/O pin the buzzer is hooked up to.
+    */
+    Buzzer(int const MELODY_PIN) : M_MELODY_PIN(MELODY_PIN) {
+        pinMode(MELODY_PIN, OUTPUT);
+    }
+
+    /** void sing(SongTypes song){}
+    * @brief  Calculates current values
+    * @param  SongTypes song - ID of the melody to be played, defined in buzzer.h
+    * @return void.
+    */
+    void sing(SongTypes song) const;
+
+    /**
+    * @brief  Creates a buzzer note at a specified frequency and duration - note that this is a blocking function.
+    * @param  long frequency - frequency of the note to be played
+    * @param  long length - length of note to be played. To calculate the note
+    *          duration, take one second divided by the note type.
+    *          e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+    * @return void.
+    */
+    void buzz(long frequency, long length) const;
+
+private:
+    const int M_MELODY_PIN;
+};
+
 /*Functions------------------------------------------------------------*/
-void initBuzzer();
-void startBuzzer();
-void sing(SongTypes song);
-void buzz(int targetPin, long frequency, long length);
+
 
 #endif

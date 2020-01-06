@@ -16,6 +16,9 @@
  */
 
 /*Includes------------------------------------------------------------*/
+#include <chrono>
+#include "Utility/time.h"
+
 #include "buzzer.h"
 
 /*Constants------------------------------------------------------------*/
@@ -110,75 +113,59 @@
 #define NOTE_DS8 4978
 
 /*Functions------------------------------------------------------------*/
-/* void initBuzzer(void){}
- * @brief  Initializes buzzer control output pins
- * @return void.
- */
-void initBuzzer(void)
-{
-    pinMode(MELODY_PIN, OUTPUT);  //buzzer pin init
-}
-
 
 /* void sing(SongTypes song){}
  * @brief  Calculates current values
  * @param  SongTypes song - ID of the melody to be played, defined in buzzer.h
  * @return void.
  */
-void sing(SongTypes song) {
+void Buzzer::sing(SongTypes song) const {
     switch(song){
         case SongTypes_SUCCESS:
         {
-            buzz(MELODY_PIN, NOTE_C1, 500);
-            buzz(MELODY_PIN, NOTE_C7, 1000);
-            buzz(MELODY_PIN, NOTE_G7, 1000);
-            buzz(MELODY_PIN, NOTE_C8, 1000);
+            buzz(NOTE_C1, 500);
+            buzz(NOTE_C7, 1000);
+            buzz(NOTE_G7, 1000);
+            buzz(NOTE_C8, 1000);
             break;
         }
         case SongTypes_NONCRITFAIL:
         {
-            buzz(MELODY_PIN, NOTE_C1, 500);
-            buzz(MELODY_PIN, NOTE_C6, 300);
-            delay(300);
-            buzz(MELODY_PIN, NOTE_C6, 300);
-            delay(300);
-            buzz(MELODY_PIN, NOTE_C6, 300);
-            delay(300);
-            buzz(MELODY_PIN, NOTE_C6, 300);
-            delay(300);
-            buzz(MELODY_PIN, NOTE_C6, 300);
-            delay(300);
-            buzz(MELODY_PIN, NOTE_C6, 300);
-            delay(300);
-            buzz(MELODY_PIN, NOTE_C6, 300);
-            delay(300);
-            buzz(MELODY_PIN, NOTE_C6, 300);
-            delay(300);
+            buzz(NOTE_C1, 500);
+            buzz(NOTE_C6, 300);
+            Utility::sleep_ms(300);
+            buzz(NOTE_C6, 300);
+            Utility::sleep_ms(300);
+            buzz(NOTE_C6, 300);
+            Utility::sleep_ms(300);
+            buzz(NOTE_C6, 300);
+            Utility::sleep_ms(300);
+            buzz(NOTE_C6, 300);
+            Utility::sleep_ms(300);
+            buzz(NOTE_C6, 300);
+            Utility::sleep_ms(300);
+            buzz(NOTE_C6, 300);
+            Utility::sleep_ms(300);
+            buzz(NOTE_C6, 300);
+            Utility::sleep_ms(300);
 
             break;
         }
         case SongTypes_CRITICALFAIL:
         {
-            buzz(MELODY_PIN, NOTE_C1, 300);
-            buzz(MELODY_PIN, NOTE_C7, 800);
-            buzz(MELODY_PIN, NOTE_B6, 800);
-            buzz(MELODY_PIN, NOTE_AS6, 800);
-            buzz(MELODY_PIN, NOTE_A6, 2500);
+            buzz(NOTE_C1, 300);
+            buzz(NOTE_C7, 800);
+            buzz(NOTE_B6, 800);
+            buzz(NOTE_AS6, 800);
+            buzz(NOTE_A6, 2500);
             break;
         }
     }
 }
 
-/* void buzz(int targetPin, long frequency, long length){}
- * @brief  Creates a buzzer note at a specified frequency and duration
- * @param  int targetPin - the buzzer control pin
- * @param  long frequency - frequency of the note to be played
- * @param  long length - length of note to be played. To calculate the note
- *          duration, take one second divided by the note type.
- *          e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
- * @return void.
- */
-void buzz(int targetPin, long frequency, long length) {
+
+void Buzzer::buzz(long frequency, long length) const {
+
     long delayValue = 1000000 / frequency / 2; //delay between transitions
     // 1 000 000 microseconds, divided by the frequency, divided by 2 b/c
     // there are two phases to each cycle
@@ -186,9 +173,9 @@ void buzz(int targetPin, long frequency, long length) {
     // multiply frequency = cycles per second, by the number of seconds to
     // get the total number of cycles to produce
     for (long i = 0; i < numCycles; i++) { // for the calculated length of time
-        digitalWrite(targetPin, HIGH); // write high to push out the diaphram
-        delayMicroseconds(delayValue); // wait for the calculated delay value
-        digitalWrite(targetPin, LOW); // write low to pull back the diaphram
-        delayMicroseconds(delayValue); // wait for the calculated delay value
+        digitalWrite(M_MELODY_PIN, HIGH); // write high to push out the diaphram
+        Utility::sleep_us(delayValue); // wait for the calculated delay value
+        digitalWrite(M_MELODY_PIN, LOW); // write low to pull back the diaphram
+        Utility::sleep_us(delayValue); // wait for the calculated delay value
     }
 }

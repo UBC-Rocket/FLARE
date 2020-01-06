@@ -111,13 +111,11 @@ static float ground_alt_arr[GROUND_ALT_SIZE];  //values for the baseline pressur
 
 /* Radio */
 static RadioController radio = RadioController(SerialRadio);
-// static XBee s_radio = XBee();
-// static XBeeAddress64 s_gndAddr = XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB);
-// static ZBTxRequest s_txPacket = ZBTxRequest();
 
 std::vector<std::reference_wrapper<IHardware> > hardware;  // Hardwares
 
-
+/* Buzzer */
+static Buzzer buzzer = Buzzer(MELODY_PIN);
 /* Functions------------------------------------------------------------*/
 
 inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp);
@@ -168,7 +166,7 @@ void setup() {
     // sensors.push_back(thermocouple);
 
     /* init sensors and report status in many ways */
-    initSensors(sensors, hardware);
+    initSensors(sensors, hardware, buzzer);
 
     /* TODO - make this not constant */
     state_input.ignitor_good = true;
