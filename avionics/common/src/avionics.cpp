@@ -72,12 +72,10 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "calculations.h"
 #include "cameras.h"
 #include "gpio.h"
-#include "groundaltitude.h"
 #include "options.h"
 #include "radio.h"
 #include "satcom.h"
 #include "sensors.h"
-#include "statemachine.h"
 
 #include "config.h"
 
@@ -102,12 +100,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #endif
 
 /* Variables------------------------------------------------------------*/
-File radiolog;
 static Status s_statusOfInit;
-static float pressure_set[PRESSURE_AVG_SET_SIZE];            //set of pressure values for a floating average
-static unsigned long delta_time_set[PRESSURE_AVG_SET_SIZE];  //set of delta time values for the delta altitude
-static float baseline_pressure;
-static float ground_alt_arr[GROUND_ALT_SIZE];  //values for the baseline pressure calculation
 
 /* Radio */
 static RadioController radio = RadioController(SerialRadio);
@@ -118,7 +111,7 @@ std::vector<std::reference_wrapper<IHardware> > hardware;  // Hardwares
 static Buzzer buzzer = Buzzer(MELODY_PIN);
 /* Functions------------------------------------------------------------*/
 
-inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp);
+// inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp);
 void blinkStatusLED();
 
 /**
@@ -179,18 +172,6 @@ void setup() {
     //TODO - build this out
     // radioStatus(&s_radio, &s_txPacket, &s_statusOfInit);
 
-    /* init various arrays */
-    barometer.readData();
-    baseline_pressure = barometer.getData()[0];    // for baseline pressure calculation
-    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) {  // for moving average
-        pressure_set[i] = baseline_pressure;
-    }
-    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) {  // for delta altitude
-        delta_time_set[i] = NOMINAL_POLLING_TIME_INTERVAL;
-    }
-    for (i = 0; i < GROUND_ALT_SIZE; i++) {
-        ground_alt_arr[i] = baseline_pressure;
-    }
 }
 
 /**
@@ -248,7 +229,7 @@ void loop() {
 
         state = state_hash_map[state]->getNewState(state_input, state_aux);
 
-        logData(timestamp, sensors, state, altitude, baseline_pressure); //TODO - think some more about data logging and how it should mesh with calculations
+        logData(timestamp, sensors, state, altitude, 0); //TODO - think some more about data logging and how it should mesh with calculations, and also get rid of baseline_pressure 
     }
 
     //LED blinks in non-critical failure
@@ -266,22 +247,22 @@ void loop() {
   * @param  float timestamp - time in ms
   * @return None
   */
-inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp) {
-    static bool mainDeploySatcomSent = false;
-    static int landedSatcomSentCount = 0;
-    static uint16_t satcomMsgOldTime = millis();
+// inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp) {
+//     static bool mainDeploySatcomSent = false;
+//     static int landedSatcomSentCount = 0;
+//     static uint16_t satcomMsgOldTime = millis();
 
-    if (state == FINAL_DESCENT && !mainDeploySatcomSent) {
-        mainDeploySatcomSent = true;
-        SatComSendGPS(&timestamp, GPS_data);
-    } else if (state == LANDED && landedSatcomSentCount < NUM_SATCOM_SENDS_ON_LANDED && millis() - satcomMsgOldTime >= SATCOM_LANDED_TIME_INTERVAL) {
-        //sends Satcom total of NUM_SATCOM_SENDS_ON_LANDED times,
-        //once every SATCOM_LANDED_TIME_INTERVAL
-        landedSatcomSentCount++;
-        SatComSendGPS(&timestamp, GPS_data);
-        satcomMsgOldTime = millis();
-    }
-}
+//     if (state == FINAL_DESCENT && !mainDeploySatcomSent) {
+//         mainDeploySatcomSent = true;
+//         SatComSendGPS(&timestamp, GPS_data);
+//     } else if (state == LANDED && landedSatcomSentCount < NUM_SATCOM_SENDS_ON_LANDED && millis() - satcomMsgOldTime >= SATCOM_LANDED_TIME_INTERVAL) {
+//         //sends Satcom total of NUM_SATCOM_SENDS_ON_LANDED times,
+//         //once every SATCOM_LANDED_TIME_INTERVAL
+//         landedSatcomSentCount++;
+//         SatComSendGPS(&timestamp, GPS_data);
+//         satcomMsgOldTime = millis();
+//     }
+// }
 
 /**
   * @brief  Helper function for LED blinking
