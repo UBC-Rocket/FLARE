@@ -122,7 +122,6 @@ std::vector<std::reference_wrapper<IHardware> > hardware;  // Hardwares
 
 inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp);
 void blinkStatusLED();
-void pollSensors() {} //??
 
 /**
   * @brief  The Arduino setup function
@@ -244,48 +243,15 @@ void loop() {
     if ((new_time - old_time) >= time_interval) {
         old_time = new_time;
 
-        /*
-        pollSensors(&timestamp, &battery_voltage, acc_data, bar_data,
-                    &temp_sensor_data, IMU_data, GPS_data,
-                    &thermocouple_data);
-        */
-
         pollSensors(&timestamp, sensors);
 
         calc.calculateValues(state, state_input, timestamp);
         altitude = state_input.altitude; //TODO - This is temporary fix for logData; should instead do something else.
 
-        // calculateValues(bar_data, &prev_altitude, &altitude,
-        //                 &delta_altitude, &baseline_pressure,
-        //                 &delta_time, pressure_set, delta_time_set);
-
-        // stateMachine(&altitude, &delta_altitude, &prev_altitude,
-        //              bar_data, &baseline_pressure, &ground_altitude,
-        //              ground_alt_arr, &state);
-
         state = state_hash_map[state]->getNewState(state_input, state_aux);
-        /*
-        logData(&timestamp, &battery_voltage, acc_data, bar_data,
-                &temp_sensor_data, IMU_data, GPS_data, state,
-                altitude, baseline_pressure, thermocouple_data);
-        */
 
-        logData(timestamp, sensors, state, altitude, baseline_pressure);
+        logData(timestamp, sensors, state, altitude, baseline_pressure); //TODO - think some more about data logging and how it should mesh with calculations
     }
-
-    /* Now done all together with radio.listenAndAct */
-    // Send logged data across radio (as backup/early access to SD card logs)
-//     if ((new_time - radio_old_time) >= radio_time_interval) {
-// #ifdef BODY
-//         sendRadioBody(&s_radio, &s_txPacket, bar_data, state, &altitude,
-//                       &timestamp);
-// #endif  // def BODY
-// #ifdef NOSECONE
-//         sendRadioNosecone(&s_radio, &s_txPacket, GPS_data, bar_data,
-//                           acc_data, &temp_sensor_data, IMU_data);
-// #endif  //def NOSECONE
-//         radio_old_time = new_time;
-//     }
 
     //LED blinks in non-critical failure
     blinkStatusLED();
