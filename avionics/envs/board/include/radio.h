@@ -20,7 +20,7 @@
 #define __RADIO_H__
 
 /*Includes------------------------------------------------------------*/
-#include <Arduino.h>
+// #include <Arduino.h>
 #include <stdint.h>
 
 #include "radio_interface.h"

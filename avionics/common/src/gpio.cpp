@@ -20,8 +20,9 @@
  */
 
 /*Includes------------------------------------------------------------*/
-#include <Arduino.h>
 #include <Servo.h>
+#include "Utility/gpio.h"
+#include "Utility/time.h"
 
 #include "buzzer.h"
 #include "gpio.h"
@@ -136,7 +137,7 @@ void deployDrogue(void)
         SerialUSB.println("DROGUE SERVO DEPLOYED");
         #endif
 
-        delay(SERVO_DELAY);
+        Utility::sleep_ms(SERVO_DELAY);
         myServo.write(INIT_SERVO_POS);
     #endif  // SERVO
 
@@ -147,7 +148,7 @@ void deployDrogue(void)
         SerialUSB.println("DROGUE IGNITER FIRED");
         #endif
 
-        delay(DROGUE_IGNITOR_DELAY);
+        Utility::sleep_ms(DROGUE_IGNITOR_DELAY);
         Utility::digitalWrite(DROGUE_IGNITOR_PIN, Utility::PinDigital::LOW);
     #endif // POW
 }
@@ -165,7 +166,7 @@ void deployMain(void)
     SerialUSB.println("MAIN IGNITER FIRED");
     #endif
 
-    delay(IGNITOR_DELAY);
+    Utility::sleep_ms(IGNITOR_DELAY);
     Utility::digitalWrite(IGNITOR_PIN, Utility::PinDigital::LOW);
 }
 
@@ -177,9 +178,9 @@ void deployMain(void)
   */
  bool continuityCheck(void){
     Utility::digitalWrite(CONTINUITY_CHECK_PIN, Utility::PinDigital::HIGH);
-    delayMicroseconds(CONTINUITY_CHECK_DELAY);
+    Utility::sleep_us(CONTINUITY_CHECK_DELAY);
 
-    int main_continuity = analogRead(CONTINUITY_CHECK_ADC);
+    int main_continuity = Utility::analogRead(CONTINUITY_CHECK_ADC);
     Utility::digitalWrite(CONTINUITY_CHECK_PIN, Utility::PinDigital::LOW);
 
     #ifdef TESTING
@@ -189,9 +190,9 @@ void deployMain(void)
 
     #ifdef POW
         Utility::digitalWrite(DROGUE_CONTINUITY_CHECK_PIN, Utility::PinDigital::HIGH);
-        delayMicroseconds(CONTINUITY_CHECK_DELAY);
+        Utility::sleep_us(CONTINUITY_CHECK_DELAY);
 
-        int drogue_continuity = analogRead(DROGUE_CONTINUITY_CHECK_ADC);
+        int drogue_continuity = Utility::analogRead(DROGUE_CONTINUITY_CHECK_ADC);
         Utility::digitalWrite(DROGUE_CONTINUITY_CHECK_PIN, Utility::PinDigital::LOW);
 
         #ifdef TESTING

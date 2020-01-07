@@ -21,6 +21,8 @@ namespace Utility {
     void pinMode(uint8_t pin, PinMode mode);
 
     void digitalWrite(uint8_t pin, PinDigital val);
+
+    int analogRead(uint8_t pin);
 }
 
 #endif

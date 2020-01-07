@@ -35,8 +35,8 @@
  * Distributed as-is; no warranty is given.
  */
 
-#ifndef XBee_h
-#define XBee_h
+#ifndef XBEE_H_EC398FADAAA94E8EA9544E8513281302
+#define XBEE_H_EC398FADAAA94E8EA9544E8513281302
 
 #if defined(ARDUINO) && ARDUINO >= 100
 	#include "Arduino.h"
