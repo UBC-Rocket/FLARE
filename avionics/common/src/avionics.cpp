@@ -60,12 +60,13 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 /* Includes------------------------------------------------------------*/
 #include <functional> //for std::reference_wrapper
 
-#include <Arduino.h>
 #include <HardwareSerial.h>
 #include <SD.h>
 #include <SPI.h>
 #include <i2c_t3.h>
 #include <string.h>
+
+#include "Utility/gpio.h"
 
 #include "XBee.h"
 #include "buzzer.h"
@@ -229,7 +230,7 @@ void loop() {
 
         state = state_hash_map[state]->getNewState(state_input, state_aux);
 
-        logData(timestamp, sensors, state, altitude, 0); //TODO - think some more about data logging and how it should mesh with calculations, and also get rid of baseline_pressure 
+        logData(timestamp, sensors, state, altitude, 0); //TODO - think some more about data logging and how it should mesh with calculations, and also get rid of baseline_pressure
     }
 
     //LED blinks in non-critical failure
@@ -278,8 +279,8 @@ inline void blinkStatusLED() {
         init_st_indicator = !init_st_indicator;
 
         if (init_st_indicator)
-            digitalWrite(LED_BUILTIN, HIGH);
+            Utility::digitalWrite(LED_BUILTIN, Utility::PinDigital::HIGH);
         else
-            digitalWrite(LED_BUILTIN, LOW);
+            Utility::digitalWrite(LED_BUILTIN, Utility::PinDigital::LOW);
     }
 }

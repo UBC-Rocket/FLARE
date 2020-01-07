@@ -48,7 +48,7 @@
 #define SerialGPS               Serial1
 #define SerialRadio             Serial2
 #define IridiumSerial           Serial4
-#define SPIThermo               SPI2
+// #define SPIThermo               SPI2 //TODO - When the other ones get moved, grab it from the MAX31855k.cpp file too
 
 /*Variables------------------------------------------------------------*/
 enum class Status {

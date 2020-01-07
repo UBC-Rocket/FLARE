@@ -18,6 +18,7 @@
 /*Includes------------------------------------------------------------*/
 #include <chrono>
 #include "Utility/time.h"
+#include "Utility/gpio.h"
 
 #include "buzzer.h"
 
@@ -173,9 +174,9 @@ void Buzzer::buzz(long frequency, long length) const {
     // multiply frequency = cycles per second, by the number of seconds to
     // get the total number of cycles to produce
     for (long i = 0; i < numCycles; i++) { // for the calculated length of time
-        digitalWrite(M_MELODY_PIN, HIGH); // write high to push out the diaphram
+        Utility::digitalWrite(M_MELODY_PIN, Utility::PinDigital::HIGH); // write high to push out the diaphram
         Utility::sleep_us(delayValue); // wait for the calculated delay value
-        digitalWrite(M_MELODY_PIN, LOW); // write low to pull back the diaphram
+        Utility::digitalWrite(M_MELODY_PIN, Utility::PinDigital::LOW); // write low to pull back the diaphram
         Utility::sleep_us(delayValue); // wait for the calculated delay value
     }
 }

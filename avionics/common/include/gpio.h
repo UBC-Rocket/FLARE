@@ -23,7 +23,7 @@
 #define GPIO_H
 
 /*Includes------------------------------------------------------------*/
-#include <Arduino.h>
+
 
 /*Constants------------------------------------------------------------*/
 #define POWER_STATUS_LED 20 //kept in one place w/ FLIGHT_LED

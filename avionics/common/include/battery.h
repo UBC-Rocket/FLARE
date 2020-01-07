@@ -18,7 +18,6 @@
 #ifndef __battery_sensor__
 #define __battery_sensor__
 
-#include <Arduino.h>
 #include "sensors.h"
 
 class Battery

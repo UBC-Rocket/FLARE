@@ -26,7 +26,9 @@
 
 #include "MAX31855k.h"
 // TODO: remove dependency on sensors.h (also defined in header file)
-#include "sensors.h"
+// #include "sensors.h"
+
+#define SPIThermo               SPI2 //TODO - Regroup with the other Serial definitions (currently in sensors.h)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Description  : This constructor does the required setup

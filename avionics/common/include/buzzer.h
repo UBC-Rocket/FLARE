@@ -19,8 +19,8 @@
 #define BUZZER_H
 
 /*Includes------------------------------------------------------------*/
-// #include <Arduino.h>
 #include "Utility/time.h"
+#include "Utility/gpio.h"
 #include "gpio.h"
 
 /*Variables------------------------------------------------------------*/
@@ -38,7 +38,7 @@ public:
      * @param MELODY_PIN I/O pin the buzzer is hooked up to.
     */
     Buzzer(int const MELODY_PIN) : M_MELODY_PIN(MELODY_PIN) {
-        pinMode(MELODY_PIN, OUTPUT);
+        Utility::pinMode(MELODY_PIN, Utility::PinMode::OUTPUT);
     }
 
     /** void sing(SongTypes song){}
