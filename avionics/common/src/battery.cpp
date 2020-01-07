@@ -17,7 +17,7 @@
 
 #include "battery.h"
 #include "sensors.h"
-#include "Arduino.h"
+#include "Utility/gpio.h"
 
 /*Constants------------------------------------------------------------*/
 #define MINIMUM_BATTERY_VOLTAGE 10
@@ -38,7 +38,7 @@ Battery::Battery(byte batterySensorPin)
 
 float Battery::getVoltage()
 {
-    float inputValue = analogRead(m_batterySensorPin);
+    float inputValue = Utility::analogRead(m_batterySensorPin);
     // map it to the range the analog out:
     // 3300mV is the highest voltage Teensy can read.
     float teensyVoltage = map(inputValue, 0, 1023, 0, 3300);
