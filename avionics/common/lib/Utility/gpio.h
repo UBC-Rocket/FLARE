@@ -7,6 +7,8 @@
 #undef LOW
 #undef HIGH
 
+#include <cstdint>
+
 namespace Utility {
     enum class PinMode {
         INPUT = 0,
