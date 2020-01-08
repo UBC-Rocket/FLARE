@@ -1,4 +1,3 @@
-// #include <Arduino.h>
 #include "Utility/time.h"
 #include "states/main_descent.h"
 

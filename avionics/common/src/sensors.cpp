@@ -31,8 +31,6 @@
 #include "radio.h"
 #include "state_interface.h"
 
-// #include <Arduino.h>
-
 /*Constants------------------------------------------------------------*/
 #define FILE_NAME "datalog.csv"
 
