@@ -19,6 +19,9 @@
  */
 
 /*Includes------------------------------------------------------------*/
+#include "Utility/time.h"
+#include "Utility/gpio.h"
+
 #include "sensors.h"
 #include "options.h"
 #include "battery.h"
@@ -28,7 +31,7 @@
 #include "radio.h"
 #include "state_interface.h"
 
-#include <Arduino.h>
+// #include <Arduino.h>
 
 /*Constants------------------------------------------------------------*/
 #define FILE_NAME "datalog.csv"
@@ -70,7 +73,7 @@ void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::ve
     SerialCamera.begin(CameraBaud);
     while (!SerialCamera) {
     }
-    delay(2000);
+    Utility::sleep_ms(2000);
     stop_record();
 
     /*init hardware*/
@@ -165,7 +168,7 @@ void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::
             for(int i = 1; i <= 5; i++) {
             #endif
                 buzzer.sing(SongTypes_CRITICALFAIL);
-                delay(400);
+                Utility::sleep_ms(400);
             }
             return;
         }
@@ -183,7 +186,7 @@ void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::
     for(int i = 1; i <= 5; i++) {
     #endif
         buzzer.sing(SongTypes_SUCCESS);
-        delay(400);
+        Utility::sleep_ms(400);
     }
 }
 

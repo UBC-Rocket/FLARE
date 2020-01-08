@@ -40,7 +40,7 @@ static State::PressureDelay state_pres_delay = State::PressureDelay(APOGEE_PRESS
 
 static State::DrogueDescent state_drogue = State::DrogueDescent(MAIN_DEPLOY_ALTITUDE, MAIN_DEPLOY_CHECKS);
 
-static State::MainDescent state_main = State::MainDescent(LAND_CHECK_TIME_INTERVAL, LAND_CHECKS, LAND_VELOCITY_THRESHOLD);
+static State::MainDescent state_main = State::MainDescent(std::chrono::milliseconds(LAND_CHECK_TIME_INTERVAL), LAND_CHECKS, LAND_VELOCITY_THRESHOLD);
 
 static State::Landed state_landed = State::Landed();
 

@@ -237,7 +237,7 @@ void loop() {
     blinkStatusLED();
 
 #ifdef TESTING
-    delay(1000);  //So you can actually read the serial output
+    Utility::sleep_ms(1000);  //So you can actually read the serial output
 #endif
 }
 

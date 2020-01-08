@@ -26,6 +26,8 @@
  */
 
 #include <time.h>
+#include <Utility/time.h>
+
 #include "IridiumSBD.h"
 
 // Power on the RockBLOCK or return from sleep
@@ -737,7 +739,7 @@ void IridiumSBD::power(bool on)
       // before powering off again
       unsigned long elapsed = millis() - lastPowerOnTime;
       if (elapsed < 2000UL)
-         delay(2000UL - elapsed);
+         Utility::sleep_ms(2000UL - elapsed);
 
       diagprint(F("Powering off modem...\r\n"));
       digitalWrite(this->sleepPin, LOW); // LOW = asleep
