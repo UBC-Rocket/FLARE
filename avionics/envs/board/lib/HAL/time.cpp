@@ -1,8 +1,8 @@
 #include <Arduino.h>
-#include <Utility/time.h>
+#include <HAL/time.h>
 
-namespace Utility{
-    
+namespace Hal{
+
 std::chrono::time_point<std::chrono::steady_clock> now_ms(){
     return std::chrono::time_point<std::chrono::steady_clock>(std::chrono::milliseconds(millis()));
 }
@@ -23,4 +23,4 @@ void sleep_us(uint32_t t){
     delayMicroseconds(t);
 }
 
-} //namespace Utility
+} //namespace Hal

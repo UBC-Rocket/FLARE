@@ -19,8 +19,8 @@
  */
 
 /*Includes------------------------------------------------------------*/
-#include "Utility/time.h"
-#include "Utility/gpio.h"
+#include "HAL/time.h"
+#include "HAL/gpio.h"
 
 #include "sensors.h"
 #include "options.h"
@@ -71,7 +71,7 @@ void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::ve
     SerialCamera.begin(CameraBaud);
     while (!SerialCamera) {
     }
-    Utility::sleep_ms(2000);
+    Hal::sleep_ms(2000);
     stop_record();
 
     /*init hardware*/
@@ -166,7 +166,7 @@ void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::
             for(int i = 1; i <= 5; i++) {
             #endif
                 buzzer.sing(SongTypes_CRITICALFAIL);
-                Utility::sleep_ms(400);
+                Hal::sleep_ms(400);
             }
             return;
         }
@@ -184,7 +184,7 @@ void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::
     for(int i = 1; i <= 5; i++) {
     #endif
         buzzer.sing(SongTypes_SUCCESS);
-        Utility::sleep_ms(400);
+        Hal::sleep_ms(400);
     }
 }
 

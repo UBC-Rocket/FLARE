@@ -1,6 +1,6 @@
-#include <Utility/time.h>
+#include <HAL/time.h>
 
-namespace Utility{
+namespace Hal{
     std::chrono::time_point<std::chrono::steady_clock> now_ms(){
         return std::chrono::steady_clock::now();
     }

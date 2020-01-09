@@ -1,7 +1,7 @@
 #include <Arduino.h>
-#include "Utility/gpio.h"
+#include "HAL/gpio.h"
 
-namespace Utility{
+namespace Hal{
 
 void pinMode(uint8_t pin, PinMode mode){
     ::pinMode(pin, static_cast<uint8_t>(mode));
@@ -14,4 +14,4 @@ void digitalWrite(uint8_t pin, PinDigital val){
 int analogRead(uint8_t pin){
     return ::analogRead(pin);
 }
-} //namespace Utility
+} //namespace Hal

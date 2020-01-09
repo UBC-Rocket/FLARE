@@ -1,4 +1,4 @@
-#include <Utility/time.h>
+#include <HAL/time.h>
 #include <Eigen/Geometry>
 
 #include "states/pre_air_start_coast_timed.h"
@@ -29,9 +29,9 @@ bool State::PreAirStartCoastTimed::flightNominal(const StateInput &input){
 
 StateId State::PreAirStartCoastTimed::getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux){
     typedef std::chrono::milliseconds ms;
-    static auto start_time = Utility::now_ms();
+    static auto start_time = Hal::now_ms();
 
-    if (Utility::now_ms() - start_time > ms(M_DELAY_TIME_MS)){
+    if (Hal::now_ms() - start_time > ms(M_DELAY_TIME_MS)){
         state_aux.in_abort = !flightNominal(input);
         return StateId::ASCENT_TO_APOGEE;
     }

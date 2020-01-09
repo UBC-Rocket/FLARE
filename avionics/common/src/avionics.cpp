@@ -66,7 +66,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include <i2c_t3.h>
 #include <string.h>
 
-#include "Utility/gpio.h"
+#include "HAL/gpio.h"
 
 #include "XBee.h"
 #include "buzzer.h"
@@ -78,6 +78,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 // #include "satcom.h"
 #include "sensors.h"
 
+#include "env_config.h"
 #include "config.h"
 
 /* Errors---------------------------------------------------------------*/
@@ -233,7 +234,7 @@ void loop() {
     blinkStatusLED();
 
 #ifdef TESTING
-    Utility::sleep_ms(1000);  //So you can actually read the serial output
+    Hal::sleep_ms(1000);  //So you can actually read the serial output
 #endif
 }
 
@@ -275,8 +276,8 @@ inline void blinkStatusLED() {
         init_st_indicator = !init_st_indicator;
 
         if (init_st_indicator)
-            Utility::digitalWrite(LED_BUILTIN, Utility::PinDigital::HIGH);
+            Hal::digitalWrite(LED_BUILTIN, Hal::PinDigital::HIGH);
         else
-            Utility::digitalWrite(LED_BUILTIN, Utility::PinDigital::LOW);
+            Hal::digitalWrite(LED_BUILTIN, Hal::PinDigital::LOW);
     }
 }

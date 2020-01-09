@@ -17,8 +17,8 @@
 
 /*Includes------------------------------------------------------------*/
 #include <chrono>
-#include "Utility/time.h"
-#include "Utility/gpio.h"
+#include "HAL/time.h"
+#include "HAL/gpio.h"
 
 #include "buzzer.h"
 
@@ -134,21 +134,21 @@ void Buzzer::sing(SongTypes song) const {
         {
             buzz(NOTE_C1, 500);
             buzz(NOTE_C6, 300);
-            Utility::sleep_ms(300);
+            Hal::sleep_ms(300);
             buzz(NOTE_C6, 300);
-            Utility::sleep_ms(300);
+            Hal::sleep_ms(300);
             buzz(NOTE_C6, 300);
-            Utility::sleep_ms(300);
+            Hal::sleep_ms(300);
             buzz(NOTE_C6, 300);
-            Utility::sleep_ms(300);
+            Hal::sleep_ms(300);
             buzz(NOTE_C6, 300);
-            Utility::sleep_ms(300);
+            Hal::sleep_ms(300);
             buzz(NOTE_C6, 300);
-            Utility::sleep_ms(300);
+            Hal::sleep_ms(300);
             buzz(NOTE_C6, 300);
-            Utility::sleep_ms(300);
+            Hal::sleep_ms(300);
             buzz(NOTE_C6, 300);
-            Utility::sleep_ms(300);
+            Hal::sleep_ms(300);
 
             break;
         }
@@ -174,9 +174,9 @@ void Buzzer::buzz(long frequency, long length) const {
     // multiply frequency = cycles per second, by the number of seconds to
     // get the total number of cycles to produce
     for (long i = 0; i < numCycles; i++) { // for the calculated length of time
-        Utility::digitalWrite(M_MELODY_PIN, Utility::PinDigital::HIGH); // write high to push out the diaphram
-        Utility::sleep_us(delayValue); // wait for the calculated delay value
-        Utility::digitalWrite(M_MELODY_PIN, Utility::PinDigital::LOW); // write low to pull back the diaphram
-        Utility::sleep_us(delayValue); // wait for the calculated delay value
+        Hal::digitalWrite(M_MELODY_PIN, Hal::PinDigital::HIGH); // write high to push out the diaphram
+        Hal::sleep_us(delayValue); // wait for the calculated delay value
+        Hal::digitalWrite(M_MELODY_PIN, Hal::PinDigital::LOW); // write low to pull back the diaphram
+        Hal::sleep_us(delayValue); // wait for the calculated delay value
     }
 }

@@ -26,7 +26,7 @@
  */
 
 #include <time.h>
-#include <Utility/time.h>
+#include <HAL/time.h>
 
 #include "IridiumSBD.h"
 
@@ -739,7 +739,7 @@ void IridiumSBD::power(bool on)
       // before powering off again
       unsigned long elapsed = millis() - lastPowerOnTime;
       if (elapsed < 2000UL)
-         Utility::sleep_ms(2000UL - elapsed);
+         Hal::sleep_ms(2000UL - elapsed);
 
       diagprint(F("Powering off modem...\r\n"));
       digitalWrite(this->sleepPin, LOW); // LOW = asleep

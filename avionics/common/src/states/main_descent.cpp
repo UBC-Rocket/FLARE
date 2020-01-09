@@ -1,10 +1,10 @@
-#include "Utility/time.h"
+#include "HAL/time.h"
 #include "states/main_descent.h"
 
 StateId State::MainDescent::getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux){
     static float prev_altitude = input.altitude;
-    static auto prev_time = Utility::now_ms(); //time_point
-    static auto curr_time = Utility::now_ms();
+    static auto prev_time = Hal::now_ms(); //time_point
+    static auto curr_time = Hal::now_ms();
     static uint8_t num_checks = 0;
 
     typedef std::chrono::milliseconds ms;

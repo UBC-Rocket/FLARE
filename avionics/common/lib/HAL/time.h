@@ -1,9 +1,9 @@
-#ifndef UTILITY__TIME_H_717DBAFB60CA40BCBB6780A74CDAF02C
-#define UTILITY__TIME_H_717DBAFB60CA40BCBB6780A74CDAF02C
+#ifndef HAL__TIME_H_717DBAFB60CA40BCBB6780A74CDAF02C
+#define HAL__TIME_H_717DBAFB60CA40BCBB6780A74CDAF02C
 
 #include <chrono>
 
-namespace Utility {
+namespace Hal {
 
     /**
      * @brief Sleep for some number of milliseconds.
