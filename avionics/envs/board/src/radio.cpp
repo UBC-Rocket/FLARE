@@ -31,7 +31,7 @@
 #include "GP20U7.h"           //GPS
 #include "gpio.h"
 #include "cameras.h"
-#include "satcom.h"
+// #include "satcom.h"
 #include "statemachine.h"
 #include "buzzer.h"
 

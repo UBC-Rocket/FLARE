@@ -25,7 +25,7 @@
 #include "sensors.h"
 #include "options.h"
 #include "battery.h"
-#include "satcom.h" //SATCOM
+// #include "satcom.h" //SATCOM
 #include "buzzer.h" //for buzzer response on startup
 #include "cameras.h"
 #include "radio.h"

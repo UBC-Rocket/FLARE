@@ -93,4 +93,11 @@ std::vector<std::reference_wrapper<ISensor> > sensors {
 
 Calculator calc(&barometer, &imuSensor);
 
+/* Radio */
+//This is environment dependent, rather than rocket dependent. It gets farmed out to a environment-specific include file.
+#include "radio_config.h"
+
+/* Pin and serial configs */
+#include "pin_config.h"
+
 #endif

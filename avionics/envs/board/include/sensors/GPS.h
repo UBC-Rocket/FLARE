@@ -67,12 +67,14 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
   */
 
 /*Includes------------------------------------------------------------*/
-#include "sensors-interface.h"
 #include <HardwareSerial.h>
 #include <TinyGPS.h>
 
+#include "sensors-interface.h"
+#include "pin_config.h" //for SerialGPS
+
 /*Constants------------------------------------------------------------*/
-#define SerialGPS               Serial1
+
 #define GPS_DATA_ARRAY_SIZE     3
 #define GPS_FIELD_LENGTH        20
 #define GPS_TIMEOUT     100

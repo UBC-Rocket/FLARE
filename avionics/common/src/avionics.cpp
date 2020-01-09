@@ -75,7 +75,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #include "gpio.h"
 #include "options.h"
 #include "radio.h"
-#include "satcom.h"
+// #include "satcom.h"
 #include "sensors.h"
 
 #include "config.h"
@@ -103,9 +103,6 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 /* Variables------------------------------------------------------------*/
 static Status s_statusOfInit;
 
-/* Radio */
-static RadioController radio = RadioController(SerialRadio);
-
 std::vector<std::reference_wrapper<IHardware> > hardware;  // Hardwares
 
 /* Buzzer */
@@ -121,7 +118,6 @@ void blinkStatusLED();
   * @return None
   */
 void setup() {
-    int i; //used as loop variable
     initPins();
 
 /* Setup all UART comms */

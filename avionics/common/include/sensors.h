@@ -43,12 +43,6 @@
 #include "CSVwrite.h"
 
 /*Constants------------------------------------------------------------*/
-//TODO: put these somehwere
-#define SerialUSB               Serial
-#define SerialGPS               Serial1
-#define SerialRadio             Serial2
-#define IridiumSerial           Serial4
-// #define SPIThermo               SPI2 //TODO - When the other ones get moved, grab it from the MAX31855k.cpp file too
 
 /*Variables------------------------------------------------------------*/
 enum class Status {
@@ -65,7 +59,7 @@ void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::
 
 Status getStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware);
 
-// TODO: Remove dependency of sensors.h for MAX31855k.cpp/.h and GP20U7.cpp/.h
+// TODO: Remove dependency of sensors.h for GP20U7.cpp/.h
 
 void pollSensors(unsigned long *timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors);
 
