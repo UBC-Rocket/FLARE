@@ -25,7 +25,7 @@
  ******************************************************************************/
 
 #include "MAX31855k.h"
-#define SPIThermo SPI2 //TODO put this somewhere
+#define SPIThermo SPI2 //TODO Modify the driver to take SPIThermo as a member variable and put this #define somewhere
 
 
 ////////////////////////////////////////////////////////////////////////////////
