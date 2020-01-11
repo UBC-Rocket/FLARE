@@ -2,6 +2,8 @@
 #define CALCULATIONS_H_62A4726C965C45AAA01550CD5DF18D99
 
 #include <cmath> //std::abs
+#undef abs //TODO This macro gets defined somewhere with Teensy and I'm not sure where or whether there's a better way around it
+
 #include <Eigen/Geometry> //quaternions
 
 #include "calculations_interface.h"

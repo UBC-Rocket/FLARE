@@ -59,26 +59,22 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 
 /* Includes------------------------------------------------------------*/
 #include <functional> //for std::reference_wrapper
-
-#include <SD.h>
-#include <SPI.h>
-#include <i2c_t3.h>
 #include <string.h>
+
+#include "env_config.h"
+#include "config.h"
 
 #include "HAL/gpio.h"
 
-#include "XBee.h"
 #include "buzzer.h"
 #include "calculations.h"
 #include "cameras.h"
 #include "gpio.h"
 #include "options.h"
 #include "radio.h"
-// #include "satcom.h"
 #include "sensors.h"
 
-#include "env_config.h"
-#include "config.h"
+
 
 /* Errors---------------------------------------------------------------*/
 #if defined NOSECONE && defined BODY

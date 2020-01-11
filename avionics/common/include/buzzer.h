@@ -21,7 +21,10 @@
 /*Includes------------------------------------------------------------*/
 #include "HAL/time.h"
 #include "HAL/gpio.h"
+
 #include "gpio.h"
+#undef INPUT
+#undef OUTPUT
 
 /*Variables------------------------------------------------------------*/
 enum SongTypes{
