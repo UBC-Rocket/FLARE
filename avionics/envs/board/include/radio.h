@@ -20,13 +20,12 @@
 #define __RADIO_H__
 
 /*Includes------------------------------------------------------------*/
-// #include <Arduino.h>
+#include <HardwareSerial.h>
 #include <stdint.h>
 
 #include "radio_interface.h"
 #include "statemachine.h"
 // #include "sensors.h"
-#include "pin_config.h"
 #include "options.h"
 #include "XBee.h"
 
@@ -51,7 +50,7 @@ public:
          {
 
         serial_radio.begin(RADIO_BAUD_RATE);
-        while (!SerialRadio);
+        while (!serial_radio);
         m_xbee.setSerial(serial_radio);
         m_tx_packet.setAddress64(m_gnd_addr);
         m_tx_packet.setPayload(m_payload);

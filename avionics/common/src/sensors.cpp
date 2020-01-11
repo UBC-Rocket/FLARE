@@ -44,7 +44,7 @@ CSVWrite datalog;
   * @return void
   */
 
-void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware, Buzzer buzzer) {
+void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware, Buzzer &buzzer) {
     // if(powerbattery.getVoltage() <= LOW_BATTERY_VOLTAGE)
     // { //TODO: Uncomment once the battery sensor is implemented
     //     status->sensorNominal[BATTERY_STATUS_POSITION] = false;
@@ -68,11 +68,8 @@ void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::ve
     datalog.init(FILE_NAME);
 
     /* Init Cameras */
-    SerialCamera.begin(CameraBaud);
-    while (!SerialCamera) {
-    }
-    Hal::sleep_ms(2000);
-    stop_record();
+
+
 
     /*init hardware*/
     for (auto hw : hardware) {

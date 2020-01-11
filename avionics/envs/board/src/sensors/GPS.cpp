@@ -66,8 +66,8 @@ void GPS::initSensor() {
     #ifdef TESTING
             SerialUSB.println("Initializing GPS");
         #endif
-        SerialGPS.begin(9600);  //baud rate 9600 for the GP-20U7
-        while (!SerialGPS) {}
+        m_serial_gps.begin(9600);  //baud rate 9600 for the GP-20U7
+        while (!m_serial_gps) {}
 
     status = SensorStatus::NOMINAL;
 }
@@ -76,8 +76,8 @@ void GPS::readData() {
 
     bool gpsSuccess = false;
     elapsedMillis timeout;
-    while(SerialGPS.available() && (timeout < GPS_TIMEOUT)) {
-        char c = SerialGPS.read();
+    while(m_serial_gps.available() && (timeout < GPS_TIMEOUT)) {
+        char c = m_serial_gps.read();
         if (gps.encode(c)) {
             gpsSuccess = true;
             break;

@@ -24,13 +24,13 @@
   * @param  None
   * @return none/ should be changed to boolean if possible
   */
-void power_cameras(){
+void Camera::power_cameras(){
     uint8_t power_command[] = {0xCC,0x01,0x01,0x0}; // LEAVE THESE HERE
     //hypothetically only looks at the first three indexes
     uint8_t crc = crc_calculator(power_command,3);
     power_command[3] = crc;
     //SerialUSB.println("the power command is %d", power_command[3]);
-    SerialCamera.write(power_command,sizeof(power_command));
+    m_seri_cam.write(power_command,sizeof(power_command));
 }
 
 /**
@@ -38,12 +38,12 @@ void power_cameras(){
   * @param  None
   * @return none
   */
-void start_record(){
+void Camera::start_record(){
     uint8_t startRecord_command[] = {0xCC,0x01,0x03,0x0}; // LEAVE THESE HERE
     //hypothetically only looks at the first three indexes
     uint8_t crc = crc_calculator(startRecord_command,3);
     startRecord_command[3] = crc;
-    SerialCamera.write(startRecord_command,sizeof(startRecord_command));
+    m_seri_cam.write(startRecord_command,sizeof(startRecord_command));
 }
 
 /**
@@ -51,12 +51,12 @@ void start_record(){
   * @param  None
   * @return none
   */
-void stop_record(){
+void Camera::stop_record(){
     uint8_t stopRecord_command[] = {0xCC,0x01,0x04,0x0}; // LEAVE THESE HERE
     //hypothetically only looks at the first three indexes
     uint8_t crc = crc_calculator(stopRecord_command,3);
     stopRecord_command[3] = crc;
-    SerialCamera.write(stopRecord_command,sizeof(stopRecord_command));
+    m_seri_cam.write(stopRecord_command,sizeof(stopRecord_command));
 }
 
 /**
@@ -66,7 +66,7 @@ void stop_record(){
   * @return calculated crc
   */
 //crc calculation,source: https://github.com/betaflight/betaflight/blob/5c5520ecf43bcd2c042828e08e7e11ab2342ccdd/src/main/common/crc.c?fbclid=IwAR3647Rv68ECXgWra1OktmKaQbQ1DhghM5o7r9s1hPTJkTfR6IW13qzt6LY#L60-L71
-uint8_t crc_calculator(uint8_t *command, uint8_t len){
+uint8_t Camera::crc_calculator(uint8_t *command, uint8_t len){
     uint8_t crc = 0;
     for (int i = 0 ; i < len ; i++){
         crc = crc8_dvb_s2 (crc, command[i]);
@@ -75,7 +75,7 @@ uint8_t crc_calculator(uint8_t *command, uint8_t len){
 }
 
 //crc calculator helper
-uint8_t crc8_dvb_s2(uint8_t crc, unsigned char a){
+uint8_t Camera::crc8_dvb_s2(uint8_t crc, unsigned char a){
     crc ^= a;
     for (int ii = 0; ii < 8; ++ii) {
         if (crc & 0x80) {

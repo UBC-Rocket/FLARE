@@ -76,7 +76,7 @@ static StateAuxilliaryInfo state_aux;
 #include "sensors/temperature.h"
 static Accelerometer accelerometer;
 static Barometer barometer;
-static GPS gps;
+static GPS gps(SerialGPS);
 static IMU imuSensor;
 static Temperature temperature;
 
@@ -93,11 +93,5 @@ std::vector<std::reference_wrapper<ISensor> > sensors {
 
 Calculator calc(&barometer, &imuSensor);
 
-/* Radio */
-//This is environment dependent, rather than rocket dependent. It gets farmed out to a environment-specific include file.
-#include "radio_config.h"
-
-/* Pin and serial configs */
-#include "pin_config.h"
 
 #endif

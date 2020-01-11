@@ -11,7 +11,7 @@ class Serial : public ISerial {
 public:
     Serial(HardwareSerial &seri) : m_seri(seri) {}
 
-    void begin(long baud) { m_seri.begin(buad); }
+    void begin(long baud) { m_seri.begin(baud); }
     bool available() { return m_seri.available(); }
     int read() { return m_seri.read(); }
     void write(const uint8_t *buffer, size_t size) {
@@ -20,12 +20,13 @@ public:
     void print(char *dat) { m_seri.print(dat); }
     void println(char *dat) { m_seri.println(dat); }
 
+    HardwareSerial &getSerial() {return m_seri;}
     operator bool() { return bool(m_seri); };
 
 private:
     HardwareSerial m_seri;
 
-}
+};
 
 }
 #endif

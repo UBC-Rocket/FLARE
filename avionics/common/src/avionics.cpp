@@ -138,10 +138,7 @@ void setup() {
     // s_txPacket.setAddress64(s_gndAddr);
 
 
-    // Comms to camera serial port
-    SerialCamera.begin(CameraBaud);
-    while (!SerialCamera) {
-    }
+
 
     /*init I2C bus @ 400 kHz */
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);

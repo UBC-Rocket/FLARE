@@ -19,7 +19,6 @@
 // /*Includes------------------------------------------------------------*/
 // #include "satcom.h"
 // // #include "sensors.h"
-// #include "pin_config.h"
 // #include "options.h"
 // #include <string.h>
 // #include "IridiumSBD.h"

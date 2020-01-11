@@ -67,11 +67,10 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
   */
 
 /*Includes------------------------------------------------------------*/
-#include <HardwareSerial.h>
+#include <Hal/port_impl.h>
 #include <TinyGPS.h>
 
 #include "sensors-interface.h"
-#include "pin_config.h" //for SerialGPS
 
 /*Constants------------------------------------------------------------*/
 
@@ -93,6 +92,7 @@ const uint8_t GPS_set_update_rate[] =
 
 class GPS : public ISensor {
 public:
+    GPS(Hal::Serial &seri) : m_serial_gps(seri.getSerial()) {}
     void initSensor();
     void readData();
     uint8_t dataLength();
@@ -101,6 +101,7 @@ public:
 
 private:
     TinyGPS gps;
+    HardwareSerial &m_serial_gps;
     float data[GPS_DATA_ARRAY_SIZE];
 };
 

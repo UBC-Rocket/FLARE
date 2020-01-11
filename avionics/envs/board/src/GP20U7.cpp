@@ -60,35 +60,35 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 */
 
 /*Includes------------------------------------------------------------*/
-#include "GP20U7.h"
-#include "sensors.h"
+// #include "GP20U7.h"
+// #include "sensors.h"
 
-#include <Arduino.h>
-#include <TinyGPS.h>
+// #include <Arduino.h>
+// #include <TinyGPS.h>
 
-/*Constants------------------------------------------------------------*/
-#define GPS_TIMEOUT     100
+// /*Constants------------------------------------------------------------*/
+// #define GPS_TIMEOUT     100
 
-/*Variables------------------------------------------------------------*/
-static TinyGPS gps;
+// /*Variables------------------------------------------------------------*/
+// static TinyGPS gps;
 
-/*Functions------------------------------------------------------------*/
-bool updateGPS(void)
-{
-    elapsedMillis timeout;
-    while(SerialGPS.available() && (timeout < GPS_TIMEOUT)) {
-        char c = SerialGPS.read();
-        if (gps.encode(c)) {
-            return true;
-        }
-    }
+// /*Functions------------------------------------------------------------*/
+// bool updateGPS(void)
+// {
+//     elapsedMillis timeout;
+//     while(SerialGPS.available() && (timeout < GPS_TIMEOUT)) {
+//         char c = SerialGPS.read();
+//         if (gps.encode(c)) {
+//             return true;
+//         }
+//     }
 
-    return false;
-}
+//     return false;
+// }
 
-void getGPS(float* GPS_data)
-{
-    unsigned long fix_age;
-    gps.f_get_position(&GPS_data[0], &GPS_data[1], &fix_age);
-    GPS_data[2] = gps.f_altitude();
-}
+// void getGPS(float* GPS_data)
+// {
+//     unsigned long fix_age;
+//     gps.f_get_position(&GPS_data[0], &GPS_data[1], &fix_age);
+//     GPS_data[2] = gps.f_altitude();
+// }

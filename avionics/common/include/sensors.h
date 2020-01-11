@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "buzzer.h"
+#include "cameras.h"
 #include "sensors-interface.h"
 #include "hw-interface.h"
 #include "statemachine.h"
@@ -53,7 +54,7 @@ enum class Status {
 
 /*Functions------------------------------------------------------------*/
 
-void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware, Buzzer buzzer);
+void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware, Buzzer &buzzer);
 
 void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware, Buzzer buzzer);
 
