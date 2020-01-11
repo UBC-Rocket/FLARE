@@ -20,7 +20,7 @@
  */
 
 /*Includes------------------------------------------------------------*/
-#include <Servo.h>
+// #include <Servo.h> //TODO - figure out if we want to keep this
 #include "HAL/gpio.h"
 #include "HAL/time.h"
 
@@ -55,7 +55,7 @@
 #define DISCONTINUOUS_THRESHOLD 650
 
 /*Variables------------------------------------------------------------*/
-static Servo myServo;
+// static Servo myServo;
 
 /*Functions------------------------------------------------------------*/
 /**
@@ -110,14 +110,14 @@ void initPins(void)
             #endif
         #endif // POW
 
-        #ifdef SERVO
-            /*init servo*/
-            myServo.attach(SERVO_PIN);
-            myServo.write(INIT_SERVO_POS);
-            #ifdef TESTING
-            SerialUSB.println("servo pins init");
-            #endif
-        #endif // SERVO
+        // #ifdef SERVO
+        //     /*init servo*/
+        //     myServo.attach(SERVO_PIN);
+        //     myServo.write(INIT_SERVO_POS);
+        //     #ifdef TESTING
+        //     SerialUSB.println("servo pins init");
+        //     #endif
+        // #endif // SERVO
 
     #endif //body
 
@@ -130,16 +130,16 @@ void initPins(void)
   */
 void deployDrogue(void)
 {
-    #ifdef SERVO
-        myServo.write(FINAL_SERVO_POS);
+    // #ifdef SERVO
+    //     myServo.write(FINAL_SERVO_POS);
 
-        #ifdef TESTING
-        SerialUSB.println("DROGUE SERVO DEPLOYED");
-        #endif
+    //     #ifdef TESTING
+    //     SerialUSB.println("DROGUE SERVO DEPLOYED");
+    //     #endif
 
-        Hal::sleep_ms(SERVO_DELAY);
-        myServo.write(INIT_SERVO_POS);
-    #endif  // SERVO
+    //     Hal::sleep_ms(SERVO_DELAY);
+    //     myServo.write(INIT_SERVO_POS);
+    // #endif  // SERVO
 
     #ifdef POW
         Hal::digitalWrite(DROGUE_IGNITOR_PIN, Hal::PinDigital::HIGH);
