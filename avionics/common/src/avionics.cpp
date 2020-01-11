@@ -60,7 +60,6 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 /* Includes------------------------------------------------------------*/
 #include <functional> //for std::reference_wrapper
 
-#include <HardwareSerial.h>
 #include <SD.h>
 #include <SPI.h>
 #include <i2c_t3.h>

@@ -1,18 +1,16 @@
 #ifndef HAL__PORT_IMPL_H_4670E21514FE46DE8214D2F192FBBD20
 #define HAL__PORT_IMPL_H_4670E21514FE46DE8214D2F192FBBD20
 
-#include <HardwareSerial.h>
-
 #include "Hal/port.h"
 
 namespace Hal {
 
-class Serial : public ISerial {
+class NativeSerial : public ISerial {
 public:
-    Serial(HardwareSerial &seri) : m_seri(seri) {}
+    Serial() : m_seri(seri) {}
 
-    void begin(long baud) { m_seri.begin(buad); }
-    bool available() { return m_seri.available(); }
+    void begin(long baud) { } //no-op for native
+    bool available() { return true; } //std::cout always available
     int read() { return m_seri.read(); }
     void write(const uint8_t *buffer, size_t size) {
         m_seri.write(buffer, size);
@@ -23,7 +21,6 @@ public:
     operator bool() { return bool(m_seri); };
 
 private:
-    HardwareSerial m_seri;
 
 }
 
