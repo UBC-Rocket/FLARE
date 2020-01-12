@@ -10,7 +10,7 @@ enum class HardwareStatus {
     FAILURE
 };
 
-class IHardware {
+class IParachute {
     public:
     /**
      * @brief initializes hardware
@@ -24,6 +24,12 @@ class IHardware {
     HardwareStatus getStatus() {
         return status;
     }
+
+    /**
+     * @brief returns true if parachute works, false otherwise
+     * @return boolean
+     */
+    virtual bool isWorking() = 0;
 
     /**
      * @brief activates the hardware
