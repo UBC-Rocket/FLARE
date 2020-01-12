@@ -3,7 +3,7 @@
 
 #include <HardwareSerial.h>
 
-#include "Hal/port.h"
+#include "HAL/port.h"
 
 namespace Hal {
 

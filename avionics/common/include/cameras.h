@@ -19,8 +19,8 @@
 #define CAMERAS_H
 
 /*Includes------------------------------------------------------------*/
-#include <hal/port.h>
-#include <hal/time.h>
+#include <HAL/port.h>
+#include <HAL/time.h>
 #include "sensors.h"
 
 /*Constants------------------------------------------------------------*/

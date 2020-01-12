@@ -2,7 +2,7 @@
 #define HAL__PORT_IMPL_H_4670E21514FE46DE8214D2F192FBBD20
 
 #include <cstring>
-#include "Hal/port.h"
+#include "HAL/port.h"
 
 namespace Hal {
 

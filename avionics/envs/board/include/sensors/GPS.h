@@ -67,7 +67,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
   */
 
 /*Includes------------------------------------------------------------*/
-#include <Hal/port_impl.h>
+#include <HAL/port_impl.h>
 #include <TinyGPS.h>
 
 #include "sensors-interface.h"
