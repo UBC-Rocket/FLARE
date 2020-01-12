@@ -24,10 +24,7 @@
 
 #include "sensors.h"
 #include "options.h"
-#include "battery.h"
-// #include "satcom.h" //SATCOM
 #include "buzzer.h" //for buzzer response on startup
-#include "cameras.h"
 #include "radio.h"
 #include "state_interface.h"
 
@@ -66,9 +63,6 @@ void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::ve
 
     /*init SD card*/
     datalog.init(FILE_NAME);
-
-    /* Init Cameras */
-
 
 
     /*init hardware*/

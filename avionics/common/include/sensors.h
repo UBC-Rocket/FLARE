@@ -27,19 +27,11 @@
 #include <vector>
 
 #include "buzzer.h"
-#include "cameras.h"
 #include "sensors-interface.h"
 #include "hw-interface.h"
 #include "statemachine.h"
 #include "state_interface.h"
 #include "options.h"
-
-#include "sensors/accelerometer.h"
-#include "sensors/barometer.h"
-#include "sensors/GPS.h"
-#include "sensors/IMU.h"
-#include "sensors/temperature.h"
-#include "sensors/thermocouple.h"
 
 #include "CSVwrite.h"
 
