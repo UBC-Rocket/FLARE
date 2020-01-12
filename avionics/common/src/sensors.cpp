@@ -44,7 +44,7 @@ CSVWrite datalog;
   * @return void
   */
 
-void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware, Buzzer &buzzer) {
+void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IParachute> > &hardware, Buzzer &buzzer) {
     // if(powerbattery.getVoltage() <= LOW_BATTERY_VOLTAGE)
     // { //TODO: Uncomment once the battery sensor is implemented
     //     status->sensorNominal[BATTERY_STATUS_POSITION] = false;
@@ -100,7 +100,7 @@ void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::ve
  * @param  InitStatus *status - status of initialization.
  * @return void
  */
-void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware, Buzzer buzzer) {
+void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IParachute> > &hardware, Buzzer buzzer) {
     // TODO: change this function to discern which sensors constitute a critical fail
     /*
     if (status->overview == CRITICAL_FAILURE) {
@@ -185,7 +185,7 @@ void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::
     }
 }
 
-Status getStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware) {
+Status getStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IParachute> > &hardware) {
     Status status = Status::NOMINAL;
     for (auto sensor : sensors) {
         if (sensor.get().getStatus() == SensorStatus::FAILURE) {

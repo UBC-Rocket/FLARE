@@ -88,6 +88,14 @@ std::vector<std::reference_wrapper<ISensor> > sensors {
     temperature
 };
 
+/* Parachute */
+#include "hw-interface.h"
+#include "hardware/ignitor.h"
+
+// TODO: Add ignitor to hardware vector with proper pin initialization
+
+std::vector<std::reference_wrapper<IParachute> > hardware;
+
 /* Calculator */
 #include "calculations.h"
 

@@ -99,8 +99,6 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 /* Variables------------------------------------------------------------*/
 static Status s_statusOfInit;
 
-std::vector<std::reference_wrapper<IHardware> > hardware;  // Hardwares
-
 /* Buzzer */
 static Buzzer buzzer = Buzzer(MELODY_PIN);
 /* Functions------------------------------------------------------------*/
