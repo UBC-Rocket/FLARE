@@ -36,12 +36,19 @@ Battery::Battery(uint8_t batterySensorPin)
 }
 
 
+//copied from Teensy source. Doesn't seemd to be used anywhere else, so temporaryily put this here.
+//TODO - put in utility file? 
+float range_map(int x, int in_min, int in_max, int out_min, int out_max){
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+
 float Battery::getVoltage()
 {
     int inputValue = Hal::analogRead(m_batterySensorPin);
     // map it to the range the analog out:
     // 3300mV is the highest voltage Teensy can read.
-    float teensyVoltage = map(inputValue, 0, 1023, 0, 3300);
+    float teensyVoltage = range_map(inputValue, 0, 1023, 0, 3300);
     // converts output value from mV to V and divides by voltage divider
     // value to calculate battery input voltage.
     float batteryVoltage = (teensyVoltage / m_divider) / 1000;
