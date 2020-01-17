@@ -29,10 +29,9 @@
 #include "state_interface.h"
 
 /*Constants------------------------------------------------------------*/
-#define FILE_NAME "datalog.csv"
 
 /*Variables------------------------------------------------------------*/
-CSVWrite datalog;
+// CSVWrite datalog; //MOVED TO ENV_CONFIG
 
 /*Functions------------------------------------------------------------*/
 /**
@@ -60,9 +59,6 @@ void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::ve
     //         #endif
     //     }
     // }
-
-    /*init SD card*/
-    datalog.init(FILE_NAME);
 
 
     /*init hardware*/
@@ -212,25 +208,3 @@ void pollSensors(unsigned long *timestamp, std::vector<std::reference_wrapper<IS
     // *battery_voltage = powerbattery.getVoltage();
 }
 
-/**
-  * @brief Logs data on the SD card
-  * @param timestamp pointer to store the timestamp value
-  * @param sensors the sensors to log data from
-  * @param state rocket flight state
-  * @param altitude Calculated rocket altitude, after filtering
-  * @param baseline_pressure Pressure used as "ground level"
-  */
-void logData(unsigned long timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors,
-             StateId state, float altitude, float baseline_pressure) {
-
-    /*write data to SD card*/
-    datalog.write(timestamp);
-    for (auto sensor : sensors) {
-        float *data = sensor.get().getData();
-        for (int i = 0; i < sensor.get().dataLength(); i++) {
-            datalog.write(data[i]);
-        }
-    }
-    datalog.writeln("");
-    datalog.flush();
-}

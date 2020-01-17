@@ -1,5 +1,5 @@
-#ifndef CSVWRITE_H
-#define CSVWRITE_H
+#ifndef CSVWRITE_H_53A4CAED991D46F687680132192B5E5A
+#define CSVWRITE_H_53A4CAED991D46F687680132192B5E5A
 
 /**
   * CSV writing Class
@@ -7,8 +7,14 @@
   */
 
 /*Includes------------------------------------------------------------*/
-#include <SD.h>
 
+/*
+Requirements on Impl:
+-Has init method that initializes the implementation. takes a char* (filename) and returns boolean (true if success, false if failure)
+-Has templated print and println functions that take in values to be printed. println should do the same thing as print, except put a newline character at the end.
+-Has void flush(void) method that flushes the buffer.
+*/
+template <typename Impl>
 class CSVWrite {
     public:
     /**
@@ -16,16 +22,17 @@ class CSVWrite {
      * @return false if the sensor fails to initialize
      */
     bool init(const char* filename) {
-        bool success = SD.begin(BUILTIN_SDCARD);
-        if(success) {
-            datalog = SD.open(filename, FILE_WRITE);
-        }
+        return(m_datalog.init(filename));
+        // bool success = SD.begin(BUILTIN_SDCARD);
+        // if(success) {
+        //     m_datalog = SD.open(filename, FILE_WRITE);
+        // }
 
-        if(!datalog) {
-            return false;
-        }
+        // if(!m_datalog) {
+        //     return false;
+        // }
 
-        return success;
+        // return success;
     }
 
     /**
@@ -34,8 +41,8 @@ class CSVWrite {
      */
     template<typename T>
     void write(T t) {
-        datalog.print(t);
-        datalog.print(",");
+        m_datalog.print(t);
+        m_datalog.print(",");
     }
 
     /**
@@ -44,17 +51,41 @@ class CSVWrite {
      */
     template<typename T>
     void writeln(T t) {
-        datalog.println(t);
+        m_datalog.println(t);
     }
 
     /**
      * @brief flushes the cached data to the SD card
      */
     void flush() {
-        datalog.flush();
+        m_datalog.flush();
+    }
+
+    /**
+     * @brief Logs data on the SD card
+     * @param timestamp pointer to store the timestamp value
+     * @param sensors the sensors to log data from
+     * @param state rocket flight state
+     * @param altitude Calculated rocket altitude, after filtering
+     * @param baseline_pressure Pressure used as "ground level"
+     */
+    void logData(unsigned long timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors,
+                StateId state, float altitude, float baseline_pressure) {
+
+        /*write data to SD card*/
+        m_datalog.write(timestamp);
+        for (auto sensor : sensors) {
+            float *data = sensor.get().getData();
+            for (int i = 0; i < sensor.get().dataLength(); i++) {
+                m_datalog.write(data[i]);
+            }
+        }
+        m_datalog.writeln("");
+        m_datalog.flush();
     }
 
     private:
-    File datalog;
+    // File m_datalog;
+    Impl m_datalog;
 };
 #endif

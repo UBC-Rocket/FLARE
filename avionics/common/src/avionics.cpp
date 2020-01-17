@@ -146,6 +146,9 @@ void setup() {
     // sensors.push_back(temperature);
     // sensors.push_back(thermocouple);
 
+    /* init log file */
+    datalog.init(LOG_FILE_NAME);
+
     /* init sensors and report status in many ways */
     initSensors(sensors, hardware, buzzer);
 
@@ -217,7 +220,7 @@ void loop() {
 
         state = state_hash_map[state]->getNewState(state_input, state_aux);
 
-        logData(timestamp, sensors, state, altitude, 0); //TODO - think some more about data logging and how it should mesh with calculations, and also get rid of baseline_pressure
+        datalog.logData(timestamp, sensors, state, altitude, 0); //TODO - think some more about data logging and how it should mesh with calculations, and also get rid of baseline_pressure
     }
 
     //LED blinks in non-critical failure

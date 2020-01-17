@@ -25,7 +25,7 @@ class Battery
     public:  // public functions
         // Constructor. batterySensorPin is the pin for battery sensor
         // (i.e. output of the voltage divider)
-        Battery(byte batterySensorPin);
+        Battery(uint8_t batterySensorPin);
 
         /**
          * @brief  Gets the battery voltage level. Maximum voltage readable
@@ -46,7 +46,7 @@ class Battery
 
     private:
         float m_divider;
-        byte m_batterySensorPin;
+        uint8_t m_batterySensorPin;
 };
 
 #endif

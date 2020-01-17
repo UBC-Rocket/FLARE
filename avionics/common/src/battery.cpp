@@ -29,7 +29,7 @@
 
 
 
-Battery::Battery(byte batterySensorPin)
+Battery::Battery(uint8_t batterySensorPin)
 {
     m_divider = static_cast<float>(R2) /(R1 + R2);
     m_batterySensorPin = batterySensorPin;
@@ -38,7 +38,7 @@ Battery::Battery(byte batterySensorPin)
 
 float Battery::getVoltage()
 {
-    float inputValue = Hal::analogRead(m_batterySensorPin);
+    int inputValue = Hal::analogRead(m_batterySensorPin);
     // map it to the range the analog out:
     // 3300mV is the highest voltage Teensy can read.
     float teensyVoltage = map(inputValue, 0, 1023, 0, 3300);

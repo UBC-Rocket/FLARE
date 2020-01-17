@@ -15,4 +15,8 @@ static RadioController radio = RadioController(Serial2); //TODO - create method 
 #include "cameras.h"
 Camera cam(SerialCamera);
 
+#include "CSVWriteImpl.h"
+constexpr char LOG_FILE_NAME[] = "datalog.csv";
+CSVWrite<CSVWriteImpl> datalog;
+
 #endif
