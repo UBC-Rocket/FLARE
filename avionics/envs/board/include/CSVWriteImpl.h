@@ -9,7 +9,7 @@
  */
 class CSVWriteImpl {
 public:
-    bool init(char *filename) {
+    bool init(char const *filename) {
         bool success = SD.begin(BUILTIN_SDCARD);
         if(success) {
             m_datalog = SD.open(filename, FILE_WRITE);

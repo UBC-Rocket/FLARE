@@ -28,6 +28,10 @@
 #include "radio.h"
 #include "state_interface.h"
 
+#undef HIGH //TODO - see if there's a better place to undef these codes from Arduino
+#undef OUTPUT
+#undef LED_BUILTIN
+
 /*Constants------------------------------------------------------------*/
 
 /*Variables------------------------------------------------------------*/
@@ -162,8 +166,8 @@ void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::
     #ifdef TESTING
     SerialUSB.println("Initialization complete! :D");
     #endif
-    pinMode(LED_BUILTIN,OUTPUT);
-    digitalWrite(LED_BUILTIN,HIGH);
+    Hal::pinMode(Hal::LED_BUILTIN(), Hal::PinMode::OUTPUT);
+    Hal::digitalWrite(Hal::LED_BUILTIN(), Hal::PinDigital::HIGH);
 
     #ifdef TESTING
     for(int i = 1; i <= 1; i++) {

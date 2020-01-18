@@ -6,6 +6,7 @@
 #undef OUTPUT
 #undef LOW
 #undef HIGH
+#undef LED_BUILTIN
 
 #include <cstdint>
 
@@ -25,6 +26,8 @@ namespace Hal {
     void digitalWrite(uint8_t pin, PinDigital val);
 
     int analogRead(uint8_t pin);
+
+    int LED_BUILTIN(); //function because c++ doesn't have forward declaration of variables or something similar
 }
 
 #endif

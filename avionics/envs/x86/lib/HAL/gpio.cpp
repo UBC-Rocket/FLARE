@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include "HAL/gpio.h"
 
 namespace Hal{
@@ -13,6 +12,11 @@ void digitalWrite(uint8_t pin, PinDigital val){
 
 int analogRead(uint8_t pin){
     //TODO - Maybe report this somehow?
+    return 0;
+}
+
+int constexpr LED_BUILTIN() {
+    return 13;
 }
 
 } //namespace Hal

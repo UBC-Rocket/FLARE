@@ -10,7 +10,7 @@ namespace Hal{
      * @param t Duration to sleep for.
      */
     template<class Duration>
-    void sleep(Duration t);{
+    void sleep(Duration t){
         namespace c = std::chrono; //alias
         c::steady_clock::time_point start = c::steady_clock::now();
         c::steady_clock::time_point tgt = start + t; //Precalculate so checks can happen more often?

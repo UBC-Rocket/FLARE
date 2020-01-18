@@ -13,7 +13,7 @@ auto static SerialCamera    = Hal::NativeSerial(5);
 
 // #include "CSVWriteImpl.h"
 class NativeDumbCSVImpl { //TODO - make this not full of no-ops
-    bool init(char *filename) {
+    bool init(char const *filename) {
         return true;
     }
 

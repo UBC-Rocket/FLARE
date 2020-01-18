@@ -76,6 +76,7 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 
 
 
+
 /* Errors---------------------------------------------------------------*/
 #if defined NOSECONE && defined BODY
 #error Only one of NOSECONE and BODY may be defined!
@@ -269,8 +270,8 @@ inline void blinkStatusLED() {
         init_st_indicator = !init_st_indicator;
 
         if (init_st_indicator)
-            Hal::digitalWrite(LED_BUILTIN, Hal::PinDigital::HIGH);
+            Hal::digitalWrite(Hal::LED_BUILTIN(), Hal::PinDigital::HIGH);
         else
-            Hal::digitalWrite(LED_BUILTIN, Hal::PinDigital::LOW);
+            Hal::digitalWrite(Hal::LED_BUILTIN(), Hal::PinDigital::LOW);
     }
 }
