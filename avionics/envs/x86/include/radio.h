@@ -18,14 +18,15 @@ public:
         uint8_t len = m_tx_q.fillPayload(m_payload);
         m_io_controller.putPacket(M_IO_ID, m_payload, len);
 
-        char command;
+
+        uint8_t command;
         while(m_io_controller.get(M_IO_ID, command)){
             //TODO - do something with command
         }
     }
 
 private:
-    std::queue m_commands;
+    std::queue<uint8_t> m_commands;
     uint8_t m_payload[256];
     StdIoController &m_io_controller;
 

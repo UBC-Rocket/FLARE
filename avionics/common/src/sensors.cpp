@@ -202,8 +202,8 @@ Status getStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::ve
   * @param timestamp pointer to store the timestamp value
   * @param sensors the sensors to poll
   */
-void pollSensors(unsigned long *timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors) {
-    *timestamp = millis();
+void pollSensors(Hal::t_point &timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors) {
+    timestamp = Hal::now_ms();
 
     for (auto sensor : sensors) {
         sensor.get().readData();

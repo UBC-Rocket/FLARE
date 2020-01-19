@@ -3,17 +3,21 @@
 
 #include "Hal/port_impl.h"
 #include "stdio_controller.hpp"
-StdIoController std_io_controller();
+StdIoController std_io_controller;
+
+#include "radio.h"
+NativeRadioController radio(800, std_io_controller);
 
 
-auto static SerialUSB       = Hal::NativeSerial(1);
-auto static SerialGPS       = Hal::NativeSerial(2);
-auto static SerialRadio     = Hal::NativeSerial(3);
-auto static IridiumSerial   = Hal::NativeSerial(4);
-auto static SerialCamera    = Hal::NativeSerial(5);
+auto static SerialUSB       = Hal::NativeSerial(1, std_io_controller);
+auto static SerialGPS       = Hal::NativeSerial(2, std_io_controller);
+auto static SerialRadio     = Hal::NativeSerial(3, std_io_controller);
+auto static IridiumSerial   = Hal::NativeSerial(4, std_io_controller);
+auto static SerialCamera    = Hal::NativeSerial(5, std_io_controller);
 
 #include "CSVwrite.h"
 class NativeDumbCSVImpl { //TODO - make this not full of no-ops
+public:
     bool init(char const *filename) {
         return true;
     }

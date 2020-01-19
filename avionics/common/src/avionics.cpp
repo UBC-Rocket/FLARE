@@ -174,7 +174,7 @@ void setup() {
   */
 void loop() {
     /* List of constants */
-    static uint32_t timestamp;
+    static Hal::t_point timestamp;
     static Hal::t_point old_time = Hal::now_ms();  //ms
     static Hal::t_point new_time = Hal::now_ms();  //ms
     // unsigned long delta_time;
@@ -215,14 +215,14 @@ void loop() {
     if ((new_time - old_time) >= time_interval) {
         old_time = new_time;
 
-        pollSensors(&timestamp, sensors);
+        pollSensors(timestamp, sensors);
 
         calc.calculateValues(state, state_input, new_time);
         altitude = state_input.altitude; //TODO - This is temporary fix for logData; should instead do something else.
 
         state = state_hash_map[state]->getNewState(state_input, state_aux);
 
-        datalog.logData(timestamp, sensors, state, altitude, 0); //TODO - think some more about data logging and how it should mesh with calculations, and also get rid of baseline_pressure
+        datalog.logData(static_cast<uint32_t>(timestamp.time_since_epoch().count()), sensors, state, altitude, 0); //TODO - think some more about data logging and how it should mesh with calculations, and also get rid of baseline_pressure
     }
 
     //LED blinks in non-critical failure

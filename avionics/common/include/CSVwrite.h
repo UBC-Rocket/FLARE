@@ -2,6 +2,7 @@
 #define CSVWRITE_H_53A4CAED991D46F687680132192B5E5A
 
 #include "sensors-interface.h" //for ISensor
+#include "state_interface.h" //for StateId
 /**
   * CSV writing Class
   * Wrapper for SD.h which makes printing to csv easier

@@ -54,7 +54,7 @@ Status getStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::ve
 
 // TODO: Remove dependency of sensors.h for GP20U7.cpp/.h
 
-void pollSensors(unsigned long *timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors);
+void pollSensors(Hal::t_point &timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors);
 
 void logData(unsigned long timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors,                    StateId state, float altitude, float baseline_pressure);
 
