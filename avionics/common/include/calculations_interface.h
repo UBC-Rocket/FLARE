@@ -2,7 +2,7 @@
 #define CALCULATIONS_INTEFACE_H_56E2593E52DF46C588173A04C05D90FC
 
 #include "state_input_struct.h" //found in rocket-specific folders
-#include "hal/time.h" //for Hal::t_point
+#include "HAL/time.h" //for Hal::t_point
 /*Classes--------------------------------------------------------------*/
 
 class ICalculator {
