@@ -48,4 +48,14 @@ public:
 constexpr char LOG_FILE_NAME[] = "datalog.csv";
 CSVWrite<NativeDumbCSVImpl> datalog;
 
+void setup(void);
+void loop(void);
+
+int main(void){
+    setup();
+    for(;;){
+        loop();
+    }
+}
+
 #endif
