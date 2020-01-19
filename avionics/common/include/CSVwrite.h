@@ -1,6 +1,7 @@
 #ifndef CSVWRITE_H_53A4CAED991D46F687680132192B5E5A
 #define CSVWRITE_H_53A4CAED991D46F687680132192B5E5A
 
+#include "sensors-interface.h" //for ISensor
 /**
   * CSV writing Class
   * Wrapper for SD.h which makes printing to csv easier
@@ -69,7 +70,7 @@ class CSVWrite {
      * @param altitude Calculated rocket altitude, after filtering
      * @param baseline_pressure Pressure used as "ground level"
      */
-    void logData(unsigned long timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors,
+    void logData(unsigned long timestamp, SensorSet &sensors,
                 StateId state, float altitude, float baseline_pressure) {
 
         /*write data to SD card*/

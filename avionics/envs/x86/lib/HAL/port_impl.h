@@ -24,7 +24,8 @@ public:
 
 private:
     uint8_t const M_IO_ID;
-}
+
+};
 
 }
 #endif

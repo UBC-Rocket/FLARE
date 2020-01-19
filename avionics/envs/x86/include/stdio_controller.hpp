@@ -1,7 +1,8 @@
 #ifndef COUT_CONTROLLER_H_28309666D6B04A8EA72B8C7C06476AE5
 #define COUT_CONTROLLER_H_28309666D6B04A8EA72B8C7C06476AE5
 
-#include <iostream>
+#include <iostream> //for std::cin/cout
+#include <queue> //for queue
 #include <thread> //for non-blocking input
 #include <mutex>
 #include <unordered_map> //for hash map
@@ -17,9 +18,13 @@ public:
      */
     bool get(uint8_t id, unsigned char &c) {
         m_mutexes[id].lock();
-        bool tmp = bool(m_istreams[id].get(c));
+        if (m_istreams[id].size() == 0){
+            return false;
+        }
+        c = m_istreams[id].front();
+        m_istreams[id].pop();
         m_mutexes[id].unlock();
-        return tmp;
+        return true;
     }
 
     /**
@@ -28,7 +33,7 @@ public:
      * @param c Pointer to array of data to be sent
      * @param length Length of the data to be sent
      */
-    void putPacket(uint8_t const id, unsigned char const * const c, uint16_t const length){
+    void putPacket(uint8_t const id, char const * const c, uint16_t const length){
         m_cout.lock();
         //TODO - check the success of std::cout.put and other unformatted output, and possibly do something about it
         std::cout.put(id); //ID
@@ -39,10 +44,10 @@ public:
     }
 
 private:
-    typedef uint8_t Id;
+    typedef char Id;
 
     std::unordered_map<Id, std::mutex> m_mutexes;
-    std::unordered_map<Id, std::stringstream> m_istreams; //Note - for input only
+    std::unordered_map<Id, std::queue> m_istreams; //Note - for input only
 
     // I got tired of thinking about the best way to pre-compose strings so instead I'm just going to lock std::cout
     std::mutex m_cout;
@@ -51,8 +56,9 @@ private:
     std::thread m_input; //run infinite inputLoop()
 
     char getCinForce(){
+        //busy loops until we get a character
         char c;
-        while(!std::cin.get(id));
+        while(!std::cin.get(c));
         return c;
     }
 
@@ -75,7 +81,7 @@ private:
 
                 m_mutexes[id].lock();
                 for(auto j : buf) {
-                    m_istreams.put(j);
+                    m_istreams.push(j);
                 }
                 m_mutexes[id].unlock();
             }

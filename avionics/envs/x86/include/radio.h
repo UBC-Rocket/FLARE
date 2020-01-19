@@ -30,7 +30,7 @@ private:
     StdIoController &m_io_controller;
 
     static uint8_t const M_IO_ID = 0x52;
-}
+};
 
 
 #endif
