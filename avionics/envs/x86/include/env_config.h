@@ -11,7 +11,7 @@ auto static SerialRadio     = Hal::NativeSerial(3);
 auto static IridiumSerial   = Hal::NativeSerial(4);
 auto static SerialCamera    = Hal::NativeSerial(5);
 
-// #include "CSVWriteImpl.h"
+#include "CSVwrite.h"
 class NativeDumbCSVImpl { //TODO - make this not full of no-ops
     bool init(char const *filename) {
         return true;
@@ -38,7 +38,7 @@ class NativeDumbCSVImpl { //TODO - make this not full of no-ops
      */
     void flush() {
     }
-}
+};
 
 constexpr char LOG_FILE_NAME[] = "datalog.csv";
 CSVWrite<NativeDumbCSVImpl> datalog;

@@ -23,11 +23,11 @@ public:
     Calculator(Barometer *baro, IMU *imu) : m_baro(baro), m_imu(imu){
         baro->readData();
         m_base_alt.reset(pressureToAltitude(*(baro->getData())), 1, BAROMETER_MOVING_AVERAGE_ALPHA);
-        m_last_t = millis();
+        m_last_t = Hal::now_ms();
         m_last_alt = m_base_alt.getAverage();
     }
 
-    void calculateValues(StateId const state, StateInput &out_state_input, uint32_t t_ms) {
+    void calculateValues(StateId const state, StateInput &out_state_input, Hal::t_point t_ms) {
         StateInput &out = out_state_input; //alias
 
         /* Update altitude average and calculate altitude*/
@@ -66,7 +66,7 @@ public:
 
         /* Do velocity calculations */
         constexpr int MILLISECONDS_PER_SECOND = 1000;
-        out.velocity_vertical = (out.altitude - m_last_alt) / (t_ms - m_last_t) * MILLISECONDS_PER_SECOND;
+        out.velocity_vertical = (out.altitude - m_last_alt) / (t_ms - m_last_t).count() * MILLISECONDS_PER_SECOND; //t_ms and m_last_t are of millisconds
 
         m_last_alt = out.altitude; //in preparation for next loop
         m_last_t = t_ms;
@@ -80,7 +80,7 @@ private:
     Eigen::Quaternionf m_gnd_quat;
 
     float m_last_alt;
-    uint32_t m_last_t;
+    Hal::t_point m_last_t;
 };
 
 #endif

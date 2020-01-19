@@ -134,10 +134,11 @@ void setup() {
 
 
 
-
+    #ifdef ARDUINO //TODO - ifdefs aren't ideal, I think, see if this can be moved somewhere else
     /*init I2C bus @ 400 kHz */
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
     Wire.setDefaultTimeout(100000);  // 100ms
+    #endif
 
     /* Add all the sensors inside sensor vector */
     // sensors.push_back(accelerometer);
@@ -174,10 +175,10 @@ void setup() {
 void loop() {
     /* List of constants */
     static uint32_t timestamp;
-    static unsigned long old_time = 0;  //ms
-    static unsigned long new_time = 0;  //ms
+    static Hal::t_point old_time = Hal::now_ms();  //ms
+    static Hal::t_point new_time = Hal::now_ms();  //ms
     // unsigned long delta_time;
-    static uint16_t time_interval = NOMINAL_POLLING_TIME_INTERVAL;  //ms
+    static Hal::duration_ms time_interval(NOMINAL_POLLING_TIME_INTERVAL);  //ms
 
     // static unsigned long radio_old_time = 0;
     // static unsigned long radio_time_interval = 500;  //ms
@@ -204,19 +205,19 @@ void loop() {
     // Polling time intervals need to be variable, since in LANDED
     // there's a lot of data that'll be recorded
     if (state == StateId::LANDED)
-        time_interval = LANDED_POLLING_TIME_INTERVAL;
+        time_interval = Hal::duration_ms(LANDED_POLLING_TIME_INTERVAL);
     else
-        time_interval = NOMINAL_POLLING_TIME_INTERVAL;
+        time_interval = Hal::duration_ms(NOMINAL_POLLING_TIME_INTERVAL);
 
     //Core functionality of rocket - take data, process it,
     //run the state machine, and log the data
-    new_time = millis();
+    new_time = Hal::now_ms();
     if ((new_time - old_time) >= time_interval) {
         old_time = new_time;
 
         pollSensors(&timestamp, sensors);
 
-        calc.calculateValues(state, state_input, timestamp);
+        calc.calculateValues(state, state_input, new_time);
         altitude = state_input.altitude; //TODO - This is temporary fix for logData; should instead do something else.
 
         state = state_hash_map[state]->getNewState(state_input, state_aux);
@@ -261,12 +262,12 @@ void loop() {
   * @return None
   */
 inline void blinkStatusLED() {
-    static unsigned long init_st_old_time = 0;
-    static const uint16_t init_st_time_interval = 500;
+    static Hal::t_point init_st_old_time = Hal::now_ms();
+    static const Hal::duration_ms init_st_time_interval(500);
     static bool init_st_indicator = false;
 
-    if (s_statusOfInit == Status::NONCRITICAL_FAILURE && millis() - init_st_old_time > init_st_time_interval) {
-        init_st_old_time = millis();
+    if (s_statusOfInit == Status::NONCRITICAL_FAILURE && Hal::now_ms() - init_st_old_time > init_st_time_interval) {
+        init_st_old_time = Hal::now_ms();
         init_st_indicator = !init_st_indicator;
 
         if (init_st_indicator)

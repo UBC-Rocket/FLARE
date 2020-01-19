@@ -15,7 +15,7 @@ int analogRead(uint8_t pin){
     return 0;
 }
 
-int constexpr LED_BUILTIN() {
+int LED_BUILTIN() {
     return 13;
 }
 

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <thread> //for non-blocking input
+#include <mutex>
 #include <unordered_map> //for hash map
 #include <vector>
 
@@ -80,6 +81,6 @@ private:
             }
         }
     }
-}
+};
 
 #endif
