@@ -7,6 +7,8 @@
 
 /*Includes------------------------------------------------------------*/
 #include "sensors-interface.h"
+#include "../sensor_data.hpp"
+#include "../env_config.h"
 
 /*Constants------------------------------------------------------------*/
 
@@ -23,6 +25,7 @@ public:
     SensorStatus getStatus() {return SensorStatus::NOMINAL;}
 
 private:
+    DataSpoof dat{BAROMETER_DATA, 1};
     float data[BAROMETER_DATA_ARRAY_SIZE] = {1000, 20};
 };
 
