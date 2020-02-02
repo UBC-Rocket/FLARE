@@ -55,13 +55,13 @@ float Battery::getVoltage()
     return batteryVoltage;
 }
 
-// OverallError Battery::getStatus()
-// {
-//     float voltage = getVoltage();
-//     if(voltage < MINIMUM_BATTERY_VOLTAGE)
-//         return CRITICAL_FAILURE;
-//     else if (voltage < LOW_BATTERY_VOLTAGE)
-//         return NONCRITICAL_FAILURE;
-//     else
-//         return NOMINAL;
-// }
+Status Battery::getStatus()
+{
+    float voltage = getVoltage();
+    if(voltage < MINIMUM_BATTERY_VOLTAGE)
+        return Status::CRITICAL_FAILURE;
+    else if (voltage < LOW_BATTERY_VOLTAGE)
+        return Status::NONCRITICAL_FAILURE;
+    else
+        return Status::NOMINAL;
+}
