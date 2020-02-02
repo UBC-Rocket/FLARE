@@ -15,14 +15,18 @@ public:
         IRadioController(MAX_QUEUED_BYTES) {}
 
     void listenAndAct(){
-        uint8_t len = m_tx_q.fillPayload(m_payload);
-        m_io_controller.putPacket(M_IO_ID, m_payload, len);
-
-
         uint8_t command;
         while(m_io_controller.get(M_IO_ID, command)){
             //TODO - do something with command
         }
+
+        if m_tx_q.empty(){
+            //Nothing to send - we're done
+            return;
+        }
+
+        uint8_t len = m_tx_q.fillPayload(m_payload);
+        m_io_controller.putPacket(M_IO_ID, m_payload, len);
     }
 
 private:
