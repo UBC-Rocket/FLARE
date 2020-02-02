@@ -20,7 +20,7 @@ public:
             //TODO - do something with command
         }
 
-        if m_tx_q.empty(){
+        if (m_tx_q.empty()){
             //Nothing to send - we're done
             return;
         }
