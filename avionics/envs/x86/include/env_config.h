@@ -7,6 +7,7 @@
 #include "HAL/port_impl.h"
 #include "stdio_controller.hpp"
 StdIoController std_io_controller;
+std::mutex StdIoController::s_cout;
 
 #include "radio.h"
 NativeRadioController radio(800, std_io_controller);
