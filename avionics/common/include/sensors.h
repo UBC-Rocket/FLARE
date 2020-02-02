@@ -25,6 +25,7 @@
 // #include <stdint.h>
 #include <functional> //for std::reference_wrapper
 #include <vector>
+#include "HAL/time.h"
 
 #include "buzzer.h"
 #include "sensors-interface.h"
@@ -46,9 +47,9 @@ enum class Status {
 
 /*Functions------------------------------------------------------------*/
 
-void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IParachute> > &hardware, Buzzer &buzzer);
+void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IParachute> > &hardware, IBuzzer &buzzer);
 
-void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IParachute> > &hardware, Buzzer buzzer);
+void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IParachute> > &hardware, IBuzzer &buzzer);
 
 Status getStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IParachute> > &hardware);
 

@@ -19,4 +19,7 @@ Camera cam(SerialCamera);
 constexpr char LOG_FILE_NAME[] = "datalog.csv";
 CSVWrite<CSVWriteImpl> datalog;
 
+/* Buzzer */
+#include "buzzer.h"
+static Buzzer buzzer = Buzzer(MELODY_PIN);
 #endif

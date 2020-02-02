@@ -21,20 +21,15 @@
 /*Includes------------------------------------------------------------*/
 #include "HAL/time.h"
 #include "HAL/gpio.h"
+#include "buzzer_interface.h"
 
 #include "gpio.h"
 #undef INPUT
 #undef OUTPUT
 
-/*Variables------------------------------------------------------------*/
-enum SongTypes{
-    SongTypes_SUCCESS,
-    SongTypes_NONCRITFAIL,
-    SongTypes_CRITICALFAIL
-};
 
 /*Classes--------------------------------------------------------------*/
-class Buzzer {
+class Buzzer : public IBuzzer {
 public:
     /**
      * @brief constructor

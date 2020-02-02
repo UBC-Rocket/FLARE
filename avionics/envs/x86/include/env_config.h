@@ -52,6 +52,10 @@ public:
 constexpr char LOG_FILE_NAME[] = "datalog.csv";
 CSVWrite<NativeDumbCSVImpl> datalog;
 
+/* Buzzer */
+#include "buzzer.h"
+static NativeBuzzer buzzer;
+
 void setup(void);
 void loop(void);
 

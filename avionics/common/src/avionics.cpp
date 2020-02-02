@@ -100,8 +100,6 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 /* Variables------------------------------------------------------------*/
 static Status s_statusOfInit;
 
-/* Buzzer */
-static Buzzer buzzer = Buzzer(MELODY_PIN);
 /* Functions------------------------------------------------------------*/
 
 // inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp);
