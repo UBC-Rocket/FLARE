@@ -20,6 +20,7 @@ public:
     bool get(uint8_t id, uint8_t &c) {
         m_mutexes[id].lock();
         if (m_istreams[id].size() == 0){
+            m_mutexes[id].unlock();
             return false;
         }
         c = m_istreams[id].front();
