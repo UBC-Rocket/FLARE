@@ -59,7 +59,15 @@ elif platform.system() == 'Windows':
         }
     ]
 elif platform.system() == 'Linux':
-    additionalConfigs = []
+    additionalConfigs = [
+        {
+            'name': 'Native Tantalus Stage 1 (Linux)',
+            'type': 'lldb',
+            'request': 'launch',
+            'program': '${workspaceFolder}/.pio/build/native_tantalus_stage_1/program',
+            'args': [],
+        }
+    ]
 
 for config in additionalConfigs:
     if config not in exist['configurations']:

@@ -13,3 +13,7 @@ Example:
 ### MacOS Catalina (10.15)
 
 In order for debugging to work in MacOS Catalina, CodeLLDB extension must be installed in VS Code.
+
+## Linux
+
+Linux instructions here... might need to install CodeLLDB
