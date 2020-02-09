@@ -33,6 +33,7 @@ public:
 
     /**
      * @brief Get number of bytes of subpacket data queued up. Note that this is not the same as the number of subpackets that are queued.
+     * @return Number of bytes of data.
      * */
     unsigned short getByteCount() const {return m_byte_count;}
 

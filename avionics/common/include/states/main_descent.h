@@ -2,6 +2,7 @@
 #define STATES__MAIN_DESCENT_H
 
 /*Includes------------------------------------------------------------*/
+#include <chrono>
 #include "state_interface.h"
 #include "state_input_struct.h"
 
@@ -14,7 +15,7 @@ namespace State {
         * @param LANDED_CHECKS number of checks to perform
         * @param LANDED_VELOCITY maximum velocity to be considered as landed
         */
-        MainDescent(uint32_t LANDED_TIME_INTERVAL, uint8_t LANDED_CHECKS, float LANDED_VELOCITY) :
+        MainDescent(std::chrono::milliseconds LANDED_TIME_INTERVAL, uint8_t LANDED_CHECKS, float LANDED_VELOCITY) :
             M_LANDED_TIME_INTERVAL(LANDED_TIME_INTERVAL),
             M_LANDED_CHECKS(LANDED_CHECKS),
             M_LANDED_VELOCITY(LANDED_VELOCITY) {}
@@ -32,7 +33,7 @@ namespace State {
         StateId getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux);
 
     private:
-        float M_LANDED_TIME_INTERVAL;
+        std::chrono::milliseconds M_LANDED_TIME_INTERVAL;
         uint8_t M_LANDED_CHECKS;
         float M_LANDED_VELOCITY;
 

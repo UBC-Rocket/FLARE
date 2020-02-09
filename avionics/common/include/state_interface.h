@@ -18,12 +18,14 @@ enum class StateId{
     WINTER_CONTINGENCY
 };
 
-//Need to specify hash for StateId, since they scoped enums allowed as hash keys until C++14
-template <> struct std::hash<StateId> {
-    std::size_t operator()(const StateId& t) const {
-        return std::hash<int>{}(static_cast<int>(t));
-    }
-};
+//Need to specify hash for StateId, since scoped enums aren't allowed as hash keys until C++14
+namespace std { //this is one of like three places where this is allowed
+    template <> struct hash<StateId> {
+        std::size_t operator()(const StateId& t) const {
+            return std::hash<int>{}(static_cast<int>(t));
+        }
+    };
+}
 
 class IState {
 public:

@@ -23,13 +23,13 @@
 #define GPIO_H
 
 /*Includes------------------------------------------------------------*/
-#include <Arduino.h>
+
 
 /*Constants------------------------------------------------------------*/
 #define POWER_STATUS_LED 20 //kept in one place w/ FLIGHT_LED
 #define FLIGHT_LED   21 //required by state machine
 
-#define MELODY_PIN 3 //required by buzzer
+constexpr int MELODY_PIN = 3; //required by buzzer
 
 /*Functions------------------------------------------------------------*/
 void initPins(void);

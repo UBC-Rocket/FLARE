@@ -20,8 +20,9 @@
  */
 
 /*Includes------------------------------------------------------------*/
-#include <Arduino.h>
-#include <Servo.h>
+// #include <Servo.h> //TODO - figure out if we want to keep this
+#include "HAL/gpio.h"
+#include "HAL/time.h"
 
 #include "buzzer.h"
 #include "gpio.h"
@@ -54,7 +55,7 @@
 #define DISCONTINUOUS_THRESHOLD 650
 
 /*Variables------------------------------------------------------------*/
-static Servo myServo;
+// static Servo myServo;
 
 /*Functions------------------------------------------------------------*/
 /**
@@ -66,27 +67,25 @@ static Servo myServo;
 void initPins(void)
 {
     /* Initialize and startup power status LEDs*/
-    pinMode(POWER_STATUS_LED, OUTPUT);
-    digitalWrite(POWER_STATUS_LED, HIGH);
+    Hal::pinMode(POWER_STATUS_LED, Hal::PinMode::OUTPUT);
+    Hal::digitalWrite(POWER_STATUS_LED, Hal::PinDigital::HIGH);
 
     /* Initialize and startup flight status LEDs*/
-    pinMode(FLIGHT_LED, OUTPUT);
-    digitalWrite(FLIGHT_LED, LOW);
-
-    initBuzzer();
+    Hal::pinMode(FLIGHT_LED, Hal::PinMode::OUTPUT);
+    Hal::digitalWrite(FLIGHT_LED, Hal::PinDigital::LOW);
 
     #ifdef BODY
         /*init main ignitor*/
-        pinMode(IGNITOR_PIN, OUTPUT);
-        digitalWrite(IGNITOR_PIN, LOW);
+        Hal::pinMode(IGNITOR_PIN, Hal::PinMode::OUTPUT);
+        Hal::digitalWrite(IGNITOR_PIN, Hal::PinDigital::LOW);
 
         #ifdef TESTING
         SerialUSB.println("main ignitor pin init low");
         #endif
 
         /*init ematch continuity check pins */
-        pinMode(CONTINUITY_CHECK_PIN, OUTPUT);
-        digitalWrite(CONTINUITY_CHECK_PIN, LOW);
+        Hal::pinMode(CONTINUITY_CHECK_PIN, Hal::PinMode::OUTPUT);
+        Hal::digitalWrite(CONTINUITY_CHECK_PIN, Hal::PinDigital::LOW);
         // the ADC read pin does not need to be initialized !!
 
         #ifdef TESTING
@@ -95,30 +94,30 @@ void initPins(void)
 
         #ifdef POW
             /*init drogue ignitor*/
-            pinMode(DROGUE_IGNITOR_PIN, OUTPUT);
-            digitalWrite(DROGUE_IGNITOR_PIN, LOW);
+            Hal::pinMode(DROGUE_IGNITOR_PIN, Hal::PinMode::OUTPUT);
+            Hal::digitalWrite(DROGUE_IGNITOR_PIN, Hal::PinDigital::LOW);
 
             #ifdef TESTING
             SerialUSB.println("drogue ignitor pin init low");
             #endif
 
             /*init drogue ematch continuity check pins */
-            pinMode(DROGUE_CONTINUITY_CHECK_PIN, OUTPUT);
-            digitalWrite(DROGUE_CONTINUITY_CHECK_PIN, LOW);
+            Hal::pinMode(DROGUE_CONTINUITY_CHECK_PIN, Hal::PinMode::OUTPUT);
+            Hal::digitalWrite(DROGUE_CONTINUITY_CHECK_PIN, Hal::PinDigital::LOW);
 
             #ifdef TESTING
             SerialUSB.println("drogue continuity pins init");
             #endif
         #endif // POW
 
-        #ifdef SERVO
-            /*init servo*/
-            myServo.attach(SERVO_PIN);
-            myServo.write(INIT_SERVO_POS);
-            #ifdef TESTING
-            SerialUSB.println("servo pins init");
-            #endif
-        #endif // SERVO
+        // #ifdef SERVO
+        //     /*init servo*/
+        //     myServo.attach(SERVO_PIN);
+        //     myServo.write(INIT_SERVO_POS);
+        //     #ifdef TESTING
+        //     SerialUSB.println("servo pins init");
+        //     #endif
+        // #endif // SERVO
 
     #endif //body
 
@@ -131,26 +130,26 @@ void initPins(void)
   */
 void deployDrogue(void)
 {
-    #ifdef SERVO
-        myServo.write(FINAL_SERVO_POS);
+    // #ifdef SERVO
+    //     myServo.write(FINAL_SERVO_POS);
 
-        #ifdef TESTING
-        SerialUSB.println("DROGUE SERVO DEPLOYED");
-        #endif
+    //     #ifdef TESTING
+    //     SerialUSB.println("DROGUE SERVO DEPLOYED");
+    //     #endif
 
-        delay(SERVO_DELAY);
-        myServo.write(INIT_SERVO_POS);
-    #endif  // SERVO
+    //     Hal::sleep_ms(SERVO_DELAY);
+    //     myServo.write(INIT_SERVO_POS);
+    // #endif  // SERVO
 
     #ifdef POW
-        digitalWrite(DROGUE_IGNITOR_PIN, HIGH);
+        Hal::digitalWrite(DROGUE_IGNITOR_PIN, Hal::PinDigital::HIGH);
 
         #ifdef TESTING
         SerialUSB.println("DROGUE IGNITER FIRED");
         #endif
 
-        delay(DROGUE_IGNITOR_DELAY);
-        digitalWrite(DROGUE_IGNITOR_PIN, LOW);
+        Hal::sleep_ms(DROGUE_IGNITOR_DELAY);
+        Hal::digitalWrite(DROGUE_IGNITOR_PIN, Hal::PinDigital::LOW);
     #endif // POW
 }
 
@@ -161,14 +160,14 @@ void deployDrogue(void)
   */
 void deployMain(void)
 {
-    digitalWrite(IGNITOR_PIN, HIGH);
+    Hal::digitalWrite(IGNITOR_PIN, Hal::PinDigital::HIGH);
 
     #ifdef TESTING
     SerialUSB.println("MAIN IGNITER FIRED");
     #endif
 
-    delay(IGNITOR_DELAY);
-    digitalWrite(IGNITOR_PIN, LOW);
+    Hal::sleep_ms(IGNITOR_DELAY);
+    Hal::digitalWrite(IGNITOR_PIN, Hal::PinDigital::LOW);
 }
 
 /** bool continuityCheck(void)
@@ -178,11 +177,11 @@ void deployMain(void)
   *             false if the ematch is disconnected or broken.
   */
  bool continuityCheck(void){
-    digitalWrite(CONTINUITY_CHECK_PIN, HIGH);
-    delayMicroseconds(CONTINUITY_CHECK_DELAY);
+    Hal::digitalWrite(CONTINUITY_CHECK_PIN, Hal::PinDigital::HIGH);
+    Hal::sleep_us(CONTINUITY_CHECK_DELAY);
 
-    int main_continuity = analogRead(CONTINUITY_CHECK_ADC);
-    digitalWrite(CONTINUITY_CHECK_PIN, LOW);
+    int main_continuity = Hal::analogRead(CONTINUITY_CHECK_ADC);
+    Hal::digitalWrite(CONTINUITY_CHECK_PIN, Hal::PinDigital::LOW);
 
     #ifdef TESTING
     SerialUSB.print("Main contiunity check ADC read: ");
@@ -190,11 +189,11 @@ void deployMain(void)
     #endif
 
     #ifdef POW
-        digitalWrite(DROGUE_CONTINUITY_CHECK_PIN, HIGH);
-        delayMicroseconds(CONTINUITY_CHECK_DELAY);
+        Hal::digitalWrite(DROGUE_CONTINUITY_CHECK_PIN, Hal::PinDigital::HIGH);
+        Hal::sleep_us(CONTINUITY_CHECK_DELAY);
 
-        int drogue_continuity = analogRead(DROGUE_CONTINUITY_CHECK_ADC);
-        digitalWrite(DROGUE_CONTINUITY_CHECK_PIN, LOW);
+        int drogue_continuity = Hal::analogRead(DROGUE_CONTINUITY_CHECK_ADC);
+        Hal::digitalWrite(DROGUE_CONTINUITY_CHECK_PIN, Hal::PinDigital::LOW);
 
         #ifdef TESTING
         SerialUSB.print("Drogue contiunity check ADC read: ");

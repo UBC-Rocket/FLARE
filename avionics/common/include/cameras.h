@@ -19,16 +19,32 @@
 #define CAMERAS_H
 
 /*Includes------------------------------------------------------------*/
+#include <HAL/port.h>
+#include <HAL/time.h>
 #include "sensors.h"
 
 /*Constants------------------------------------------------------------*/
-#define SerialCamera        Serial3
-#define CameraBaud          115200
+// #define SerialCamera        Serial3
 
 /*Functions------------------------------------------------------------*/
-void power_cameras(); //a toggle switch
-void start_record();
-void stop_record();
-uint8_t crc_calculator(uint8_t *command, uint8_t len);
-uint8_t crc8_dvb_s2(uint8_t crc, unsigned char a);
+
+class Camera{
+public:
+    Camera(Hal::ISerial &SerialCam): m_seri_cam(SerialCam) {
+        m_seri_cam.begin(M_CAMERA_BAUD);
+        while (!m_seri_cam);
+        Hal::sleep_ms(2000);
+        stop_record();
+    }
+    void power_cameras(); //a toggle switch
+    void start_record();
+    void stop_record();
+
+private:
+    uint8_t crc_calculator(uint8_t *command, uint8_t len);
+    uint8_t crc8_dvb_s2(uint8_t crc, unsigned char a);
+
+    Hal::ISerial &m_seri_cam;
+    static constexpr auto M_CAMERA_BAUD = 115200;
+};
 #endif

@@ -1,14 +1,17 @@
-#include <Arduino.h>
+#include "HAL/time.h"
 #include "states/main_descent.h"
 
 StateId State::MainDescent::getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux){
     static float prev_altitude = input.altitude;
-    static uint32_t prev_time = millis() / 1000.0; //seconds
-    static uint32_t curr_time = millis() / 1000.0;
+    static auto prev_time = Hal::now_ms(); //time_point
+    static auto curr_time = Hal::now_ms();
     static uint8_t num_checks = 0;
 
+    typedef std::chrono::milliseconds ms;
+
     if(curr_time - prev_time >= M_LANDED_TIME_INTERVAL) {
-        if (abs((input.altitude - prev_altitude) / (curr_time - prev_time)) < M_LANDED_VELOCITY){
+        auto dt_ms = std::chrono::duration_cast<ms>(curr_time - prev_time).count();
+        if (abs(input.altitude - prev_altitude) * 1000 / dt_ms < M_LANDED_VELOCITY){
             num_checks++;
         } else {
             num_checks = 0;

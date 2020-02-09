@@ -59,27 +59,23 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 
 /* Includes------------------------------------------------------------*/
 #include <functional> //for std::reference_wrapper
-
-#include <Arduino.h>
-#include <HardwareSerial.h>
-#include <SD.h>
-#include <SPI.h>
-#include <i2c_t3.h>
 #include <string.h>
 
-#include "XBee.h"
+#include "env_config.h"
+#include "config.h"
+
+#include "HAL/gpio.h"
+
 #include "buzzer.h"
 #include "calculations.h"
 #include "cameras.h"
 #include "gpio.h"
-#include "groundaltitude.h"
 #include "options.h"
 #include "radio.h"
-#include "satcom.h"
 #include "sensors.h"
-#include "statemachine.h"
 
-#include "config.h"
+
+
 
 /* Errors---------------------------------------------------------------*/
 #if defined NOSECONE && defined BODY
@@ -102,34 +98,12 @@ VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLE
 #endif
 
 /* Variables------------------------------------------------------------*/
-File radiolog;
 static Status s_statusOfInit;
-static float pressure_set[PRESSURE_AVG_SET_SIZE];            //set of pressure values for a floating average
-static unsigned long delta_time_set[PRESSURE_AVG_SET_SIZE];  //set of delta time values for the delta altitude
-static float baseline_pressure;
-static float ground_alt_arr[GROUND_ALT_SIZE];  //values for the baseline pressure calculation
-
-/* Radio */
-static RadioController radio = RadioController(SerialRadio);
-// static XBee s_radio = XBee();
-// static XBeeAddress64 s_gndAddr = XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB);
-// static ZBTxRequest s_txPacket = ZBTxRequest();
-
-std::vector<std::reference_wrapper<ISensor> > sensors;      // Sensors
-std::vector<std::reference_wrapper<IHardware> > hardware;  // Hardwares
-
-Accelerometer accelerometer;
-Barometer barometer;
-GPS gps;
-IMU imuSensor;
-Temperature temperature;
-Thermocouple thermocouple;
 
 /* Functions------------------------------------------------------------*/
 
-inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp);
+// inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp);
 void blinkStatusLED();
-void pollSensors() {} //??
 
 /**
   * @brief  The Arduino setup function
@@ -137,7 +111,6 @@ void pollSensors() {} //??
   * @return None
   */
 void setup() {
-    int i; //used as loop variable
     initPins();
 
 /* Setup all UART comms */
@@ -158,25 +131,26 @@ void setup() {
     // s_txPacket.setAddress64(s_gndAddr);
 
 
-    // Comms to camera serial port
-    SerialCamera.begin(CameraBaud);
-    while (!SerialCamera) {
-    }
 
+    #ifdef ARDUINO //TODO - ifdefs aren't ideal, I think, see if this can be moved somewhere else
     /*init I2C bus @ 400 kHz */
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
     Wire.setDefaultTimeout(100000);  // 100ms
+    #endif
 
     /* Add all the sensors inside sensor vector */
-    sensors.push_back(accelerometer);
-    sensors.push_back(barometer);
-    sensors.push_back(gps);
-    sensors.push_back(imuSensor);
-    sensors.push_back(temperature);
-    sensors.push_back(thermocouple);
+    // sensors.push_back(accelerometer);
+    // sensors.push_back(barometer);
+    // sensors.push_back(gps);
+    // sensors.push_back(imuSensor);
+    // sensors.push_back(temperature);
+    // sensors.push_back(thermocouple);
+
+    /* init log file */
+    datalog.init(LOG_FILE_NAME);
 
     /* init sensors and report status in many ways */
-    initSensors(sensors, hardware);
+    initSensors(sensors, hardware, buzzer);
 
     /* TODO - make this not constant */
     state_input.ignitor_good = true;
@@ -189,18 +163,6 @@ void setup() {
     //TODO - build this out
     // radioStatus(&s_radio, &s_txPacket, &s_statusOfInit);
 
-    /* init various arrays */
-    barometer.readData();
-    baseline_pressure = barometer.getData()[0];    // for baseline pressure calculation
-    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) {  // for moving average
-        pressure_set[i] = baseline_pressure;
-    }
-    for (i = 0; i < PRESSURE_AVG_SET_SIZE; i++) {  // for delta altitude
-        delta_time_set[i] = NOMINAL_POLLING_TIME_INTERVAL;
-    }
-    for (i = 0; i < GROUND_ALT_SIZE; i++) {
-        ground_alt_arr[i] = baseline_pressure;
-    }
 }
 
 /**
@@ -210,18 +172,18 @@ void setup() {
   */
 void loop() {
     /* List of constants */
-    static uint32_t timestamp;
-    static unsigned long old_time = 0;  //ms
-    static unsigned long new_time = 0;  //ms
-    unsigned long delta_time;
-    static uint16_t time_interval = NOMINAL_POLLING_TIME_INTERVAL;  //ms
+    static Hal::t_point timestamp;
+    static Hal::t_point old_time = Hal::now_ms();  //ms
+    static Hal::t_point new_time = Hal::now_ms();  //ms
+    // unsigned long delta_time;
+    static Hal::duration_ms time_interval(NOMINAL_POLLING_TIME_INTERVAL);  //ms
 
     // static unsigned long radio_old_time = 0;
     // static unsigned long radio_time_interval = 500;  //ms
 
-    float *battery_voltage, *acc_data, *bar_data, *temp_sensor_data, *IMU_data, *GPS_data, *thermocouple_data;
+    // float *battery_voltage, *acc_data, *bar_data, *temp_sensor_data, *IMU_data, *GPS_data, *thermocouple_data;
 
-    static float prev_altitude, altitude, delta_altitude, ground_altitude;
+    static float altitude;
 
     // static FlightStates state = STANDBY;
 
@@ -241,70 +203,31 @@ void loop() {
     // Polling time intervals need to be variable, since in LANDED
     // there's a lot of data that'll be recorded
     if (state == StateId::LANDED)
-        time_interval = LANDED_POLLING_TIME_INTERVAL;
+        time_interval = Hal::duration_ms(LANDED_POLLING_TIME_INTERVAL);
     else
-        time_interval = NOMINAL_POLLING_TIME_INTERVAL;
+        time_interval = Hal::duration_ms(NOMINAL_POLLING_TIME_INTERVAL);
 
     //Core functionality of rocket - take data, process it,
     //run the state machine, and log the data
-    new_time = millis();
+    new_time = Hal::now_ms();
     if ((new_time - old_time) >= time_interval) {
-        delta_time = new_time - old_time;
         old_time = new_time;
 
-        /*
-        pollSensors(&timestamp, &battery_voltage, acc_data, bar_data,
-                    &temp_sensor_data, IMU_data, GPS_data,
-                    &thermocouple_data);
-        */
+        pollSensors(timestamp, sensors);
 
-        pollSensors(&timestamp, sensors);
-
-        // Store sensors in all fields
-        acc_data = accelerometer.getData();
-        bar_data = barometer.getData();
-        temp_sensor_data = temperature.getData();
-        IMU_data = imuSensor.getData();
-        GPS_data = gps.getData();
-        thermocouple_data = thermocouple.getData();
-
-        calculateValues(bar_data, &prev_altitude, &altitude,
-                        &delta_altitude, &baseline_pressure,
-                        &delta_time, pressure_set, delta_time_set);
-
-        // stateMachine(&altitude, &delta_altitude, &prev_altitude,
-        //              bar_data, &baseline_pressure, &ground_altitude,
-        //              ground_alt_arr, &state);
+        calc.calculateValues(state, state_input, new_time);
+        altitude = state_input.altitude; //TODO - This is temporary fix for logData; should instead do something else.
 
         state = state_hash_map[state]->getNewState(state_input, state_aux);
-        /*
-        logData(&timestamp, &battery_voltage, acc_data, bar_data,
-                &temp_sensor_data, IMU_data, GPS_data, state,
-                altitude, baseline_pressure, thermocouple_data);
-        */
 
-        logData(timestamp, sensors, state, altitude, baseline_pressure);
+        datalog.logData(static_cast<uint32_t>(timestamp.time_since_epoch().count()), sensors, state, altitude, 0); //TODO - think some more about data logging and how it should mesh with calculations, and also get rid of baseline_pressure
     }
-
-    /* Now done all together with radio.listenAndAct */
-    // Send logged data across radio (as backup/early access to SD card logs)
-//     if ((new_time - radio_old_time) >= radio_time_interval) {
-// #ifdef BODY
-//         sendRadioBody(&s_radio, &s_txPacket, bar_data, state, &altitude,
-//                       &timestamp);
-// #endif  // def BODY
-// #ifdef NOSECONE
-//         sendRadioNosecone(&s_radio, &s_txPacket, GPS_data, bar_data,
-//                           acc_data, &temp_sensor_data, IMU_data);
-// #endif  //def NOSECONE
-//         radio_old_time = new_time;
-//     }
 
     //LED blinks in non-critical failure
     blinkStatusLED();
 
 #ifdef TESTING
-    delay(1000);  //So you can actually read the serial output
+    Hal::sleep_ms(1000);  //So you can actually read the serial output
 #endif
 }
 
@@ -315,39 +238,39 @@ void loop() {
   * @param  float timestamp - time in ms
   * @return None
   */
-inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp) {
-    static bool mainDeploySatcomSent = false;
-    static int landedSatcomSentCount = 0;
-    static uint16_t satcomMsgOldTime = millis();
+// inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t timestamp) {
+//     static bool mainDeploySatcomSent = false;
+//     static int landedSatcomSentCount = 0;
+//     static uint16_t satcomMsgOldTime = millis();
 
-    if (state == FINAL_DESCENT && !mainDeploySatcomSent) {
-        mainDeploySatcomSent = true;
-        SatComSendGPS(&timestamp, GPS_data);
-    } else if (state == LANDED && landedSatcomSentCount < NUM_SATCOM_SENDS_ON_LANDED && millis() - satcomMsgOldTime >= SATCOM_LANDED_TIME_INTERVAL) {
-        //sends Satcom total of NUM_SATCOM_SENDS_ON_LANDED times,
-        //once every SATCOM_LANDED_TIME_INTERVAL
-        landedSatcomSentCount++;
-        SatComSendGPS(&timestamp, GPS_data);
-        satcomMsgOldTime = millis();
-    }
-}
+//     if (state == FINAL_DESCENT && !mainDeploySatcomSent) {
+//         mainDeploySatcomSent = true;
+//         SatComSendGPS(&timestamp, GPS_data);
+//     } else if (state == LANDED && landedSatcomSentCount < NUM_SATCOM_SENDS_ON_LANDED && millis() - satcomMsgOldTime >= SATCOM_LANDED_TIME_INTERVAL) {
+//         //sends Satcom total of NUM_SATCOM_SENDS_ON_LANDED times,
+//         //once every SATCOM_LANDED_TIME_INTERVAL
+//         landedSatcomSentCount++;
+//         SatComSendGPS(&timestamp, GPS_data);
+//         satcomMsgOldTime = millis();
+//     }
+// }
 
 /**
   * @brief  Helper function for LED blinking
   * @return None
   */
 inline void blinkStatusLED() {
-    static unsigned long init_st_old_time = 0;
-    static const uint16_t init_st_time_interval = 500;
+    static Hal::t_point init_st_old_time = Hal::now_ms();
+    static const Hal::duration_ms init_st_time_interval(500);
     static bool init_st_indicator = false;
 
-    if (s_statusOfInit == Status::NONCRITICAL_FAILURE && millis() - init_st_old_time > init_st_time_interval) {
-        init_st_old_time = millis();
+    if (s_statusOfInit == Status::NONCRITICAL_FAILURE && Hal::now_ms() - init_st_old_time > init_st_time_interval) {
+        init_st_old_time = Hal::now_ms();
         init_st_indicator = !init_st_indicator;
 
         if (init_st_indicator)
-            digitalWrite(LED_BUILTIN, HIGH);
+            Hal::digitalWrite(Hal::LED_BUILTIN(), Hal::PinDigital::HIGH);
         else
-            digitalWrite(LED_BUILTIN, LOW);
+            Hal::digitalWrite(Hal::LED_BUILTIN(), Hal::PinDigital::LOW);
     }
 }

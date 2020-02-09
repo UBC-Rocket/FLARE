@@ -1,6 +1,9 @@
 /*Includes------------------------------------------------------------*/
+#include <HAL/gpio.h>
+#include <HAL/time.h>
+
 #include "hardware/ignitor.h"
-#include <Arduino.h>
+
 
 void Ignitor(uint8_t pin) {
 
@@ -8,17 +11,17 @@ void Ignitor(uint8_t pin) {
 
 void Ignitor::init() {
     /*init ignitor*/
-    pinMode(ignitePin, OUTPUT);
-    digitalWrite(ignitePin, LOW);
+    Hal::pinMode(ignitePin, Hal::PinMode::OUTPUT);
+    Hal::digitalWrite(ignitePin, Hal::PinDigital::LOW);
 
     /*continuity check */
-    pinMode(continuityPin, OUTPUT);
-    
-    digitalWrite(continuityPin, HIGH);
-    delayMicroseconds(CONTINUITY_CHECK_DELAY);
+    Hal::pinMode(continuityPin, Hal::PinMode::OUTPUT);
 
-    int continuity = analogRead(continuityADCPin);
-    digitalWrite(continuityPin, LOW);
+    Hal::digitalWrite(continuityPin, Hal::PinDigital::HIGH);
+    Hal::sleep_us(CONTINUITY_CHECK_DELAY);
+
+    int continuity = Hal::analogRead(continuityADCPin);
+    Hal::digitalWrite(continuityPin, Hal::PinDigital::LOW);
 
     if (continuity <= DISCONTINUOUS_THRESHOLD) {
         status = HardwareStatus::FAILURE;
@@ -27,8 +30,16 @@ void Ignitor::init() {
     }
 }
 
+bool Ignitor::isWorking() {
+    if (status == HardwareStatus::FAILURE) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
 void Ignitor::activate() {
-    digitalWrite(ignitePin, HIGH);
-    delay(IGNITOR_DELAY);
-    digitalWrite(ignitePin, LOW);
+    Hal::digitalWrite(ignitePin, Hal::PinDigital::HIGH);
+    Hal::sleep_ms(IGNITOR_DELAY);
+    Hal::digitalWrite(ignitePin, Hal::PinDigital::LOW);
 }

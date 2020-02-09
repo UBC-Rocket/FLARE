@@ -17,7 +17,7 @@
 // threshold for a discontinuous ematch -> read voltage / 3.3 * 1023
 #define DISCONTINUOUS_THRESHOLD 650
 
-class Ignitor : public IHardware {
+class Ignitor : public IParachute {
     public:
     /**
      * @brief ignitor constructor
@@ -35,6 +35,7 @@ class Ignitor : public IHardware {
 
     void init();
     void activate();
+    bool isWorking();
 
     private:
     uint8_t ignitePin;

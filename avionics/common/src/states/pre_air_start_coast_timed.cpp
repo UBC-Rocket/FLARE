@@ -1,7 +1,7 @@
-#include <Arduino.h>
+#include <HAL/time.h>
+#include <Eigen/Geometry>
 
 #include "states/pre_air_start_coast_timed.h"
-#include "Eigen/Geometry"
 
 /*
 https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Using_quaternion_as_rotations
@@ -28,8 +28,10 @@ bool State::PreAirStartCoastTimed::flightNominal(const StateInput &input){
 }
 
 StateId State::PreAirStartCoastTimed::getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux){
-    static uint32_t start_time = millis();
-    if (millis() - start_time > M_DELAY_TIME_MS){
+    typedef std::chrono::milliseconds ms;
+    static auto start_time = Hal::now_ms();
+
+    if (Hal::now_ms() - start_time > ms(M_DELAY_TIME_MS)){
         state_aux.in_abort = !flightNominal(input);
         return StateId::ASCENT_TO_APOGEE;
     }

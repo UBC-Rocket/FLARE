@@ -16,6 +16,7 @@
 #include "states/main_descent.h"
 #include "states/landed.h"
 
+/* States */
 static State::Standby state_standby = State::Standby(StateId::POWERED_ASCENT, STANDBY_LAUNCH_CHECKS, LAUNCH_THRESHOLD);
 
 static State::Armed state_armed = State::Armed(StateId::POWERED_ASCENT, ARMED_LAUNCH_CHECKS, LAUNCH_THRESHOLD);
@@ -39,7 +40,7 @@ static State::PressureDelay state_pres_delay = State::PressureDelay(APOGEE_PRESS
 
 static State::DrogueDescent state_drogue = State::DrogueDescent(MAIN_DEPLOY_ALTITUDE, MAIN_DEPLOY_CHECKS);
 
-static State::MainDescent state_main = State::MainDescent(LAND_CHECK_TIME_INTERVAL, LAND_CHECKS, LAND_VELOCITY_THRESHOLD);
+static State::MainDescent state_main = State::MainDescent(std::chrono::milliseconds(LAND_CHECK_TIME_INTERVAL), LAND_CHECKS, LAND_VELOCITY_THRESHOLD);
 
 static State::Landed state_landed = State::Landed();
 
@@ -62,7 +63,43 @@ static StateId state = StateId::STANDBY;
 /* TODO - MAKE THIS NOT A CONSTANT*/
 #include "state_input_struct.h"
 
-StateInput state_input;
-StateAuxilliaryInfo state_aux;
+static StateInput state_input;
+static StateAuxilliaryInfo state_aux;
+
+
+/* Sensors */
+#include "sensors-interface.h"
+#include "sensors/accelerometer.h"
+#include "sensors/barometer.h"
+#include "sensors/GPS.h"
+#include "sensors/IMU.h"
+#include "sensors/temperature.h"
+static Accelerometer accelerometer;
+static Barometer barometer;
+static GPS gps(SerialGPS);
+static IMU imuSensor;
+static Temperature temperature;
+
+std::vector<std::reference_wrapper<ISensor> > sensors {
+    accelerometer,
+    barometer,
+    gps,
+    imuSensor,
+    temperature
+};
+
+/* Parachute */
+#include "hw-interface.h"
+#include "hardware/ignitor.h"
+
+// TODO: Add ignitor to hardware vector with proper pin initialization
+
+std::vector<std::reference_wrapper<IParachute> > hardware;
+
+/* Calculator */
+#include "calculations.h"
+
+Calculator calc(&barometer, &imuSensor);
+
 
 #endif

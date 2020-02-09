@@ -18,7 +18,6 @@
 #ifndef __battery_sensor__
 #define __battery_sensor__
 
-#include <Arduino.h>
 #include "sensors.h"
 
 class Battery
@@ -26,7 +25,7 @@ class Battery
     public:  // public functions
         // Constructor. batterySensorPin is the pin for battery sensor
         // (i.e. output of the voltage divider)
-        Battery(byte batterySensorPin);
+        Battery(uint8_t batterySensorPin);
 
         /**
          * @brief  Gets the battery voltage level. Maximum voltage readable
@@ -40,14 +39,13 @@ class Battery
         /**
          * @brief  Gets the error status that the battery should report
          * @param  None
-         * @return OverallError - battery status
+         * @return Status - battery status
          */
-        // TODO: Commented out since it's not used and keeping it in leads to a compile error - this should get properly refactored at some point
-        // OverallError getStatus();
+        Status getStatus();
 
     private:
         float m_divider;
-        byte m_batterySensorPin;
+        uint8_t m_batterySensorPin;
 };
 
 #endif

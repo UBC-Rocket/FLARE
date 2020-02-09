@@ -19,22 +19,23 @@
  */
 
 /*Includes------------------------------------------------------------*/
+#include "HAL/time.h"
+#include "HAL/gpio.h"
+
 #include "sensors.h"
 #include "options.h"
-#include "battery.h"
-#include "satcom.h" //SATCOM
 #include "buzzer.h" //for buzzer response on startup
-#include "cameras.h"
 #include "radio.h"
 #include "state_interface.h"
 
-#include <Arduino.h>
+#undef HIGH //TODO - see if there's a better place to undef these codes from Arduino
+#undef OUTPUT
+#undef LED_BUILTIN
 
 /*Constants------------------------------------------------------------*/
-#define FILE_NAME "datalog.csv"
 
 /*Variables------------------------------------------------------------*/
-CSVWrite datalog;
+// CSVWrite datalog; //MOVED TO ENV_CONFIG
 
 /*Functions------------------------------------------------------------*/
 /**
@@ -43,7 +44,7 @@ CSVWrite datalog;
   * @return void
   */
 
-void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware) {
+void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IParachute> > &hardware, IBuzzer &buzzer) {
     // if(powerbattery.getVoltage() <= LOW_BATTERY_VOLTAGE)
     // { //TODO: Uncomment once the battery sensor is implemented
     //     status->sensorNominal[BATTERY_STATUS_POSITION] = false;
@@ -63,15 +64,6 @@ void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::ve
     //     }
     // }
 
-    /*init SD card*/
-    datalog.init(FILE_NAME);
-
-    /* Init Cameras */
-    SerialCamera.begin(CameraBaud);
-    while (!SerialCamera) {
-    }
-    delay(2000);
-    stop_record();
 
     /*init hardware*/
     for (auto hw : hardware) {
@@ -94,7 +86,7 @@ void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::ve
     #endif // NOSECONE
 
     /* transmit sensor report */
-    displayStatus(sensors, hardware);
+    displayStatus(sensors, hardware, buzzer);
 }
 
 /**
@@ -102,7 +94,7 @@ void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::ve
  * @param  InitStatus *status - status of initialization.
  * @return void
  */
-void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware) {
+void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IParachute> > &hardware, IBuzzer &buzzer) {
     // TODO: change this function to discern which sensors constitute a critical fail
     /*
     if (status->overview == CRITICAL_FAILURE) {
@@ -164,8 +156,8 @@ void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::
             #else
             for(int i = 1; i <= 5; i++) {
             #endif
-                sing(SongTypes_CRITICALFAIL);
-                delay(400);
+                buzzer.sing(SongTypes_CRITICALFAIL);
+                Hal::sleep_ms(400);
             }
             return;
         }
@@ -174,20 +166,20 @@ void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::
     #ifdef TESTING
     SerialUSB.println("Initialization complete! :D");
     #endif
-    pinMode(LED_BUILTIN,OUTPUT);
-    digitalWrite(LED_BUILTIN,HIGH);
+    Hal::pinMode(Hal::LED_BUILTIN(), Hal::PinMode::OUTPUT);
+    Hal::digitalWrite(Hal::LED_BUILTIN(), Hal::PinDigital::HIGH);
 
     #ifdef TESTING
     for(int i = 1; i <= 1; i++) {
     #else
     for(int i = 1; i <= 5; i++) {
     #endif
-        sing(SongTypes_SUCCESS);
-        delay(400);
+        buzzer.sing(SongTypes_SUCCESS);
+        Hal::sleep_ms(400);
     }
 }
 
-Status getStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IHardware> > &hardware) {
+Status getStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IParachute> > &hardware) {
     Status status = Status::NOMINAL;
     for (auto sensor : sensors) {
         if (sensor.get().getStatus() == SensorStatus::FAILURE) {
@@ -210,8 +202,8 @@ Status getStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::ve
   * @param timestamp pointer to store the timestamp value
   * @param sensors the sensors to poll
   */
-void pollSensors(unsigned long *timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors) {
-    *timestamp = millis();
+void pollSensors(Hal::t_point &timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors) {
+    timestamp = Hal::now_ms();
 
     for (auto sensor : sensors) {
         sensor.get().readData();
@@ -220,25 +212,3 @@ void pollSensors(unsigned long *timestamp, std::vector<std::reference_wrapper<IS
     // *battery_voltage = powerbattery.getVoltage();
 }
 
-/**
-  * @brief Logs data on the SD card
-  * @param timestamp pointer to store the timestamp value
-  * @param sensors the sensors to log data from
-  * @param state rocket flight state
-  * @param altitude Calculated rocket altitude, after filtering
-  * @param baseline_pressure Pressure used as "ground level"
-  */
-void logData(unsigned long timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors,
-             StateId state, float altitude, float baseline_pressure) {
-
-    /*write data to SD card*/
-    datalog.write(timestamp);
-    for (auto sensor : sensors) {
-        float *data = sensor.get().getData();
-        for (int i = 0; i < sensor.get().dataLength(); i++) {
-            datalog.write(data[i]);
-        }
-    }
-    datalog.writeln("");
-    datalog.flush();
-}
