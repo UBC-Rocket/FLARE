@@ -2,7 +2,11 @@ User specific files - you'll have to manually fill these out. Trying to reduce t
 
 ## Windows
 
-Windows related instructions here...
+To enable GDB debugging, create a txt file name called `WindowsGDBPath.txt` in `/custom_tools/UserSpecific/` folder.
+Add your gdb.exe location inside the txt file.
+
+Example:
+`C:/gdb.exe`
 
 ## MacOS
 

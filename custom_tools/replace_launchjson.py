@@ -1,4 +1,5 @@
 import json
+import platform
 
 try:
     with open('.vscode/launch.json', 'r') as f:
@@ -15,42 +16,44 @@ except FileNotFoundError:
 
 exist = json.loads(uncommented)
 
-
-additionalConfigs = [{
-        'name': 'Python: Current File',
-        'type': 'python',
-        'request': 'launch',
-        'program': '${file}',
-        'console': 'integratedTerminal'
-    },
-    {
-        'name': 'Native Tantalus Stage 1 (Windows)',
-        'type': 'cppdbg',
-        'request': 'launch',
-        'program': '${workspaceFolder}/.pio/build/native_tantalus_stage_1/program.exe',
-        'args': [],
-        'stopAtEntry': True,
-        'cwd': '${workspaceFolder}',
-        'environment': [],
-        'externalConsole': True,
-        'MIMode': 'gdb',
-        'miDebuggerPath': 'C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/gdb.exe',
-        'setupCommands': [
-            {
-                'description': 'Enable pretty-printing for gdb',
-                'text': '-enable-pretty-printing',
-                'ignoreFailures': True
-            }
-        ]
-    },
-    {
-        'name': 'Native Tantalus Stage 1 (MacOS)',
-        'type': 'lldb',
-        'request': 'launch',
-        'program': '${workspaceFolder}/.pio/build/native_tantalus_stage_1/program',
-        'args': [],
-    }
-]
+if platform.system() == 'Darwin':
+    additionalConfigs = [
+        {
+            'name': 'Native Tantalus Stage 1 (MacOS)',
+            'type': 'lldb',
+            'request': 'launch',
+            'program': '${workspaceFolder}/.pio/build/native_tantalus_stage_1/program',
+            'args': [],
+        }
+    ]
+elif platform.system() == 'Windows':
+    with open('custom_tools/UserSpecific/WindowsGDBPath.txt', 'r') as file:
+        filePath = file.read()
+    
+    additionalConfigs = [
+        {
+            'name': 'Native Tantalus Stage 1 (Windows)',
+            'type': 'cppdbg',
+            'request': 'launch',
+            'program': '${workspaceFolder}/.pio/build/native_tantalus_stage_1/program.exe',
+            'args': [],
+            'stopAtEntry': True,
+            'cwd': '${workspaceFolder}',
+            'environment': [],
+            'externalConsole': True,
+            'MIMode': 'gdb',
+            'miDebuggerPath': filePath,
+            'setupCommands': [
+                {
+                    'description': 'Enable pretty-printing for gdb',
+                    'text': '-enable-pretty-printing',
+                    'ignoreFailures': True
+                }
+            ]
+        }
+    ]
+elif platform.system() == 'Linux':
+    additionalConfigs = []
 
 for config in additionalConfigs:
     if config not in exist['configurations']:
@@ -58,5 +61,3 @@ for config in additionalConfigs:
 
 with open('.vscode/launch.json', 'w') as wr:
     json.dump(exist, wr)
-
-
