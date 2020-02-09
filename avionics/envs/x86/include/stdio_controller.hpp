@@ -18,14 +18,13 @@ public:
      * @return True if read succeeded, false if EOF.
      */
     bool get(uint8_t id, uint8_t &c) {
-        m_mutexes[id].lock();
+        const std::lock_guard<std::mutex> lock(m_mutexes[id]);
+
         if (m_istreams[id].size() == 0){
-            m_mutexes[id].unlock();
             return false;
         }
         c = m_istreams[id].front();
         m_istreams[id].pop();
-        m_mutexes[id].unlock();
         return true;
     }
 
@@ -36,13 +35,12 @@ public:
      * @param length Length of the data to be sent
      */
     static void putPacket(uint8_t const id, char const * const c, uint16_t const length){
-        s_cout.lock();
+        const std::lock_guard<std::mutex> lock(s_cout);
         //TODO - check the success of std::cout.put and other unformatted output, and possibly do something about it
         std::cout.put(id); //ID
         std::cout.put(static_cast<char>(length >> 8)); //Length, bigendian
         std::cout.put(static_cast<char>(length & 0xFF));
         std::cout.write(c, length); //Data
-        s_cout.unlock();
     }
 
     /**
@@ -92,11 +90,13 @@ private:
                     buf.push_back(getCinForce());
                 }
 
-                m_mutexes[id].lock();
+                { //scope for lock-guard
+                const std::lock_guard<std::mutex> lock(m_mutexes[id]);
                 for(auto j : buf) {
                     m_istreams[id].push(j);
+                } // unlock mutex
+                
                 }
-                m_mutexes[id].unlock();
             }
         }
     }
