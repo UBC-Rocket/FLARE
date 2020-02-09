@@ -24,7 +24,7 @@ additionalConfigs = [{
         'console': 'integratedTerminal'
     },
     {
-        'name': 'Native Tantalus Stage 1',
+        'name': 'Native Tantalus Stage 1 (Windows)',
         'type': 'cppdbg',
         'request': 'launch',
         'program': '${workspaceFolder}/.pio/build/native_tantalus_stage_1/program.exe',
@@ -42,6 +42,13 @@ additionalConfigs = [{
                 'ignoreFailures': True
             }
         ]
+    },
+    {
+        'name': 'Native Tantalus Stage 1 (MacOS)',
+        'type': 'lldb',
+        'request': 'launch',
+        'program': '${workspaceFolder}/.pio/build/native_tantalus_stage_1/program',
+        'args': [],
     }
 ]
 
