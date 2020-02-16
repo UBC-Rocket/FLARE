@@ -75,16 +75,6 @@ void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::ve
         sensor.get().initSensor();
     }
 
-    // TODO: figure out what to do with satcom
-    #ifdef NOSECONE
-    /*init satcom*/
-    if (!SatComSetup()) {
-        if (status->overview < NONCRITICAL_FAILURE)
-            status->overview = NONCRITICAL_FAILURE;
-        status->sensorNominal[SATCOM_STATUS_POSITION] = false;
-    }
-    #endif // NOSECONE
-
     /* transmit sensor report */
     displayStatus(sensors, hardware, buzzer);
 }
