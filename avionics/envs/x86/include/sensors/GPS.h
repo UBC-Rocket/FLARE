@@ -3,6 +3,7 @@
 
 
 #include "sensors-interface.h"
+#include "HAL/port_impl.h"
 
 /*Variables------------------------------------------------------------*/
 
