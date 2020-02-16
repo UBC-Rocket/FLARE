@@ -7,10 +7,14 @@
 #include <mutex>
 #include <unordered_map> //for hash map
 #include <vector>
+#include <cstring> //for memmove
 
 class StdIoController {
 public:
-    StdIoController() : m_input(&StdIoController::inputLoop, this) {}
+    StdIoController() : m_input(&StdIoController::inputLoop, this) {
+        putConfigPacket();
+    }
+
     /**
      * @brief Attempts to extract a single character from the specified buffer Id.
      * @param id ID being used (see documentation on stdio multiplexing spec: http://confluence.ubcrocket.com/display/AV/Specs)
@@ -53,6 +57,20 @@ public:
         putPacket(id, reinterpret_cast<const char*>(c), length);
         //Shoudn't need to worry that std::cin et al thinks its pointing to a char - the bits should come out as defined by uint8_t, which would be expected. Char is defined to be a byte, so this is fine as long as a byte is 8 bits (no seriously there are some machines that have bytes with more than 8 bits.)
         //TODO - maybe less sloppily deal with this problem without using reinterpret_cast? Although we're low enough that reinterpret is close to being allowed
+    }
+
+    /**
+     * @brief Helper function for configuration packet.
+     */
+    static void putConfigPacket(){
+        uint8_t id = 0x01;
+        uint32_t int_test = 0x04030201;
+        float float_test = -2.0; //0xC000 0000;
+
+        char buf[8];
+        std::memmove(buf, &int_test, 4);
+        std::memmove(buf + 4, &float_test, 4);
+        putPacket(id, buf, 8);
     }
 
 private:
