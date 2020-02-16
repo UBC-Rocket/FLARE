@@ -29,28 +29,28 @@ public:
      */
     void sendBulkSensor(uint32_t time, float alt, Accelerometer &xl, IMU imu,GPS gps, uint8_t state_id) {
         SubPktPtr buf(new std::vector<uint8_t>);
-        buf->reserve(42);
+        buf->resize(42);
 
 
         (*buf)[0] = 0x30; //ID
 
         // Time
-        std::memmove(buf->data() + 1, &time, 4);
+        std::memcpy(buf->data() + 1, &time, 4);
 
         // Altitude
-        std::memmove(buf->data() + 5, &alt, 4);
+        std::memcpy(buf->data() + 5, &alt, 4);
 
         // Accelerometer
-        std::memmove(buf->data() + 9, xl.getData(), 12);
+        std::memcpy(buf->data() + 9, xl.getData(), 12);
 
         // IMU //TODO - check that these are the correct 3 floats to send for orientation
-        std::memmove(buf->data() + 21, imu.getData(), 12);
+        std::memcpy(buf->data() + 21, imu.getData(), 12);
 
         // GPS
-        std::memmove(buf->data() + 33, gps.getData(), 8);
+        std::memcpy(buf->data() + 33, gps.getData(), 8);
 
         // State
-        std::memmove(buf->data() + 41, &state_id, 1);
+        std::memcpy(buf->data() + 41, &state_id, 1);
 
         addSubpacket(std::move(buf));
     }

@@ -8,8 +8,8 @@ void RadioQueue::push(SubPktPtr subpacket) {
     if(subpacket->size() > RADIO_MAX_SUBPACKET_SIZE)
         return;
 
-    m_subpacket_q.push_back(std::move(subpacket));
     m_byte_count += subpacket->size();
+    m_subpacket_q.push_back(std::move(subpacket));
 
     while (m_byte_count > M_MAX_BYTES){
         popFront();
