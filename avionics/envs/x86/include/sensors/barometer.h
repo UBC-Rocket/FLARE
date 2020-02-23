@@ -25,7 +25,7 @@ public:
     SensorStatus getStatus() {return SensorStatus::NOMINAL;}
 
 private:
-    DataSpoof dat{BAROMETER_DATA, 1};
+    DataSpoof<1> dat{BAROMETER_DATA};
     float data[BAROMETER_DATA_ARRAY_SIZE] = {1000, 20};
 };
 
