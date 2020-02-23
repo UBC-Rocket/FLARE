@@ -28,7 +28,7 @@ public:
         float dataTime;
         do {
             std::string dataStr;
-            std::getline(dataStream, dataStr); 
+            std::getline(dataStream, dataStr);
             std::vector<std::string> dataFields = split_string(dataStr);
 
             dataTime = std::stof(dataFields[0]);
@@ -53,7 +53,7 @@ private:
     int dlength;
     float *data;
 
-    // helper functino for splitting strings
+    // helper function for splitting strings
     std::vector<std::string> split_string(std::string str) {
         std::stringstream ss(str);
         std::vector<std::string> out;
