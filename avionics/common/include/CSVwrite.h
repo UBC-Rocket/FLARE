@@ -16,6 +16,9 @@ Requirements on Impl:
 -Has templated print and println functions that take in values to be printed. println should do the same thing as print, except put a newline character at the end.
 -Has void flush(void) method that flushes the buffer.
 */
+
+// TODO: Add Impl class or integrate in this class.
+
 template <typename Impl>
 class CSVWrite {
     public:
