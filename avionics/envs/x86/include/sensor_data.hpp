@@ -14,21 +14,26 @@
 template <std::size_t data_length>
 class DataSpoof {
 public:
-    DataSpoof(std::string dataFile) {
+    DataSpoof(std::string const &dataFile) {
         dataStream = std::ifstream(dataFile);
+
+        if(!dataStream){
+            std::cerr << "File could not be opened";
+            std::exit(1);
+        }
         // dlength = data_length;
         // data[dlength];
         // std::string dummy;
         // throw away first line of csv (headers)
         dataStream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        // std::getline(dataStream, dummy);
+                char c;
     }
 
     // returns next data point in stream
     float* getData() {
         constexpr std::streamsize MAX_BUFF = 255;
-        auto t_now = Hal::now_ms();
-        while (t1 < t_now.time_since_epoch().count()) {
+        auto t_now = Hal::now_ms().time_since_epoch().count();
+        while (t1 < t_now) {
             // std::vector<std::string> dataFields = split_string(dataStr);
 
             //get line
