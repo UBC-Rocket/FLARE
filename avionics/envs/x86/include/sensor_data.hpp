@@ -27,7 +27,8 @@ public:
     // returns next data point in stream
     float* getData() {
         constexpr std::streamsize MAX_BUFF = 255;
-        while (t1 < Hal::now_ms().time_since_epoch().count()) {
+        auto t_now = Hal::now_ms();
+        while (t1 < t_now.time_since_epoch().count()) {
             // std::vector<std::string> dataFields = split_string(dataStr);
 
             //get line
@@ -52,7 +53,7 @@ public:
                 dat_new[i] = std::stof(data_strs[i + 1]);
             }
         }
-        interpolate();
+        interpolate(t_now);
         return dat_now;
     }
 
@@ -65,7 +66,6 @@ private:
     std::ifstream dataStream;
     long int t0, t1;
 
-    int dlength;
     float dat_new[data_length], dat_old[data_length], dat_now[data_length];
 
     // // helper function for splitting strings
@@ -82,8 +82,7 @@ private:
     // }
 
     //helper function for interpolation
-    void interpolate(){
-        long int t_now = Hal::now_ms().time_since_epoch().count();
+    void interpolate(long int t_now){
         double frac = (static_cast<double>(t_now) - t0) / (t1 - t0);
         double cfrac = 1 - frac;
         for (int i = 0; i < data_length; i++){
