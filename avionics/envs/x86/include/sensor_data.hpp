@@ -5,6 +5,7 @@
 #include <fstream>
 #include <vector>
 #include <limits> //for numeric_limits
+
 #include "HAL/time.h"
 
 // class for linking data streams to different sensors
@@ -52,14 +53,14 @@ public:
 
             t0 = t1;
             t1 = std::stol(data_strs[0]);
+            assert(t1 - t0 < 200); //Spacing between data points can't be too high otherwise sim becomes inaccurate
 
             for(int i = 0; i < data_length; i++) {
-                dat_old[i] = dat_new[i];
-                dat_new[i] = std::stof(data_strs[i + 1]);
+                dat_read[i] = std::stof(data_strs[i + 1]);
             }
         }
-        interpolate(t_now);
-        return dat_now;
+
+        return dat_read; //Not linearly interpolating b/c that is averaging, which reduces the noise level
     }
 
     int getDataLength() {return data_length;}
@@ -69,30 +70,8 @@ public:
     }
 private:
     std::ifstream dataStream;
-    long int t0, t1;
+    long int t0, t1; //two variables exist only for the purpose of assert
 
-    float dat_new[data_length], dat_old[data_length], dat_now[data_length];
-
-    // // helper function for splitting strings
-    // std::vector<std::string> split_string(std::string &str) {
-    //     std::stringstream ss(str);
-    //     std::vector<std::string> out;
-    //     while(ss.good()) {
-    //         std::string substr;
-    //         std::getline(ss, substr, ',');
-    //         out.push_back(substr);
-    //     }
-
-    //     return out;
-    // }
-
-    //helper function for interpolation
-    void interpolate(long int t_now){
-        double frac = (static_cast<double>(t_now) - t0) / (t1 - t0);
-        double cfrac = 1 - frac;
-        for (int i = 0; i < data_length; i++){
-            dat_now[i] = frac * dat_old[i] + cfrac * dat_new[i];
-        }
-    }
+    float dat_read[data_length];
 };
 #endif
