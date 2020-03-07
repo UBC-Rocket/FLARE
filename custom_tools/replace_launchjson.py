@@ -62,7 +62,8 @@ elif platform.system() == 'Linux':
     additionalConfigs = [
         {
             'name': 'Native Tantalus Stage 1 (Linux)',
-            'type': 'lldb',
+            'type': 'cppdbg',
+            'cwd': '${workspaceFolder}/.pio/build/native_tantalus_stage_1/'
             'request': 'launch',
             'program': '${workspaceFolder}/.pio/build/native_tantalus_stage_1/program',
             'args': [],
