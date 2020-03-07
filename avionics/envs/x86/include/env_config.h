@@ -31,7 +31,7 @@ public:
      * @param t the data to write
      */
     template<typename T>
-    void write(T t) {
+    void print(T t) {
     }
 
     /**
@@ -39,7 +39,7 @@ public:
      * @param t the data to write
      */
     template<typename T>
-    void writeln(T t) {
+    void println(T t) {
     }
 
     /**

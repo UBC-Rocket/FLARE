@@ -27,7 +27,7 @@ public:
      * @param t the data to write
      */
     template<typename T>
-    void write(T t) {
+    void print(T t) {
         m_datalog.print(t);
         m_datalog.print(",");
     }
@@ -37,7 +37,7 @@ public:
      * @param t the data to write
      */
     template<typename T>
-    void writeln(T t) {
+    void println(T t) {
         m_datalog.println(t);
     }
 
