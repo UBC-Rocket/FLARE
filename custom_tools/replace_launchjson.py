@@ -36,7 +36,13 @@ elif platform.system() == 'Windows':
     except IOError:
         print("Error: File WindowsGDBPath.txt Not Found")
 
-    additionalConfigs = [
+    additionalConfigs = [{
+            'name': 'Python: Current File',
+            'type': 'python',
+            'request': 'launch',
+            'program': '${file}',
+            'console': 'integratedTerminal'
+        },
         {
             'name': 'Native Tantalus Stage 1 (Windows)',
             'type': 'cppdbg',

@@ -3,8 +3,8 @@
 
 namespace Hal{
 
-std::chrono::time_point<std::chrono::steady_clock> now_ms(){
-    return std::chrono::time_point<std::chrono::steady_clock>(std::chrono::milliseconds(millis()));
+t_point now_ms(){
+    return t_point(std::chrono::milliseconds(millis()));
 }
 
 /**
