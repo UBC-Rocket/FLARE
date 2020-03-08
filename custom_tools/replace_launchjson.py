@@ -34,7 +34,7 @@ elif platform.system() == 'Windows':
         with open('custom_tools/UserSpecific/WindowsGDBPath.txt', 'r') as file:
             filePath = file.read()
     except IOError:
-        print("Error: File WindowsGDBPath.txt Not Found")
+        raise Exception("Error: File WindowsGDBPath.txt Not Found!")
 
     additionalConfigs = [{
             'name': 'Python: Current File',
