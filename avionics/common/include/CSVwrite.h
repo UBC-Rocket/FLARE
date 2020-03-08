@@ -3,6 +3,9 @@
 
 #include "sensors-interface.h" //for ISensor
 #include "state_interface.h" //for StateId
+#include <iostream>
+#include <fstream>
+using namespace std;
 /**
   * CSV writing Class
   * Wrapper for SD.h which makes printing to csv easier
@@ -39,21 +42,19 @@ class CSVWrite {
 
     /**
      * @brief writes t to the next csv column in order
-     * @param t the data to write
+     * @param s the data in string to write
      */
-    template<typename T>
-    void write(T t) {
-        m_datalog.print(t);
+    void write(string s) {
+        m_datalog.print(s);
         m_datalog.print(",");
     }
 
     /**
-     * @brief writes t and ends the line
-     * @param t the data to write
+     * @brief writes s and ends the line
+     * @param s the in string data to write
      */
-    template<typename T>
-    void writeln(T t) {
-        m_datalog.println(t);
+    void writeln(string s) {
+        m_datalog.println(s);
     }
 
     /**
@@ -72,8 +73,8 @@ class CSVWrite {
      * @param baseline_pressure Pressure used as "ground level"
      */
     void logData(unsigned long timestamp, SensorSet &sensors,
-                StateId state, float altitude, float baseline_pressure) {
-
+                 StateId state, float altitude, float baseline_pressure) {
+        
         /*write data to SD card*/
         m_datalog.write(timestamp);
         for (auto sensor : sensors) {
