@@ -19,6 +19,9 @@ Requirements on Impl:
 -Has templated print and println functions that take in values to be printed. println should do the same thing as print, except put a newline character at the end.
 -Has void flush(void) method that flushes the buffer.
 */
+
+// TODO: Add Impl class or integrate in this class.
+
 template <typename Impl>
 class CSVWrite {
     public:
@@ -76,15 +79,15 @@ class CSVWrite {
                  StateId state, float altitude, float baseline_pressure) {
         
         /*write data to SD card*/
-        m_datalog.write(timestamp);
+        write(timestamp);
         for (auto sensor : sensors) {
             float *data = sensor.get().getData();
             for (int i = 0; i < sensor.get().dataLength(); i++) {
-                m_datalog.write(data[i]);
+                write(data[i]);
             }
         }
-        m_datalog.writeln("");
-        m_datalog.flush();
+        writeln("");
+        flush();
     }
 
     private:

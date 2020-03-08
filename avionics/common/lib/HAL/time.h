@@ -17,8 +17,9 @@ namespace Hal {
      */
     void sleep_us(uint32_t t);
 
-    typedef std::chrono::time_point<std::chrono::steady_clock> t_point;
-    typedef std::chrono::milliseconds duration_ms;
+    typedef std::chrono::time_point<std::chrono::steady_clock, std::chrono::milliseconds> t_point;
+    typedef std::chrono::milliseconds ms;
+
     /**
      * @brief Get current time point; is somewhat more portable than Arduino's millis().
      * @return Current time_point, using std::chrono::steady_clock.

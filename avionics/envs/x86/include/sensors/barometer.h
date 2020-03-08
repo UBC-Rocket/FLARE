@@ -21,12 +21,12 @@ public:
     void initSensor(){}
     void readData(){};
     uint8_t dataLength(){return BAROMETER_DATA_ARRAY_SIZE;}
-    float *getData() {return data;}
+    float *getData() {return dat.getData();}
     SensorStatus getStatus() {return SensorStatus::NOMINAL;}
 
 private:
-    DataSpoof dat{BAROMETER_DATA, 1};
-    float data[BAROMETER_DATA_ARRAY_SIZE] = {1000, 20};
+    DataSpoof<2> dat{BAROMETER_DATA};
+    // float data[BAROMETER_DATA_ARRAY_SIZE] = {1000, 20};
 };
 
 #endif
