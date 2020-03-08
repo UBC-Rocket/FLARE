@@ -9,7 +9,7 @@
 constexpr unsigned short RADIO_MAX_SUBPACKET_SIZE = 255;
 
 /*Classes--------------------------------------------------------------*/
-typedef std::unique_ptr<std::vector<int>> SubPktPtr;
+typedef std::unique_ptr<std::vector<uint8_t>> SubPktPtr;
 
 class RadioQueue {
 public:

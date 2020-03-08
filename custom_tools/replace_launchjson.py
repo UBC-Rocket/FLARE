@@ -35,7 +35,7 @@ elif platform.system() == 'Windows':
             filePath = file.read()
     except IOError:
         print("Error: File WindowsGDBPath.txt Not Found")
-    
+
     additionalConfigs = [
         {
             'name': 'Native Tantalus Stage 1 (Windows)',
@@ -63,7 +63,7 @@ elif platform.system() == 'Linux':
         {
             'name': 'Native Tantalus Stage 1 (Linux)',
             'type': 'cppdbg',
-            'cwd': '${workspaceFolder}/.pio/build/native_tantalus_stage_1/'
+            'cwd': '${workspaceFolder}/.pio/build/native_tantalus_stage_1/',
             'request': 'launch',
             'program': '${workspaceFolder}/.pio/build/native_tantalus_stage_1/program',
             'args': [],

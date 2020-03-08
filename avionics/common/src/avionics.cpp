@@ -175,8 +175,13 @@ void loop() {
     static Hal::t_point timestamp;
     static Hal::t_point old_time = Hal::now_ms();  //ms
     static Hal::t_point new_time = Hal::now_ms();  //ms
+    uint32_t new_time_int;
     // unsigned long delta_time;
     static Hal::duration_ms time_interval(NOMINAL_POLLING_TIME_INTERVAL);  //ms
+
+    static Hal::t_point radio_old_time = Hal::now_ms();
+    static Hal::duration_ms radio_t_interval(500); //ms //TODO - make 500 a constant somewhere
+
 
     // static unsigned long radio_old_time = 0;
     // static unsigned long radio_time_interval = 500;  //ms
@@ -210,6 +215,8 @@ void loop() {
     //Core functionality of rocket - take data, process it,
     //run the state machine, and log the data
     new_time = Hal::now_ms();
+    new_time_int = static_cast<uint32_t>(timestamp.time_since_epoch().count());
+
     if ((new_time - old_time) >= time_interval) {
         old_time = new_time;
 
@@ -220,9 +227,13 @@ void loop() {
 
         state = state_hash_map[state]->getNewState(state_input, state_aux);
 
-        datalog.logData(static_cast<uint32_t>(timestamp.time_since_epoch().count()), sensors, state, altitude, 0); //TODO - think some more about data logging and how it should mesh with calculations, and also get rid of baseline_pressure
+        datalog.logData(new_time_int, sensors, state, altitude, 0); //TODO - think some more about data logging and how it should mesh with calculations, and also get rid of baseline_pressure
     }
 
+    if (new_time - radio_old_time >= radio_t_interval) {
+        radio_old_time = new_time;
+        radio.sendBulkSensor(new_time_int, altitude, accelerometer, imuSensor, gps, static_cast<uint8_t>(state));
+    }
     //LED blinks in non-critical failure
     blinkStatusLED();
 

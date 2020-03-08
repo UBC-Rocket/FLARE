@@ -1,9 +1,7 @@
 #include <HAL/time.h>
 
 namespace Hal{
-    std::chrono::time_point<std::chrono::steady_clock> now_ms(){
-        return std::chrono::steady_clock::now();
-    }
+
 
     /**
      * @brief Sleep for the given std::chrono::duration. Only available for x86 - Arduino framework doesn't implement enough of <chrono>.
@@ -33,4 +31,9 @@ namespace Hal{
         sleep(std::chrono::microseconds(t));
     }
 
+    extern const t_point startup_t_point = std::chrono::steady_clock::now();
+
+    std::chrono::time_point<std::chrono::steady_clock> now_ms(){
+        return t_point(std::chrono::steady_clock::now() - startup_t_point);
+    }
 }

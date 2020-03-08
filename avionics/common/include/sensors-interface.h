@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <vector> //for std::vector
 #include <functional> //for std::reference_wrapper
+#include "HAL/port_impl.h"
 
 enum class SensorStatus {
     NOMINAL,
