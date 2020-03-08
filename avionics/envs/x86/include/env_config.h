@@ -5,6 +5,9 @@
 #include <string>
 const std::string BAROMETER_DATA{"barometer.csv"};
 
+#include <fstream>
+#include <iostream>
+
 #include "HAL/port_impl.h"
 #include "stdio_controller.hpp"
 StdIoController std_io_controller;
@@ -13,17 +16,17 @@ std::mutex StdIoController::s_cout;
 #include "radio.h"
 NativeRadioController radio(800, std_io_controller);
 
-
-auto static SerialUSB       = Hal::NativeSerial(1, std_io_controller);
-auto static SerialGPS       = Hal::NativeSerial(2, std_io_controller);
-auto static SerialRadio     = Hal::NativeSerial(3, std_io_controller);
-auto static IridiumSerial   = Hal::NativeSerial(4, std_io_controller);
-auto static SerialCamera    = Hal::NativeSerial(5, std_io_controller);
+auto static SerialUSB = Hal::NativeSerial(1, std_io_controller);
+auto static SerialGPS = Hal::NativeSerial(2, std_io_controller);
+auto static SerialRadio = Hal::NativeSerial(3, std_io_controller);
+auto static IridiumSerial = Hal::NativeSerial(4, std_io_controller);
+auto static SerialCamera = Hal::NativeSerial(5, std_io_controller);
 
 #include "CSVwrite.h"
-class NativeDumbCSVImpl { //TODO - make this not full of no-ops
-public:
+class NativeDumbCSVImpl {  //TODO - make this not full of no-ops
+   public:
     bool init(char const *filename) {
+        myFile.open(filename);
         return true;
     }
 
@@ -31,16 +34,18 @@ public:
      * @brief writes t to the next csv column in order
      * @param t the data to write
      */
-    template<typename T>
+    template <typename T>
     void print(T t) {
+        myFile << t;
     }
 
     /**
      * @brief writes t and ends the line
      * @param t the data to write
      */
-    template<typename T>
+    template <typename T>
     void println(T t) {
+        myFile << t << "\n";
     }
 
     /**
@@ -48,6 +53,9 @@ public:
      */
     void flush() {
     }
+
+   private:
+    std::ofstream myFile;
 };
 
 constexpr char LOG_FILE_NAME[] = "datalog.csv";
@@ -60,9 +68,9 @@ static NativeBuzzer buzzer;
 void setup(void);
 void loop(void);
 
-int main(void){
+int main(void) {
     setup();
-    for(;;){
+    for (;;) {
         loop();
     }
 }
