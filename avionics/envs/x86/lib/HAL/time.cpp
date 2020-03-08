@@ -20,7 +20,7 @@ namespace Hal{
      * @param t Duration to sleep for, in milliseconds.
      */
     void sleep_ms(uint32_t t){
-        sleep(std::chrono::milliseconds(t));
+        sleep(ms(t));
     }
 
     /**
@@ -31,9 +31,10 @@ namespace Hal{
         sleep(std::chrono::microseconds(t));
     }
 
-    extern const t_point startup_t_point = std::chrono::steady_clock::now();
+    extern const t_point startup_t_point = std::chrono::time_point_cast<ms>(std::chrono::steady_clock::now());
 
-    std::chrono::time_point<std::chrono::steady_clock> now_ms(){
-        return t_point(std::chrono::steady_clock::now() - startup_t_point);
+    t_point now_ms(){
+        t_point now = std::chrono::time_point_cast<ms>(std::chrono::steady_clock::now());
+        return t_point{now - startup_t_point};
     }
 }

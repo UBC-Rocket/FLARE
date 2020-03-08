@@ -177,10 +177,10 @@ void loop() {
     static Hal::t_point new_time = Hal::now_ms();  //ms
     uint32_t new_time_int;
     // unsigned long delta_time;
-    static Hal::duration_ms time_interval(NOMINAL_POLLING_TIME_INTERVAL);  //ms
+    static Hal::ms time_interval(NOMINAL_POLLING_TIME_INTERVAL);  //ms
 
     static Hal::t_point radio_old_time = Hal::now_ms();
-    static Hal::duration_ms radio_t_interval(500); //ms //TODO - make 500 a constant somewhere
+    static Hal::ms radio_t_interval(500); //ms //TODO - make 500 a constant somewhere
 
 
     // static unsigned long radio_old_time = 0;
@@ -208,9 +208,9 @@ void loop() {
     // Polling time intervals need to be variable, since in LANDED
     // there's a lot of data that'll be recorded
     if (state == StateId::LANDED)
-        time_interval = Hal::duration_ms(LANDED_POLLING_TIME_INTERVAL);
+        time_interval = Hal::ms(LANDED_POLLING_TIME_INTERVAL);
     else
-        time_interval = Hal::duration_ms(NOMINAL_POLLING_TIME_INTERVAL);
+        time_interval = Hal::ms(NOMINAL_POLLING_TIME_INTERVAL);
 
     //Core functionality of rocket - take data, process it,
     //run the state machine, and log the data
@@ -272,7 +272,7 @@ void loop() {
   */
 inline void blinkStatusLED() {
     static Hal::t_point init_st_old_time = Hal::now_ms();
-    static const Hal::duration_ms init_st_time_interval(500);
+    static const Hal::ms init_st_time_interval(500);
     static bool init_st_indicator = false;
 
     if (s_statusOfInit == Status::NONCRITICAL_FAILURE && Hal::now_ms() - init_st_old_time > init_st_time_interval) {

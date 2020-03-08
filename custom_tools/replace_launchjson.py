@@ -30,7 +30,7 @@ additionalConfigs = [{
         'program': '${workspaceFolder}/.pio/build/native_tantalus_stage_1/program.exe',
         'args': [],
         'stopAtEntry': True,
-        'cwd': '${workspaceFolder}',
+        'cwd': '${workspaceFolder}/.pio/build/native_tantalus_stage_1/',
         'environment': [],
         'externalConsole': True,
         'MIMode': 'gdb',

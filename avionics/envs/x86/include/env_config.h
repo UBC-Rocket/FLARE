@@ -2,7 +2,8 @@
 #define ENV_CONFIG_H_A5EBD35B10114DF0B6FDCD24E3FE7DA8
 
 // barometer data file
-#define BAROMETER_DATA "/data/barometer.csv"
+#include <string>
+const std::string BAROMETER_DATA{"barometer.csv"};
 
 #include "HAL/port_impl.h"
 #include "stdio_controller.hpp"
