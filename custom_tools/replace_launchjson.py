@@ -24,6 +24,7 @@ if platform.system() == 'Darwin':
             'request': 'launch',
             'program': '${workspaceFolder}/.pio/build/native_tantalus_stage_1/program',
             'args': [],
+            'cwd': '${workspaceFolder}',
         }
     ]
 elif platform.system() == 'Windows':
@@ -69,7 +70,7 @@ elif platform.system() == 'Linux':
         {
             'name': 'Native Tantalus Stage 1 (Linux)',
             'type': 'cppdbg',
-            'cwd': '${workspaceFolder}/.pio/build/native_tantalus_stage_1/',
+            'cwd': '${workspaceFolder}',
             'request': 'launch',
             'program': '${workspaceFolder}/.pio/build/native_tantalus_stage_1/program',
             'args': [],

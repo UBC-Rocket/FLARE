@@ -5,6 +5,7 @@
 #include <fstream>
 #include <vector>
 #include <limits> //for numeric_limits
+#include <stdexcept>
 
 #include "HAL/time.h"
 
@@ -19,8 +20,8 @@ public:
         dataStream = std::ifstream(dataFile);
 
         if(!dataStream){
-            std::cerr << "File could not be opened";
-            std::exit(1);
+            // std::exit(1);
+            throw std::runtime_error("Data file could not be opened!");
         }
         // dlength = data_length;
         // data[dlength];
