@@ -31,7 +31,11 @@ namespace Hal{
         sleep(std::chrono::microseconds(t));
     }
 
-    extern const t_point startup_t_point = std::chrono::time_point_cast<ms>(std::chrono::steady_clock::now());
+    t_point startup_t_point = std::chrono::time_point_cast<ms>(std::chrono::steady_clock::now());
+
+    void initialSystem() {
+        startup_t_point = std::chrono::time_point_cast<ms>(std::chrono::steady_clock::now());
+    }
 
     t_point now_ms(){
         t_point now = std::chrono::time_point_cast<ms>(std::chrono::steady_clock::now());
