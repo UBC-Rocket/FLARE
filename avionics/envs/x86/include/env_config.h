@@ -3,7 +3,7 @@
 
 // barometer data file
 #include <string>
-const std::string BAROMETER_DATA{"barometer.csv"};
+const std::string BAROMETER_DATA{"data/barometer.csv"};
 
 #include "HAL/port_impl.h"
 #include "stdio_controller.hpp"
