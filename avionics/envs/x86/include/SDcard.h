@@ -5,33 +5,38 @@
 #include <fstream>
 
 
-class SDcard {
+class NativeSDcard {
 public:
     bool init(const char* filename) {
         std::string name = filename;
         name += ".csv";
-        myFile.open(name);
+        m_file.open(name);
         return true;
     }
-    
-    ~SDcard() {
-        myFile.close();
+    NativeSDcard() {
+        m_file.exceptions(std::ofstream::failbit | std::ofstream::badbit );
     }
-    
-    void print(std::string str) {
-        myFile << str;
+
+    ~NativeSDcard() {
+        m_file.close();
     }
-    
-    void println(std::string str) {
-        myFile << str << "\n";
+
+    template<typename T>
+    void print(T t) {
+        m_file << t;
     }
-    
+
+    template<typename T>
+    void println(T t) {
+        m_file << t << "\n";
+    }
+
     void flush() {
-        
+        m_file.flush();
     }
-    
+
 private:
-    std::ofstream myFile;
+    std::ofstream m_file;
 };
 
 #endif /* SDcard_h */
