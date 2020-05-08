@@ -85,10 +85,10 @@ private:
     std::thread m_input; //run infinite inputLoop()
 
     char getCinForce(){
-        //busy loops until we get a character
-        char c;
-        while(!std::cin.get(c));
-        return c;
+        char c[2];
+        std::cin.getline(c, 2, '\0');
+        //getline always appends '\0' to the end, so if the character actually is '\0' then it will be discarded, but '\0' will still be returned
+        return c[0];
     }
 
 
@@ -97,24 +97,23 @@ private:
         uint16_t length;
 
         for(;;){
-            if(std::cin.get(id)){
-                length = getCinForce();
-                length <<= 8;
-                length |= getCinForce();
+            id = getCinForce();
+            length = getCinForce();
+            length <<= 8;
+            length |= getCinForce();
 
-                auto buf = std::vector<char>();
-                buf.reserve(length);
-                for(int i = 0; i < length; i++) {
-                    buf.push_back(getCinForce());
-                }
+            auto buf = std::vector<char>();
+            buf.reserve(length);
+            for(int i = 0; i < length; i++) {
+                buf.push_back(getCinForce());
+            }
 
-                { //scope for lock-guard
-                const std::lock_guard<std::mutex> lock(m_mutexes[id]);
-                for(auto j : buf) {
-                    m_istreams[id].push(j);
-                } // unlock mutex
-                
-                }
+            { //scope for lock-guard
+            const std::lock_guard<std::mutex> lock(m_mutexes[id]);
+            for(auto j : buf) {
+                m_istreams[id].push(j);
+            } // unlock mutex
+            
             }
         }
     }
