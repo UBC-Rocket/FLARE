@@ -1,18 +1,15 @@
 #ifndef CSVWRITE_H_53A4CAED991D46F687680132192B5E5A
 #define CSVWRITE_H_53A4CAED991D46F687680132192B5E5A
 
-#include "sensors-interface.h" //for ISensor
-#include "state_interface.h" //for StateId
-#include <iostream>
-#include <fstream>
-
-
 /**
   * CSV writing Class
   * Wrapper for SD.h which makes printing to csv easier
   */
 
 /*Includes------------------------------------------------------------*/
+
+#include "sensors-interface.h"  // ISensor
+#include "state_interface.h"    // StateId
 
 /*
 Requirements on Impl:
@@ -22,6 +19,7 @@ Requirements on Impl:
 */
 
 // TODO: Add Impl class or integrate in this class.
+// TODO: Figure out how to interface with SD Card
 
 template <typename Impl>
 class CSVWrite {
@@ -81,8 +79,24 @@ class CSVWrite {
     void logData(unsigned long timestamp, SensorSet &sensors,
                  StateId state, float altitude, float baseline_pressure) {
 
-        /*print data to SD card*/
+        /*
+         * SD Card data layout:
+         * Timestamp, Rocket flight state, Altitude, Baseline Pressure, Sensor Data
+         */
+
+        // Print Timestamp
         print(timestamp);
+        
+        // Print Rocket flight state
+        printState(state);
+
+        // Print Altitude
+        print(altitude);
+
+        // Print Baseline Pressure
+        print(baseline_pressure);
+
+        // Print Sensor Data
         for (auto sensor : sensors) {
             float *data = sensor.get().getData();
             for (int i = 0; i < sensor.get().dataLength(); i++) {
@@ -94,6 +108,48 @@ class CSVWrite {
     }
 
     private:
+    /**
+     * @brief Prints out current flight state
+     * @param state Flight state enum class
+     */
+    void printState(StateId state) {
+        if(state == StateId::STANDBY) {
+            print("Standby");
+        }
+        else if(state == StateId::ARMED) {
+            print("Armed");
+        }
+        else if(state == StateId::POWERED_ASCENT) {
+            print("Powered_Ascent");
+        }
+        else if(state == StateId::PRE_AIR_START_COAST_TIMED) {
+            print("Pre_Air_Start_Coast_Timed");
+        }
+        else if(state == StateId::ASCENT_TO_APOGEE) {
+            print("Ascent_To_Apogee");
+        }
+        else if(state == StateId::MACH_LOCK) {
+            print("Mach_Lock");
+        }
+        else if(state == StateId::PRESSURE_DELAY) {
+            print("Pressure_Delay");
+        }
+        else if(state == StateId::DROGUE_DESCENT) {
+            print("Drogue_Descent");
+        }
+        else if(state == StateId::MAIN_DESCENT) {
+            print("Main_Descent");
+        }
+        else if(state == StateId::LANDED) {
+            print("Landed");
+        }
+        else if(state == StateId::WINTER_CONTINGENCY) {
+            print("Winter_Contingency");
+        }
+        else {
+            print("Error_Unknown_State");
+        }
+    }
     // File m_datalog;
     Impl m_datalog;
 };
