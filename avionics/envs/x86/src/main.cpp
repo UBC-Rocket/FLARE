@@ -49,9 +49,13 @@ void loop(void){};
 
 #include "radio.h"
 
+#include "cameras.h"
+#include "test_build.h"
+
 int main(void) {
     setup();
-    NativeRadioController radio(800, std_io_controller);
+    // NativeRadioController radio(800, std_io_controller);
+
     for (;;) {
         loop();
     }
