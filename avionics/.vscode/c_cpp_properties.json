@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "TantalusStage1 - Linux",
+            "includePath": [
+                "${workspaceFolder}/common/include",
+                "${workspaceFolder}/envs/x86/include",
+                "${workspaceFolder}/rockets/tantalus_stage_1/include",
+                "${workspaceFolder}/envs/x86/lib",
+                "${workspaceFolder}/common/lib"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}
