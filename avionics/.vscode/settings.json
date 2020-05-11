@@ -1,0 +1,8 @@
+{
+    "files.exclude": {
+        "CMakeFiles/": true,
+        "Makefile": true,
+        "cmake_install.cmake": true,
+        "CMakeCache.txt": true
+    }
+}

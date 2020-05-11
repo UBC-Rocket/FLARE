@@ -4,16 +4,20 @@
             "name": "TantalusStage1 - Linux",
             "includePath": [
                 "${workspaceFolder}/common/include",
+                "${workspaceFolder}/common/lib",
                 "${workspaceFolder}/envs/x86/include",
-                "${workspaceFolder}/rockets/tantalus_stage_1/include",
                 "${workspaceFolder}/envs/x86/lib",
-                "${workspaceFolder}/common/lib"
+                "${workspaceFolder}/rockets/tantalus_stage_1/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++11",
-            "intelliSenseMode": "clang-x64"
+            "intelliSenseMode": "clang-x64",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true
+            }
         }
     ],
     "version": 4
