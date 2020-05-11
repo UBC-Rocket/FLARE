@@ -9,6 +9,11 @@
 #include <vector>
 #include <cstring> //for memmove
 
+#if defined(WIN32) || defined(_WIN32)
+    #define OS_IS_WINDOWS
+#endif
+
+
 class StdIoController {
 public:
     StdIoController() : m_input(&StdIoController::inputLoop, this) {
@@ -38,13 +43,18 @@ public:
      * @param c Pointer to array of data to be sent
      * @param length Length of the data to be sent
      */
-    static void putPacket(uint8_t const id, char const * const c, uint16_t const length){
+    static void putPacket(uint8_t const id, char const *c, uint16_t const length){
         const std::lock_guard<std::mutex> lock(s_cout);
         //TODO - check the success of std::cout.put and other unformatted output, and possibly do something about it
+
+        // Windows converts lf -> crlf. To get around this, we force every character to be put one at a time -- this means a stream like CRLF becomes CRLFLF. Then on the reciving end replace CRLF with LF to recover the original values.
         std::cout.put(id); //ID
         std::cout.put(static_cast<char>(length >> 8)); //Length, bigendian
         std::cout.put(static_cast<char>(length & 0xFF));
-        std::cout.write(c, length); //Data
+
+        // Data
+        for(char const *end = c+length; c!= end; c++)
+            std::cout.put(*c);
     }
 
     /**
@@ -84,10 +94,19 @@ private:
 
     std::thread m_input; //run infinite inputLoop()
 
+
     char getCinForce(){
         char c[2];
         std::cin.getline(c, 2, '\0');
         //getline always appends '\0' to the end, so if the character actually is '\0' then it will be discarded, but '\0' will still be returned
+        #ifdef OS_IS_WINDOWS
+            //0x0D is CR, 0x0A is LF
+            if (c[0] == 0x0D && std::cin.peek() == 0x0A){
+                std::cin.ignore(1);
+                return 0x0A;
+            }
+        #endif
+
         return c[0];
     }
 
