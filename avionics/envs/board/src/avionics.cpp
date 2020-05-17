@@ -65,8 +65,8 @@ PLEASE READ ME!
 #include <functional> //for std::reference_wrapper
 #include <string.h>
 
-#include "config.h"
 #include "env_config.h"
+#include "config.h"
 
 #include "HAL/gpio.h"
 
