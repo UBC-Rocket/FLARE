@@ -1,12 +1,12 @@
-
-// barometer data file
 #include <string>
-const std::string BAROMETER_DATA{"data/barometer.csv"};
-
-#include "HAL/port_impl.h"
-#include "stdio_controller.hpp"
 
 #include "CSVwrite.h"
+#include "HAL/port_impl.h"
+#include "buzzer.h"
+#include "cameras.h"
+#include "radio.h"
+#include "stdio_controller.hpp"
+
 class NativeDumbCSVImpl { // TODO - make this not full of no-ops
   public:
     bool init(char const *filename) { return true; }
@@ -29,21 +29,10 @@ class NativeDumbCSVImpl { // TODO - make this not full of no-ops
     void flush() {}
 };
 
+// barometer data file
+const std::string BAROMETER_DATA{"data/barometer.csv"};
 constexpr char LOG_FILE_NAME[] = "datalog.csv";
-CSVWrite<NativeDumbCSVImpl> datalog;
 
-/* Buzzer */
-#include "buzzer.h"
-#include "radio.h"
-
-#include "cameras.h"
-#include "test_build.h"
-
-// This wraps std::cout and std::cin, so this is a global for the same reason
-// std::cout and std::cin are globals
-namespace global {
-StdIoController stdio_controller;
-}
 int main(void) {
     RadioController radio(800);
     auto SerialUSB = Hal::Serial(1);
@@ -52,7 +41,8 @@ int main(void) {
     auto IridiumSerial = Hal::Serial(4);
     auto SerialCamera = Hal::Serial(5);
 
-    NativeBuzzer buzzer;
+    Buzzer buzzer;
+    CSVWrite<NativeDumbCSVImpl> datalog;
     for (;;) {
     }
 }

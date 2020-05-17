@@ -4,10 +4,6 @@
 #include "buzzer_interface.h"
 #include "stdio_controller.hpp"
 
-namespace global {
-StdIoController extern stdio_controller;
-}
-
 class Buzzer : public IBuzzer {
     void sing(SongTypes song) const {
         uint8_t tmp = 1;

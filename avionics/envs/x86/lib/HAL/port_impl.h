@@ -5,21 +5,20 @@
 #include "stdio_controller.hpp"
 #include <cstring>
 
-namespace global {
-StdIoController extern stdio_controller;
-}
-
 namespace Hal {
 
 class Serial : public ISerial {
+  private:
+    typedef StdIoController StdIO;
+
   public:
-    Serial(uint8_t id) : m_io{::global::stdio_controller}, M_IO_ID(id) {}
+    Serial(uint8_t id) : M_IO_ID(id) {}
 
     void begin(long baud) {}          // no-op for native
     bool available() { return true; } // std::cout always available
     int read() { return 0; } // TODO - make this read from multiplexed stdio
     void write(const uint8_t *buffer, std::size_t size) {
-        m_io.putPacket(M_IO_ID, buffer, size);
+        StdIO::putPacket(M_IO_ID, buffer, size);
     };
     // TODO - make these actually do something
     void print(char *dat) {}
@@ -29,7 +28,6 @@ class Serial : public ISerial {
 
   private:
     uint8_t M_IO_ID;
-    StdIoController const &m_io; // alias
 };
 
 } // namespace Hal

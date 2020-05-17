@@ -8,11 +8,10 @@
 #include <queue>
 #include <thread>
 
-namespace global {
-StdIoController extern stdio_controller;
-}
-
 class RadioController : public RadioControllerBase {
+  private:
+    typedef StdIoController StdIO;
+
   public:
     RadioController(unsigned short const MAX_QUEUED_BYTES)
         : RadioControllerBase(MAX_QUEUED_BYTES) {}
@@ -20,9 +19,7 @@ class RadioController : public RadioControllerBase {
     void listenAndAct() {
         uint8_t command;
 
-        auto &io = global::stdio_controller; // alias
-
-        while (io.get(M_IO_ID, command)) {
+        while (StdIO::get(M_IO_ID, command)) {
             // TODO - do something with command
         }
 
@@ -32,7 +29,7 @@ class RadioController : public RadioControllerBase {
         }
 
         uint8_t len = m_tx_q.fillPayload(m_payload);
-        io.putPacket(M_IO_ID, m_payload, len);
+        StdIO::putPacket(M_IO_ID, m_payload, len);
     }
 
   private:
