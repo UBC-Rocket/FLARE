@@ -65,8 +65,8 @@ PLEASE READ ME!
 #include <functional> //for std::reference_wrapper
 #include <string.h>
 
-#include "env_config.h"
 #include "config.h"
+#include "env_config.h"
 
 #include "HAL/gpio.h"
 
@@ -112,7 +112,12 @@ void blinkStatusLED();
  * @param  None
  * @return None
  */
-void setup() {
+int main(void) {
+
+    static RadioController radio =
+        RadioController(Serial2); // TODO - create method in Hal::Serial that
+                                  // can extract the underlying HardwareSerial
+
     initPins();
 
 /* Setup all UART comms */
@@ -165,117 +170,88 @@ void setup() {
 
     // TODO - build this out
     // radioStatus(&s_radio, &s_txPacket, &s_statusOfInit);
-}
 
-/**
- * @brief  The Arduino loop function
- * @param  None
- * @return None
- */
-void loop() {
-    /* List of constants */
-    static Hal::t_point timestamp;
-    static Hal::t_point old_time = Hal::now_ms(); // ms
-    static Hal::t_point new_time = Hal::now_ms(); // ms
-    uint32_t new_time_int;
-    // unsigned long delta_time;
-    static Hal::ms time_interval(NOMINAL_POLLING_TIME_INTERVAL); // ms
+    for (;;) {
+        /* List of constants */
+        static Hal::t_point timestamp;
+        static Hal::t_point old_time = Hal::now_ms(); // ms
+        static Hal::t_point new_time = Hal::now_ms(); // ms
+        uint32_t new_time_int;
+        // unsigned long delta_time;
+        static Hal::ms time_interval(NOMINAL_POLLING_TIME_INTERVAL); // ms
 
-    static Hal::t_point radio_old_time = Hal::now_ms();
-    static Hal::ms radio_t_interval(
-        500); // ms //TODO - make 500 a constant somewhere
+        static Hal::t_point radio_old_time = Hal::now_ms();
+        static Hal::ms radio_t_interval(
+            500); // ms //TODO - make 500 a constant somewhere
 
-    // static unsigned long radio_old_time = 0;
-    // static unsigned long radio_time_interval = 500;  //ms
+        // static unsigned long radio_old_time = 0;
+        // static unsigned long radio_time_interval = 500;  //ms
 
-    // float *battery_voltage, *acc_data, *bar_data, *temp_sensor_data,
-    // *IMU_data, *GPS_data, *thermocouple_data;
+        // float *battery_voltage, *acc_data, *bar_data, *temp_sensor_data,
+        // *IMU_data, *GPS_data, *thermocouple_data;
 
-    static float altitude;
+        static float altitude;
 
-    // static FlightStates state = STANDBY;
+        // static FlightStates state = STANDBY;
 
-    // makes sure that even if it does somehow get accidentally changed,
-    // it gets reverted
-    if (s_statusOfInit == Status::CRITICAL_FAILURE)
-        state = StateId::WINTER_CONTINGENCY;
+        // makes sure that even if it does somehow get accidentally changed,
+        // it gets reverted
+        if (s_statusOfInit == Status::CRITICAL_FAILURE)
+            state = StateId::WINTER_CONTINGENCY;
 
-    radio.listenAndAct();
-    // resolveRadioRx(&s_radio, &s_txPacket, GPS_data, &state, &s_statusOfInit);
+        radio.listenAndAct();
+        // resolveRadioRx(&s_radio, &s_txPacket, GPS_data, &state,
+        // &s_statusOfInit);
 
 #ifdef NOSECONE // send satcom data
-    sendSatcomMsg(state, GPS_data, timestamp);
+        sendSatcomMsg(state, GPS_data, timestamp);
 #endif
 
-    // Polling time intervals need to be variable, since in LANDED
-    // there's a lot of data that'll be recorded
-    if (state == StateId::LANDED)
-        time_interval = Hal::ms(LANDED_POLLING_TIME_INTERVAL);
-    else
-        time_interval = Hal::ms(NOMINAL_POLLING_TIME_INTERVAL);
+        // Polling time intervals need to be variable, since in LANDED
+        // there's a lot of data that'll be recorded
+        if (state == StateId::LANDED)
+            time_interval = Hal::ms(LANDED_POLLING_TIME_INTERVAL);
+        else
+            time_interval = Hal::ms(NOMINAL_POLLING_TIME_INTERVAL);
 
-    // Core functionality of rocket - take data, process it,
-    // run the state machine, and log the data
-    new_time = Hal::now_ms();
-    new_time_int = static_cast<uint32_t>(timestamp.time_since_epoch().count());
+        // Core functionality of rocket - take data, process it,
+        // run the state machine, and log the data
+        new_time = Hal::now_ms();
+        new_time_int =
+            static_cast<uint32_t>(timestamp.time_since_epoch().count());
 
-    if ((new_time - old_time) >= time_interval) {
-        old_time = new_time;
+        if ((new_time - old_time) >= time_interval) {
+            old_time = new_time;
 
-        pollSensors(timestamp, sensors);
+            pollSensors(timestamp, sensors);
 
-        calc.calculateValues(state, state_input, new_time);
-        altitude =
-            state_input.altitude; // TODO - This is temporary fix for logData;
-                                  // should instead do something else.
+            calc.calculateValues(state, state_input, new_time);
+            altitude =
+                state_input
+                    .altitude; // TODO - This is temporary fix for logData;
+                               // should instead do something else.
 
-        state = state_hash_map[state]->getNewState(state_input, state_aux);
+            state = state_hash_map[state]->getNewState(state_input, state_aux);
 
-        datalog.logData(
-            new_time_int, sensors, state, altitude,
-            0); // TODO - think some more about data logging and how it should
-                // mesh with calculations, and also get rid of baseline_pressure
-    }
+            datalog.logData(new_time_int, sensors, state, altitude,
+                            0); // TODO - think some more about data logging and
+                                // how it should mesh with calculations, and
+                                // also get rid of baseline_pressure
+        }
 
-    if (new_time - radio_old_time >= radio_t_interval) {
-        radio_old_time = new_time;
-        radio.sendBulkSensor(new_time_int, altitude, accelerometer, imuSensor,
-                             gps, static_cast<uint8_t>(state));
-    }
-    // LED blinks in non-critical failure
-    blinkStatusLED();
+        if (new_time - radio_old_time >= radio_t_interval) {
+            radio_old_time = new_time;
+            radio.sendBulkSensor(new_time_int, altitude, accelerometer,
+                                 imuSensor, gps, static_cast<uint8_t>(state));
+        }
+        // LED blinks in non-critical failure
+        blinkStatusLED();
 
 #ifdef TESTING
-    Hal::sleep_ms(1000); // So you can actually read the serial output
+        Hal::sleep_ms(1000); // So you can actually read the serial output
 #endif
+    }
 }
-
-/**
- * @brief  Helper function for satcom
- * @param  FlightStates state - flight state of the rocket
- * @param  float GPS_data[]
- * @param  float timestamp - time in ms
- * @return None
- */
-// inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t
-// timestamp) {
-//     static bool mainDeploySatcomSent = false;
-//     static int landedSatcomSentCount = 0;
-//     static uint16_t satcomMsgOldTime = millis();
-
-//     if (state == FINAL_DESCENT && !mainDeploySatcomSent) {
-//         mainDeploySatcomSent = true;
-//         SatComSendGPS(&timestamp, GPS_data);
-//     } else if (state == LANDED && landedSatcomSentCount <
-//     NUM_SATCOM_SENDS_ON_LANDED && millis() - satcomMsgOldTime >=
-//     SATCOM_LANDED_TIME_INTERVAL) {
-//         //sends Satcom total of NUM_SATCOM_SENDS_ON_LANDED times,
-//         //once every SATCOM_LANDED_TIME_INTERVAL
-//         landedSatcomSentCount++;
-//         SatComSendGPS(&timestamp, GPS_data);
-//         satcomMsgOldTime = millis();
-//     }
-// }
 
 /**
  * @brief  Helper function for LED blinking

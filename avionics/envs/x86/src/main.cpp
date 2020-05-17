@@ -5,14 +5,6 @@ const std::string BAROMETER_DATA{"data/barometer.csv"};
 
 #include "HAL/port_impl.h"
 #include "stdio_controller.hpp"
-StdIoController std_io_controller;
-std::mutex StdIoController::s_cout;
-
-auto static SerialUSB = Hal::NativeSerial(1, std_io_controller);
-auto static SerialGPS = Hal::NativeSerial(2, std_io_controller);
-auto static SerialRadio = Hal::NativeSerial(3, std_io_controller);
-auto static IridiumSerial = Hal::NativeSerial(4, std_io_controller);
-auto static SerialCamera = Hal::NativeSerial(5, std_io_controller);
 
 #include "CSVwrite.h"
 class NativeDumbCSVImpl { // TODO - make this not full of no-ops
@@ -42,21 +34,25 @@ CSVWrite<NativeDumbCSVImpl> datalog;
 
 /* Buzzer */
 #include "buzzer.h"
-static NativeBuzzer buzzer;
-
-void setup(void){};
-void loop(void){};
-
 #include "radio.h"
 
 #include "cameras.h"
 #include "test_build.h"
 
+// This wraps std::cout and std::cin, so this is a global for the same reason
+// std::cout and std::cin are globals
+namespace global {
+StdIoController stdio_controller;
+}
 int main(void) {
-    setup();
-    // NativeRadioController radio(800, std_io_controller);
+    RadioController radio(800);
+    auto SerialUSB = Hal::Serial(1);
+    auto SerialGPS = Hal::Serial(2);
+    auto SerialRadio = Hal::Serial(3);
+    auto IridiumSerial = Hal::Serial(4);
+    auto SerialCamera = Hal::Serial(5);
 
+    NativeBuzzer buzzer;
     for (;;) {
-        loop();
     }
 }
