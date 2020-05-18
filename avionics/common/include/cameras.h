@@ -30,21 +30,21 @@
 
 class Camera{
 public:
-    Camera(Hal::ISerial &SerialCam): m_seri_cam(SerialCam) {
+    Camera(Hal::Serial &SerialCam): m_seri_cam(SerialCam) {
         m_seri_cam.begin(M_CAMERA_BAUD);
         while (!m_seri_cam);
         Hal::sleep_ms(2000);
         stop_record();
     }
-    void power_cameras(); //a toggle switch
-    void start_record();
-    void stop_record();
+    void const power_cameras(); //a toggle switch
+    void const start_record();
+    void const stop_record();
 
 private:
     uint8_t crc_calculator(uint8_t *command, uint8_t len);
     uint8_t crc8_dvb_s2(uint8_t crc, unsigned char a);
 
-    Hal::ISerial &m_seri_cam;
+    Hal::Serial &m_seri_cam;
     static constexpr auto M_CAMERA_BAUD = 115200;
 };
 #endif

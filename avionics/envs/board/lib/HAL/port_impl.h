@@ -7,26 +7,25 @@
 
 namespace Hal {
 
-class Serial : public ISerial {
-public:
-    Serial(HardwareSerial &seri) : m_seri(seri) {}
+class Serial {
+  public:
+    constexpr Serial(HardwareSerial &seri) : m_seri(seri) {}
 
-    void begin(long baud) { m_seri.begin(baud); }
-    bool available() { return m_seri.available(); }
-    int read() { return m_seri.read(); }
-    void write(const uint8_t *buffer, size_t size) {
+    void const begin(long baud) { m_seri.begin(baud); }
+    bool const available() { return m_seri.available(); }
+    int const read() { return m_seri.read(); }
+    void const write(const uint8_t *buffer, size_t size) {
         m_seri.write(buffer, size);
     };
-    void print(char *dat) { m_seri.print(dat); }
-    void println(char *dat) { m_seri.println(dat); }
+    void const print(char *dat) { m_seri.print(dat); }
+    void const println(char *dat) { m_seri.println(dat); }
 
-    HardwareSerial &getSerial() {return m_seri;}
+    HardwareSerial &getSerial() { return m_seri; }
     operator bool() { return bool(m_seri); };
 
-private:
+  private:
     HardwareSerial m_seri;
-
 };
 
-}
+} // namespace Hal
 #endif

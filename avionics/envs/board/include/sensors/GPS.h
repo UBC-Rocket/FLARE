@@ -92,7 +92,7 @@ const uint8_t GPS_set_update_rate[] =
 
 class GPS : public ISensor {
 public:
-    GPS(Hal::Serial &seri) : m_serial_gps(seri.getSerial()) {}
+    GPS(const Hal::Serial &seri) : m_serial_gps(seri.getSerial()) {}
     void initSensor();
     void readData();
     uint8_t dataLength();

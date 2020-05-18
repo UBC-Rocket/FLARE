@@ -35,7 +35,7 @@ constexpr uint64_t GND_STN_ADDR_MSB = 0x0013A200; //Ground Station - Body
 constexpr uint64_t GND_STN_ADDR_LSB = 0x41678FC0;
 constexpr uint32_t RADIO_BAUD_RATE = 921600;
 
-class RadioController : public IRadioController {
+class RadioController : public RadioControllerBase {
 public:
     /**
      * @brief Constructor.
@@ -44,7 +44,7 @@ public:
      */
     RadioController(HardwareSerial &serial_radio,
             unsigned short const MAX_QUEUED_BYTES = 800, uint8_t MAX_PACKETS_PER_RX_LOOP = 8) :
-        IRadioController(MAX_QUEUED_BYTES),
+        RadioControllerBase(MAX_QUEUED_BYTES),
         m_gnd_addr(XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB)),
         M_MAX_PACKETS_PER_RX_LOOP(MAX_PACKETS_PER_RX_LOOP)
          {

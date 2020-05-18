@@ -7,28 +7,36 @@
 
 namespace Hal {
 
-class Serial : public ISerial {
+class Serial {
   private:
     typedef StdIoController StdIO;
 
   public:
-    Serial(uint8_t id) : M_IO_ID(id) {}
+    constexpr Serial(uint8_t const id) : M_IO_ID(id) {}
 
-    void begin(long baud) {}          // no-op for native
-    bool available() { return true; } // std::cout always available
-    int read() { return 0; } // TODO - make this read from multiplexed stdio
-    void write(const uint8_t *buffer, std::size_t size) {
+    void const begin(long baud) {}          // no-op for native
+    bool const available() { return true; } // std::cout always available
+    int const read() {
+        return 0;
+    } // TODO - make this read from multiplexed stdio
+    void const write(const uint8_t *buffer, std::size_t size) {
         StdIO::putPacket(M_IO_ID, buffer, size);
     };
     // TODO - make these actually do something
-    void print(char *dat) {}
-    void println(char *dat) {}
+    void const print(char *dat) {}
+    void const println(char *dat) {}
 
-    operator bool() { return true; };
+    constexpr operator bool() { return true; };
 
   private:
-    uint8_t M_IO_ID;
+    const uint8_t M_IO_ID;
 };
 
+constexpr Serial SerialUSB(1);
+constexpr Serial SerialGPS(2);
+constexpr Serial SerialRadio(3);
+constexpr Serial IridiumSerial(4);
+constexpr Serial SerialCamera(5);
 } // namespace Hal
+
 #endif

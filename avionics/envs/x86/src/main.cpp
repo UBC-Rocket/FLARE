@@ -35,14 +35,9 @@ constexpr char LOG_FILE_NAME[] = "datalog.csv";
 
 int main(void) {
     RadioController radio(800);
-    auto SerialUSB = Hal::Serial(1);
-    auto SerialGPS = Hal::Serial(2);
-    auto SerialRadio = Hal::Serial(3);
-    auto IridiumSerial = Hal::Serial(4);
-    auto SerialCamera = Hal::Serial(5);
 
     Buzzer buzzer;
     CSVWrite<NativeDumbCSVImpl> datalog;
-    for (;;) {
-    }
+    for (;;)
+        ;
 }
