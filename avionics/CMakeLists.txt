@@ -8,19 +8,10 @@ project(Avionics_Native)
 
 
 add_executable(TantalusStage1 envs/x86/src/main.cpp)
-add_library(TantalusStage1_lib "")
 
 add_subdirectory(common)
 add_subdirectory(envs/x86)
 add_subdirectory(rockets/tantalus_stage_1)
-
-target_include_directories(TantalusStage1_lib PUBLIC
-    common/include
-    common/lib
-    envs/x86/include
-    envs/x86/lib
-    rockets/tantalus_stage_1/include
-)
 
 target_include_directories(TantalusStage1 PUBLIC
     common/include
@@ -30,4 +21,3 @@ target_include_directories(TantalusStage1 PUBLIC
     rockets/tantalus_stage_1/include
 )
 
-target_link_libraries(TantalusStage1_lib)

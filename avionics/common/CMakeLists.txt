@@ -1,5 +1,5 @@
 target_sources( 
-    TantalusStage1_lib
+    TantalusStage1
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/src/battery.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/calculations.cpp
