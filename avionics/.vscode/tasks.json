@@ -12,6 +12,6 @@
             },
             "command": "cmake . && make",
             "problemMatcher": []
-        },
+        }
     ]
 }

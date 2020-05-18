@@ -14,8 +14,21 @@
 #endif
 
 class StdIoController {
+  private:
+    typedef char Id;
+
+    static std::unordered_map<Id, std::mutex> m_mutexes;
+    static std::unordered_map<Id, std::queue<uint8_t>>
+        m_istreams; // Note - for input only
+
+    // I got tired of thinking about the best way to pre-compose strings so
+    // instead I'm just going to lock std::cout
+    static std::mutex m_cout;
+
+    static std::thread m_input; // run infinite inputLoop()
     // Everything is static but it's not a namespace b/c of the private member
     // variables
+
   public:
     StdIoController() { putConfigPacket(); }
 
@@ -46,7 +59,7 @@ class StdIoController {
      */
     static void putPacket(uint8_t const id, char const *c,
                           uint16_t const length) {
-        const std::lock_guard<std::mutex> lock(s_cout);
+        const std::lock_guard<std::mutex> lock(m_cout);
         // TODO - check the success of std::cout.put and other unformatted
         // output, and possibly do something about it
 
@@ -97,18 +110,6 @@ class StdIoController {
     }
 
   private:
-    typedef char Id;
-
-    static std::unordered_map<Id, std::mutex> m_mutexes;
-    static std::unordered_map<Id, std::queue<uint8_t>>
-        m_istreams; // Note - for input only
-
-    // I got tired of thinking about the best way to pre-compose strings so
-    // instead I'm just going to lock std::cout
-    static std::mutex s_cout;
-
-    static std::thread m_input; // run infinite inputLoop()
-
     static char getCinForce() {
         char c[2];
         std::cin.getline(c, 2, '\0');

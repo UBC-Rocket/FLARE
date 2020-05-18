@@ -1,12 +1,14 @@
 #ifndef RADIO_H_22181C75119344C48BDF0D5A550D2A02
 #define RADIO_H_22181C75119344C48BDF0D5A550D2A02
 
-#include "radio_interface.h"
-#include "stdio_controller.hpp"
 #include <iostream>
 #include <mutex>
 #include <queue>
 #include <thread>
+
+#include "radio_interface.h"
+#include "radio_queue.h"
+#include "stdio_controller.hpp"
 
 class RadioController : public RadioControllerBase {
   private:

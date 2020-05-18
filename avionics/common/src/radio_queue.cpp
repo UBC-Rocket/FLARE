@@ -1,7 +1,7 @@
 #include "radio_queue.h"
 
 // recall:
-// typedef SubPktPtr std::unique_ptr<std::vector<int>>;
+// typedef std::unique_ptr<std::vector<int>> SubPktPtr;
 void RadioQueue::push(SubPktPtr subpacket) {
     if (!subpacket) // check for null pointer
         return;
