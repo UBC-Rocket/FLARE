@@ -118,7 +118,7 @@ void blinkStatusLED();
 int main(void) {
     constexpr char LOG_FILE_NAME[] = "datalog.csv";
     CSVWrite<CSVWriteImpl> datalog;
-    static Buzzer buzzer = Buzzer(MELODY_PIN);
+    static Buzzer buzzer;
     Camera cam(Hal::SerialCamera);
 
     static RadioController radio = RadioController(Hal::SerialRadio);
