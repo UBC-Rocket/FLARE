@@ -32,11 +32,11 @@ class Serial {
     const uint8_t M_IO_ID;
 };
 
-constexpr Serial SerialUSB(1);
-constexpr Serial SerialGPS(2);
-constexpr Serial SerialRadio(3);
-constexpr Serial IridiumSerial(4);
-constexpr Serial SerialCamera(5);
+static Serial SerialUSB(1);
+static Serial SerialGPS(2);
+static Serial SerialRadio(3);
+static Serial IridiumSerial(4);
+static Serial SerialCamera(5);
 } // namespace Hal
 
 #endif

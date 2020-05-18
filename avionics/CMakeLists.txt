@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -static-libgcc")
 project(Avionics_Native)
 
 
-add_executable(TantalusStage1 envs/x86/src/main.cpp)
+add_executable(TantalusStage1 common/src/avionics.cpp)
 
 add_subdirectory(common)
 add_subdirectory(envs/x86)

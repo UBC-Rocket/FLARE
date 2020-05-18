@@ -27,5 +27,16 @@ class Serial {
     HardwareSerial m_seri;
 };
 
+// auto static SerialUSB       = Hal::Serial(Serial); //?
+auto const static SerialGPS = Hal::Serial(Serial1);
+auto static SerialRadio = Hal::Serial(Serial2);
+
+auto static SerialCamera = Hal::Serial(Serial3);
+auto const static IridiumSerial = Hal::Serial(Serial4);
+// Annoyingly trying to make some of these SerialX const directly doesn't easily
+// work because the underlying HardwareSerial isn't const, which I think means
+// everything that uses HardwareSerial (i.e. everything useful) is not const,
+// which kind of cascades upwards.
+
 } // namespace Hal
 #endif

@@ -65,11 +65,12 @@ PLEASE READ ME!
 #include <functional> //for std::reference_wrapper
 #include <string.h>
 
-#include "env_config.h"
+#include "HAL/gpio.h"
+#include <HAL/port_impl.h> // <> vs "" for HAL ??
+
 #include "config.h"
 
-#include "HAL/gpio.h"
-
+#include "CSVWriteImpl.h"
 #include "buzzer.h"
 #include "calculations.h"
 #include "cameras.h"
@@ -77,6 +78,8 @@ PLEASE READ ME!
 #include "options.h"
 #include "radio.h"
 #include "sensors.h"
+
+#include "env_config.h"
 
 /* Errors---------------------------------------------------------------*/
 #if defined NOSECONE && defined BODY
@@ -113,10 +116,14 @@ void blinkStatusLED();
  * @return None
  */
 int main(void) {
+    constexpr char LOG_FILE_NAME[] = "datalog.csv";
+    CSVWrite<CSVWriteImpl> datalog;
+    static Buzzer buzzer = Buzzer(MELODY_PIN);
+    Camera cam(Hal::SerialCamera);
 
-    static RadioController radio =
-        RadioController(Serial2); // TODO - create method in Hal::Serial that
-                                  // can extract the underlying HardwareSerial
+    static RadioController radio = RadioController(Hal::SerialRadio);
+    // TODO - create method in Hal::Serial that
+    // can extract the underlying HardwareSerial
 
     initPins();
 

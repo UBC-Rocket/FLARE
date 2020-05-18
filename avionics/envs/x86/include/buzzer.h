@@ -5,6 +5,8 @@
 #include "stdio_controller.hpp"
 
 class Buzzer : public IBuzzer {
+  public:
+    Buzzer(int discard) {} // to keep the Teensy version happy
     void sing(SongTypes song) const {
         uint8_t tmp = 1;
         char tmpsong = static_cast<char>(song);

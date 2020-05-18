@@ -1,4 +1,4 @@
-#ifndef ENV_CONFIG_H_A5EBD35B10114DF0B6FDCD24E3FE7DA8
-#define ENV_CONFIG_H_A5EBD35B10114DF0B6FDCD24E3FE7DA8
+#pragma once
 
-#endif
+constexpr char BAROMETER_DATA[] = "data/barometer.csv";
+constexpr char LOG_FILE_NAME[] = "datalog.csv";
