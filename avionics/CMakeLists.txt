@@ -3,6 +3,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -static-libgcc")
+add_definitions(-Wall)
 
 project(Avionics_Native)
 
