@@ -8,8 +8,6 @@
 
 /*Includes------------------------------------------------------------*/
 
-#include <SPI.h>                // Arduino SD card library
-#include <SD.h>                 // Arduino SD card library
 #include "sensors-interface.h"  // ISensor
 #include "state_interface.h"    // StateId
 
@@ -31,23 +29,7 @@ class CSVWrite {
      * @return false if the sensor fails to initialize
      */
     bool init(const char* filename) {
-        bool success = SD.begin(BUILTIN_SDCARD);
-        if(success) {
-            m_datalog = SD.open(filename, FILE_WRITE);
-        }
-
-        if(!m_datalog) {
-            return false;
-        }
-
-        return success;
-    }
-
-    /**
-     * @brief destructor for closing datalogger when program terminates 
-     */
-    ~CSVWrite() {
-        m_datalog.close();
+        return m_datalog.init(filename);
     }
 
     /**
@@ -159,6 +141,6 @@ class CSVWrite {
         }
     }
     // File m_datalog;
-    File m_datalog;
+    Impl m_datalog;
 };
 #endif
