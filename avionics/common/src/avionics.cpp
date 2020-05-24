@@ -134,13 +134,7 @@ int main(void) {
     //     SerialUSB.println("Initializing radio");
     // #endif
 
-#ifdef ARDUINO // TODO - ifdefs aren't ideal, I think, see if this can be moved
-               // somewhere else
-    /*init I2C bus @ 400 kHz */
-    Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
-    Wire.setDefaultTimeout(100000); // 100ms
-#endif
-
+    env_initialize();
     /* Add all the sensors inside sensor vector */
     // sensors.push_back(accelerometer);
     // sensors.push_back(barometer);

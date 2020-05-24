@@ -10,7 +10,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "command": "cmake . && make",
+            "command": "cd build && cmake ../ && make",
             "problemMatcher": []
         }
     ]

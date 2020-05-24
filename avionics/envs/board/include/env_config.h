@@ -1,5 +1,4 @@
-#ifndef ENV_CONFIG_H_B447E20B937446FCA6C66F5444A7D9A7
-#define ENV_CONFIG_H_B447E20B937446FCA6C66F5444A7D9A7
+#pragma once
 
 #undef INPUT
 #undef OUTPUT
@@ -7,4 +6,9 @@
 #undef HIGH
 #undef LED_BUILTIN
 
-#endif
+#include <i2c_t3.h>
+
+void env_initialize() {
+    Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
+    Wire.setDefaultTimeout(100000); // 100ms
+}

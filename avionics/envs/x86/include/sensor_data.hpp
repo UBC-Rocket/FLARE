@@ -32,7 +32,6 @@ template <std::size_t data_length> class DataSpoof {
     // returns next data point in stream
     float *getData() {
         constexpr std::streamsize MAX_BUFF = 255;
-        Hal::initialSystem();
         auto t_now = Hal::now_ms().time_since_epoch().count();
         while (t1 < t_now) {
             // std::vector<std::string> dataFields = split_string(dataStr);
