@@ -85,7 +85,7 @@ static IMU imuSensor;
 static Temperature temperature;
 
 std::vector<std::reference_wrapper<ISensor>> sensors{
-    accelerometer, barometer, gps, imuSensor, temperature};
+    barometer, gps, accelerometer, imuSensor, temperature};
 
 /* Parachute */
 #include "hardware/ignitor.h"

@@ -135,13 +135,6 @@ int main(void) {
     // #endif
 
     env_initialize();
-    /* Add all the sensors inside sensor vector */
-    // sensors.push_back(accelerometer);
-    // sensors.push_back(barometer);
-    // sensors.push_back(gps);
-    // sensors.push_back(imuSensor);
-    // sensors.push_back(temperature);
-    // sensors.push_back(thermocouple);
 
     /* init log file */
     datalog.init(LOG_FILE_NAME);
@@ -213,10 +206,9 @@ int main(void) {
             pollSensors(timestamp, sensors);
 
             calc.calculateValues(state, state_input, new_time);
-            altitude =
-                state_input
-                    .altitude; // TODO - This is temporary fix for logData;
-                               // should instead do something else.
+            altitude = state_input.altitude;
+            // TODO - This is temporary fix for logData;
+            // should instead do something else.
 
             state = state_hash_map[state]->getNewState(state_input, state_aux);
 
