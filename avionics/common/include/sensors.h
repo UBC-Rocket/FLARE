@@ -23,16 +23,16 @@
 
 /*Includes------------------------------------------------------------*/
 // #include <stdint.h>
+#include "HAL/time.h"
 #include <functional> //for std::reference_wrapper
 #include <vector>
-#include "HAL/time.h"
 
 #include "buzzer.h"
-#include "sensors-interface.h"
 #include "hw-interface.h"
-#include "statemachine.h"
-#include "state_interface.h"
 #include "options.h"
+#include "sensors-interface.h"
+#include "state_interface.h"
+#include "statemachine.h"
 
 #include "CSVwrite.h"
 
@@ -40,23 +40,31 @@
 
 /*Variables------------------------------------------------------------*/
 enum class Status {
-    NOMINAL,
-    NONCRITICAL_FAILURE,
-    CRITICAL_FAILURE
+    NOMINAL = 0x00,
+    NONCRITICAL_FAILURE = 0x01,
+    CRITICAL_FAILURE = 0x03
 };
 
 /*Functions------------------------------------------------------------*/
 
-void initSensors(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IParachute> > &hardware, IBuzzer &buzzer);
+void initSensors(std::vector<std::reference_wrapper<ISensor>> &sensors,
+                 std::vector<std::reference_wrapper<IParachute>> &hardware,
+                 IBuzzer &buzzer);
 
-void displayStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IParachute> > &hardware, IBuzzer &buzzer);
+void displayStatus(std::vector<std::reference_wrapper<ISensor>> &sensors,
+                   std::vector<std::reference_wrapper<IParachute>> &hardware,
+                   IBuzzer &buzzer);
 
-Status getStatus(std::vector<std::reference_wrapper<ISensor> > &sensors, std::vector<std::reference_wrapper<IParachute> > &hardware);
+Status getStatus(std::vector<std::reference_wrapper<ISensor>> &sensors,
+                 std::vector<std::reference_wrapper<IParachute>> &hardware);
 
 // TODO: Remove dependency of sensors.h for GP20U7.cpp/.h
 
-void pollSensors(Hal::t_point &timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors);
+void pollSensors(Hal::t_point &timestamp,
+                 std::vector<std::reference_wrapper<ISensor>> &sensors);
 
-void logData(unsigned long timestamp, std::vector<std::reference_wrapper<ISensor> > &sensors,                    StateId state, float altitude, float baseline_pressure);
+void logData(unsigned long timestamp,
+             std::vector<std::reference_wrapper<ISensor>> &sensors,
+             StateId state, float altitude, float baseline_pressure);
 
 #endif

@@ -17,23 +17,23 @@
  */
 
 /*Includes------------------------------------------------------------*/
-#include <utility> //for std::move
 #include <algorithm> //for std::copy
+#include <utility>   //for std::move
 
 #include "radio.h"
 
-#include "options.h"
+#include "Adafruit_BNO055.h" //IMU
+#include "GP20U7.h"          //GPS
+#include "MS5803_01.h"       //barometer
+#include "SparkFunTMP102.h"  //temp sensor
+#include "SparkFun_LIS331.h" //accelerometer
 #include "battery.h"
-#include "SparkFun_LIS331.h"        //accelerometer
-#include "MS5803_01.h"              //barometer
-#include "SparkFunTMP102.h"         //temp sensor
-#include "Adafruit_BNO055.h"        //IMU
-#include "GP20U7.h"           //GPS
-#include "gpio.h"
 #include "cameras.h"
+#include "gpio.h"
+#include "options.h"
 // #include "satcom.h"
-#include "statemachine.h"
 #include "buzzer.h"
+#include "statemachine.h"
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -63,32 +63,40 @@ The first bit (0x01) is reserved for identifing Nosecone vs Body
 #define BAROMETER_BIT_FLAG 0x02
 #define IMU_BIT_FLAG 0x04
 #ifdef BODY
-    #define EMATCH_0_BIT_FLAG 0x08
-    #define EMATCH_1_BIT_FLAG 0x10
+#define EMATCH_0_BIT_FLAG 0x08
+#define EMATCH_1_BIT_FLAG 0x10
 #endif
 #ifdef NOSECONE
-    #define THERMOCOUPLE_BIT_FLAG 0x08
-    #define SATCOM_BIT_FLAG 0x10
+#define THERMOCOUPLE_BIT_FLAG 0x08
+#define SATCOM_BIT_FLAG 0x10
 #endif
 #define FILE_BIT_FLAG 0x20
 
-void RadioController::listenAndAct(){
+void RadioController::listenAndAct() {
     m_xbee.readPacket();
     uint8_t i = 0;
-    while(i < M_MAX_PACKETS_PER_RX_LOOP && (m_xbee.getResponse().isAvailable() || m_xbee.getResponse().isError())){
-        //goes through all m_xbee packets in buffer
+    while (i < M_MAX_PACKETS_PER_RX_LOOP &&
+           (m_xbee.getResponse().isAvailable() ||
+            m_xbee.getResponse().isError())) {
+        // goes through all m_xbee packets in buffer
 
-        if(m_xbee.getResponse().isError()) { //TODO - figure out whether there's anything we should do about Xbee errors
+        if (m_xbee.getResponse()
+                .isError()) { // TODO - figure out whether there's anything we
+                              // should do about Xbee errors
             // #ifdef TESTING
             //     SerialUSB.println("m_Xbee error");
             // #endif
-        } else if(m_xbee.getResponse().getApiId() == ZB_RX_RESPONSE) {
-            //received command from m_xbee
+        } else if (m_xbee.getResponse().getApiId() == ZB_RX_RESPONSE) {
+            // received command from m_xbee
+            uint8_t len = rx.getDataLength();
             m_xbee.getResponse().getZBRxResponse(rx);
-            // command = *(rx.getData());
-            //TODO - do something with the command
+            uint8_t command;
+            for (uint8_t j = 0; j < len; j++) {
+                command = rx.getData()[j];
+                // TODO - do something with the command
+            }
 
-        } else if(m_xbee.getResponse().getApiId() == ZB_TX_STATUS_RESPONSE) {
+        } else if (m_xbee.getResponse().getApiId() == ZB_TX_STATUS_RESPONSE) {
             send();
         }
 
@@ -98,8 +106,7 @@ void RadioController::listenAndAct(){
     }
 }
 
-void RadioController::send(){
-    m_tx_packet.setPayloadLength( m_tx_q.fillPayload(m_payload) );
+void RadioController::send() {
+    m_tx_packet.setPayloadLength(m_tx_q.fillPayload(m_payload));
     m_xbee.send(m_tx_packet);
 }
-

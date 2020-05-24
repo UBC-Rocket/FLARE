@@ -24,7 +24,7 @@
   * @param  None
   * @return none/ should be changed to boolean if possible
   */
-void Camera::power_cameras(){
+void const Camera::power_cameras(){
     uint8_t power_command[] = {0xCC,0x01,0x01,0x0}; // LEAVE THESE HERE
     //hypothetically only looks at the first three indexes
     uint8_t crc = crc_calculator(power_command,3);
@@ -38,7 +38,7 @@ void Camera::power_cameras(){
   * @param  None
   * @return none
   */
-void Camera::start_record(){
+void const Camera::start_record(){
     uint8_t startRecord_command[] = {0xCC,0x01,0x03,0x0}; // LEAVE THESE HERE
     //hypothetically only looks at the first three indexes
     uint8_t crc = crc_calculator(startRecord_command,3);
@@ -51,7 +51,7 @@ void Camera::start_record(){
   * @param  None
   * @return none
   */
-void Camera::stop_record(){
+void const Camera::stop_record(){
     uint8_t stopRecord_command[] = {0xCC,0x01,0x04,0x0}; // LEAVE THESE HERE
     //hypothetically only looks at the first three indexes
     uint8_t crc = crc_calculator(stopRecord_command,3);

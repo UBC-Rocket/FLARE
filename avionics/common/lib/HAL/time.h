@@ -25,6 +25,8 @@ namespace Hal {
      * @return Current time_point, using std::chrono::steady_clock.
      */
     t_point now_ms();
+
+    void initialSystem();
 }
 
 #endif

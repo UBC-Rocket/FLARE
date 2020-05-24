@@ -19,48 +19,48 @@
 #define BUZZER_H
 
 /*Includes------------------------------------------------------------*/
-#include "HAL/time.h"
 #include "HAL/gpio.h"
+#include "HAL/time.h"
 #include "buzzer_interface.h"
 
 #include "gpio.h"
 #undef INPUT
 #undef OUTPUT
 
-
 /*Classes--------------------------------------------------------------*/
 class Buzzer : public IBuzzer {
-public:
+  public:
     /**
      * @brief constructor
      * @param MELODY_PIN I/O pin the buzzer is hooked up to.
-    */
-    Buzzer(int const MELODY_PIN) : M_MELODY_PIN(MELODY_PIN) {
+     */
+    Buzzer() : M_MELODY_PIN(MELODY_PIN) {
         Hal::pinMode(MELODY_PIN, Hal::PinMode::OUTPUT);
     }
 
     /** void sing(SongTypes song){}
-    * @brief  Calculates current values
-    * @param  SongTypes song - ID of the melody to be played, defined in buzzer.h
-    * @return void.
-    */
+     * @brief  Calculates current values
+     * @param  SongTypes song - ID of the melody to be played, defined in
+     * buzzer.h
+     * @return void.
+     */
     void sing(SongTypes song) const;
 
     /**
-    * @brief  Creates a buzzer note at a specified frequency and duration - note that this is a blocking function.
-    * @param  long frequency - frequency of the note to be played
-    * @param  long length - length of note to be played. To calculate the note
-    *          duration, take one second divided by the note type.
-    *          e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
-    * @return void.
-    */
+     * @brief  Creates a buzzer note at a specified frequency and duration -
+     * note that this is a blocking function.
+     * @param  long frequency - frequency of the note to be played
+     * @param  long length - length of note to be played. To calculate the note
+     *          duration, take one second divided by the note type.
+     *          e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+     * @return void.
+     */
     void buzz(long frequency, long length) const;
 
-private:
+  private:
     const int M_MELODY_PIN;
 };
 
 /*Functions------------------------------------------------------------*/
-
 
 #endif

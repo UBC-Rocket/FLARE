@@ -7,26 +7,36 @@
 
 namespace Hal {
 
-class Serial : public ISerial {
-public:
-    Serial(HardwareSerial &seri) : m_seri(seri) {}
+class Serial {
+  public:
+    constexpr Serial(HardwareSerial &seri) : m_seri(seri) {}
 
-    void begin(long baud) { m_seri.begin(baud); }
-    bool available() { return m_seri.available(); }
-    int read() { return m_seri.read(); }
-    void write(const uint8_t *buffer, size_t size) {
+    void const begin(long baud) { m_seri.begin(baud); }
+    bool const available() { return m_seri.available(); }
+    int const read() { return m_seri.read(); }
+    void const write(const uint8_t *buffer, size_t size) {
         m_seri.write(buffer, size);
     };
-    void print(char *dat) { m_seri.print(dat); }
-    void println(char *dat) { m_seri.println(dat); }
+    void const print(char *dat) { m_seri.print(dat); }
+    void const println(char *dat) { m_seri.println(dat); }
 
-    HardwareSerial &getSerial() {return m_seri;}
+    HardwareSerial &getSerial() { return m_seri; }
     operator bool() { return bool(m_seri); };
 
-private:
+  private:
     HardwareSerial m_seri;
-
 };
 
-}
+// auto static SerialUSB       = Hal::Serial(Serial); //?
+auto const static SerialGPS = Hal::Serial(Serial1);
+auto static SerialRadio = Hal::Serial(Serial2);
+
+auto static SerialCamera = Hal::Serial(Serial3);
+auto const static IridiumSerial = Hal::Serial(Serial4);
+// Annoyingly trying to make some of these SerialX const directly doesn't easily
+// work because the underlying HardwareSerial isn't const, which I think means
+// everything that uses HardwareSerial (i.e. everything useful) is not const,
+// which kind of cascades upwards.
+
+} // namespace Hal
 #endif

@@ -4,7 +4,8 @@
 #include "buzzer_interface.h"
 #include "stdio_controller.hpp"
 
-class NativeBuzzer : public IBuzzer {
+class Buzzer : public IBuzzer {
+  public:
     void sing(SongTypes song) const {
         uint8_t tmp = 1;
         char tmpsong = static_cast<char>(song);
