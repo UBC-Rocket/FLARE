@@ -110,11 +110,6 @@ static Status s_statusOfInit;
 // timestamp);
 void blinkStatusLED();
 
-/**
- * @brief  The Arduino setup function
- * @param  None
- * @return None
- */
 int main(void) {
     constexpr char LOG_FILE_NAME[] = "datalog.csv";
     CSVWrite<CSVWriteImpl> datalog;
@@ -122,8 +117,6 @@ int main(void) {
     Camera cam(Hal::SerialCamera);
 
     static RadioController radio = RadioController(Hal::SerialRadio);
-    // TODO - create method in Hal::Serial that
-    // can extract the underlying HardwareSerial
 
     initPins();
 
@@ -140,9 +133,6 @@ int main(void) {
     // #ifdef TESTING
     //     SerialUSB.println("Initializing radio");
     // #endif
-
-    // s_radio.setSerial(SerialRadio);
-    // s_txPacket.setAddress64(s_gndAddr);
 
 #ifdef ARDUINO // TODO - ifdefs aren't ideal, I think, see if this can be moved
                // somewhere else
@@ -209,10 +199,6 @@ int main(void) {
         radio.listenAndAct();
         // resolveRadioRx(&s_radio, &s_txPacket, GPS_data, &state,
         // &s_statusOfInit);
-
-#ifdef NOSECONE // send satcom data
-        sendSatcomMsg(state, GPS_data, timestamp);
-#endif
 
         // Polling time intervals need to be variable, since in LANDED
         // there's a lot of data that'll be recorded
