@@ -1,14 +1,15 @@
 #ifndef CSVWRITE_H_53A4CAED991D46F687680132192B5E5A
 #define CSVWRITE_H_53A4CAED991D46F687680132192B5E5A
 
-#include "sensors-interface.h" //for ISensor
-#include "state_interface.h" //for StateId
 /**
   * CSV writing Class
   * Wrapper for SD.h which makes printing to csv easier
   */
 
 /*Includes------------------------------------------------------------*/
+
+#include "sensors-interface.h"  // ISensor
+#include "state_interface.h"    // StateId
 
 /*
 Requirements on Impl:
@@ -18,6 +19,7 @@ Requirements on Impl:
 */
 
 // TODO: Add Impl class or integrate in this class.
+// TODO: Figure out how to interface with SD Card
 
 template <typename Impl>
 class CSVWrite {
@@ -27,36 +29,26 @@ class CSVWrite {
      * @return false if the sensor fails to initialize
      */
     bool init(const char* filename) {
-        return(m_datalog.init(filename));
-        // bool success = SD.begin(BUILTIN_SDCARD);
-        // if(success) {
-        //     m_datalog = SD.open(filename, FILE_WRITE);
-        // }
-
-        // if(!m_datalog) {
-        //     return false;
-        // }
-
-        // return success;
+        return m_datalog.init(filename);
     }
 
     /**
-     * @brief writes t to the next csv column in order
-     * @param t the data to write
+     * @brief prints t to the next csv column in order
+     * @param s the data in string to print
      */
     template<typename T>
-    void write(T t) {
-        m_datalog.print(t);
+    void print(T s) {
+        m_datalog.print(s);
         m_datalog.print(",");
     }
 
     /**
-     * @brief writes t and ends the line
-     * @param t the data to write
+     * @brief prints s and ends the line
+     * @param s the in string data to print
      */
     template<typename T>
-    void writeln(T t) {
-        m_datalog.println(t);
+    void println(T s) {
+        m_datalog.println(s);
     }
 
     /**
@@ -75,21 +67,79 @@ class CSVWrite {
      * @param baseline_pressure Pressure used as "ground level"
      */
     void logData(unsigned long timestamp, SensorSet &sensors,
-                StateId state, float altitude, float baseline_pressure) {
+                 StateId state, float altitude, float baseline_pressure) {
 
-        /*write data to SD card*/
-        write(timestamp);
+        /*
+         * SD Card data layout:
+         * Timestamp, Rocket flight state, Altitude, Baseline Pressure, Sensor Data
+         */
+
+        // Print Timestamp
+        print(timestamp);
+        
+        // Print Rocket flight state
+        printState(state);
+
+        // Print Altitude
+        print(altitude);
+
+        // Print Baseline Pressure
+        print(baseline_pressure);
+
+        // Print Sensor Data
         for (auto sensor : sensors) {
             float *data = sensor.get().getData();
             for (int i = 0; i < sensor.get().dataLength(); i++) {
-                write(data[i]);
+                print(data[i]);
             }
         }
-        writeln("");
+        print('\n');
         flush();
     }
 
     private:
+    /**
+     * @brief Prints out current flight state
+     * @param state Flight state enum class
+     */
+    void printState(StateId state) {
+        if(state == StateId::STANDBY) {
+            print("Standby");
+        }
+        else if(state == StateId::ARMED) {
+            print("Armed");
+        }
+        else if(state == StateId::POWERED_ASCENT) {
+            print("Powered_Ascent");
+        }
+        else if(state == StateId::PRE_AIR_START_COAST_TIMED) {
+            print("Pre_Air_Start_Coast_Timed");
+        }
+        else if(state == StateId::ASCENT_TO_APOGEE) {
+            print("Ascent_To_Apogee");
+        }
+        else if(state == StateId::MACH_LOCK) {
+            print("Mach_Lock");
+        }
+        else if(state == StateId::PRESSURE_DELAY) {
+            print("Pressure_Delay");
+        }
+        else if(state == StateId::DROGUE_DESCENT) {
+            print("Drogue_Descent");
+        }
+        else if(state == StateId::MAIN_DESCENT) {
+            print("Main_Descent");
+        }
+        else if(state == StateId::LANDED) {
+            print("Landed");
+        }
+        else if(state == StateId::WINTER_CONTINGENCY) {
+            print("Winter_Contingency");
+        }
+        else {
+            print("Error_Unknown_State");
+        }
+    }
     // File m_datalog;
     Impl m_datalog;
 };
