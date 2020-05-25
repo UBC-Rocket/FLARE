@@ -70,6 +70,7 @@
         "set": "cpp",
         "string": "cpp",
         "string_view": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "valarray": "cpp"
     }
 }

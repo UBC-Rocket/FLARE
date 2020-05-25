@@ -116,6 +116,8 @@ int main(void) {
     static Buzzer buzzer;
     Camera cam(Hal::SerialCamera);
 
+    env_initialize();
+
     static RadioController radio = RadioController(Hal::SerialRadio);
 
     initPins();
@@ -134,13 +136,20 @@ int main(void) {
     //     SerialUSB.println("Initializing radio");
     // #endif
 
-    env_initialize();
-
     /* init log file */
     datalog.init(LOG_FILE_NAME);
 
     /* init sensors and report status in many ways */
+    auto sensors = getSensors();
+    auto &barometer = sensors[SensorPositions::BAROMETER];
+    auto &gps = sensors[SensorPositions::GPS];
+    auto &accelerometer = sensors[SensorPositions::ACCELEROMETER];
+    auto &imuSensor = sensors[SensorPositions::IMU];
+    auto &temperature = sensors[SensorPositions::TEMPERATURE];
+
     initSensors(sensors, hardware, buzzer);
+
+    Calculator calc(&(barometer.get()), &(imuSensor.get()));
 
     /* TODO - make this not constant */
     state_input.ignitor_good = true;

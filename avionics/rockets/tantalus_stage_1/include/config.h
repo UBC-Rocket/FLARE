@@ -78,14 +78,25 @@ static StateAuxilliaryInfo state_aux;
 #include "sensors/accelerometer.h"
 #include "sensors/barometer.h"
 #include "sensors/temperature.h"
-static Accelerometer accelerometer;
-static Barometer barometer;
-static GPS gps(Hal::SerialGPS);
-static IMU imuSensor;
-static Temperature temperature;
 
-std::vector<std::reference_wrapper<ISensor>> sensors{
-    barometer, gps, accelerometer, imuSensor, temperature};
+SensorSet getSensors() {
+    Barometer barometer;
+    GPS gps(Hal::SerialGPS);
+    Accelerometer accelerometer;
+    IMU imuSensor;
+    Temperature temperature;
+
+    return std::vector<std::reference_wrapper<ISensor>>{
+        barometer, gps, accelerometer, imuSensor, temperature};
+}
+
+namespace SensorPositions {
+constexpr uint8_t BAROMETER = 0;
+constexpr uint8_t GPS = 1;
+constexpr uint8_t ACCELEROMETER = 2;
+constexpr uint8_t IMU = 3;
+constexpr uint8_t TEMPERATURE = 4;
+} // namespace SensorPositions
 
 /* Parachute */
 #include "hardware/ignitor.h"
@@ -94,10 +105,5 @@ std::vector<std::reference_wrapper<ISensor>> sensors{
 // TODO: Add ignitor to hardware vector with proper pin initialization
 
 std::vector<std::reference_wrapper<IParachute>> hardware;
-
-/* Calculator */
-#include "calculations.h"
-
-Calculator calc(&barometer, &imuSensor);
 
 #endif
