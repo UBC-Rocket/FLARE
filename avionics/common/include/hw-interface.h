@@ -2,28 +2,25 @@
 #define HW_INTERFACE_H
 
 /**
-  * Generic Hardware Interface
-  */
+ * Generic Hardware Interface
+ */
 
-enum class HardwareStatus {
-    NOMINAL,
-    FAILURE
-};
+enum class HardwareStatus { NOMINAL, FAILURE };
 
 class IParachute {
-    public:
+  public:
     /**
      * @brief initializes hardware
      */
-    virtual void init() = 0;
+    // This should be done in the constructor, not as a seperate 2-phase
+    // initializer.
+    //  virtual void init() = 0;
 
     /**
      * @brief returns the status of the hardware
      * @return the hardware's status
      */
-    HardwareStatus getStatus() {
-        return status;
-    }
+    HardwareStatus getStatus() { return status; }
 
     /**
      * @brief returns true if parachute works, false otherwise
@@ -36,7 +33,7 @@ class IParachute {
      */
     virtual void activate() = 0;
 
-    protected:
+  protected:
     HardwareStatus status;
 };
 #endif

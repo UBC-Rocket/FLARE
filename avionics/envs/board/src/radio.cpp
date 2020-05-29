@@ -27,7 +27,7 @@
 #include "MS5803_01.h"       //barometer
 #include "SparkFunTMP102.h"  //temp sensor
 #include "SparkFun_LIS331.h" //accelerometer
-#include "battery.h"
+// #include "battery.h"
 #include "cameras.h"
 #include "gpio.h"
 #include "options.h"

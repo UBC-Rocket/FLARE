@@ -4,31 +4,9 @@
 
 #include "hardware/ignitor.h"
 
+// void Ignitor(uint8_t pin) {}
 
-void Ignitor(uint8_t pin) {
-
-}
-
-void Ignitor::init() {
-    /*init ignitor*/
-    Hal::pinMode(ignitePin, Hal::PinMode::OUTPUT);
-    Hal::digitalWrite(ignitePin, Hal::PinDigital::LOW);
-
-    /*continuity check */
-    Hal::pinMode(continuityPin, Hal::PinMode::OUTPUT);
-
-    Hal::digitalWrite(continuityPin, Hal::PinDigital::HIGH);
-    Hal::sleep_us(CONTINUITY_CHECK_DELAY);
-
-    int continuity = Hal::analogRead(continuityADCPin);
-    Hal::digitalWrite(continuityPin, Hal::PinDigital::LOW);
-
-    if (continuity <= DISCONTINUOUS_THRESHOLD) {
-        status = HardwareStatus::FAILURE;
-    } else {
-        status = HardwareStatus::NOMINAL;
-    }
-}
+// void Ignitor::init() {}
 
 bool Ignitor::isWorking() {
     if (status == HardwareStatus::FAILURE) {

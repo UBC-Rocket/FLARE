@@ -79,17 +79,6 @@ static StateAuxilliaryInfo state_aux;
 #include "sensors/barometer.h"
 #include "sensors/temperature.h"
 
-SensorSet getSensors() {
-    Barometer barometer;
-    GPS gps(Hal::SerialGPS);
-    Accelerometer accelerometer;
-    IMU imuSensor;
-    Temperature temperature;
-
-    return std::vector<std::reference_wrapper<ISensor>>{
-        barometer, gps, accelerometer, imuSensor, temperature};
-}
-
 namespace SensorPositions {
 constexpr uint8_t BAROMETER = 0;
 constexpr uint8_t GPS = 1;

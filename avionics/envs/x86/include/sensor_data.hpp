@@ -29,6 +29,14 @@ template <std::size_t data_length> class DataSpoof {
         dataStream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
+    /**
+     * @brief Constructor
+     * @param dataFile Path to csv data file.
+     * @param extern_dat_buf External data buffer.
+     */
+    DataSpoof(std::string const &dataFile, const float *extern_dat_buf)
+        : dat_read(extern_dat_buf), DataSpoof(dataFile) {}
+
     // returns next data point in stream
     float *getData() {
         constexpr std::streamsize MAX_BUFF = 255;
