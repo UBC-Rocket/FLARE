@@ -85,30 +85,43 @@ template <typename Impl> class CSVWrite {
      * @param state Flight state enum class
      */
     void printState(StateId state) {
-        if (state == StateId::STANDBY) {
-            print("Standby");
-        } else if (state == StateId::ARMED) {
-            print("Armed");
-        } else if (state == StateId::POWERED_ASCENT) {
-            print("Powered_Ascent");
-        } else if (state == StateId::PRE_AIR_START_COAST_TIMED) {
-            print("Pre_Air_Start_Coast_Timed");
-        } else if (state == StateId::ASCENT_TO_APOGEE) {
-            print("Ascent_To_Apogee");
-        } else if (state == StateId::MACH_LOCK) {
-            print("Mach_Lock");
-        } else if (state == StateId::PRESSURE_DELAY) {
-            print("Pressure_Delay");
-        } else if (state == StateId::DROGUE_DESCENT) {
-            print("Drogue_Descent");
-        } else if (state == StateId::MAIN_DESCENT) {
-            print("Main_Descent");
-        } else if (state == StateId::LANDED) {
-            print("Landed");
-        } else if (state == StateId::WINTER_CONTINGENCY) {
-            print("Winter_Contingency");
-        } else {
-            print("Error_Unknown_State");
+        switch(state) {
+            case StateId::STANDBY:
+                print("Standby");
+                break;
+            case StateId::ARMED:
+                print("Armed");
+                break;
+            case StateId::POWERED_ASCENT:
+                print("Powered_Ascent");
+                break;
+            case StateId::PRE_AIR_START_COAST_TIMED:
+                print("Pre_Air_Start_Coast_Timed");
+                break;
+            case StateId::ASCENT_TO_APOGEE:
+                print("Ascent_To_Apogee");
+                break;
+            case StateId::MACH_LOCK:
+                print("Mach_Lock");
+                break;
+            case StateId::PRESSURE_DELAY:
+                print("Pressure_Delay");
+                break;
+            case StateId::DROGUE_DESCENT:
+                print("Drogue_Descent");
+                break;
+            case StateId::MAIN_DESCENT:
+                print("Main_Descent");
+                break;
+            case StateId::LANDED:
+                print("Landed");
+                break;
+            case StateId::WINTER_CONTINGENCY:
+                print("Winter_Contingency");
+                break;
+            default:
+                print("Error_Unknown_State");
+                break;
         }
     }
     // File m_datalog;
