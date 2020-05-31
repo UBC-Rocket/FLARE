@@ -1,31 +1,25 @@
-#ifndef ACCELEROMETER_H
-#define ACCELEROMETER_H
+#pragma once
 
 /**
-  * Accelerometer Sensor Class
-  */
+ * Accelerometer Sensor Class
+ */
 
 /*Includes------------------------------------------------------------*/
-#include "sensors-interface.h"
 #include "SparkFun_LIS331.h" // Accelerometer
+#include "sensors-interface.h"
 
 /*Constants------------------------------------------------------------*/
-#define ACCELEROMETER_ADDRESS 0x18
-#define ACCELEROMETER_SCALE 24
-#define ACCELEROMETER_STATUS_POSITION 2
-#define ACCELEROMETER_DATA_ARRAY_SIZE 3
+// #define ACCELEROMETER_STATUS_POSITION 2
+// #define ACCELEROMETER_DATA_ARRAY_SIZE 3
 
-class Accelerometer : public ISensor {
-public:
-    void initSensor();
-    void readData(void);
-    uint8_t dataLength();
-    float *getData();
-    SensorStatus getStatus();
+class Accelerometer : public SensorBase<3> {
+  public:
+    Accelerometer(float *const buf);
+    void readData();
 
-private:
+  private:
+    constexpr static uint8_t ACCELEROMETER_ADDRESS = 0x18;
+    constexpr static uint8_t ACCELEROMETER_SCALE = 24;
     LIS331 accelerometer;
     int16_t x, y, z;
-    float data[ACCELEROMETER_DATA_ARRAY_SIZE];
 };
-#endif

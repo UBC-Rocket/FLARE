@@ -16,7 +16,8 @@
  */
 
 /*
-VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!
+VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT
+PLEASE READ ME!
 
                  uuuuuuu
              uu$$$$$$$$$$$uu
@@ -45,38 +46,53 @@ $$$$"""$$$$$$$$$$uuu   uu$$$$$$$$$"""$$$"
    "$$$$$"                      ""$$$$""
      $$$"                         $$$$"
 
-In order to successfully poll the GPS, the serial RX buffer size must be increased. This needs
-to be done on the computer used for compilation. This can be done by navigating to the following
-path in the Arduino contents folder:
-On Mac: Got to the Applications folder, right click on the Arduino app, select Show Package Contents,
-    then navigate to ‎⁨Contents⁩/⁨Java⁩/⁨hardware⁩/⁨teensy⁩/⁨avr⁩/⁨cores⁩/⁨teensy3⁩/serial1.c
-On Windows: [user_drive]\Program Files (x86)\Arduino\hardware\teensy\avr\cores\teensy3\serial1.c
+In order to successfully poll the GPS, the serial RX buffer size must be
+increased. This needs to be done on the computer used for compilation. This can
+be done by navigating to the following path in the Arduino contents folder: On
+Mac: Got to the Applications folder, right click on the Arduino app, select Show
+Package Contents, then navigate to
+‎⁨Contents⁩/⁨Java⁩/⁨hardware⁩/⁨teensy⁩/⁨avr⁩/⁨cores⁩/⁨teensy3⁩/serial1.c
+On Windows: [user_drive]\Program Files
+(x86)\Arduino\hardware\teensy\avr\cores\teensy3\serial1.c
 
 On line 43 increase SERIAL1_RX_BUFFER_SIZE from 64 to 1024
 
 THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
 
-VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!
+VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT
+PLEASE READ ME!
 */
 
 /*Includes------------------------------------------------------------*/
 #include "sensors/GPS.h"
 
-void GPS::initSensor() {
-    #ifdef TESTING
-            SerialUSB.println("Initializing GPS");
-        #endif
-        m_serial_gps.begin(9600);  //baud rate 9600 for the GP-20U7
-        while (!m_serial_gps) {}
+GPS::GPS(Hal::Serial &seri, float *const data)
+    : SensorBase(data),
+      m_serial_gps(seri.getSerial()), GPS_reset_defaults{0xA0, 0xA1, 0x00,
+                                                         0x02, 0x04, 0x00,
+                                                         0x04, 0x0D, 0x0A},
+      GPS_set_baud_rate{0xA0, 0xA1, 0x00, 0x04, 0x05, 0x00,
+                        0x00, 0x00, 0x05, 0x0D, 0x0A},
+      GPS_set_NMEA_message{0xA0, 0xA1, 0x00, 0x09, 0x08, 0x01, 0x00, 0x00,
+                           0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x0D, 0x0A},
+      GPS_set_update_rate{0xA0, 0xA1, 0x00, 0x03, 0x0E,
+                          0x01, 0x00, 0x0F, 0x0D, 0x0A}
+
+{
+#ifdef TESTING
+    SerialUSB.println("Initializing GPS");
+#endif
+    m_serial_gps.begin(9600); // baud rate 9600 for the GP-20U7
+    while (!m_serial_gps) {
+    }
 
     status = SensorStatus::NOMINAL;
 }
 
 void GPS::readData() {
-
     bool gpsSuccess = false;
     elapsedMillis timeout;
-    while(m_serial_gps.available() && (timeout < GPS_TIMEOUT)) {
+    while (m_serial_gps.available() && (timeout < GPS_TIMEOUT)) {
         char c = m_serial_gps.read();
         if (gps.encode(c)) {
             gpsSuccess = true;
@@ -84,21 +100,13 @@ void GPS::readData() {
         }
     }
 
-    if(!gpsSuccess) {
+    if (!gpsSuccess) {
         status = SensorStatus::FAILURE;
     }
 
     unsigned long fix_age;
-    gps.f_get_position(&data[0], &data[1], &fix_age);
-    data[2] = gps.f_altitude();
+    gps.f_get_position(data_, data_ + 1, &fix_age);
+    data_[2] = gps.f_altitude();
 
     status = SensorStatus::NOMINAL;
-}
-
-uint8_t GPS::dataLength() {
-    return GPS_DATA_ARRAY_SIZE;
-}
-
-float *GPS::getData() {
-    return data;
 }

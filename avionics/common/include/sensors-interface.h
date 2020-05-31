@@ -20,40 +20,6 @@ enum class SensorType {
     THERMOCOUPLE
 };
 
-// class ISensor {
-//   public:
-//     /**
-//      * @brief  Initialize sensor
-//      * @return SensorStatus
-//      */
-//     virtual void initSensor() = 0;
-
-//     /**
-//      * @brief  Reads sensor data
-//      */
-//     virtual void readData() = 0;
-
-//     /**
-//      * @brief  Returns the length of the data array the sensor requires
-//      */
-//     virtual uint8_t dataLength() = 0;
-
-//     /**
-//      * @brief  Returns data read during readData()
-//      * @return the data
-//      */
-//     virtual float *getData() = 0;
-
-//     /**
-//      * @brief returns the current status of the snesor
-//      * @return the current sensor status
-//      */
-//     SensorStatus getStatus() { return status; }
-
-//   protected:
-//     SensorStatus status;
-// };
-
 template <uint8_t size> class SensorBase {
   public:
     SensorBase(float *const data) : data_(data) {}

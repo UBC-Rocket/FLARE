@@ -1,5 +1,4 @@
-#ifndef IGNITOR_H
-#define IGNITOR_H
+#pragma once
 
 /**
  * Ignitor Class
@@ -16,6 +15,12 @@
 //  or 1.33k/330 (629)
 // threshold for a discontinuous ematch -> read voltage / 3.3 * 1023
 #define DISCONTINUOUS_THRESHOLD 650
+
+#undef INPUT
+#undef OUTPUT
+#undef LOW
+#undef HIGH
+#undef LED_BUILTIN
 
 class Ignitor : public IParachute {
   public:
@@ -57,5 +62,3 @@ class Ignitor : public IParachute {
     uint8_t continuityPin_;
     uint8_t continuityADCPin_;
 };
-
-#endif

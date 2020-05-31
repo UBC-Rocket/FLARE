@@ -1,31 +1,21 @@
-#ifndef TEMPERATURE_H
-#define TEMPERATURE_H
-
+#pragma once
 /**
-  * Temperature Sensor Class
-  */
+ * Temperature Sensor Class
+ */
 
 /*Includes------------------------------------------------------------*/
-#include "sensors-interface.h"
 #include "SparkFunTMP102.h" // Temperature
+#include "sensors-interface.h"
 
 /*Constants------------------------------------------------------------*/
-#define TEMP_SENSOR_ADDRESS 0x48
-#define TEMPERATURE_STATUS_POSITION 4
-#define TEMPERATURE_DATA_ARRAY_SIZE 1
+// #define TEMPERATURE_STATUS_POSITION 4
 
-class Temperature : public ISensor {
-public:
-    void initSensor();
+class Temperature : public SensorBase<1> {
+  public:
+    Temperature(float *const data);
     void readData();
-    uint8_t dataLength();
-    float *getData();
-    SensorStatus getStatus();
 
-private:
-    TMP102 *temp_sensor;
-    float temp;
-    float data[TEMPERATURE_DATA_ARRAY_SIZE];
+  private:
+    constexpr static uint8_t TEMP_SENSOR_ADDRESS = 0x48;
+    TMP102 temp_sensor;
 };
-
-#endif

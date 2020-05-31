@@ -1,18 +1,20 @@
 /*Includes------------------------------------------------------------*/
-#include "MAX31855k.h"
 #include "sensors/thermocouple.h"
+#include "MAX31855k.h"
 #include <cmath>
 
 /*Variables------------------------------------------------------------*/
-#ifdef TESTING
-// Self powered with debug output
-MAX31855k probe(THERMO_SELECT_PIN, NONE, NONE, true);
-#else
-// Self powered with no debug messages
-MAX31855k probe(THERMO_SELECT_PIN);
-#endif // TESTING
 
-void Thermocouple::initSensor() {
+Thermocouple::Thermocouple(float *const data)
+    : SensorBase{data},
+#ifdef TESTING
+      // Self powered with debug output
+      probe(THERMO_SELECT_PIN, NONE, NONE, true)
+#else
+      // Self powered with no debug messages
+      probe(THERMO_SELECT_PIN)
+#endif
+{
 #ifdef TESTING
     SerialUSB.println("Initializing thermocouple");
 #endif
@@ -24,8 +26,7 @@ void Thermocouple::initSensor() {
         SerialUSB.println(thermo_temp);
         SerialUSB.println("Thermocouple initialized");
 #endif
-    }
-    else {
+    } else {
         status = SensorStatus::FAILURE;
     }
 
@@ -36,24 +37,15 @@ void Thermocouple::readData() {
 #ifdef TESTING
     SerialUSB.println("Polling Thermocouple");
 #endif // TESTING
-    data[0] = probe.readTempC();
+    data_[0] = probe.readTempC();
 #ifdef TESTING
     if (!std::isnan(*thermocouple_data)) {
         SerialUSB.print("Temp[C]=");
         SerialUSB.println(*thermocouple_data);
-    }
-    else {
+    } else {
         SerialUSB.println("Thermocouple ERROR");
     }
 #endif // TESTING
 
     status = SensorStatus::NOMINAL;
-}
-
-uint8_t Thermocouple::dataLength() {
-    return THERMOCOUPLE_DATA_ARRAY_SIZE;
-}
-
-float *Thermocouple::getData() {
-    return data;
 }

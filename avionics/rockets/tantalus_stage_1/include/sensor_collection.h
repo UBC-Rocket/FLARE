@@ -24,6 +24,7 @@
 #include "HAL/time.h"
 #include <array>
 #include <functional> //for std::reference_wrapper
+#include <memory>     //std::unique_ptr
 
 // #include "buzzer.h"
 // #include "hw-interface.h"

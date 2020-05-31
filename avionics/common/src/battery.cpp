@@ -16,35 +16,30 @@
  */
 
 #include "battery.h"
-#include "sensors.h"
 #include "HAL/gpio.h"
+#include "status.h"
 
 /*Constants------------------------------------------------------------*/
 #define MINIMUM_BATTERY_VOLTAGE 10
 #define LOW_BATTERY_VOLTAGE 11
 
-#define R1 44170  //Nominal: 44200. Higher is larger range.
-#define R2 15150  //Nominal: 16000. Lower is larger range.
-//Maximum voltage = 3.3*(R1+R2)/R2
+#define R1 44170 // Nominal: 44200. Higher is larger range.
+#define R2 15150 // Nominal: 16000. Lower is larger range.
+// Maximum voltage = 3.3*(R1+R2)/R2
 
-
-
-Battery::Battery(uint8_t batterySensorPin)
-{
-    m_divider = static_cast<float>(R2) /(R1 + R2);
+Battery::Battery(uint8_t batterySensorPin) {
+    m_divider = static_cast<float>(R2) / (R1 + R2);
     m_batterySensorPin = batterySensorPin;
 }
 
-
-//copied from Teensy source. Doesn't seemd to be used anywhere else, so temporaryily put this here.
-//TODO - put in utility file? 
-float range_map(int x, int in_min, int in_max, int out_min, int out_max){
+// copied from Teensy source. Doesn't seemd to be used anywhere else, so
+// temporaryily put this here.
+// TODO - put in utility file?
+float range_map(int x, int in_min, int in_max, int out_min, int out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-
-float Battery::getVoltage()
-{
+float Battery::getVoltage() {
     int inputValue = Hal::analogRead(m_batterySensorPin);
     // map it to the range the analog out:
     // 3300mV is the highest voltage Teensy can read.
@@ -55,10 +50,9 @@ float Battery::getVoltage()
     return batteryVoltage;
 }
 
-Status Battery::getStatus()
-{
+Status Battery::getStatus() {
     float voltage = getVoltage();
-    if(voltage < MINIMUM_BATTERY_VOLTAGE)
+    if (voltage < MINIMUM_BATTERY_VOLTAGE)
         return Status::CRITICAL_FAILURE;
     else if (voltage < LOW_BATTERY_VOLTAGE)
         return Status::NONCRITICAL_FAILURE;
