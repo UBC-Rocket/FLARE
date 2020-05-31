@@ -14,7 +14,7 @@
 
 class Barometer : public SensorBase<2> {
   public:
-    Barometer(float *buf) : SensorBase(buf) {}
+    Barometer(float *const buf) : SensorBase(buf) {}
     void initSensor() {}
     void readData() {
         dat.getData(); // Forces DataSpoof to refresh.

@@ -97,11 +97,11 @@ void displayStatus(SensorCollection &sensors,
                    IBuzzer &buzzer) {
     // TODO: Make response dependent on e-match success
     SongTypes song;
-    switch (getStatus()) {
+    switch (sensors.getStatus()) {
     case Status::NOMINAL:
         song = SongTypes_SUCCESS;
         break;
-    case Status::NON_CRITICAL_FAILURE:
+    case Status::NONCRITICAL_FAILURE:
         song = SongTypes_NONCRITFAIL;
         break;
     case Status::CRITICAL_FAILURE:
@@ -117,7 +117,7 @@ void displayStatus(SensorCollection &sensors,
 #else
     for (int i = 1; i <= 5; i++) {
 #endif
-        buzzer.sing(SongTypes_CRITICALFAIL);
+        buzzer.sing(song);
         Hal::sleep_ms(400);
     }
     return;

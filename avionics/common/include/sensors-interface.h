@@ -82,7 +82,7 @@ template <uint8_t size> class SensorBase {
 
   protected:
     SensorStatus status;
-    const float *data_;
+    float *const data_;
 };
 
 // typedef std::vector<std::reference_wrapper<ISensor>> SensorSet;

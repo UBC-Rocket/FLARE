@@ -17,7 +17,7 @@ bool Ignitor::isWorking() {
 }
 
 void Ignitor::activate() {
-    Hal::digitalWrite(ignitePin, Hal::PinDigital::HIGH);
+    Hal::digitalWrite(ignitePin_, Hal::PinDigital::HIGH);
     Hal::sleep_ms(IGNITOR_DELAY);
-    Hal::digitalWrite(ignitePin, Hal::PinDigital::LOW);
+    Hal::digitalWrite(ignitePin_, Hal::PinDigital::LOW);
 }

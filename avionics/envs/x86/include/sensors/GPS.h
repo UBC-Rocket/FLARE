@@ -8,10 +8,10 @@
 
 class GPS : public SensorBase<3> {
   public:
-    GPS(Hal::Serial &seri, float *buf) : SensorBase(buf) {
-        buf[0] = 49;
-        buf[1] = -123;
-        buf[2] = 0;
+    GPS(Hal::Serial &seri, float *const buf) : SensorBase(buf) {
+        data_[0] = 49;
+        data_[1] = -123;
+        data_[2] = 0;
     }
     void initSensor() {}
     void readData() {}

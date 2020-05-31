@@ -31,7 +31,7 @@
 // #include "sensors-interface.h"
 // #include "state_interface.h"
 // #include "statemachine.h"
-#include "CSVwrite.h"
+// #include "CSVwrite.h"
 
 #include "HAL/port_impl.h"
 #include "sensors/GPS.h"
@@ -56,7 +56,7 @@ class SensorCollection {
         TEMP_INDEX + Temperature::dataLength();
 
     std::array<float, DATA_LENGTH> sensor_data;
-    const float *const &BEGIN = sensor_data.begin();
+    float *const &BEGIN = sensor_data.begin();
 
     Status status_;
     uint8_t status_bitfield_[3];
@@ -64,13 +64,19 @@ class SensorCollection {
   public:
     constexpr static std::size_t NUM_SENSORS = 5;
 
-    Barometer barometer(BEGIN + BAROMETER_INDEX);
-    GPS gps(Hal::SerialGPS, BEGIN + GPS_INDEX);
-    Accelerometer accelerometer(BEGIN + ACCEL_INDEX);
-    IMU imuSensor(BEGIN + IMU_INDEX);
-    Temperature temperature(BEGIN + TEMP_INDEX);
+    Barometer barometer;
+    GPS gps;
+    Accelerometer accelerometer;
+    IMU imuSensor;
+    Temperature temperature;
 
-    SensorCollection() { updateStatus(); }
+    SensorCollection()
+        : barometer{BEGIN + BAROMETER_INDEX}, gps{Hal::SerialGPS,
+                                                  BEGIN + GPS_INDEX},
+          accelerometer{BEGIN + ACCEL_INDEX}, imuSensor{BEGIN + IMU_INDEX},
+          temperature{BEGIN + TEMP_INDEX} {
+        updateStatus();
+    }
 
     void poll(Hal::t_point &timestamp) {
         timestamp = Hal::now_ms();
@@ -91,39 +97,38 @@ class SensorCollection {
     uint8_t *getStatusBitfield() { return status_bitfield_; }
     void updateStatus() {
         status_ = Status::NOMINAL;
-        status_bitfield_ = 0;
+        status_bitfield_[0] = 0;
         if (barometer.getStatus() == SensorStatus::FAILURE) {
             raiseToStatus(status_, Status::CRITICAL_FAILURE);
             *status_bitfield_ |= 0x80;
         }
 
         if (gps.getStatus() == SensorStatus::FAILURE) {
-            raiseToStatus(status_, Status::NON_CRITICAL_FAILURE);
+            raiseToStatus(status_, Status::NONCRITICAL_FAILURE);
             *status_bitfield_ |= 0x40;
         }
         if (accelerometer.getStatus() == SensorStatus::FAILURE) {
-            raiseToStatus(status_, Status::NON_CRITICAL_FAILURE);
+            raiseToStatus(status_, Status::NONCRITICAL_FAILURE);
             *status_bitfield_ |= 0x20;
         }
         if (imuSensor.getStatus() == SensorStatus::FAILURE) {
-            raiseToStatus(status_, Status::NON_CRITICAL_FAILURE);
+            raiseToStatus(status_, Status::NONCRITICAL_FAILURE);
             *status_bitfield_ |= 0x10;
         }
         if (temperature.getStatus() == SensorStatus::FAILURE) {
-            raiseToStatus(status_, Status::NON_CRITICAL_FAILURE);
+            raiseToStatus(status_, Status::NONCRITICAL_FAILURE);
             *status_bitfield_ |= 0x08;
         }
     }
 
-    const std::array<float, DATA_LENGTH> getData() const { return sensor_data; }
+    const std::array<float, DATA_LENGTH> &getData() const {
+        return sensor_data;
+    }
 };
 
 /*Functions------------------------------------------------------------*/
 typedef std::unique_ptr<SensorCollection> SensorCollectionPtr;
-SensorCollectionPtr getSensors() {
-    std::unique_ptr<SensorCollection> tmp(new SensorCollection);
-    return std::move(tmp);
-}
+SensorCollectionPtr getSensors();
 
 // void displayStatus(std::vector<std::reference_wrapper<ISensor>> &sensors,
 //                    std::vector<std::reference_wrapper<IParachute>> &hardware,

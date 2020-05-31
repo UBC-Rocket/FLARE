@@ -28,7 +28,6 @@
 
 #include "buzzer.h"
 #include "hw-interface.h"
-#include "sensor_collection.h"
 // #include "options.h"
 // #include "sensors-interface.h"
 // #include "state_interface.h"

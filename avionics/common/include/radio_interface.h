@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "radio_queue.h"
+#include "sensor_collection.h"
 #include "sensors/GPS.h"
 #include "sensors/IMU.h"
 #include "sensors/accelerometer.h"

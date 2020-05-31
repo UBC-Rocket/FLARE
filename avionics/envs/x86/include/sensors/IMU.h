@@ -1,5 +1,4 @@
-#ifndef SENSORS__IMU_H_DC4773AC6EA440C5967FDBBE32B8B196
-#define SENSORS__IMU_H_DC4773AC6EA440C5967FDBBE32B8B196
+#pragma once
 
 /**
  * IMU Sensor Class
@@ -13,11 +12,11 @@ class IMU : public SensorBase<4> {
     //     static constexpr int IMU_DATA_ARRAY_SIZE = 4;
 
   public:
-    IMU(float *buf) : SensorBase(buf) {
-        buf[0] = 1;
-        buf[1] = 0;
-        buf[2] = 0;
-        buf[3] = 0;
+    IMU(float *const data) : SensorBase(data) {
+        data_[0] = 1;
+        data_[1] = 0;
+        data_[2] = 0;
+        data_[3] = 0;
     }
     void initSensor() {}
     void readData() {}
@@ -29,5 +28,3 @@ class IMU : public SensorBase<4> {
     //     float data[IMU_DATA_ARRAY_SIZE] = {1, 0, 0, 0}; // Unit quaternion,
     //     for now
 };
-
-#endif

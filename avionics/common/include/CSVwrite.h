@@ -7,7 +7,7 @@
 
 /*Includes------------------------------------------------------------*/
 
-#include "sensors-interface.h" // ISensor
+#include "sensor_collection.h" // Sensors
 #include "state_interface.h"   // StateId
 
 /*
@@ -73,7 +73,7 @@ template <typename Impl> class CSVWrite {
 
         // Print Sensor Data
         for (auto dat : sensors.getData()) {
-            print(*dat);
+            print(dat);
         }
         print('\n');
         flush();

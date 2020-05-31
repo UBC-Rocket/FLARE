@@ -15,13 +15,14 @@
  * Distributed as-is; no warranty is given.
  */
 
-#ifndef CAMERAS_H
-#define CAMERAS_H
+#pragma once
 
 /*Includes------------------------------------------------------------*/
-#include "status.h"
 #include <HAL/port.h>
+#include <HAL/port_impl.h>
 #include <HAL/time.h>
+
+#include "status.h"
 
 /*Constants------------------------------------------------------------*/
 // #define SerialCamera        Serial3
@@ -48,4 +49,3 @@ class Camera {
     Hal::Serial &m_seri_cam;
     static constexpr auto M_CAMERA_BAUD = 115200;
 };
-#endif

@@ -1,5 +1,4 @@
-#ifndef SENSORS__TEMPERATURE_H_C47C3CE2B03B4C5BB928707B66E7052D
-#define SENSORS__TEMPERATURE_H_C47C3CE2B03B4C5BB928707B66E7052D
+#pragma once
 
 /**
  * Temperature Sensor Class
@@ -15,7 +14,7 @@ class Temperature : public SensorBase<1> {
     //     static constexpr int TEMPERATURE_DATA_ARRAY_SIZE = 1;
 
   public:
-    Temperature(float *buf) : SensorBase(buf) { buf[0] = 20; }
+    Temperature(float *const data) : SensorBase(data) { data_[0] = 20; }
     void initSensor() {}
     void readData() {}
     // uint8_t dataLength() { return TEMPERATURE_DATA_ARRAY_SIZE; }
@@ -25,4 +24,3 @@ class Temperature : public SensorBase<1> {
     //   private:
     // float data[TEMPERATURE_DATA_ARRAY_SIZE] = {20};
 };
-#endif

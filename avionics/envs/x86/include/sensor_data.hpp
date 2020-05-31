@@ -1,6 +1,7 @@
 #ifndef SENSOR_DATA_SPOOF
 #define SENSOR_DATA_SPOOF
 
+#include <cassert>
 #include <fstream>
 #include <limits> //for numeric_limits
 #include <stdexcept>
@@ -15,7 +16,13 @@
 // NOTE: The time in ms of the data must be aligned with the used time
 template <std::size_t data_length> class DataSpoof {
   public:
-    DataSpoof(std::string const &dataFile) {
+    /**
+     * @brief Constructor
+     * @param dataFile Path to csv data file.
+     * @param extern_dat_buf External data buffer.
+     */
+    DataSpoof(std::string const &dataFile, float *const extern_dat_buf)
+        : dat_read(extern_dat_buf) {
         dataStream = std::ifstream(dataFile);
 
         if (!dataStream) {
@@ -28,14 +35,6 @@ template <std::size_t data_length> class DataSpoof {
         // throw away first line of csv (headers)
         dataStream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
-
-    /**
-     * @brief Constructor
-     * @param dataFile Path to csv data file.
-     * @param extern_dat_buf External data buffer.
-     */
-    DataSpoof(std::string const &dataFile, const float *extern_dat_buf)
-        : dat_read(extern_dat_buf), DataSpoof(dataFile) {}
 
     // returns next data point in stream
     float *getData() {
@@ -82,6 +81,6 @@ template <std::size_t data_length> class DataSpoof {
     std::ifstream dataStream;
     long int t0, t1; // two variables exist only for the purpose of assert
 
-    float dat_read[data_length];
+    float *const dat_read;
 };
 #endif

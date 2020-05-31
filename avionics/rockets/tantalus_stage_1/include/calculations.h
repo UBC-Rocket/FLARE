@@ -10,10 +10,10 @@
 #include "CalcHelpers/barometric.h"
 #include "CalcHelpers/exponential_moving_avg.h"
 #include "calculations_interface.h"
-#include "state_input_struct.h"
-
+#include "sensor_collection.h"
 #include "sensors/IMU.h"
 #include "sensors/barometer.h"
+#include "state_input_struct.h"
 
 // following recomendation for alpha = 2/(2N + 1)
 constexpr float BAROMETER_MOVING_AVERAGE_ALPHA = 2.0f / (2 * 40 + 1);
@@ -22,8 +22,8 @@ class Calculator : public ICalculator {
   public:
     Calculator(SensorCollection &sensors)
         : m_baro(sensors.barometer), m_imu(sensors.imuSensor) {
-        baro.readData();
-        m_base_alt.reset(pressureToAltitude(*(baro.getData())), 1,
+        m_baro.readData();
+        m_base_alt.reset(pressureToAltitude(*(m_baro.getData())), 1,
                          BAROMETER_MOVING_AVERAGE_ALPHA);
         m_last_t = Hal::now_ms();
         m_last_alt = m_base_alt.getAverage();
