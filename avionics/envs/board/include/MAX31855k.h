@@ -36,8 +36,7 @@
  * max31855k::F will return degrees Fahrenheit                                 *
  * max31855k::R will return degrees Rankine                                    *
  *******************************************************************************/
-#ifndef _MAX31855K_h_
-#define _MAX31855K_h_
+#pragma once
 
 #include <Arduino.h>
 // #include "sensors.h"
@@ -48,43 +47,38 @@
 
 const uint8_t NONE = 0; // This is used to indicate VCC or GND pin isn't used
 
-class MAX31855k
-{
-protected:
-  union { // Union makes conversion from 4 bytes to an unsigned 32-bit int easy
-    uint8_t bytes[4];
-    uint32_t uint32;
-  } data;
-  uint8_t cs;
+class MAX31855k {
+  protected:
+    union { // Union makes conversion from 4 bytes to an unsigned 32-bit int
+            // easy
+        uint8_t bytes[4];
+        uint32_t uint32;
+    } data;
+    uint8_t cs;
 
-  void readBytes(void);
-  uint8_t checkHasFault(void);
+    void readBytes(void);
+    uint8_t checkHasFault(void);
 
-public:
-  // Simple Arduino API style guide functions
-  inline float readTempC() { return readTemp(MAX31855k::C); }
-  inline float readTempF() { return readTemp(MAX31855k::F); }
-  inline float readTempR() { return readTemp(MAX31855k::R); }
-  inline float readTempK() { return readTemp(MAX31855k::K); }
+  public:
+    // Simple Arduino API style guide functions
+    inline float readTempC() { return readTemp(MAX31855k::C); }
+    inline float readTempF() { return readTemp(MAX31855k::F); }
+    inline float readTempR() { return readTemp(MAX31855k::R); }
+    inline float readTempK() { return readTemp(MAX31855k::K); }
 
-  // More advanced code concepts used below
-  enum units {
-    F, C, K, R
-  };
-  // If non-zero will turn on serial debugging messages
-  uint8_t debug;
-  // Returns the temperature in degrees F, K, R, or C (default if unspecified)
-  float readTemp(MAX31855k::units _u=C);
-  // Returns the cold junction temperature in ˚C
-  float readCJT(void);
+    // More advanced code concepts used below
+    enum units { F, C, K, R };
+    // If non-zero will turn on serial debugging messages
+    uint8_t debug;
+    // Returns the temperature in degrees F, K, R, or C (default if unspecified)
+    float readTemp(MAX31855k::units _u = C);
+    // Returns the cold junction temperature in ˚C
+    float readCJT(void);
 
-  // Pass a pin number to set as CS
-  void setCS(int pin);
+    // Pass a pin number to set as CS
+    void setCS(int pin);
 
-  MAX31855k(const uint8_t, const uint8_t _vcc=NONE,
-                    const uint8_t _gnd=NONE, const bool _debug=0);
-  ~MAX31855k() {} // User responsible 4 reassigning pins & stopping SPI
-
+    MAX31855k(const uint8_t, const uint8_t _vcc = NONE,
+              const uint8_t _gnd = NONE, const bool _debug = 0);
+    ~MAX31855k() {} // User responsible 4 reassigning pins & stopping SPI
 };
-
-#endif

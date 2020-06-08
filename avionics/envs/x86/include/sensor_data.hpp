@@ -1,5 +1,4 @@
-#ifndef SENSOR_DATA_SPOOF
-#define SENSOR_DATA_SPOOF
+#pragma once
 
 #include <cassert>
 #include <fstream>
@@ -83,4 +82,3 @@ template <std::size_t data_length> class DataSpoof {
 
     float *const dat_read;
 };
-#endif

@@ -1,6 +1,4 @@
-#ifndef HW_INTERFACE_H
-#define HW_INTERFACE_H
-
+#pragma once
 /**
  * Generic Hardware Interface
  */
@@ -36,4 +34,3 @@ class IParachute {
   protected:
     HardwareStatus status;
 };
-#endif

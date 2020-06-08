@@ -1,5 +1,4 @@
-#ifndef SENSOR_INTERFACE_H
-#define SENSOR_INTERFACE_H
+#pragma once
 
 #include "HAL/port_impl.h"
 #include <cstdint>
@@ -50,7 +49,3 @@ template <uint8_t size> class SensorBase {
     SensorStatus status;
     float *const data_;
 };
-
-// typedef std::vector<std::reference_wrapper<ISensor>> SensorSet;
-
-#endif

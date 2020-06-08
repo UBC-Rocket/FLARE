@@ -15,8 +15,7 @@
  * Distributed as-is; no warranty is given.
  */
 
-#ifndef BUZZER_H
-#define BUZZER_H
+#pragma once
 
 /*Includes------------------------------------------------------------*/
 #include "HAL/gpio.h"
@@ -60,7 +59,3 @@ class Buzzer : public IBuzzer {
   private:
     const int M_MELODY_PIN;
 };
-
-/*Functions------------------------------------------------------------*/
-
-#endif

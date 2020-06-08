@@ -1,5 +1,4 @@
-#ifndef HAL__PORT_IMPL_H_4670E21514FE46DE8214D2F192FBBD20
-#define HAL__PORT_IMPL_H_4670E21514FE46DE8214D2F192FBBD20
+#pragma once
 
 #include <cstring>
 
@@ -39,5 +38,3 @@ static Serial SerialRadio(3);
 static Serial IridiumSerial(4);
 static Serial SerialCamera(5);
 } // namespace Hal
-
-#endif

@@ -1,6 +1,4 @@
-#ifndef HAL__TIME_H_717DBAFB60CA40BCBB6780A74CDAF02C
-#define HAL__TIME_H_717DBAFB60CA40BCBB6780A74CDAF02C
-
+#pragma once
 #include <chrono>
 
 namespace Hal {
@@ -29,5 +27,3 @@ t_point now_ms();
 
 void initialSystem();
 } // namespace Hal
-
-#endif

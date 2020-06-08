@@ -19,22 +19,18 @@
  * Distributed as-is; no warranty is given.
  */
 
-#ifndef GPIO_H
-#define GPIO_H
+#pragma once
 
 /*Includes------------------------------------------------------------*/
 
-
 /*Constants------------------------------------------------------------*/
-#define POWER_STATUS_LED 20 //kept in one place w/ FLIGHT_LED
-#define FLIGHT_LED   21 //required by state machine
+#define POWER_STATUS_LED 20 // kept in one place w/ FLIGHT_LED
+#define FLIGHT_LED 21       // required by state machine
 
-constexpr int MELODY_PIN = 3; //required by buzzer
+constexpr int MELODY_PIN = 3; // required by buzzer
 
 /*Functions------------------------------------------------------------*/
 void initPins(void);
 void deployDrogue(void);
 void deployMain(void);
 bool continuityCheck(void);
-
-#endif

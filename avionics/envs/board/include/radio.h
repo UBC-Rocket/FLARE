@@ -16,8 +16,7 @@
  * Distributed as-is; no warranty is given.
  */
 
-#ifndef __RADIO_H__
-#define __RADIO_H__
+#pragma once
 
 /*Includes------------------------------------------------------------*/
 #include <HardwareSerial.h>
@@ -76,5 +75,3 @@ class RadioController : public RadioControllerBase {
     uint8_t M_MAX_PACKETS_PER_RX_LOOP;
     void send();
 };
-
-#endif

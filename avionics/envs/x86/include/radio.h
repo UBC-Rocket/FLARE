@@ -1,5 +1,4 @@
-#ifndef RADIO_H_22181C75119344C48BDF0D5A550D2A02
-#define RADIO_H_22181C75119344C48BDF0D5A550D2A02
+#pragma once
 
 #include <iostream>
 #include <mutex>
@@ -43,5 +42,3 @@ class RadioController : public RadioControllerBase {
     // TODO use serial_radio, not this
     static uint8_t const M_IO_ID = 0x52;
 };
-
-#endif

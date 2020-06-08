@@ -1,5 +1,4 @@
-#ifndef COUT_CONTROLLER_H_28309666D6B04A8EA72B8C7C06476AE5
-#define COUT_CONTROLLER_H_28309666D6B04A8EA72B8C7C06476AE5
+#pragma once
 
 #include <cstring>  //for memmove
 #include <iostream> //for std::cin/cout
@@ -151,5 +150,3 @@ class StdIoController {
         }
     }
 };
-
-#endif

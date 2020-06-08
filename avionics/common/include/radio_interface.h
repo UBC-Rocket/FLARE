@@ -1,5 +1,4 @@
-#ifndef RADIO_INTERFACE_H_D7F3F9B440C74CEAB19571C6D763314B
-#define RADIO_INTERFACE_H_D7F3F9B440C74CEAB19571C6D763314B
+#pragma once
 
 #include <assert.h>
 #include <cstring>
@@ -110,5 +109,3 @@ class RadioControllerBase {
     }
     RadioQueue m_tx_q;
 };
-
-#endif

@@ -16,18 +16,16 @@
  * Distributed as-is; no warranty is given.
  */
 
-#ifndef OPTIONS_H
-#define OPTIONS_H
+#pragma once
 
 /*Constants------------------------------------------------------------*/
 // #define NOSECONE //enable or disable nosecone-avionics specific functionality
-#define BODY //enable or disable body-avionics specific functionality
+#define BODY // enable or disable body-avionics specific functionality
 // #define SERVO //if drogue release utilizes CO2 canister
-#define POW //if drogue release utilizes black powder charge
+#define POW // if drogue release utilizes black powder charge
 // #define TESTING //enable or disable debug output
 // #define GROUND_TEST
 
 // #define THERMOCOUPLE    // if thermocouple is utilized or not
 
 // Refer to README or the wiki for more information.
-#endif
