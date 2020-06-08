@@ -1,5 +1,4 @@
-#ifndef RADIO_QUEUE_H_8E9F7D041E4A491889DEA1A194DD56A0
-#define RADIO_QUEUE_H_8E9F7D041E4A491889DEA1A194DD56A0
+#pragma once
 
 #include <deque>  // for std::deque
 #include <memory> // for std::unique_ptr
@@ -70,5 +69,3 @@ class RadioQueue {
      */
     uint8_t dispenseIntoPayload(uint8_t *payload);
 };
-
-#endif

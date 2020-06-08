@@ -1,5 +1,4 @@
-#ifndef CALCULATIONS_INTEFACE_H_56E2593E52DF46C588173A04C05D90FC
-#define CALCULATIONS_INTEFACE_H_56E2593E52DF46C588173A04C05D90FC
+#pragma once
 
 #include "HAL/time.h"           //for Hal::t_point
 #include "state_input_struct.h" //found in rocket-specific folders
@@ -19,5 +18,3 @@ class ICalculator {
     virtual void calculateValues(StateId state, StateInput &out_state_input,
                                  Hal::t_point t_ms) = 0;
 };
-
-#endif

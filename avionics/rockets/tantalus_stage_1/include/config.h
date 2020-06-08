@@ -1,5 +1,4 @@
-#ifndef CONFIG_H_41E0CC504D364079AC42AF610BBE6F7A
-#define CONFIG_H_41E0CC504D364079AC42AF610BBE6F7A
+#pragma once
 
 #include <unordered_map> //for std::unordered_map (hash map)
 
@@ -94,5 +93,3 @@ constexpr uint8_t TEMPERATURE = 4;
 // TODO: Add ignitor to hardware vector with proper pin initialization
 
 std::vector<std::reference_wrapper<IParachute>> hardware;
-
-#endif

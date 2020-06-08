@@ -107,9 +107,6 @@ PLEASE READ ME!
 static Status s_statusOfInit;
 
 /* Functions------------------------------------------------------------*/
-
-// inline void sendSatcomMsg(FlightStates state, float GPS_data[], uint32_t
-// timestamp);
 void blinkStatusLED();
 
 int main(void) {
@@ -133,22 +130,12 @@ int main(void) {
     SerialUSB.println("Initializing...");
 #endif
 
-    // Radio
-    // #ifdef TESTING
-    //     SerialUSB.println("Initializing radio");
-    // #endif
-
     /* init log file */
     datalog.init(LOG_FILE_NAME);
 
     /* init sensors and report status in many ways */
     SensorCollectionPtr sensors_ptr = getSensors();
     SensorCollection &sensors = *sensors_ptr;
-    // auto &barometer = sensors[SensorPositions::BAROMETER];
-    // auto &gps = sensors[SensorPositions::GPS];
-    // auto &accelerometer = sensors[SensorPositions::ACCELEROMETER];
-    // auto &imuSensor = sensors[SensorPositions::IMU];
-    // auto &temperature = sensors[SensorPositions::TEMPERATURE];
 
     displayStatus(sensors, hardware, buzzer);
 
@@ -164,31 +151,21 @@ int main(void) {
         (Eigen::Vector3f() << 10.0f, 0.0f, 0.0f).finished();
     state_input.orientation = Eigen::Quaternionf().Identity();
 
-    // TODO - build this out
-    // radioStatus(&s_radio, &s_txPacket, &s_statusOfInit);
+    // Timing
+    Hal::t_point timestamp;
+    Hal::t_point old_time = Hal::now_ms(); // ms
+    Hal::t_point new_time;                 // ms
+    uint32_t new_time_int;
+    Hal::ms time_interval(NOMINAL_POLLING_TIME_INTERVAL); // ms
+    Hal::t_point radio_old_time = Hal::now_ms();
+    Hal::ms radio_t_interval(500); // ms //TODO - make 500 a constant somewhere
 
     for (;;) {
-        /* List of constants */
-        static Hal::t_point timestamp;
-        static Hal::t_point old_time = Hal::now_ms(); // ms
-        static Hal::t_point new_time = Hal::now_ms(); // ms
-        uint32_t new_time_int;
-        // unsigned long delta_time;
-        static Hal::ms time_interval(NOMINAL_POLLING_TIME_INTERVAL); // ms
-
-        static Hal::t_point radio_old_time = Hal::now_ms();
-        static Hal::ms radio_t_interval(
-            500); // ms //TODO - make 500 a constant somewhere
-
-        // static unsigned long radio_old_time = 0;
-        // static unsigned long radio_time_interval = 500;  //ms
-
-        // float *battery_voltage, *acc_data, *bar_data, *temp_sensor_data,
-        // *IMU_data, *GPS_data, *thermocouple_data;
+        new_time = Hal::now_ms();
+        new_time_int =
+            static_cast<uint32_t>(timestamp.time_since_epoch().count());
 
         static float altitude;
-
-        // static FlightStates state = STANDBY;
 
         // makes sure that even if it does somehow get accidentally changed,
         // it gets reverted
@@ -196,8 +173,6 @@ int main(void) {
             state = StateId::WINTER_CONTINGENCY;
 
         radio.listenAndAct();
-        // resolveRadioRx(&s_radio, &s_txPacket, GPS_data, &state,
-        // &s_statusOfInit);
 
         // Polling time intervals need to be variable, since in LANDED
         // there's a lot of data that'll be recorded
@@ -208,10 +183,6 @@ int main(void) {
 
         // Core functionality of rocket - take data, process it,
         // run the state machine, and log the data
-        new_time = Hal::now_ms();
-        new_time_int =
-            static_cast<uint32_t>(timestamp.time_since_epoch().count());
-
         if ((new_time - old_time) >= time_interval) {
             old_time = new_time;
 

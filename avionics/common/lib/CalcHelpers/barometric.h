@@ -1,9 +1,7 @@
-#ifndef CALC_HELPERS_BAROMETRIC_6DBAD7E3E40A4536AC9DD4839FDF643C
-#define CALC_HELPERS_BAROMETRIC_6DBAD7E3E40A4536AC9DD4839FDF643C
-
+#pragma once
 #include <cmath>
 
-float pressureToAltitude(float const pres){
+float pressureToAltitude(float const pres) {
     constexpr float Pb = 101325;
     constexpr float Tb = 288.15;
     constexpr float Lb = -0.0065;
@@ -13,5 +11,3 @@ float pressureToAltitude(float const pres){
 
     return Tb / Lb * (std::pow(Pb / pres, R * Lb / (g0 * M)) - 1);
 }
-
-#endif

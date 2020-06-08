@@ -15,12 +15,9 @@
  * Distributed as-is; no warranty is given.
  */
 
-#ifndef STATEMACHINE_H
-#define STATEMACHINE_H
+#pragma once
 
 /*Constants------------------------------------------------------------*/
 // Polling time changes
-#define LANDED_POLLING_TIME_INTERVAL 5000 //ms
-#define NOMINAL_POLLING_TIME_INTERVAL 50  //ms
-
-#endif
+#define LANDED_POLLING_TIME_INTERVAL 5000 // ms
+#define NOMINAL_POLLING_TIME_INTERVAL 50  // ms

@@ -1,5 +1,4 @@
-#ifndef SENSORS__BAROMETER_H_8294D8F9282A4D1DB60BC9F067B8FE5A
-#define SENSORS__BAROMETER_H_8294D8F9282A4D1DB60BC9F067B8FE5A
+#pragma once
 
 /**
  * Barometer Sensor Class
@@ -24,5 +23,3 @@ class Barometer : public SensorBase<2> {
   private:
     DataSpoof<2> dat{BAROMETER_DATA, data_};
 };
-
-#endif

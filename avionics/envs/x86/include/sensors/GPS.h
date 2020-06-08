@@ -1,5 +1,4 @@
-#ifndef SENSORS__GPS_H_C87D138269654043A56EFCE31F6A40C5
-#define SENSORS__GPS_H_C87D138269654043A56EFCE31F6A40C5
+#pragma once
 
 #include "HAL/port_impl.h"
 #include "sensors-interface.h"
@@ -17,5 +16,3 @@ class GPS : public SensorBase<3> {
     void readData() {}
     SensorStatus getStatus() { return SensorStatus::NOMINAL; }
 };
-
-#endif

@@ -45,42 +45,6 @@
  * @return void
  */
 
-// void initSensors(std::vector<std::reference_wrapper<ISensor>> &sensors,
-//                  std::vector<std::reference_wrapper<IParachute>> &hardware,
-//                  IBuzzer &buzzer) {
-//     // if(powerbattery.getVoltage() <= LOW_BATTERY_VOLTAGE)
-//     // { //TODO: Uncomment once the battery sensor is implemented
-//     //     status->sensorNominal[BATTERY_STATUS_POSITION] = false;
-//     //     if(powerbattery.getVoltage() <= MINIMUM_BATTERY_VOLTAGE){
-//     //         status->overview = CRITICAL_FAILURE;
-//     //         #ifdef TESTING
-//     //         SerialUSB.println("DANGER: BATTERY AT UNACCEPTABLY LOW
-//     //         VOLTAGE!"); #endif
-//     //     }
-//     //     else{
-//     //         if(status->overview < NONCRITICAL_FAILURE){
-//     //             status->overview = NONCRITICAL_FAILURE;
-//     //         }
-//     //         #ifdef TESTING
-//     //         SerialUSB.println("WARNING: Battery at low voltage!");
-//     //         #endif
-//     //     }
-//     // }
-
-//     /*init hardware*/
-//     for (auto hw : hardware) {
-//         hw.get().init();
-//     }
-//
-//     /*init sensors*/
-//     for (auto sensor : sensors) {
-//         sensor.get().initSensor();
-//     }
-
-//     /* transmit sensor report */
-//     displayStatus(sensors, hardware, buzzer);
-// }
-
 void raiseToStatus(Status &currentStatus, Status incomingStatus) {
     if (incomingStatus > currentStatus) {
         currentStatus = incomingStatus;
@@ -89,7 +53,9 @@ void raiseToStatus(Status &currentStatus, Status incomingStatus) {
 
 /**
  * @brief  Reports status with buzzer tune and LED.
- * @param  InitStatus *status - status of initialization.
+ * @param SensorCollection &sensors - collection of sensors
+ * @param &hardware - collection of e-matches
+ * @param &buzzer - buzzer
  * @return void
  */
 void displayStatus(SensorCollection &sensors,
@@ -121,24 +87,10 @@ void displayStatus(SensorCollection &sensors,
         Hal::sleep_ms(400);
     }
     return;
+
+    Hal::pinMode(Hal::LED_BUILTIN(), Hal::PinMode::OUTPUT);
+    Hal::digitalWrite(Hal::LED_BUILTIN(), Hal::PinDigital::HIGH);
 }
-
-// TODO - ????
-// #ifdef TESTING
-// SerialUSB.println("Initialization complete! :D");
-// #endif
-// Hal::pinMode(Hal::LED_BUILTIN(), Hal::PinMode::OUTPUT);
-// Hal::digitalWrite(Hal::LED_BUILTIN(), Hal::PinDigital::HIGH);
-
-// #ifdef TESTING
-// for (int i = 1; i <= 1; i++) {
-// #else
-// for (int i = 1; i <= 5; i++) {
-// #endif
-//     buzzer.sing(SongTypes_SUCCESS);
-//     Hal::sleep_ms(400);
-// }
-// }
 
 Status getStatus(SensorCollection &sensors,
                  std::vector<std::reference_wrapper<IParachute>> &hardware) {
@@ -152,19 +104,3 @@ Status getStatus(SensorCollection &sensors,
     }
     return status;
 }
-
-/**
- * @brief Polls all the sensors
- * @param timestamp pointer to store the timestamp value
- * @param sensors the sensors to poll
- */
-// void pollSensors(Hal::t_point &timestamp,
-//                  std::vector<std::reference_wrapper<ISensor>> &sensors) {
-//     timestamp = Hal::now_ms();
-
-//     for (auto sensor : sensors) {
-//         sensor.get().readData();
-//     }
-
-//     // *battery_voltage = powerbattery.getVoltage();
-// }
