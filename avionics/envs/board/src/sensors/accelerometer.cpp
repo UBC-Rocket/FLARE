@@ -1,7 +1,7 @@
 /*Includes------------------------------------------------------------*/
 #include "sensors/accelerometer.h"
 
-void Accelerometer::initSensor() {
+Accelerometer::Accelerometer(float *const buf) : SensorBase(buf) {
 /*init accerlerometer*/
 #ifdef TESTING
     SerialUSB.println("Initializing accelerometer");
@@ -18,15 +18,7 @@ void Accelerometer::readData(void) {
     SerialUSB.println("Polling accelerometer");
 #endif
     accelerometer.readAxes(x, y, z);
-    data[0] = accelerometer.convertToG(ACCELEROMETER_SCALE, x);
-    data[1] = accelerometer.convertToG(ACCELEROMETER_SCALE, y);
-    data[2] = accelerometer.convertToG(ACCELEROMETER_SCALE, z);
-}
-
-uint8_t Accelerometer::dataLength() {
-    return ACCELEROMETER_DATA_ARRAY_SIZE;
-}
-
-float *Accelerometer::getData() {
-    return data;
+    data_[0] = accelerometer.convertToG(ACCELEROMETER_SCALE, x);
+    data_[1] = accelerometer.convertToG(ACCELEROMETER_SCALE, y);
+    data_[2] = accelerometer.convertToG(ACCELEROMETER_SCALE, z);
 }

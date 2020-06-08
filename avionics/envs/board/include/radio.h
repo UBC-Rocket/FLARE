@@ -25,7 +25,7 @@
 
 #include "radio_interface.h"
 #include "statemachine.h"
-// #include "sensors.h"
+// #include "status.h"
 #include "XBee.h"
 #include "options.h"
 

@@ -15,37 +15,33 @@
  * Distributed as-is; no warranty is given.
  */
 
-#ifndef __battery_sensor__
-#define __battery_sensor__
+#pragma once
 
-#include "sensors.h"
+#include "status.h"
 
-class Battery
-{
-    public:  // public functions
-        // Constructor. batterySensorPin is the pin for battery sensor
-        // (i.e. output of the voltage divider)
-        Battery(uint8_t batterySensorPin);
+class Battery {
+  public: // public functions
+    // Constructor. batterySensorPin is the pin for battery sensor
+    // (i.e. output of the voltage divider)
+    Battery(uint8_t batterySensorPin);
 
-        /**
-         * @brief  Gets the battery voltage level. Maximum voltage readable
-         *          is 11.0 volts; to adjust, change the resistors used
-         *          in the voltage divider.
-         * @param  None
-         * @return float batteryVoltage - voltage of the battery, in volts.
-         */
-        float getVoltage();
+    /**
+     * @brief  Gets the battery voltage level. Maximum voltage readable
+     *          is 11.0 volts; to adjust, change the resistors used
+     *          in the voltage divider.
+     * @param  None
+     * @return float batteryVoltage - voltage of the battery, in volts.
+     */
+    float getVoltage();
 
-        /**
-         * @brief  Gets the error status that the battery should report
-         * @param  None
-         * @return Status - battery status
-         */
-        Status getStatus();
+    /**
+     * @brief  Gets the error status that the battery should report
+     * @param  None
+     * @return Status - battery status
+     */
+    Status getStatus();
 
-    private:
-        float m_divider;
-        uint8_t m_batterySensorPin;
+  private:
+    float m_divider;
+    uint8_t m_batterySensorPin;
 };
-
-#endif

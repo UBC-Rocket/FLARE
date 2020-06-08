@@ -15,36 +15,37 @@
  * Distributed as-is; no warranty is given.
  */
 
-#ifndef CAMERAS_H
-#define CAMERAS_H
+#pragma once
 
 /*Includes------------------------------------------------------------*/
 #include <HAL/port.h>
+#include <HAL/port_impl.h>
 #include <HAL/time.h>
-#include "sensors.h"
+
+#include "status.h"
 
 /*Constants------------------------------------------------------------*/
 // #define SerialCamera        Serial3
 
 /*Functions------------------------------------------------------------*/
 
-class Camera{
-public:
-    Camera(Hal::Serial &SerialCam): m_seri_cam(SerialCam) {
+class Camera {
+  public:
+    Camera(Hal::Serial &SerialCam) : m_seri_cam(SerialCam) {
         m_seri_cam.begin(M_CAMERA_BAUD);
-        while (!m_seri_cam);
+        while (!m_seri_cam)
+            ;
         Hal::sleep_ms(2000);
         stop_record();
     }
-    void const power_cameras(); //a toggle switch
+    void const power_cameras(); // a toggle switch
     void const start_record();
     void const stop_record();
 
-private:
+  private:
     uint8_t crc_calculator(uint8_t *command, uint8_t len);
     uint8_t crc8_dvb_s2(uint8_t crc, unsigned char a);
 
     Hal::Serial &m_seri_cam;
     static constexpr auto M_CAMERA_BAUD = 115200;
 };
-#endif

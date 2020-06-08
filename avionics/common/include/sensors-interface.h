@@ -1,15 +1,12 @@
 #ifndef SENSOR_INTERFACE_H
 #define SENSOR_INTERFACE_H
 
-#include <cstdint>
-#include <vector> //for std::vector
-#include <functional> //for std::reference_wrapper
 #include "HAL/port_impl.h"
+#include <cstdint>
+#include <functional> //for std::reference_wrapper
+#include <vector>     //for std::vector
 
-enum class SensorStatus {
-    NOMINAL,
-    FAILURE
-};
+enum class SensorStatus { NOMINAL, FAILURE };
 
 /**
  * @brief enum of all sensors
@@ -23,13 +20,9 @@ enum class SensorType {
     THERMOCOUPLE
 };
 
-class ISensor {
-public:
-    /**
-     * @brief  Initialize sensor
-     * @return SensorStatus
-     */
-    virtual void initSensor() = 0;
+template <uint8_t size> class SensorBase {
+  public:
+    SensorBase(float *const data) : data_(data) {}
 
     /**
      * @brief  Reads sensor data
@@ -39,26 +32,25 @@ public:
     /**
      * @brief  Returns the length of the data array the sensor requires
      */
-    virtual uint8_t dataLength() = 0;
+    static constexpr uint8_t dataLength() { return size; }
 
     /**
      * @brief  Returns data read during readData()
      * @return the data
      */
-    virtual float *getData() = 0;
+    const float *getData() { return data_; }
 
     /**
-     * @brief returns the current status of the snesor
+     * @brief returns the current status of the seNsor
      * @return the current sensor status
      */
-    SensorStatus getStatus() {
-        return status;
-    }
+    SensorStatus getStatus() { return status; }
 
-protected:
+  protected:
     SensorStatus status;
+    float *const data_;
 };
 
-typedef std::vector<std::reference_wrapper<ISensor>> SensorSet;
+// typedef std::vector<std::reference_wrapper<ISensor>> SensorSet;
 
 #endif

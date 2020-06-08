@@ -68,17 +68,19 @@ PLEASE READ ME!
 #include "HAL/gpio.h"
 #include <HAL/port_impl.h> // <> vs "" for HAL ??
 
-#include "config.h"
-
 #include "CSVWriteImpl.h"
+#include "CSVwrite.h"
 #include "buzzer.h"
 #include "calculations.h"
 #include "cameras.h"
 #include "gpio.h"
 #include "options.h"
 #include "radio.h"
-#include "sensors.h"
+#include "sensor_collection.h"
+#include "statemachine.h"
+#include "status.h"
 
+#include "config.h"
 #include "env_config.h"
 
 /* Errors---------------------------------------------------------------*/
@@ -116,6 +118,8 @@ int main(void) {
     static Buzzer buzzer;
     Camera cam(Hal::SerialCamera);
 
+    env_initialize();
+
     static RadioController radio = RadioController(Hal::SerialRadio);
 
     initPins();
@@ -134,13 +138,21 @@ int main(void) {
     //     SerialUSB.println("Initializing radio");
     // #endif
 
-    env_initialize();
-
     /* init log file */
     datalog.init(LOG_FILE_NAME);
 
     /* init sensors and report status in many ways */
-    initSensors(sensors, hardware, buzzer);
+    SensorCollectionPtr sensors_ptr = getSensors();
+    SensorCollection &sensors = *sensors_ptr;
+    // auto &barometer = sensors[SensorPositions::BAROMETER];
+    // auto &gps = sensors[SensorPositions::GPS];
+    // auto &accelerometer = sensors[SensorPositions::ACCELEROMETER];
+    // auto &imuSensor = sensors[SensorPositions::IMU];
+    // auto &temperature = sensors[SensorPositions::TEMPERATURE];
+
+    displayStatus(sensors, hardware, buzzer);
+
+    Calculator calc(sensors);
 
     /* TODO - make this not constant */
     state_input.ignitor_good = true;
@@ -203,7 +215,7 @@ int main(void) {
         if ((new_time - old_time) >= time_interval) {
             old_time = new_time;
 
-            pollSensors(timestamp, sensors);
+            sensors.poll(timestamp);
 
             calc.calculateValues(state, state_input, new_time);
             altitude = state_input.altitude;
@@ -212,16 +224,17 @@ int main(void) {
 
             state = state_hash_map[state]->getNewState(state_input, state_aux);
 
-            datalog.logData(new_time_int, sensors, state, altitude,
-                            0); // TODO - think some more about data logging and
-                                // how it should mesh with calculations, and
-                                // also get rid of baseline_pressure
+            datalog.logData(new_time_int, sensors, state, altitude, 0);
+            // TODO - think some more about data logging and
+            // how it should mesh with calculations, and
+            // also get rid of baseline_pressure
         }
 
         if (new_time - radio_old_time >= radio_t_interval) {
             radio_old_time = new_time;
-            radio.sendBulkSensor(new_time_int, altitude, accelerometer,
-                                 imuSensor, gps, static_cast<uint8_t>(state));
+            radio.sendBulkSensor(new_time_int, altitude, sensors.accelerometer,
+                                 sensors.imuSensor, sensors.gps,
+                                 static_cast<uint8_t>(state));
         }
         // LED blinks in non-critical failure
         blinkStatusLED();

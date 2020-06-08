@@ -1,12 +1,11 @@
 target_sources( 
     TantalusStage1
     PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR}/src/battery.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/calculations.cpp
+        # ${CMAKE_CURRENT_LIST_DIR}/src/battery.cpp
+        # ${CMAKE_CURRENT_LIST_DIR}/src/calculations.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/cameras.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/gpio.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/radio_queue.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/satcom.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/sensors.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/states/armed.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/states/ascent_to_apogee.cpp

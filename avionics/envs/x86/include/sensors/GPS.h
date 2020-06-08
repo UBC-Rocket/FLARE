@@ -6,20 +6,16 @@
 
 /*Variables------------------------------------------------------------*/
 
-class GPS : public ISensor {
-  private:
-    static constexpr int GPS_DATA_ARRAY_SIZE = 3;
-
+class GPS : public SensorBase<3> {
   public:
-    GPS(Hal::Serial &seri) {}
+    GPS(Hal::Serial &seri, float *const buf) : SensorBase(buf) {
+        data_[0] = 49;
+        data_[1] = -123;
+        data_[2] = 0;
+    }
     void initSensor() {}
     void readData() {}
-    uint8_t dataLength() { return GPS_DATA_ARRAY_SIZE; }
-    float *getData() { return data; }
     SensorStatus getStatus() { return SensorStatus::NOMINAL; }
-
-  private:
-    float data[GPS_DATA_ARRAY_SIZE] = {49, -123, 0};
 };
 
 #endif

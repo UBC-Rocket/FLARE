@@ -1,19 +1,15 @@
 /*Includes------------------------------------------------------------*/
 #include "sensors/barometer.h"
 
-void Barometer::initSensor() {
-    barometer = new MS_5803(1024);
-
-/*init barometer*/
+Barometer::Barometer(float *const buf) : SensorBase(buf) {
+    /*init barometer*/
 #ifdef TESTING
     SerialUSB.println("Initializing barometer");
-#endif
-#ifdef TESTING
-    if (!barometer.initializeMS_5803(true)) { //because one is verbose
+    if (!barometer.initializeMS_5803(true)) { // because one is verbose
         return CRITICAL_FAILURE;
     }
 #else
-    if (!barometer->initializeMS_5803(false)) {
+    if (!barometer.initializeMS_5803(false)) {
         status = SensorStatus::FAILURE;
     }
 #endif
@@ -30,17 +26,17 @@ void Barometer::readData() {
         return NOMINAL;
     }
 #else
-    barometer->readSensor();
+    barometer.readSensor();
 #endif
 
-    data[0] = barometer->pressure();
-    data[1] = barometer->temperature();
+    data_[0] = barometer.pressure();
+    data_[1] = barometer.temperature();
 }
 
-uint8_t Barometer::dataLength() {
-    return BAROMETER_DATA_ARRAY_SIZE;
-}
+// uint8_t Barometer::dataLength() {
+//     return BAROMETER_DATA_ARRAY_SIZE;
+// }
 
-float *Barometer::getData() {
-    return data;
-}
+// float *Barometer::getData() {
+//     return data;
+// }

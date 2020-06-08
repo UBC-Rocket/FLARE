@@ -5,10 +5,11 @@
 #include <cstring>
 
 #include "radio_queue.h"
-#include "sensors.h"
+#include "sensor_collection.h"
 #include "sensors/GPS.h"
 #include "sensors/IMU.h"
 #include "sensors/accelerometer.h"
+#include "status.h"
 
 class RadioControllerBase {
   private:
@@ -39,7 +40,7 @@ class RadioControllerBase {
     /**
      * @brief Helper function to send status.
      */
-    void sendStatus(uint32_t time, Status status, SensorSet sensors) {
+    void sendStatus(uint32_t time, Status status, SensorCollection &sensors) {
         SubPktPtr buf(new std::vector<uint8_t>);
         buf->resize(8);
 
@@ -47,22 +48,22 @@ class RadioControllerBase {
 
         *(buf->data() + 5) |= (static_cast<uint8_t>(status) << 6);
 
-        uint8_t byte_pos = 5;
-        uint8_t bit_pos = 5;
+        // uint8_t byte_pos = 5;
 
         // Status message spec limits size of sensors to 22 (3 bytes * 8 bits -
         // 2 bits reserved for overall status).
-        assert(sensors.size() <= 22);
-        for (auto sensor : sensors) {
-            *(buf->data() + 5) |=
-                (static_cast<uint8_t>(sensor.get().getStatus()) << bit_pos);
-            if (bit_pos == 0) {
-                bit_pos = 7;
-                byte_pos++;
-            } else {
-                bit_pos--;
-            }
-        }
+        assert(sensors.NUM_SENSORS <= 22);
+        uint8_t *sensor_bits = sensors.getStatusBitfield();
+
+        // There's probably a proper way to do this with loops n stuff but
+        // I'm to lazy to figure it out
+        *(buf->data() + 5) |= (sensor_bits[0] >> 2);
+        *(buf->data() + 6) |= (sensor_bits[0] << 6);
+        *(buf->data() + 6) |= (sensor_bits[1] >> 2);
+        *(buf->data() + 7) |= (sensor_bits[1] << 6);
+        *(buf->data() + 7) |= (sensor_bits[2] >> 2);
+
+        // TODO Include status of E-match components
     }
 
     /**

@@ -18,23 +18,22 @@
  * Distributed as-is; no warranty is given.
  */
 
-#ifndef SENSORS_H
-#define SENSORS_H
+#pragma once
 
 /*Includes------------------------------------------------------------*/
-// #include <stdint.h>
-#include "HAL/time.h"
-#include <functional> //for std::reference_wrapper
+#include <stdint.h>
 #include <vector>
+
+// #include "HAL/time.h"
 
 #include "buzzer.h"
 #include "hw-interface.h"
-#include "options.h"
-#include "sensors-interface.h"
-#include "state_interface.h"
-#include "statemachine.h"
+// #include "options.h"
+// #include "sensors-interface.h"
+// #include "state_interface.h"
+// #include "statemachine.h"
 
-#include "CSVwrite.h"
+// #include "CSVwrite.h"
 
 /*Constants------------------------------------------------------------*/
 
@@ -45,26 +44,27 @@ enum class Status {
     CRITICAL_FAILURE = 0x03
 };
 
-/*Functions------------------------------------------------------------*/
+void raiseToStatus(Status &currentStatus, Status incomingStatus);
+// /*Functions------------------------------------------------------------*/
 
-void initSensors(std::vector<std::reference_wrapper<ISensor>> &sensors,
-                 std::vector<std::reference_wrapper<IParachute>> &hardware,
-                 IBuzzer &buzzer);
+// void initSensors(std::vector<std::reference_wrapper<ISensor>> &sensors,
+//                  std::vector<std::reference_wrapper<IParachute>>
+//                  &hardware, IBuzzer &buzzer);
+class SensorCollection;
 
-void displayStatus(std::vector<std::reference_wrapper<ISensor>> &sensors,
+void displayStatus(SensorCollection &sensors,
                    std::vector<std::reference_wrapper<IParachute>> &hardware,
                    IBuzzer &buzzer);
 
-Status getStatus(std::vector<std::reference_wrapper<ISensor>> &sensors,
-                 std::vector<std::reference_wrapper<IParachute>> &hardware);
+// Status getStatus(std::vector<std::reference_wrapper<ISensor>> &sensors,
+//                  std::vector<std::reference_wrapper<IParachute>>
+//                  &hardware);
 
-// TODO: Remove dependency of sensors.h for GP20U7.cpp/.h
+// // TODO: Remove dependency of sensors.h for GP20U7.cpp/.h
 
-void pollSensors(Hal::t_point &timestamp,
-                 std::vector<std::reference_wrapper<ISensor>> &sensors);
+// void pollSensors(Hal::t_point &timestamp,
+//                  std::vector<std::reference_wrapper<ISensor>> &sensors);
 
-void logData(unsigned long timestamp,
-             std::vector<std::reference_wrapper<ISensor>> &sensors,
-             StateId state, float altitude, float baseline_pressure);
-
-#endif
+// void logData(unsigned long timestamp,
+//              std::vector<std::reference_wrapper<ISensor>> &sensors,
+//              StateId state, float altitude, float baseline_pressure);

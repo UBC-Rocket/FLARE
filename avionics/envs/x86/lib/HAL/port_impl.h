@@ -1,9 +1,10 @@
 #ifndef HAL__PORT_IMPL_H_4670E21514FE46DE8214D2F192FBBD20
 #define HAL__PORT_IMPL_H_4670E21514FE46DE8214D2F192FBBD20
 
+#include <cstring>
+
 #include "HAL/port.h"
 #include "stdio_controller.hpp"
-#include <cstring>
 
 namespace Hal {
 
