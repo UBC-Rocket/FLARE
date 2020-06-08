@@ -15,7 +15,9 @@ class RadioController : public RadioControllerBase {
     typedef StdIoController StdIO;
 
   public:
-    RadioController(unsigned short const MAX_QUEUED_BYTES)
+    RadioController(Hal::Serial &serial_radio,
+                    unsigned short const MAX_QUEUED_BYTES = 800,
+                    uint8_t const MAX_PACKETS_PER_RX_LOOP = 8)
         : RadioControllerBase(MAX_QUEUED_BYTES) {}
 
     void listenAndAct() {
@@ -38,6 +40,7 @@ class RadioController : public RadioControllerBase {
     std::queue<uint8_t> m_commands;
     uint8_t m_payload[256];
 
+    // TODO use serial_radio, not this
     static uint8_t const M_IO_ID = 0x52;
 };
 
