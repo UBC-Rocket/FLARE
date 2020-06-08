@@ -104,9 +104,3 @@ Status getStatus(SensorCollection &sensors,
     }
     return status;
 }
-
-/**
- * @brief Polls all the sensors
- * @param timestamp pointer to store the timestamp value
- * @param sensors the sensors to poll
- */

@@ -52,7 +52,7 @@ class RadioControllerBase {
         // Status message spec limits size of sensors to 22 (3 bytes * 8 bits -
         // 2 bits reserved for overall status).
         assert(sensors.NUM_SENSORS <= 22);
-        uint8_t *sensor_bits = sensors.getStatusBitfield();
+        const uint8_t *const sensor_bits = sensors.getStatusBitfield();
 
         // There's probably a proper way to do this with loops n stuff but
         // I'm to lazy to figure it out
