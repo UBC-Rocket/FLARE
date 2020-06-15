@@ -31,6 +31,7 @@ class StdIoController {
   public:
     StdIoController() { putConfigPacket(); }
 
+    constexpr static uint8_t DEV_NULL = 0;
     /**
      * @brief Attempts to extract a single character from the specified buffer
      * Id.
@@ -48,6 +49,11 @@ class StdIoController {
         c = m_istreams[id].front();
         m_istreams[id].pop();
         return true;
+    }
+
+    static int available(uint8_t id) {
+        const std::lock_guard<std::mutex> lock(m_mutexes[id]);
+        return m_istreams[id].size();
     }
 
     /**

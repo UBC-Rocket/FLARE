@@ -19,14 +19,13 @@
 #pragma once
 
 /*Includes------------------------------------------------------------*/
-#include <HardwareSerial.h>
 #include <stdint.h>
 
-#include "radio_interface.h"
-#include "statemachine.h"
-// #include "status.h"
 #include "XBee.h"
-#include "options.h"
+#include "radio_interface.h"
+#include "radio_queue.h"
+
+#include "statemachine.h"
 
 /*Constants------------------------------------------------------------*/
 /* radio addressing */

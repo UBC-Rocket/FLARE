@@ -8,7 +8,8 @@
                 "${workspaceFolder}/envs/x86/include",
                 "${workspaceFolder}/envs/x86/lib",
                 "${workspaceFolder}/rockets/tantalus_stage_1/include",
-                "${workspaceFolder}/envs/x86/include"
+                "${workspaceFolder}/envs/x86/include",
+                "${workspaceFolder}/envs/x86/lib"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
