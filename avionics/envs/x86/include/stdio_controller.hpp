@@ -29,7 +29,7 @@ class StdIoController {
     // variables
 
   public:
-    StdIoController() { putConfigPacket(); }
+    // StdIoController() { putConfigPacket(); }
 
     constexpr static uint8_t DEV_NULL = 0;
     /**
@@ -79,6 +79,8 @@ class StdIoController {
         // Data
         for (char const *end = c + length; c != end; c++)
             std::cout.put(*c);
+
+        std::cout << std::flush;
     }
 
     /**
