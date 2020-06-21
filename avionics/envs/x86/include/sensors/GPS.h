@@ -1,7 +1,7 @@
 #pragma once
 
 #include "HAL/port_impl.h"
-#include "sensors-interface.h"
+#include "sensors_interface.h"
 
 /*Variables------------------------------------------------------------*/
 

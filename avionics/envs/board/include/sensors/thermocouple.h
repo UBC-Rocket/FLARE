@@ -7,7 +7,7 @@
 /*Includes------------------------------------------------------------*/
 #include <MAX31855k.h>
 
-#include "sensors-interface.h"
+#include "sensors_interface.h"
 
 /*Constants------------------------------------------------------------*/
 // #define THERMOCOUPLE_STATUS_POSITION 8

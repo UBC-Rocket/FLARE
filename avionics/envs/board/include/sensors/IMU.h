@@ -6,7 +6,7 @@
 /*Includes------------------------------------------------------------*/
 #include "Adafruit_BNO055.h"
 #include "options.h"
-#include "sensors-interface.h"
+#include "sensors_interface.h"
 
 /*Constants------------------------------------------------------------*/
 // #define IMU_STATUS_POSITION 5

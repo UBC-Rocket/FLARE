@@ -72,7 +72,7 @@ PLEASE READ ME!
 #include <HAL/port_impl.h>
 #include <TinyGPS.h>
 
-#include "sensors-interface.h"
+#include "sensors_interface.h"
 
 /*Constants------------------------------------------------------------*/
 

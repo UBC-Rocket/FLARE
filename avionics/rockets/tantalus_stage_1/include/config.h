@@ -71,7 +71,7 @@ static StateInput state_input;
 static StateAuxilliaryInfo state_aux;
 
 /* Sensors */
-#include "sensors-interface.h"
+#include "sensors_interface.h"
 #include "sensors/GPS.h"
 #include "sensors/IMU.h"
 #include "sensors/accelerometer.h"

@@ -4,7 +4,7 @@
  */
 
 /*Includes------------------------------------------------------------*/
-#include "sensors-interface.h"
+#include "sensors_interface.h"
 
 class Accelerometer : public SensorBase<3> {
   public:
