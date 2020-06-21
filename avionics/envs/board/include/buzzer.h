@@ -18,7 +18,7 @@
 #pragma once
 
 /*Includes------------------------------------------------------------*/
-#include "HAL/gpio.h"
+#include "HAL/pin_util.h"
 #include "HAL/time.h"
 #include "buzzer_interface.h"
 

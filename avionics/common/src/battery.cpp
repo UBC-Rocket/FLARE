@@ -16,7 +16,7 @@
  */
 
 #include "battery.h"
-#include "HAL/gpio.h"
+#include "HAL/pin_util.h"
 #include "status.h"
 
 /*Constants------------------------------------------------------------*/

@@ -1,5 +1,5 @@
 /*Includes------------------------------------------------------------*/
-#include <HAL/gpio.h>
+#include <HAL/pin_util.h>
 #include <HAL/time.h>
 
 #include "hardware/ignitor.h"

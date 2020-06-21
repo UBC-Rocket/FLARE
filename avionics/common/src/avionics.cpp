@@ -65,7 +65,7 @@ PLEASE READ ME!
 #include <functional> //for std::reference_wrapper
 #include <string.h>
 
-#include "HAL/gpio.h"
+#include "HAL/pin_util.h"
 #include <HAL/port_impl.h> // <> vs "" for HAL ??
 
 #include "CSVWriteImpl.h"

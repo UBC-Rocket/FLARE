@@ -21,16 +21,22 @@
 
 #pragma once
 
-/*Includes------------------------------------------------------------*/
-
 /*Constants------------------------------------------------------------*/
-#define POWER_STATUS_LED 20 // kept in one place w/ FLIGHT_LED
-#define FLIGHT_LED 21       // required by state machine
-
-constexpr int MELODY_PIN = 3; // required by buzzer
+// Double, triple check pin assignments
+enum class Pin {
+    POWER_LED = 20,  // kept in one place w/ FLIGHT_LED
+    FLIGHT_LED = 21, // required by state machine
+    BUZZER = 3,      // required by buzzer
+    MAIN_IGNITOR = 16,
+    MAIN_CONTINUITY_TEST = 4,
+    MAIN_CONTINUITY_READ = 14,
+    DROGUE_IGNITOR = 35,
+    DROGUE_CONTINUITY_TEST = 17,
+    DROGUE_CONTINUITY_READ = 34
+};
 
 /*Functions------------------------------------------------------------*/
 void initPins(void);
-void deployDrogue(void);
-void deployMain(void);
-bool continuityCheck(void);
+// void deployDrogue(void);
+// void deployMain(void);
+// bool continuityCheck(void);
