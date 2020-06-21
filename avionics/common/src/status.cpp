@@ -23,9 +23,10 @@
 #include "HAL/time.h"
 
 #include "buzzer.h" //for buzzer response on startup
+#include "ignitor_collection.h"
 #include "options.h"
 #include "radio.h"
-#include "state_interface.h"
+#include "sensor_collection.h"
 #include "status.h"
 
 #undef HIGH // TODO - see if there's a better place to undef these codes from
@@ -92,15 +93,9 @@ void displayStatus(RocketStatus status, IBuzzer &buzzer) {
 
 /* clang-format off */ // Clang puts the function name on the next line :/
 RocketStatus collectStatus(SensorCollection &sensors,
-          std::vector<std::reference_wrapper<IIgnitor>> &ignitors) {
+          IgnitorCollection &ignitors) {
     /* clang-format on */
     RocketStatus status = sensors.getStatus();
-
-    for (auto &hw : ignitors) {
-        if (hw.get().getStatus() == HardwareStatus::FAILURE) {
-            status = RocketStatus::CRITICAL_FAILURE;
-            return status;
-        }
-    }
+    raiseToStatus(status, ignitors.getStatus());
     return status;
 }

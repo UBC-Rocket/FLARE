@@ -74,6 +74,7 @@ PLEASE READ ME!
 #include "calculations.h"
 #include "cameras.h"
 #include "gpio.h"
+#include "ignitor_collection.h"
 #include "options.h"
 #include "radio.h"
 #include "sensor_collection.h"
@@ -136,8 +137,10 @@ int main(void) {
     /* init sensors and report status in many ways */
     SensorCollectionPtr sensors_ptr = getSensors();
     SensorCollection &sensors = *sensors_ptr;
+    IgnitorCollectionPtr ignitors_ptr = getIgnitors();
+    IgnitorCollection &ignitors = *ignitors_ptr;
 
-    s_statusOfInit = collectStatus(sensors, hardware);
+    s_statusOfInit = collectStatus(sensors, ignitors);
     displayStatus(s_statusOfInit, buzzer);
 
     Calculator calc(sensors);
