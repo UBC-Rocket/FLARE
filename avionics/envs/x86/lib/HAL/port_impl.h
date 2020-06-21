@@ -14,7 +14,9 @@ class Serial {
     typedef StdIoController StdIO;
 
   public:
-    constexpr Serial(uint8_t const id) : IO_ID_(id), buf_() {}
+    Serial(uint8_t const id)
+        : IO_ID_(id), buf_(),
+          buffer_regular_thread_(&Serial::buffer_send_loop, this) {}
 
     void begin(long baud) {} // no-op for native
     int available() const { return StdIO::available(IO_ID_); }
@@ -34,13 +36,13 @@ class Serial {
   private:
     const uint8_t IO_ID_;
     constexpr static std::size_t BUFFER_SIZE = 1024;
-    constexpr static int SEND_PERIOD_MS = 100;
+    // constexpr static int SEND_PERIOD_MS = 100;
 
     std::array<uint8_t, BUFFER_SIZE> buf_;
     std::size_t buf_used_ = 0;
     bool buf_sent_ = false;
     std::mutex buf_mutex_; // All  3 of the above require this mutex
-
+    std::thread buffer_regular_thread_;
     /**
      * \brief Loops and ensures that data is sent at least at 10 Hz.
      * To be run by another thread. Note that if data is already sent in a given
@@ -48,8 +50,7 @@ class Serial {
      */
     void buffer_send_loop() {
         while (true) {
-            std::this_thread::sleep_for(
-                std::chrono::milliseconds(SEND_PERIOD_MS));
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
             const std::lock_guard<std::mutex> lock(buf_mutex_);
             if (!buf_sent_ && buf_used_ != 0) {
                 send_buffer();
