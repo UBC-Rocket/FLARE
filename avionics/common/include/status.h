@@ -33,6 +33,12 @@ void raiseToStatus(RocketStatus &currentStatus, RocketStatus incomingStatus);
 
 class SensorCollection;
 
-void displayStatus(SensorCollection &sensors,
-                   std::vector<std::reference_wrapper<IIgnitor>> &hardware,
-                   IBuzzer &buzzer);
+/* clang-format off */
+RocketStatus collectStatus(SensorCollection &sensors,
+              std::vector<std::reference_wrapper<IIgnitor>> &ignitors);
+/* clang-format on */
+// void displayStatus(SensorCollection &sensors,
+//                    std::vector<std::reference_wrapper<IIgnitor>> &hardware,
+//                    IBuzzer &buzzer);
+
+void displayStatus(RocketStatus status, IBuzzer &buzzer);

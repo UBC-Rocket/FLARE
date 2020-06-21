@@ -137,7 +137,8 @@ int main(void) {
     SensorCollectionPtr sensors_ptr = getSensors();
     SensorCollection &sensors = *sensors_ptr;
 
-    displayStatus(sensors, hardware, buzzer);
+    s_statusOfInit = collectStatus(sensors, hardware);
+    displayStatus(s_statusOfInit, buzzer);
 
     Calculator calc(sensors);
 

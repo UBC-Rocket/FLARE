@@ -54,13 +54,17 @@
  * @return None
  */
 void initPins(void) {
-    /* Initialize and startup power status LEDs*/
+    /* Initialize and startup power status LEDs */
     Hal::pinMode(Pin::POWER_LED, Hal::PinMode::OUTPUT);
     Hal::digitalWrite(Pin::POWER_LED, Hal::PinDigital::HIGH);
 
-    /* Initialize and startup flight status LEDs*/
+    /* Initialize and startup flight status LEDs */
     Hal::pinMode(Pin::FLIGHT_LED, Hal::PinMode::OUTPUT);
     Hal::digitalWrite(Pin::FLIGHT_LED, Hal::PinDigital::LOW);
+
+    /* Initialize status LED - writing is performed in acutal status evaluation
+     */
+    Hal::pinMode(Pin::STATUS_LED, Hal::PinMode::OUTPUT);
 
     // Ignitor and continuity pins are initialized in the ignitor constructor
 

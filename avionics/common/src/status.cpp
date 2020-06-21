@@ -58,20 +58,21 @@ void raiseToStatus(RocketStatus &currentStatus, RocketStatus incomingStatus) {
  * @param &buzzer - buzzer
  * @return void
  */
-void displayStatus(SensorCollection &sensors,
-                   std::vector<std::reference_wrapper<IIgnitor>> &ignitor,
-                   IBuzzer &buzzer) {
+void displayStatus(RocketStatus status, IBuzzer &buzzer) {
     // TODO: Make response dependent on e-match success
     SongTypes song;
-    switch (sensors.getStatus()) {
+    switch (status) {
     case RocketStatus::NOMINAL:
         song = SongTypes_SUCCESS;
+        Hal::digitalWrite(Pin::STATUS_LED, Hal::PinDigital::HIGH);
         break;
     case RocketStatus::NONCRITICAL_FAILURE:
         song = SongTypes_NONCRITFAIL;
+        // LED blinks - don't bother with specifing STATUS_LED
         break;
     case RocketStatus::CRITICAL_FAILURE:
         song = SongTypes_CRITICALFAIL;
+        Hal::digitalWrite(Pin::STATUS_LED, Hal::PinDigital::LOW);
         break;
     default:
         // Not known - assume the worst
@@ -86,18 +87,16 @@ void displayStatus(SensorCollection &sensors,
         buzzer.sing(song);
         Hal::sleep_ms(400);
     }
-    Hal::pinMode(Pin::BUILTIN_LED, Hal::PinMode::OUTPUT);
-    Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HIGH);
-
     return;
 }
 
-RocketStatus
-getStatus(SensorCollection &sensors,
-          std::vector<std::reference_wrapper<IIgnitor>> &hardware) {
+/* clang-format off */ // Clang puts the function name on the next line :/
+RocketStatus collectStatus(SensorCollection &sensors,
+          std::vector<std::reference_wrapper<IIgnitor>> &ignitors) {
+    /* clang-format on */
     RocketStatus status = sensors.getStatus();
 
-    for (auto hw : hardware) {
+    for (auto &hw : ignitors) {
         if (hw.get().getStatus() == HardwareStatus::FAILURE) {
             status = RocketStatus::CRITICAL_FAILURE;
             return status;
