@@ -4,8 +4,7 @@
 
 #include "hardware/ignitor.h"
 
-Ignitor::Ignitor(uint8_t ignitePin, uint8_t continuityPin,
-                 uint8_t continuityADCPin)
+Ignitor::Ignitor(Pin ignitePin, Pin continuityPin, Pin continuityADCPin)
     : ignitePin_(ignitePin), continuityPin_(continuityPin),
       continuityADCPin_(continuityADCPin) {
     /*init ignitor*/

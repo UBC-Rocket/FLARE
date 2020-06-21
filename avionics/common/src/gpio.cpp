@@ -62,38 +62,40 @@ void initPins(void) {
     Hal::pinMode(Pin::FLIGHT_LED, Hal::PinMode::OUTPUT);
     Hal::digitalWrite(Pin::FLIGHT_LED, Hal::PinDigital::LOW);
 
-    /*init main ignitor*/
-    Hal::pinMode(Pin::IGNITOR, Hal::PinMode::OUTPUT);
-    Hal::digitalWrite(Pin::IGNITOR, Hal::PinDigital::LOW);
+    // Ignitor and continuity pins are initialized in the ignitor constructor
 
-#ifdef TESTING
-    SerialUSB.println("main ignitor pin init low");
-#endif
+    //     /*init main ignitor*/
+    //     Hal::pinMode(Pin::IGNITOR, Hal::PinMode::OUTPUT);
+    //     Hal::digitalWrite(Pin::IGNITOR, Hal::PinDigital::LOW);
 
-    /*init ematch continuity check pins */
-    Hal::pinMode(Pin::MAIN_CONTINUITY_TEST, Hal::PinMode::OUTPUT);
-    Hal::digitalWrite(Pin::MAIN_CONTINUITY_TEST, Hal::PinDigital::LOW);
-    // the ADC read pin does not need to be initialized !!
+    // #ifdef TESTING
+    //     SerialUSB.println("main ignitor pin init low");
+    // #endif
 
-#ifdef TESTING
-    SerialUSB.println("main continuity pins init");
-#endif
+    //     /*init ematch continuity check pins */
+    //     Hal::pinMode(Pin::MAIN_CONTINUITY_TEST, Hal::PinMode::OUTPUT);
+    //     Hal::digitalWrite(Pin::MAIN_CONTINUITY_TEST, Hal::PinDigital::LOW);
+    //     // the ADC read pin does not need to be initialized !!
 
-    /*init drogue ignitor*/
-    Hal::pinMode(Pin::DROGUE_IGNITOR, Hal::PinMode::OUTPUT);
-    Hal::digitalWrite(Pin::DROGUE_IGNITOR, Hal::PinDigital::LOW);
+    // #ifdef TESTING
+    //     SerialUSB.println("main continuity pins init");
+    // #endif
 
-#ifdef TESTING
-    SerialUSB.println("drogue ignitor pin init low");
-#endif
+    //     /*init drogue ignitor*/
+    //     Hal::pinMode(Pin::DROGUE_IGNITOR, Hal::PinMode::OUTPUT);
+    //     Hal::digitalWrite(Pin::DROGUE_IGNITOR, Hal::PinDigital::LOW);
 
-    /*init drogue ematch continuity check pins */
-    Hal::pinMode(Pin::DROGUE_CONTINUITY_TEST, Hal::PinMode::OUTPUT);
-    Hal::digitalWrite(Pin::DROGUE_CONTINUITY_TEST, Hal::PinDigital::LOW);
+    // #ifdef TESTING
+    //     SerialUSB.println("drogue ignitor pin init low");
+    // #endif
 
-#ifdef TESTING
-    SerialUSB.println("drogue continuity pins init");
-#endif
+    //     /*init drogue ematch continuity check pins */
+    //     Hal::pinMode(Pin::DROGUE_CONTINUITY_TEST, Hal::PinMode::OUTPUT);
+    //     Hal::digitalWrite(Pin::DROGUE_CONTINUITY_TEST, Hal::PinDigital::LOW);
+
+    // #ifdef TESTING
+    //     SerialUSB.println("drogue continuity pins init");
+    // #endif
 }
 
 // /**

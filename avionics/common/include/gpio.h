@@ -26,7 +26,8 @@
 enum class Pin {
     POWER_LED = 20,  // kept in one place w/ FLIGHT_LED
     FLIGHT_LED = 21, // required by state machine
-    BUZZER = 3,      // required by buzzer
+    BUILTIN_LED = 13,
+    BUZZER = 3, // required by buzzer
     MAIN_IGNITOR = 16,
     MAIN_CONTINUITY_TEST = 4,
     MAIN_CONTINUITY_READ = 14,

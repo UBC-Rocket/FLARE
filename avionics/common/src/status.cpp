@@ -86,8 +86,8 @@ void displayStatus(SensorCollection &sensors,
         buzzer.sing(song);
         Hal::sleep_ms(400);
     }
-    Hal::pinMode(Hal::LED_BUILTIN(), Hal::PinMode::OUTPUT);
-    Hal::digitalWrite(Hal::LED_BUILTIN(), Hal::PinDigital::HIGH);
+    Hal::pinMode(Pin::BUILTIN_LED, Hal::PinMode::OUTPUT);
+    Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HIGH);
 
     return;
 }

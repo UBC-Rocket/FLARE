@@ -231,8 +231,8 @@ inline void blinkStatusLED() {
         init_st_indicator = !init_st_indicator;
 
         if (init_st_indicator)
-            Hal::digitalWrite(Hal::LED_BUILTIN(), Hal::PinDigital::HIGH);
+            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HIGH);
         else
-            Hal::digitalWrite(Hal::LED_BUILTIN(), Hal::PinDigital::LOW);
+            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LOW);
     }
 }

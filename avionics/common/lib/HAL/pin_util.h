@@ -19,6 +19,6 @@ void pinMode(::Pin pin, PinMode mode);
 void digitalWrite(::Pin pin, PinDigital val);
 int analogRead(::Pin pin);
 
-int LED_BUILTIN(); // function because c++ doesn't have forward declaration of
-                   // variables or something similar
+// int LED_BUILTIN(); // function because c++ doesn't have forward declaration
+// of variables or something similar
 } // namespace Hal

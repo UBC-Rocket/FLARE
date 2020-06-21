@@ -5,6 +5,7 @@
  */
 
 /*Includes------------------------------------------------------------*/
+#include "gpio.h"
 #include "hw-interface.h"
 #include <cstdint>
 
@@ -34,12 +35,12 @@ class Ignitor : public IIgnitor {
      * @param continuityADCPin the pin for the ADC for checking continuity -
      * when testing continuity, the value at this pin is read
      */
-    Ignitor(uint8_t ignitePin, uint8_t continuityPin, uint8_t continuityADCPin);
+    Ignitor(Pin ignitePin, Pin continuityPin, Pin continuityADCPin);
 
     void fire() override;
 
   private:
-    uint8_t ignitePin_;
-    uint8_t continuityPin_;
-    uint8_t continuityADCPin_;
+    Pin ignitePin_;
+    Pin continuityPin_;
+    Pin continuityADCPin_;
 };
