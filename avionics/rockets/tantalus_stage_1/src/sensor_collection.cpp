@@ -6,10 +6,10 @@ SensorCollectionPtr getSensors() {
 }
 
 SensorCollection::SensorCollection()
-    : barometer{BEGIN + BAROMETER_INDEX}, gps{Hal::SerialGPS,
-                                              BEGIN + GPS_INDEX},
-      accelerometer{BEGIN + ACCEL_INDEX}, imuSensor{BEGIN + IMU_INDEX},
-      temperature{BEGIN + TEMP_INDEX} {
+    : barometer(BEGIN + BAROMETER_INDEX),
+      gps(Hal::SerialGPS, BEGIN + GPS_INDEX),
+      accelerometer(BEGIN + ACCEL_INDEX), imuSensor(BEGIN + IMU_INDEX),
+      temperature(BEGIN + TEMP_INDEX) {
     updateStatus();
 }
 

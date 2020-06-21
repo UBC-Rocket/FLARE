@@ -18,7 +18,7 @@ class Serial {
         : IO_ID_(id), buf_(),
           buffer_regular_thread_(&Serial::buffer_send_loop, this) {}
 
-    void begin(long baud) {} // no-op for native
+    void begin(long) {} // no-op for native
     int available() const { return StdIO::available(IO_ID_); }
     int read();
     std::size_t write(const uint8_t *const inbuf, std::size_t const size);

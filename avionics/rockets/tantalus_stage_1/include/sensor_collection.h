@@ -45,7 +45,7 @@ class SensorCollection {
         TEMP_INDEX + Temperature::dataLength();
 
     std::array<float, DATA_LENGTH> sensor_data;
-    float *const &BEGIN = sensor_data.begin();
+    float *const BEGIN = sensor_data.begin();
 
     Status status_;
     uint8_t status_bitfield_[3];
@@ -74,7 +74,7 @@ class SensorCollection {
      * @return void
      */
     Status getStatus(bool refresh = false);
-    const uint8_t *const getStatusBitfield() const { return status_bitfield_; }
+    const uint8_t *getStatusBitfield() const { return status_bitfield_; }
     void updateStatus();
 
     const std::array<float, DATA_LENGTH> &getData() const {
