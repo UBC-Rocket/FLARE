@@ -48,7 +48,7 @@ class SensorCollection {
     float *const BEGIN = sensor_data.begin();
 
     Status status_;
-    uint8_t status_bitfield_[3];
+    uint8_t status_bitfield_[2];
 
   public:
     constexpr static std::size_t NUM_SENSORS = 5;

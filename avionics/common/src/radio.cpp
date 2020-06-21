@@ -30,22 +30,22 @@
 // #include "statemachine.h"
 
 void RadioController::listenAndAct() {
-    m_xbee.readPacket();
+    xbee_.readPacket();
     uint8_t i = 0;
-    while (i < M_MAX_PACKETS_PER_RX_LOOP &&
-           (m_xbee.getResponse().isAvailable() ||
-            m_xbee.getResponse().isError())) {
-        // goes through all m_xbee packets in buffer
+    while (
+        i < M_MAX_PACKETS_PER_RX_LOOP &&
+        (xbee_.getResponse().isAvailable() || xbee_.getResponse().isError())) {
+        // goes through all xbee_ packets in buffer
 
-        if (m_xbee.getResponse()
+        if (xbee_.getResponse()
                 .isError()) { // TODO - figure out whether there's anything we
                               // should do about Xbee errors
             // #ifdef TESTING
-            //     SerialUSB.println("m_Xbee error");
+            //     SerialUSB.println("xbee_ error");
             // #endif
-        } else if (m_xbee.getResponse().getApiId() == ZB_RX_RESPONSE) {
-            // received command from m_xbee
-            m_xbee.getResponse().getZBRxResponse(rx);
+        } else if (xbee_.getResponse().getApiId() == ZB_RX_RESPONSE) {
+            // received command from xbee_
+            xbee_.getResponse().getZBRxResponse(rx);
             uint8_t len = rx.getDataLength();
             uint8_t command;
             for (uint8_t j = 0; j < len; j++) {
@@ -53,17 +53,60 @@ void RadioController::listenAndAct() {
                 // TODO - do something with the command
             }
 
-        } else if (m_xbee.getResponse().getApiId() == ZB_TX_STATUS_RESPONSE) {
+        } else if (xbee_.getResponse().getApiId() == ZB_TX_STATUS_RESPONSE) {
             send();
         }
 
-        m_xbee.readPacket();
+        xbee_.readPacket();
 
         i++;
     }
 }
 
 void RadioController::send() {
-    m_tx_packet.setPayloadLength(m_tx_q.fillPayload(m_payload));
-    m_xbee.send(m_tx_packet);
+    tx_packet_.setPayloadLength(tx_q_.fillPayload(payload_));
+    xbee_.send(tx_packet_);
+}
+
+void RadioController::sendStatus(uint32_t time, Status status,
+                                 SensorCollection &sensors) {
+    SubPktPtr buf(new std::vector<uint8_t>);
+    buf->resize(8);
+
+    setupIdTime(buf.get(), Ids::status_ping, time);
+
+    *(buf->data() + 5) = static_cast<uint8_t>(status);
+
+    *(buf->data() + 6) = *sensors.getStatusBitfield();
+    *(buf->data() + 7) = *(sensors.getStatusBitfield() + 1);
+
+    // TODO Include status of E-match components
+    addSubpacket(std::move(buf));
+}
+
+void RadioController::sendBulkSensor(uint32_t time, float alt,
+                                     Accelerometer &xl, IMU imu, GPS gps,
+                                     uint8_t state_id) {
+    SubPktPtr buf(new std::vector<uint8_t>);
+    buf->resize(42);
+
+    setupIdTime(buf.get(), Ids::bulk_sensor, time);
+
+    // Altitude
+    std::memcpy(buf->data() + 5, &alt, 4);
+
+    // Accelerometer
+    std::memcpy(buf->data() + 9, xl.getData(), 12);
+
+    // IMU // TODO - check that these are the correct 3 floats to send for
+    // orientation
+    std::memcpy(buf->data() + 21, imu.getData(), 12);
+
+    // GPS
+    std::memcpy(buf->data() + 33, gps.getData(), 8);
+
+    // State
+    std::memcpy(buf->data() + 41, &state_id, 1);
+
+    addSubpacket(std::move(buf));
 }
