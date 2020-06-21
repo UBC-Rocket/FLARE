@@ -46,17 +46,19 @@ class RadioController {
   public:
     /**
      * @brief Constructor.
-     * @param MAX_QUEUED_BYTES Maximum number of subpacket data bytes to queue
-     * before dropping the oldest subpackets.
      * @param SERIAL_RADIO Uninitialized HardwareSerial used for radio (e.g.
      * SerialRadio)
+     * @param MAX_QUEUED_BYTES Maximum number of subpacket data bytes to queue
+     * before dropping the oldest subpackets.
+     * @param MAX_PACKETS_PER_RX_LOOP Maximum number of packets to send every
+     * time listenAndAct() is called.
      */
     RadioController(Hal::Serial &serial_radio,
                     unsigned short const MAX_QUEUED_BYTES = 800,
                     uint8_t const MAX_PACKETS_PER_RX_LOOP = 8)
-        : tx_q_(MAX_QUEUED_BYTES),
-          gnd_addr_(XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB)),
-          M_MAX_PACKETS_PER_RX_LOOP(MAX_PACKETS_PER_RX_LOOP) {
+        : gnd_addr_(XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB)),
+          tx_q_(MAX_QUEUED_BYTES),
+          MAX_PACKETS_PER_RX_LOOP_(MAX_PACKETS_PER_RX_LOOP) {
 
         serial_radio.begin(RADIO_BAUD_RATE);
         while (!serial_radio)
@@ -89,7 +91,8 @@ class RadioController {
      * @param sensors Sensor collection, from which detailed status information
      * is extracted
      */
-    void sendStatus(uint32_t time, Status status, SensorCollection &sensors);
+    void sendStatus(uint32_t time, RocketStatus status,
+                    SensorCollection &sensors);
 
     /**
      * @brief Helper function to send bulk sensor data.
@@ -125,6 +128,6 @@ class RadioController {
     RadioQueue tx_q_; // the [ueue] is silent :)
     uint8_t payload_[RADIO_MAX_SUBPACKET_SIZE];
 
-    const uint8_t M_MAX_PACKETS_PER_RX_LOOP;
+    const uint8_t MAX_PACKETS_PER_RX_LOOP_;
     void send();
 };

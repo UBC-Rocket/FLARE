@@ -39,7 +39,7 @@ class Battery {
      * @param  None
      * @return Status - battery status
      */
-    Status getStatus();
+    ComponentStatus getStatus();
 
   private:
     float m_divider;

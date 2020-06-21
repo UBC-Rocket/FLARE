@@ -92,4 +92,4 @@ constexpr uint8_t TEMPERATURE = 4;
 
 // TODO: Add ignitor to hardware vector with proper pin initialization
 
-std::vector<std::reference_wrapper<IParachute>> hardware;
+std::vector<std::reference_wrapper<IIgnitor>> hardware;

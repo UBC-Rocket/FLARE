@@ -47,7 +47,7 @@ class SensorCollection {
     std::array<float, DATA_LENGTH> sensor_data;
     float *const BEGIN = sensor_data.begin();
 
-    Status status_;
+    RocketStatus status_;
     uint8_t status_bitfield_[2];
 
   public:
@@ -73,7 +73,7 @@ class SensorCollection {
      * @param bool refresh If true, refreshes the status.
      * @return void
      */
-    Status getStatus(bool refresh = false);
+    RocketStatus getStatus(bool refresh = false);
     const uint8_t *getStatusBitfield() const { return status_bitfield_; }
     void updateStatus();
 

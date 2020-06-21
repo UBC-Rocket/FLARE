@@ -50,7 +50,7 @@ float Battery::getVoltage() {
     return batteryVoltage;
 }
 
-Status Battery::getStatus() {
+ComponentStatus Battery::getStatus() {
     float voltage = getVoltage();
     if (voltage < MINIMUM_BATTERY_VOLTAGE)
         return Status::CRITICAL_FAILURE;

@@ -22,7 +22,7 @@ void SensorCollection::poll(Hal::t_point &timestamp) {
     temperature.readData();
 }
 
-Status SensorCollection::getStatus(bool refresh) {
+RocketStatus SensorCollection::getStatus(bool refresh) {
     if (refresh) {
         updateStatus();
     }
@@ -30,27 +30,27 @@ Status SensorCollection::getStatus(bool refresh) {
 }
 
 void SensorCollection::updateStatus() {
-    status_ = Status::NOMINAL;
+    status_ = RocketStatus::NOMINAL;
     status_bitfield_[0] = 0;
     if (barometer.getStatus() == SensorStatus::FAILURE) {
-        raiseToStatus(status_, Status::CRITICAL_FAILURE);
+        raiseToStatus(status_, RocketStatus::CRITICAL_FAILURE);
         *status_bitfield_ |= 0x80;
     }
 
     if (gps.getStatus() == SensorStatus::FAILURE) {
-        raiseToStatus(status_, Status::NONCRITICAL_FAILURE);
+        raiseToStatus(status_, RocketStatus::NONCRITICAL_FAILURE);
         *status_bitfield_ |= 0x40;
     }
     if (accelerometer.getStatus() == SensorStatus::FAILURE) {
-        raiseToStatus(status_, Status::NONCRITICAL_FAILURE);
+        raiseToStatus(status_, RocketStatus::NONCRITICAL_FAILURE);
         *status_bitfield_ |= 0x20;
     }
     if (imuSensor.getStatus() == SensorStatus::FAILURE) {
-        raiseToStatus(status_, Status::NONCRITICAL_FAILURE);
+        raiseToStatus(status_, RocketStatus::NONCRITICAL_FAILURE);
         *status_bitfield_ |= 0x10;
     }
     if (temperature.getStatus() == SensorStatus::FAILURE) {
-        raiseToStatus(status_, Status::NONCRITICAL_FAILURE);
+        raiseToStatus(status_, RocketStatus::NONCRITICAL_FAILURE);
         *status_bitfield_ |= 0x08;
     }
 }

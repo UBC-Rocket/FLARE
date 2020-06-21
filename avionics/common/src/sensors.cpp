@@ -45,7 +45,7 @@
  * @return void
  */
 
-void raiseToStatus(Status &currentStatus, Status incomingStatus) {
+void raiseToStatus(RocketStatus &currentStatus, RocketStatus incomingStatus) {
     if (incomingStatus > currentStatus) {
         currentStatus = incomingStatus;
     }
@@ -54,23 +54,23 @@ void raiseToStatus(Status &currentStatus, Status incomingStatus) {
 /**
  * @brief  Reports status with buzzer tune and LED.
  * @param SensorCollection &sensors - collection of sensors
- * @param &hardware - collection of e-matches
+ * @param &ignitor - collection of e-matches
  * @param &buzzer - buzzer
  * @return void
  */
 void displayStatus(SensorCollection &sensors,
-                   std::vector<std::reference_wrapper<IParachute>> &hardware,
+                   std::vector<std::reference_wrapper<IIgnitor>> &ignitor,
                    IBuzzer &buzzer) {
     // TODO: Make response dependent on e-match success
     SongTypes song;
     switch (sensors.getStatus()) {
-    case Status::NOMINAL:
+    case RocketStatus::NOMINAL:
         song = SongTypes_SUCCESS;
         break;
-    case Status::NONCRITICAL_FAILURE:
+    case RocketStatus::NONCRITICAL_FAILURE:
         song = SongTypes_NONCRITFAIL;
         break;
-    case Status::CRITICAL_FAILURE:
+    case RocketStatus::CRITICAL_FAILURE:
         song = SongTypes_CRITICALFAIL;
         break;
     default:
@@ -92,13 +92,14 @@ void displayStatus(SensorCollection &sensors,
     return;
 }
 
-Status getStatus(SensorCollection &sensors,
-                 std::vector<std::reference_wrapper<IParachute>> &hardware) {
-    Status status = sensors.getStatus();
+RocketStatus
+getStatus(SensorCollection &sensors,
+          std::vector<std::reference_wrapper<IIgnitor>> &hardware) {
+    RocketStatus status = sensors.getStatus();
 
     for (auto hw : hardware) {
         if (hw.get().getStatus() == HardwareStatus::FAILURE) {
-            status = Status::CRITICAL_FAILURE;
+            status = RocketStatus::CRITICAL_FAILURE;
             return status;
         }
     }

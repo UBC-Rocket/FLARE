@@ -104,7 +104,7 @@ PLEASE READ ME!
 #endif
 
 /* Variables------------------------------------------------------------*/
-static Status s_statusOfInit;
+static RocketStatus s_statusOfInit;
 
 /* Functions------------------------------------------------------------*/
 void blinkStatusLED();
@@ -169,7 +169,7 @@ int main(void) {
 
         // makes sure that even if it does somehow get accidentally changed,
         // it gets reverted
-        if (s_statusOfInit == Status::CRITICAL_FAILURE)
+        if (s_statusOfInit == RocketStatus::CRITICAL_FAILURE)
             state = StateId::WINTER_CONTINGENCY;
 
         radio.listenAndAct();
@@ -225,7 +225,7 @@ inline void blinkStatusLED() {
     static const Hal::ms init_st_time_interval(500);
     static bool init_st_indicator = false;
 
-    if (s_statusOfInit == Status::NONCRITICAL_FAILURE &&
+    if (s_statusOfInit == RocketStatus::NONCRITICAL_FAILURE &&
         Hal::now_ms() - init_st_old_time > init_st_time_interval) {
         init_st_old_time = Hal::now_ms();
         init_st_indicator = !init_st_indicator;

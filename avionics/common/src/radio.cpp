@@ -32,9 +32,8 @@
 void RadioController::listenAndAct() {
     xbee_.readPacket();
     uint8_t i = 0;
-    while (
-        i < M_MAX_PACKETS_PER_RX_LOOP &&
-        (xbee_.getResponse().isAvailable() || xbee_.getResponse().isError())) {
+    while (i < MAX_PACKETS_PER_RX_LOOP_ && (xbee_.getResponse().isAvailable() ||
+                                            xbee_.getResponse().isError())) {
         // goes through all xbee_ packets in buffer
 
         if (xbee_.getResponse()
@@ -68,7 +67,7 @@ void RadioController::send() {
     xbee_.send(tx_packet_);
 }
 
-void RadioController::sendStatus(uint32_t time, Status status,
+void RadioController::sendStatus(uint32_t time, RocketStatus status,
                                  SensorCollection &sensors) {
     SubPktPtr buf(new std::vector<uint8_t>);
     buf->resize(8);
