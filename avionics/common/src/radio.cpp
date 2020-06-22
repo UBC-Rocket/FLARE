@@ -20,7 +20,9 @@
 #include <algorithm> //for std::copy
 #include <utility>   //for std::move
 
+#include "ignitor_collection.h"
 #include "radio.h"
+#include "sensor_collection.h"
 
 // #include "cameras.h"
 // #include "gpio.h"
@@ -68,7 +70,8 @@ void RadioController::send() {
 }
 
 void RadioController::sendStatus(uint32_t time, RocketStatus status,
-                                 SensorCollection &sensors) {
+                                 SensorCollection &sensors,
+                                 IgnitorCollection &ignitors) {
     SubPktPtr buf(new std::vector<uint8_t>);
     buf->resize(8);
 
@@ -78,6 +81,8 @@ void RadioController::sendStatus(uint32_t time, RocketStatus status,
 
     *(buf->data() + 6) = *sensors.getStatusBitfield();
     *(buf->data() + 7) = *(sensors.getStatusBitfield() + 1);
+    *(buf->data() + 8) = *ignitors.getStatusBitfield();
+    *(buf->data() + 9) = *(ignitors.getStatusBitfield() + 1);
 
     // TODO Include status of E-match components
     addSubpacket(std::move(buf));

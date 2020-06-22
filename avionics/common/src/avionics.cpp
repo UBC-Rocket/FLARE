@@ -163,7 +163,8 @@ int main(void) {
     Hal::ms time_interval(NOMINAL_POLLING_TIME_INTERVAL); // ms
     Hal::t_point radio_old_time = Hal::now_ms();
     Hal::ms radio_t_interval(500); // ms //TODO - make 500 a constant somewhere
-
+    radio.sendStatus(old_time.time_since_epoch().count(), s_statusOfInit,
+                     sensors, ignitors);
     for (;;) {
         new_time = Hal::now_ms();
         new_time_int =

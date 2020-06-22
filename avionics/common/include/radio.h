@@ -22,6 +22,7 @@
 #include <stdint.h>
 
 #include "XBee.h"
+#include "ignitor_collection.h"
 #include "radio_queue.h"
 #include "sensor_collection.h"
 #include "sensors/GPS.h"
@@ -92,7 +93,7 @@ class RadioController {
      * is extracted
      */
     void sendStatus(uint32_t time, RocketStatus status,
-                    SensorCollection &sensors);
+                    SensorCollection &sensors, IgnitorCollection &ignitors);
 
     /**
      * @brief Helper function to send bulk sensor data.
