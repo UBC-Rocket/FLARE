@@ -3,9 +3,9 @@
  * Generic Hardware Interface
  */
 
-enum class HardwareStatus { NOMINAL, FAILURE };
+#include "status_enums.h"
 
-class IParachute {
+class IIgnitor {
   public:
     /**
      * @brief initializes hardware
@@ -24,12 +24,12 @@ class IParachute {
      * @brief returns true if parachute works, false otherwise
      * @return boolean
      */
-    virtual bool isWorking() = 0;
+    // virtual bool isWorking() = 0;
 
     /**
-     * @brief activates the hardware
+     * @brief fires the ignitor
      */
-    virtual void activate() = 0;
+    virtual void fire() = 0;
 
   protected:
     HardwareStatus status;

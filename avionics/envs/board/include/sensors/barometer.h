@@ -5,7 +5,7 @@
 
 /*Includes------------------------------------------------------------*/
 #include "MS5803_01.h" // Barometer
-#include "sensors-interface.h"
+#include "sensors_interface.h"
 
 /*Constants------------------------------------------------------------*/
 // #define BAROMETER_STATUS_POSITION 3

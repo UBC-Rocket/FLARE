@@ -71,6 +71,10 @@
         "string": "cpp",
         "string_view": "cpp",
         "variant": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "hash_map": "cpp",
+        "hash_set": "cpp",
+        "unordered_set": "cpp",
+        "*.inc": "cpp"
     }
 }

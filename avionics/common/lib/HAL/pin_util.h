@@ -7,6 +7,7 @@
 #undef HIGH
 #undef LED_BUILTIN
 
+#include "gpio.h"
 #include <cstdint>
 
 namespace Hal {
@@ -14,12 +15,10 @@ enum class PinMode { INPUT = 0, OUTPUT = 1 };
 
 enum class PinDigital { LOW = 0, HIGH = 1 };
 
-void pinMode(uint8_t pin, PinMode mode);
+void pinMode(::Pin pin, PinMode mode);
+void digitalWrite(::Pin pin, PinDigital val);
+int analogRead(::Pin pin);
 
-void digitalWrite(uint8_t pin, PinDigital val);
-
-int analogRead(uint8_t pin);
-
-int LED_BUILTIN(); // function because c++ doesn't have forward declaration of
-                   // variables or something similar
+// int LED_BUILTIN(); // function because c++ doesn't have forward declaration
+// of variables or something similar
 } // namespace Hal

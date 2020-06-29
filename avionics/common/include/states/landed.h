@@ -22,8 +22,7 @@ class Landed : public IState {
      * @return State enumeration code, to be passed into the std::map between
      * codes and used states. Note that the returned code may be the same state.
      */
-    StateId getNewState(const StateInput &input,
-                        StateAuxilliaryInfo &state_aux) {
+    StateId getNewState(const StateInput &, StateAuxilliaryInfo &) {
         return StateId::LANDED;
     }
 };

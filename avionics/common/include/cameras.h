@@ -38,9 +38,9 @@ class Camera {
         Hal::sleep_ms(2000);
         stop_record();
     }
-    void const power_cameras(); // a toggle switch
-    void const start_record();
-    void const stop_record();
+    void power_cameras(); // a toggle switch
+    void start_record();
+    void stop_record();
 
   private:
     uint8_t crc_calculator(uint8_t *command, uint8_t len);

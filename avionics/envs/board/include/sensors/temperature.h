@@ -5,7 +5,7 @@
 
 /*Includes------------------------------------------------------------*/
 #include "SparkFunTMP102.h" // Temperature
-#include "sensors-interface.h"
+#include "sensors_interface.h"
 
 /*Constants------------------------------------------------------------*/
 // #define TEMPERATURE_STATUS_POSITION 4

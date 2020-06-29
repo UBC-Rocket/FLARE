@@ -5,7 +5,7 @@
  */
 
 /*Includes------------------------------------------------------------*/
-#include "sensors-interface.h"
+#include "sensors_interface.h"
 
 class IMU : public SensorBase<4> {
     //   private:

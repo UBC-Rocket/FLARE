@@ -1,17 +1,20 @@
-#include "HAL/time.h"
 #include "states/main_descent.h"
+#include "HAL/time.h"
 
-StateId State::MainDescent::getNewState(const StateInput &input, StateAuxilliaryInfo &state_aux){
+StateId State::MainDescent::getNewState(const StateInput &input,
+                                        StateAuxilliaryInfo &) {
     static float prev_altitude = input.altitude;
-    static auto prev_time = Hal::now_ms(); //time_point
+    static auto prev_time = Hal::now_ms(); // time_point
     static auto curr_time = Hal::now_ms();
     static uint8_t num_checks = 0;
 
     typedef std::chrono::milliseconds ms;
 
-    if(curr_time - prev_time >= M_LANDED_TIME_INTERVAL) {
-        auto dt_ms = std::chrono::duration_cast<ms>(curr_time - prev_time).count();
-        if (abs(input.altitude - prev_altitude) * 1000 / dt_ms < M_LANDED_VELOCITY){
+    if (curr_time - prev_time >= M_LANDED_TIME_INTERVAL) {
+        auto dt_ms =
+            std::chrono::duration_cast<ms>(curr_time - prev_time).count();
+        if (abs(input.altitude - prev_altitude) * 1000 / dt_ms <
+            M_LANDED_VELOCITY) {
             num_checks++;
         } else {
             num_checks = 0;
@@ -25,4 +28,3 @@ StateId State::MainDescent::getNewState(const StateInput &input, StateAuxilliary
 
     return StateId::LANDED;
 }
-

@@ -5,7 +5,7 @@
 #include <functional> //for std::reference_wrapper
 #include <vector>     //for std::vector
 
-enum class SensorStatus { NOMINAL, FAILURE };
+#include "status_enums.h"
 
 /**
  * @brief enum of all sensors

@@ -65,7 +65,7 @@ PLEASE READ ME!
 #include <functional> //for std::reference_wrapper
 #include <string.h>
 
-#include "HAL/gpio.h"
+#include "HAL/pin_util.h"
 #include <HAL/port_impl.h> // <> vs "" for HAL ??
 
 #include "CSVWriteImpl.h"
@@ -74,6 +74,7 @@ PLEASE READ ME!
 #include "calculations.h"
 #include "cameras.h"
 #include "gpio.h"
+#include "ignitor_collection.h"
 #include "options.h"
 #include "radio.h"
 #include "sensor_collection.h"
@@ -104,7 +105,7 @@ PLEASE READ ME!
 #endif
 
 /* Variables------------------------------------------------------------*/
-static Status s_statusOfInit;
+static RocketStatus s_statusOfInit;
 
 /* Functions------------------------------------------------------------*/
 void blinkStatusLED();
@@ -136,8 +137,11 @@ int main(void) {
     /* init sensors and report status in many ways */
     SensorCollectionPtr sensors_ptr = getSensors();
     SensorCollection &sensors = *sensors_ptr;
+    IgnitorCollectionPtr ignitors_ptr = getIgnitors();
+    IgnitorCollection &ignitors = *ignitors_ptr;
 
-    displayStatus(sensors, hardware, buzzer);
+    s_statusOfInit = collectStatus(sensors, ignitors);
+    displayStatus(s_statusOfInit, buzzer);
 
     Calculator calc(sensors);
 
@@ -159,7 +163,8 @@ int main(void) {
     Hal::ms time_interval(NOMINAL_POLLING_TIME_INTERVAL); // ms
     Hal::t_point radio_old_time = Hal::now_ms();
     Hal::ms radio_t_interval(500); // ms //TODO - make 500 a constant somewhere
-
+    radio.sendStatus(old_time.time_since_epoch().count(), s_statusOfInit,
+                     sensors, ignitors);
     for (;;) {
         new_time = Hal::now_ms();
         new_time_int =
@@ -169,7 +174,7 @@ int main(void) {
 
         // makes sure that even if it does somehow get accidentally changed,
         // it gets reverted
-        if (s_statusOfInit == Status::CRITICAL_FAILURE)
+        if (s_statusOfInit == RocketStatus::CRITICAL_FAILURE)
             state = StateId::WINTER_CONTINGENCY;
 
         radio.listenAndAct();
@@ -225,14 +230,14 @@ inline void blinkStatusLED() {
     static const Hal::ms init_st_time_interval(500);
     static bool init_st_indicator = false;
 
-    if (s_statusOfInit == Status::NONCRITICAL_FAILURE &&
+    if (s_statusOfInit == RocketStatus::NONCRITICAL_FAILURE &&
         Hal::now_ms() - init_st_old_time > init_st_time_interval) {
         init_st_old_time = Hal::now_ms();
         init_st_indicator = !init_st_indicator;
 
         if (init_st_indicator)
-            Hal::digitalWrite(Hal::LED_BUILTIN(), Hal::PinDigital::HIGH);
+            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HIGH);
         else
-            Hal::digitalWrite(Hal::LED_BUILTIN(), Hal::PinDigital::LOW);
+            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LOW);
     }
 }

@@ -7,7 +7,7 @@
 /*Includes------------------------------------------------------------*/
 #include "../env_config.h"
 #include "../sensor_data.hpp"
-#include "sensors-interface.h"
+#include "sensors_interface.h"
 
 /*Constants------------------------------------------------------------*/
 

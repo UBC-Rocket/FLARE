@@ -19,13 +19,14 @@
  */
 
 /*Includes------------------------------------------------------------*/
-#include "HAL/gpio.h"
+#include "HAL/pin_util.h"
 #include "HAL/time.h"
 
 #include "buzzer.h" //for buzzer response on startup
+#include "ignitor_collection.h"
 #include "options.h"
 #include "radio.h"
-#include "state_interface.h"
+#include "sensor_collection.h"
 #include "status.h"
 
 #undef HIGH // TODO - see if there's a better place to undef these codes from
@@ -45,7 +46,7 @@
  * @return void
  */
 
-void raiseToStatus(Status &currentStatus, Status incomingStatus) {
+void raiseToStatus(RocketStatus &currentStatus, RocketStatus incomingStatus) {
     if (incomingStatus > currentStatus) {
         currentStatus = incomingStatus;
     }
@@ -54,24 +55,25 @@ void raiseToStatus(Status &currentStatus, Status incomingStatus) {
 /**
  * @brief  Reports status with buzzer tune and LED.
  * @param SensorCollection &sensors - collection of sensors
- * @param &hardware - collection of e-matches
+ * @param &ignitor - collection of e-matches
  * @param &buzzer - buzzer
  * @return void
  */
-void displayStatus(SensorCollection &sensors,
-                   std::vector<std::reference_wrapper<IParachute>> &hardware,
-                   IBuzzer &buzzer) {
+void displayStatus(RocketStatus status, IBuzzer &buzzer) {
     // TODO: Make response dependent on e-match success
     SongTypes song;
-    switch (sensors.getStatus()) {
-    case Status::NOMINAL:
+    switch (status) {
+    case RocketStatus::NOMINAL:
         song = SongTypes_SUCCESS;
+        Hal::digitalWrite(Pin::STATUS_LED, Hal::PinDigital::HIGH);
         break;
-    case Status::NONCRITICAL_FAILURE:
+    case RocketStatus::NONCRITICAL_FAILURE:
         song = SongTypes_NONCRITFAIL;
+        // LED blinks - don't bother with specifing STATUS_LED
         break;
-    case Status::CRITICAL_FAILURE:
+    case RocketStatus::CRITICAL_FAILURE:
         song = SongTypes_CRITICALFAIL;
+        Hal::digitalWrite(Pin::STATUS_LED, Hal::PinDigital::LOW);
         break;
     default:
         // Not known - assume the worst
@@ -87,20 +89,13 @@ void displayStatus(SensorCollection &sensors,
         Hal::sleep_ms(400);
     }
     return;
-
-    Hal::pinMode(Hal::LED_BUILTIN(), Hal::PinMode::OUTPUT);
-    Hal::digitalWrite(Hal::LED_BUILTIN(), Hal::PinDigital::HIGH);
 }
 
-Status getStatus(SensorCollection &sensors,
-                 std::vector<std::reference_wrapper<IParachute>> &hardware) {
-    Status status = sensors.getStatus();
-
-    for (auto hw : hardware) {
-        if (hw.get().getStatus() == HardwareStatus::FAILURE) {
-            status = Status::CRITICAL_FAILURE;
-            return status;
-        }
-    }
+/* clang-format off */ // Clang puts the function name on the next line :/
+RocketStatus collectStatus(SensorCollection &sensors,
+          IgnitorCollection &ignitors) {
+    /* clang-format on */
+    RocketStatus status = sensors.getStatus();
+    raiseToStatus(status, ignitors.getStatus());
     return status;
 }

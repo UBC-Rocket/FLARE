@@ -6,7 +6,7 @@
 
 /*Includes------------------------------------------------------------*/
 #include "SparkFun_LIS331.h" // Accelerometer
-#include "sensors-interface.h"
+#include "sensors_interface.h"
 
 /*Constants------------------------------------------------------------*/
 // #define ACCELEROMETER_STATUS_POSITION 2

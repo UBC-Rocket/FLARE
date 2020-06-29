@@ -1,12 +1,17 @@
+# file(GLOB common_files ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
+
 target_sources( 
     TantalusStage1
     PRIVATE
-        # ${CMAKE_CURRENT_LIST_DIR}/src/battery.cpp
-        # ${CMAKE_CURRENT_LIST_DIR}/src/calculations.cpp
+        # ${common_files}
         ${CMAKE_CURRENT_LIST_DIR}/src/cameras.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/gpio.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/ignitor_collection.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/radio.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/radio_queue.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/sensors.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/status.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/XBee.cpp
+
         ${CMAKE_CURRENT_LIST_DIR}/src/states/armed.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/states/ascent_to_apogee.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/states/drogue_descent.cpp
@@ -16,5 +21,6 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/src/states/pre_air_start_coast_timed.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/states/pressure_delay.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/states/standby.cpp
+        
         ${CMAKE_CURRENT_LIST_DIR}/src/hardware/ignitor.cpp
 )
