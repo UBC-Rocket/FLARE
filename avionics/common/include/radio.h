@@ -28,7 +28,6 @@
 #include "sensors/GPS.h"
 #include "sensors/IMU.h"
 #include "sensors/accelerometer.h"
-#include "statemachine.h"
 
 /*Constants------------------------------------------------------------*/
 /* radio addressing */

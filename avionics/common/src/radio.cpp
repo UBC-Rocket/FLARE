@@ -29,7 +29,6 @@
 // #include "options.h"
 // #include "satcom.h"
 // #include "buzzer.h"
-// #include "statemachine.h"
 
 void RadioController::listenAndAct() {
     xbee_.readPacket();

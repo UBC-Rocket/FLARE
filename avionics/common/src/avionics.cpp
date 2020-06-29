@@ -78,7 +78,6 @@ PLEASE READ ME!
 #include "options.h"
 #include "radio.h"
 #include "sensor_collection.h"
-#include "statemachine.h"
 #include "status.h"
 
 #include "config.h"
@@ -113,6 +112,9 @@ void blinkStatusLED();
 int main(void) {
     // Before anything else there's some environment specific setup to be done
     env_initialize();
+
+    constexpr unsigned int LANDED_POLLING_TIME_INTERVAL = 5000; // ms
+    constexpr unsigned int NOMINAL_POLLING_TIME_INTERVAL = 50;  // ms
 
     static Buzzer buzzer;
     Camera cam(Hal::SerialCamera);
