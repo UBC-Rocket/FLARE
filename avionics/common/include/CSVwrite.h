@@ -65,7 +65,7 @@ template <typename Impl> class CSVWrite {
         for (auto dat : sensors.getData()) {
             print(dat);
         }
-        print('\n');
+        m_datalog.print('\n');
         flush();
     }
 
