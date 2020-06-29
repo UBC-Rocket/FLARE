@@ -46,10 +46,10 @@ template <typename Impl> class CSVWrite {
      * @param sensors the sensors to log data from
      * @param state rocket flight state
      * @param altitude Calculated rocket altitude, after filtering
-     * @param baseline_pressure Pressure used as "ground level"
+     * @param baseline_alt Altitude (m) above sea level at the launch site.
      */
     void logData(unsigned long timestamp, SensorCollection &sensors,
-                 StateId state, float altitude, float baseline_pressure) {
+                 StateId state, float altitude, float baseline_alt) {
 
         /*
          * SD Card data layout:
@@ -59,7 +59,7 @@ template <typename Impl> class CSVWrite {
         print(timestamp);
         print(state);
         print(altitude);
-        print(baseline_pressure);
+        print(baseline_alt);
 
         // Print Sensor Data
         for (auto dat : sensors.getData()) {

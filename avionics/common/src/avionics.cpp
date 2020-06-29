@@ -195,15 +195,11 @@ int main(void) {
 
             calc.calculateValues(state, state_input, new_time);
             altitude = state_input.altitude;
-            // TODO - This is temporary fix for logData;
-            // should instead do something else.
 
             state = state_hash_map[state]->getNewState(state_input, state_aux);
 
-            datalog.logData(new_time_int, sensors, state, altitude, 0);
-            // TODO - think some more about data logging and
-            // how it should mesh with calculations, and
-            // also get rid of baseline_pressure
+            datalog.logData(new_time_int, sensors, state, altitude,
+                            calc.getBaseAltitude());
         }
 
         if (new_time - radio_old_time >= radio_t_interval) {
