@@ -111,12 +111,11 @@ static RocketStatus s_statusOfInit;
 void blinkStatusLED();
 
 int main(void) {
-    constexpr char LOG_FILE_NAME[] = "datalog.csv";
-    CSVWrite<CSVWriteImpl> datalog;
+    // Before anything else there's some environment specific setup to be done
+    env_initialize();
+
     static Buzzer buzzer;
     Camera cam(Hal::SerialCamera);
-
-    env_initialize();
 
     static RadioController radio = RadioController(Hal::SerialRadio);
 
@@ -132,7 +131,8 @@ int main(void) {
 #endif
 
     /* init log file */
-    datalog.init(LOG_FILE_NAME);
+    constexpr char LOG_FILE_NAME[] = "datalog.csv";
+    CSVWrite<CSVWriteImpl> datalog(LOG_FILE_NAME);
 
     /* init sensors and report status in many ways */
     SensorCollectionPtr sensors_ptr = getSensors();

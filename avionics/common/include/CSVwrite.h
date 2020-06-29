@@ -25,10 +25,15 @@ method that flushes the buffer.
 template <typename Impl> class CSVWrite {
   public:
     /**
-     * @brief initializes the SD card connection
-     * @return false if the sensor fails to initialize
+     * @brief Constructor
+     * @param filename Name of the file to log data to.
      */
-    bool init(const char *filename) { return m_datalog.init(filename); }
+    CSVWrite(const char *filename) { ok_ = m_datalog.init(filename); }
+
+    /**
+     * @brief Returns true if initialization was successful.
+     */
+    bool ok() { return ok_; }
 
     /**
      * @brief flushes the cached data to the SD card
@@ -127,4 +132,5 @@ template <typename Impl> class CSVWrite {
 
     // File m_datalog;
     Impl m_datalog;
+    bool ok_;
 };
