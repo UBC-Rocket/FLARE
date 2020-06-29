@@ -52,6 +52,10 @@ class SensorCollection {
 
   public:
     constexpr static std::size_t NUM_SENSORS = 5;
+    constexpr static char LOG_FILE_HEADER[] =
+        "Pressure (mbar), Barom. Temp (C), GPS (lat), GPS (long), GPS (alt), "
+        "Accel (x)(g), Accel (y)(g), Accel (z)(g), IMU (w), IMU(x), IMU(y), "
+        "IMU(z), Temperature (C),";
 
     Barometer barometer;
     GPS gps;

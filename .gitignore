@@ -3,3 +3,4 @@
 /common/build/*
 *.DS_Store
 
+*.csv

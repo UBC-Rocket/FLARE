@@ -22,13 +22,29 @@ method that flushes the buffer.
 // TODO: Add Impl class or integrate in this class.
 // TODO: Figure out how to interface with SD Card
 
+constexpr char SensorCollection::LOG_FILE_HEADER[];
+// https://stackoverflow.com/questions/8016780/undefined-reference-to-static-constexpr-char
+// :/
+
 template <typename Impl> class CSVWrite {
   public:
     /**
      * @brief Constructor
      * @param filename Name of the file to log data to.
      */
-    CSVWrite(const char *filename) { ok_ = m_datalog.init(filename); }
+    CSVWrite(const char *filename) {
+        ok_ = m_datalog.init(filename);
+        if (!ok_)
+            return;
+
+        // Header
+        print("Timestamp (ms)");
+        print("State");
+        print("Altitude (m)");
+        print("Baseline altitude (m)");
+        m_datalog.print(SensorCollection::LOG_FILE_HEADER);
+        m_datalog.print('\n');
+    }
 
     /**
      * @brief Returns true if initialization was successful.

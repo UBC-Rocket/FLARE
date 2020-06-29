@@ -130,15 +130,17 @@ int main(void) {
     SerialUSB.println("Initializing...");
 #endif
 
+    /* init sensors*/
+    SensorCollectionPtr sensors_ptr = getSensors();
+    SensorCollection &sensors = *sensors_ptr;
+
+    /* init ignitors*/
+    IgnitorCollectionPtr ignitors_ptr = getIgnitors();
+    IgnitorCollection &ignitors = *ignitors_ptr;
+
     /* init log file */
     constexpr char LOG_FILE_NAME[] = "datalog.csv";
     CSVWrite<CSVWriteImpl> datalog(LOG_FILE_NAME);
-
-    /* init sensors and report status in many ways */
-    SensorCollectionPtr sensors_ptr = getSensors();
-    SensorCollection &sensors = *sensors_ptr;
-    IgnitorCollectionPtr ignitors_ptr = getIgnitors();
-    IgnitorCollection &ignitors = *ignitors_ptr;
 
     s_statusOfInit = collectStatus(sensors, ignitors);
     displayStatus(s_statusOfInit, buzzer);
