@@ -14,6 +14,7 @@
 #include "states/pre_air_start_coast_timed.h"
 #include "states/pressure_delay.h"
 #include "states/standby.h"
+#include "states/winter_contingency.h"
 
 /* States */
 static State::Standby state_standby = State::Standby(
@@ -50,6 +51,8 @@ static State::MainDescent state_main =
 
 static State::Landed state_landed = State::Landed();
 
+static State::WinterContingency state_contingency{};
+
 static std::unordered_map<StateId, IState *> state_hash_map = {
     {StateId::STANDBY, &state_standby},
     {StateId::ARMED, &state_armed},
@@ -60,7 +63,8 @@ static std::unordered_map<StateId, IState *> state_hash_map = {
     {StateId::PRESSURE_DELAY, &state_pres_delay},
     {StateId::DROGUE_DESCENT, &state_drogue},
     {StateId::MAIN_DESCENT, &state_main},
-    {StateId::LANDED, &state_landed}};
+    {StateId::LANDED, &state_landed},
+    {StateId::WINTER_CONTINGENCY, &state_contingency}};
 
 static StateId state = StateId::STANDBY;
 

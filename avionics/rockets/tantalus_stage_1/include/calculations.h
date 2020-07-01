@@ -84,6 +84,13 @@ class Calculator : public ICalculator {
         m_last_t = t_ms;
     }
 
+    /**
+     * @brief Get baseline altitude (i.e. altitude of launch site above sea
+     * level)
+     * @return Altitude, in metres
+     */
+    float getBaseAltitude() { return m_base_alt.getAverage(); }
+
   private:
     ExponentialMovingAvg<float> m_base_alt;
     Barometer &m_baro;

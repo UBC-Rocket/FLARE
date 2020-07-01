@@ -111,12 +111,11 @@ static RocketStatus s_statusOfInit;
 void blinkStatusLED();
 
 int main(void) {
-    constexpr char LOG_FILE_NAME[] = "datalog.csv";
-    CSVWrite<CSVWriteImpl> datalog;
+    // Before anything else there's some environment specific setup to be done
+    env_initialize();
+
     static Buzzer buzzer;
     Camera cam(Hal::SerialCamera);
-
-    env_initialize();
 
     static RadioController radio = RadioController(Hal::SerialRadio);
 
@@ -131,14 +130,17 @@ int main(void) {
     SerialUSB.println("Initializing...");
 #endif
 
-    /* init log file */
-    datalog.init(LOG_FILE_NAME);
-
-    /* init sensors and report status in many ways */
+    /* init sensors*/
     SensorCollectionPtr sensors_ptr = getSensors();
     SensorCollection &sensors = *sensors_ptr;
+
+    /* init ignitors*/
     IgnitorCollectionPtr ignitors_ptr = getIgnitors();
     IgnitorCollection &ignitors = *ignitors_ptr;
+
+    /* init log file */
+    constexpr char LOG_FILE_NAME[] = "datalog.csv";
+    CSVWrite<CSVWriteImpl> datalog(LOG_FILE_NAME);
 
     s_statusOfInit = collectStatus(sensors, ignitors);
     displayStatus(s_statusOfInit, buzzer);
@@ -195,15 +197,11 @@ int main(void) {
 
             calc.calculateValues(state, state_input, new_time);
             altitude = state_input.altitude;
-            // TODO - This is temporary fix for logData;
-            // should instead do something else.
 
             state = state_hash_map[state]->getNewState(state_input, state_aux);
 
-            datalog.logData(new_time_int, sensors, state, altitude, 0);
-            // TODO - think some more about data logging and
-            // how it should mesh with calculations, and
-            // also get rid of baseline_pressure
+            datalog.logData(new_time_int, sensors, state, altitude,
+                            calc.getBaseAltitude());
         }
 
         if (new_time - radio_old_time >= radio_t_interval) {

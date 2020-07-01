@@ -19,5 +19,5 @@
 
 /*Constants------------------------------------------------------------*/
 // Polling time changes
-#define LANDED_POLLING_TIME_INTERVAL 5000 // ms
-#define NOMINAL_POLLING_TIME_INTERVAL 50  // ms
+constexpr unsigned int LANDED_POLLING_TIME_INTERVAL = 5000; // ms
+constexpr unsigned int NOMINAL_POLLING_TIME_INTERVAL = 50;  // ms

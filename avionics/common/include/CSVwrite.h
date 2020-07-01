@@ -22,14 +22,70 @@ method that flushes the buffer.
 // TODO: Add Impl class or integrate in this class.
 // TODO: Figure out how to interface with SD Card
 
+constexpr char SensorCollection::LOG_FILE_HEADER[];
+// https://stackoverflow.com/questions/8016780/undefined-reference-to-static-constexpr-char
+// :/
+
 template <typename Impl> class CSVWrite {
   public:
     /**
-     * @brief initializes the SD card connection
-     * @return false if the sensor fails to initialize
+     * @brief Constructor
+     * @param filename Name of the file to log data to.
      */
-    bool init(const char *filename) { return m_datalog.init(filename); }
+    CSVWrite(const char *filename) {
+        ok_ = m_datalog.init(filename);
+        if (!ok_)
+            return;
 
+        // Header
+        print("Timestamp (ms)");
+        print("State");
+        print("Altitude (m)");
+        print("Baseline altitude (m)");
+        m_datalog.print(SensorCollection::LOG_FILE_HEADER);
+        m_datalog.print('\n');
+    }
+
+    /**
+     * @brief Returns true if initialization was successful.
+     */
+    bool ok() { return ok_; }
+
+    /**
+     * @brief flushes the cached data to the SD card
+     */
+    void flush() { m_datalog.flush(); }
+
+    /**
+     * @brief Logs data on the SD card
+     * @param timestamp pointer to store the timestamp value
+     * @param sensors the sensors to log data from
+     * @param state rocket flight state
+     * @param altitude Calculated rocket altitude, after filtering
+     * @param baseline_alt Altitude (m) above sea level at the launch site.
+     */
+    void logData(unsigned long timestamp, SensorCollection &sensors,
+                 StateId state, float altitude, float baseline_alt) {
+
+        /*
+         * SD Card data layout:
+         * Timestamp, Rocket flight state, Altitude, Baseline Pressure, Sensor
+         * Data
+         */
+        print(timestamp);
+        print(state);
+        print(altitude);
+        print(baseline_alt);
+
+        // Print Sensor Data
+        for (auto dat : sensors.getData()) {
+            print(dat);
+        }
+        m_datalog.print('\n');
+        flush();
+    }
+
+  private:
     /**
      * @brief prints t to the next csv column in order
      * @param s the data in string to print
@@ -46,84 +102,51 @@ template <typename Impl> class CSVWrite {
     template <typename T> void println(T s) { m_datalog.println(s); }
 
     /**
-     * @brief flushes the cached data to the SD card
+     * @brief Specialization of print() for StateId.
+     * @param state The state to print
      */
-    void flush() { m_datalog.flush(); }
-
-    /**
-     * @brief Logs data on the SD card
-     * @param timestamp pointer to store the timestamp value
-     * @param sensors the sensors to log data from
-     * @param state rocket flight state
-     * @param altitude Calculated rocket altitude, after filtering
-     * @param baseline_pressure Pressure used as "ground level"
-     */
-    void logData(unsigned long timestamp, SensorCollection &sensors,
-                 StateId state, float altitude, float baseline_pressure) {
-
-        /*
-         * SD Card data layout:
-         * Timestamp, Rocket flight state, Altitude, Baseline Pressure, Sensor
-         * Data
-         */
-        print(timestamp);
-        printState(state);
-        print(altitude);
-        print(baseline_pressure);
-
-        // Print Sensor Data
-        for (auto dat : sensors.getData()) {
-            print(dat);
-        }
-        print('\n');
-        flush();
-    }
-
-  private:
-    /**
-     * @brief Prints out current flight state
-     * @param state Flight state enum class
-     */
-    void printState(StateId state) {
-        switch(state) {
-            case StateId::STANDBY:
-                print("Standby");
-                break;
-            case StateId::ARMED:
-                print("Armed");
-                break;
-            case StateId::POWERED_ASCENT:
-                print("Powered_Ascent");
-                break;
-            case StateId::PRE_AIR_START_COAST_TIMED:
-                print("Pre_Air_Start_Coast_Timed");
-                break;
-            case StateId::ASCENT_TO_APOGEE:
-                print("Ascent_To_Apogee");
-                break;
-            case StateId::MACH_LOCK:
-                print("Mach_Lock");
-                break;
-            case StateId::PRESSURE_DELAY:
-                print("Pressure_Delay");
-                break;
-            case StateId::DROGUE_DESCENT:
-                print("Drogue_Descent");
-                break;
-            case StateId::MAIN_DESCENT:
-                print("Main_Descent");
-                break;
-            case StateId::LANDED:
-                print("Landed");
-                break;
-            case StateId::WINTER_CONTINGENCY:
-                print("Winter_Contingency");
-                break;
-            default:
-                print("Error_Unknown_State");
-                break;
+    void print(StateId state) {
+        switch (state) {
+        case StateId::STANDBY:
+            print("Standby");
+            break;
+        case StateId::ARMED:
+            print("Armed");
+            break;
+        case StateId::POWERED_ASCENT:
+            print("Powered_Ascent");
+            break;
+        case StateId::PRE_AIR_START_COAST_TIMED:
+            print("Pre_Air_Start_Coast_Timed");
+            break;
+        case StateId::ASCENT_TO_APOGEE:
+            print("Ascent_To_Apogee");
+            break;
+        case StateId::MACH_LOCK:
+            print("Mach_Lock");
+            break;
+        case StateId::PRESSURE_DELAY:
+            print("Pressure_Delay");
+            break;
+        case StateId::DROGUE_DESCENT:
+            print("Drogue_Descent");
+            break;
+        case StateId::MAIN_DESCENT:
+            print("Main_Descent");
+            break;
+        case StateId::LANDED:
+            print("Landed");
+            break;
+        case StateId::WINTER_CONTINGENCY:
+            print("Winter_Contingency");
+            break;
+        default:
+            print("Error_Unknown_State");
+            break;
         }
     }
+
     // File m_datalog;
     Impl m_datalog;
+    bool ok_;
 };

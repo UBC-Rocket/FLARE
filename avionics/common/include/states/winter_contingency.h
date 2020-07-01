@@ -10,13 +10,13 @@ class WinterContingency : public IState {
   public:
     WinterContingency() {}
 
-    /*
+    /**
      * @brief Return the assigned enumeration code.
      * @return Enumeration code.
      */
     StateId getStateEnum(void) { return StateId::WINTER_CONTINGENCY; }
 
-    /*
+    /**
      * @brief Return the next state, based on input data (mostly from filtered
      * sensor data)
      * @return State enumeration code, to be passed into the std::map between
@@ -26,6 +26,6 @@ class WinterContingency : public IState {
                         StateAuxilliaryInfo &state_aux) {
         return StateId::WINTER_CONTINGENCY;
     }
-}
+};
 
 } // namespace State
