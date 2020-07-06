@@ -78,6 +78,7 @@ PLEASE READ ME!
 #include "options.h"
 #include "radio.h"
 #include "sensor_collection.h"
+#include "state_machine.h"
 #include "status.h"
 
 #include "config.h"
@@ -149,15 +150,7 @@ int main(void) {
 
     Calculator calc(sensors);
 
-    /* TODO - make this not constant */
-    state_input.ignitor_good = true;
-    state_input.altitude = 5;
-    state_input.velocity_vertical = 0;
-    state_input.accel_ground =
-        (Eigen::Vector3f() << 10.0f, 0.0f, 0.0f).finished();
-    state_input.accel_rocket =
-        (Eigen::Vector3f() << 10.0f, 0.0f, 0.0f).finished();
-    state_input.orientation = Eigen::Quaternionf().Identity();
+    StateMachine state_machine;
 
     // Timing
     Hal::t_point timestamp;
@@ -178,10 +171,13 @@ int main(void) {
 
         // makes sure that even if it does somehow get accidentally changed,
         // it gets reverted
-        if (s_statusOfInit == RocketStatus::CRITICAL_FAILURE)
-            state = StateId::WINTER_CONTINGENCY;
+        if (s_statusOfInit == RocketStatus::CRITICAL_FAILURE) {
+            state_machine.abort();
+        }
 
         radio.listenAndAct();
+
+        const StateId &state = state_machine.getState(); // convenience
 
         // Polling time intervals need to be variable, since in LANDED
         // there's a lot of data that'll be recorded
@@ -200,7 +196,7 @@ int main(void) {
             calc.calculateValues(state, state_input, new_time);
             altitude = state_input.altitude;
 
-            state = state_hash_map[state]->getNewState(state_input, state_aux);
+            state_machine.update(state_input, state_aux);
 
             datalog.logData(new_time_int, sensors, state, altitude,
                             calc.getBaseAltitude());
