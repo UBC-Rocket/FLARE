@@ -101,9 +101,35 @@ class StateMachine {
     }
 
     /**
+     * Arm the state machine. Only allowed if in STANDBY.
+     * Returns true if arming was successful, false otherwise (i.e. not in
+     * STANDBY)
+     */
+    bool arm() {
+        if (current_state == StateId::STANDBY) {
+            current_state = StateId::ARMED;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Disarm the state machine. Only allowed if in ARMED.
+     * Returns true if disarming was successful, false otherwise (i.e. not in
+     * ARMED)
+     */
+    bool disarm() {
+        if (current_state == StateId::ARMED) {
+            current_state = StateId::STANDBY;
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Set the state machine to a failsafe state
      */
     void abort() { current_state = StateId::WINTER_CONTINGENCY; }
 
-    const StateId &getState() { return current_state; }
+    const StateId &getState() const { return current_state; }
 };

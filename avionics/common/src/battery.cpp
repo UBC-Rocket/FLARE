@@ -34,7 +34,8 @@ Battery::Battery(uint8_t batterySensorPin) {
 
 // copied from Teensy source. Doesn't seemd to be used anywhere else, so
 // temporaryily put this here.
-// TODO - put in utility file?
+// TODO - put in utility file? TODO this doesn't do float math properly - need
+// to cast first
 float range_map(int x, int in_min, int in_max, int out_min, int out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
