@@ -59,7 +59,8 @@ class RadioController {
                     uint8_t const MAX_PACKETS_PER_RX_LOOP = 8)
         : gnd_addr_(XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB)),
           tx_q_(MAX_QUEUED_BYTES),
-          MAX_PACKETS_PER_RX_LOOP_(MAX_PACKETS_PER_RX_LOOP) {
+          MAX_PACKETS_PER_RX_LOOP_(MAX_PACKETS_PER_RX_LOOP),
+          WATCHDOG_SEND_INTERVAL_(3000), watchdog_last_send_(Hal::now_ms()) {
 
         serial_radio.begin(RADIO_BAUD_RATE);
         while (!serial_radio)
@@ -141,7 +142,9 @@ class RadioController {
     uint8_t payload_[RADIO_MAX_SUBPACKET_SIZE];
 
     const uint8_t MAX_PACKETS_PER_RX_LOOP_;
-    const Hal::t_point current;
+    const Hal::ms WATCHDOG_SEND_INTERVAL_;
+    Hal::t_point
+        watchdog_last_send_; // Keeps track of last time sending was done.
     void send();
 
     // A bit of magic SFINAE from stack overflow, for listenAndAct

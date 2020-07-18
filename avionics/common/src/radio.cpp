@@ -52,14 +52,18 @@ void RadioController::listenAndAct(Func act_upon) {
 
         } else if (xbee_.getResponse().getApiId() == ZB_TX_STATUS_RESPONSE) {
             can_send = true;
+            // If we get 2 responses in a row, implies previously we sent an
+            // extra one, so we shouldn't respond twice again.
         }
 
         xbee_.readPacket();
         i++;
     }
+    if (Hal::now_ms() - watchdog_last_send_ > WATCHDOG_SEND_INTERVAL_) {
+        can_send = true;
+    }
     if (can_send) {
-        // If we get 2 responses in a row, implies previously we sent an extra
-        // one, so we shouldn't respond twice again.
+        watchdog_last_send_ = Hal::now_ms();
         send();
     }
 }
