@@ -74,8 +74,10 @@ class RadioController {
     /**
      * @brief Meat of the action - listens for any incoming packets, then
      * transmits data and performs rocket actions as necessary.
+     * @param act_upon Function-like object (e.g. lambda expression) that
+     * accepts an unsigned char (representing the command) and returns void.
      */
-    void listenAndAct();
+    template <typename Func> void listenAndAct(Func act_upon);
 
     /**
      * @brief Add a subpacket to the queue to be sent. Note that this is a
@@ -141,4 +143,33 @@ class RadioController {
     const uint8_t MAX_PACKETS_PER_RX_LOOP_;
     const Hal::t_point current;
     void send();
+
+    // A bit of magic SFINAE from stack overflow, for listenAndAct
+    // https://stackoverflow.com/a/16824239/10762409
+
+    // Primary template, used for meaningful error message
+    // Falls back to this if operator() is not present
+    template <typename, typename T> struct can_receive_command {
+        static_assert(std::integral_constant<T, false>::value,
+                      "The passed in value for listenAndAct() must be callable "
+                      "( has operator() )");
+    };
+
+    // specialization that does the checking
+    template <typename C, typename Ret, typename... Args>
+    struct can_receive_command<C, Ret(Args...)> {
+      private:
+        template <typename T>
+        static constexpr auto check(T *) -> typename std::is_same<
+            decltype(std::declval<T>().operator()(std::declval<Args>()...)),
+            Ret      // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            >::type; // attempt to call it and see if the return type is correct
+
+        template <typename> static constexpr std::false_type check(...);
+
+        typedef decltype(check<C>(0)) type;
+
+      public:
+        static constexpr bool value = type::value;
+    };
 };

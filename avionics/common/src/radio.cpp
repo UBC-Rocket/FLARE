@@ -25,13 +25,8 @@
 #include "radio.h"
 #include "sensor_collection.h"
 
-// #include "cameras.h"
-// #include "gpio.h"
-// #include "options.h"
-// #include "satcom.h"
-// #include "buzzer.h"
-
-void RadioController::listenAndAct() {
+template <typename Func> //
+void RadioController::listenAndAct(Func act_upon) {
     xbee_.readPacket();
     int i = 0;
     bool can_send = false;
@@ -39,9 +34,9 @@ void RadioController::listenAndAct() {
                                             xbee_.getResponse().isError())) {
         // goes through all xbee_ packets in buffer
 
-        if (xbee_.getResponse()
-                .isError()) { // TODO - figure out whether there's anything we
-                              // should do about Xbee errors
+        if (xbee_.getResponse().isError()) {
+            // TODO - figure out whether there's anything
+            // we should do about Xbee errors
             // #ifdef TESTING
             //     SerialUSB.println("xbee_ error");
             // #endif

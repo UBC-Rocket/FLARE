@@ -25,5 +25,12 @@ typedef std::chrono::time_point<std::chrono::steady_clock, ms> t_point;
  */
 t_point now_ms();
 
+/**
+ * @brief Convenience function, to get a timestamp. Equivalent to Arduino's
+ * millis().
+ * @return Current timestamp, in milliseconds.
+ */
+uint32_t millis();
+
 void initialSystem();
 } // namespace Hal
