@@ -18,7 +18,8 @@
 
 /*Includes------------------------------------------------------------*/
 #include <algorithm> //for std::copy
-#include <utility>   //for std::move
+#include <cstring>
+#include <utility> //for std::move
 
 #include "ignitor_collection.h"
 #include "radio.h"
@@ -32,7 +33,8 @@
 
 void RadioController::listenAndAct() {
     xbee_.readPacket();
-    uint8_t i = 0;
+    int i = 0;
+    bool can_send = false;
     while (i < MAX_PACKETS_PER_RX_LOOP_ && (xbee_.getResponse().isAvailable() ||
                                             xbee_.getResponse().isError())) {
         // goes through all xbee_ packets in buffer
@@ -48,18 +50,22 @@ void RadioController::listenAndAct() {
             xbee_.getResponse().getZBRxResponse(rx);
             uint8_t len = rx.getDataLength();
             uint8_t command;
-            for (uint8_t j = 0; j < len; j++) {
+            for (int j = 0; j < len; j++) {
                 command = rx.getData()[j];
                 // TODO - do something with the command
             }
 
         } else if (xbee_.getResponse().getApiId() == ZB_TX_STATUS_RESPONSE) {
-            send();
+            can_send = true;
         }
 
         xbee_.readPacket();
-
         i++;
+    }
+    if (can_send) {
+        // If we get 2 responses in a row, implies previously we sent an extra
+        // one, so we shouldn't respond twice again.
+        send();
     }
 }
 
@@ -111,5 +117,14 @@ void RadioController::sendBulkSensor(uint32_t time, float alt,
     // State
     std::memcpy(buf->data() + 41, &state_id, 1);
 
+    addSubpacket(std::move(buf));
+}
+
+void RadioController::sendMessage(const uint32_t time, const char *str) {
+    SubPktPtr buf(new std::vector<uint8_t>);
+    auto strlen = std::strlen(str);
+    buf->resize(strlen + 5);
+    setupIdTime(buf.get(), Ids::message, time);
+    std::memcpy(buf->data() + 5, str, strlen);
     addSubpacket(std::move(buf));
 }

@@ -120,8 +120,6 @@ int main(void) {
     static Buzzer buzzer;
     Camera cam(Hal::SerialCamera);
 
-    static RadioController radio = RadioController(Hal::SerialRadio);
-
     initPins();
 
 /* Setup all UART comms */
@@ -148,6 +146,8 @@ int main(void) {
     s_statusOfInit = collectStatus(sensors, ignitors);
     displayStatus(s_statusOfInit, buzzer);
 
+    RadioController radio{Hal::SerialRadio};
+
     Calculator calc(sensors);
 
     StateMachine state_machine;
@@ -162,6 +162,7 @@ int main(void) {
     Hal::ms radio_t_interval(500); // ms //TODO - make 500 a constant somewhere
     radio.sendStatus(old_time.time_since_epoch().count(), s_statusOfInit,
                      sensors, ignitors);
+
     for (;;) {
         new_time = Hal::now_ms();
         new_time_int =

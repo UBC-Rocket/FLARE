@@ -21,6 +21,7 @@
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
 
+#include "HAL/time.h"
 #include "XBee.h"
 #include "ignitor_collection.h"
 #include "radio_queue.h"
@@ -66,6 +67,8 @@ class RadioController {
         xbee_.setSerial(serial_radio.getSerial());
         tx_packet_.setAddress64(gnd_addr_);
         tx_packet_.setPayload(payload_);
+        sendMessage(Hal::millis(), "Radio initialized");
+        send();
     }
 
     /**
@@ -106,14 +109,21 @@ class RadioController {
     void sendBulkSensor(uint32_t time, float alt, Accelerometer &xl, IMU imu,
                         GPS gps, uint8_t state_id);
 
+    /**
+     * @brief Helper function to send message.
+     * @param time Timestamp, in millisconds
+     * @param str C-style string to send.
+     */
+    void sendMessage(const uint32_t time, const char *str);
+
   private:
     /**
      * @brief Fills in the ID and timestamp given a subpacket pointer.
      * Note that this method expects that the buffer has already been
      * appropreiately sized.
-     * To avoid needing to deal with move semantics, this method expects a raw
-     * pointer rather than a unique pointer, so you'll need to call the get()
-     * method of SubPktPtr.
+     * To avoid needing to deal with move semantics, this method expects a
+     * raw pointer rather than a unique pointer, so you'll need to call the
+     * get() method of SubPktPtr.
      */
     void setupIdTime(std::vector<uint8_t> *buf, Ids id, uint32_t time) {
         (*buf)[0] = static_cast<uint8_t>(id);
@@ -129,5 +139,6 @@ class RadioController {
     uint8_t payload_[RADIO_MAX_SUBPACKET_SIZE];
 
     const uint8_t MAX_PACKETS_PER_RX_LOOP_;
+    const Hal::t_point current;
     void send();
 };
