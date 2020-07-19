@@ -20,6 +20,8 @@
 
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
+#include <type_traits>
+#include <utility>
 
 #include "HAL/time.h"
 #include "XBee.h"
@@ -78,7 +80,53 @@ class RadioController {
      * @param act_upon Function-like object (e.g. lambda expression) that
      * accepts an unsigned char (representing the command) and returns void.
      */
-    template <typename Func> void listenAndAct(Func act_upon);
+    template <typename Func> void listenAndAct(Func act_upon) {
+        static_assert(
+            can_receive_command<Func>::value,
+            "act_upon does not have the expected signature void(uint8_t)");
+
+        xbee_.readPacket();
+        int i = 0;
+        bool can_send = false;
+        while (i < MAX_PACKETS_PER_RX_LOOP_ &&
+               (xbee_.getResponse().isAvailable() ||
+                xbee_.getResponse().isError())) {
+            // goes through all xbee_ packets in buffer
+
+            if (xbee_.getResponse().isError()) {
+                // TODO - figure out whether there's anything
+                // we should do about Xbee errors
+                // #ifdef TESTING
+                //     SerialUSB.println("xbee_ error");
+                // #endif
+            } else if (xbee_.getResponse().getApiId() == ZB_RX_RESPONSE) {
+                // received command from xbee_
+                xbee_.getResponse().getZBRxResponse(rx);
+                uint8_t len = rx.getDataLength();
+                uint8_t command;
+                for (int j = 0; j < len; j++) {
+                    command = rx.getData()[j];
+                    act_upon(command);
+                }
+
+            } else if (xbee_.getResponse().getApiId() ==
+                       ZB_TX_STATUS_RESPONSE) {
+                can_send = true;
+                // If we get 2 responses in a row, implies previously we sent an
+                // extra one, so we shouldn't respond twice again.
+            }
+
+            xbee_.readPacket();
+            i++;
+        }
+        if (Hal::now_ms() - watchdog_last_send_ > WATCHDOG_SEND_INTERVAL_) {
+            can_send = true;
+        }
+        if (can_send) {
+            watchdog_last_send_ = Hal::now_ms();
+            send();
+        }
+    }
 
     /**
      * @brief Add a subpacket to the queue to be sent. Note that this is a
@@ -152,27 +200,29 @@ class RadioController {
 
     // Primary template, used for meaningful error message
     // Falls back to this if operator() is not present
-    template <typename, typename T> struct can_receive_command {
-        static_assert(std::integral_constant<T, false>::value,
+    template <typename T, typename...> struct can_receive_command {
+      public:
+        // type dependent false
+        static_assert(!(std::is_same<T, T>::value),
                       "The passed in value for listenAndAct() must be callable "
                       "( has operator() )");
+
+        static constexpr bool value = true;
     };
 
     // specialization that does the checking
-    template <typename C, typename Ret, typename... Args>
-    struct can_receive_command<C, Ret(Args...)> {
+    template <typename T> struct can_receive_command<T> {
       private:
-        template <typename T>
-        static constexpr auto check(T *) -> typename std::is_same<
-            decltype(std::declval<T>().operator()(std::declval<Args>()...)),
-            Ret      // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-            >::type; // attempt to call it and see if the return type is correct
+        template <typename C>
+        static constexpr auto check(C *) -> typename std::is_same<
+            decltype(std::declval<C>().operator()(std::declval<uint8_t>())),
+            void>::type;
 
         template <typename> static constexpr std::false_type check(...);
 
-        typedef decltype(check<C>(0)) type;
+        typedef decltype(check<T>(nullptr)) is_ok;
 
       public:
-        static constexpr bool value = type::value;
+        static constexpr bool value = is_ok::value;
     };
 };

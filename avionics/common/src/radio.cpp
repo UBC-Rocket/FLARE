@@ -25,49 +25,6 @@
 #include "radio.h"
 #include "sensor_collection.h"
 
-template <typename Func> //
-void RadioController::listenAndAct(Func act_upon) {
-    xbee_.readPacket();
-    int i = 0;
-    bool can_send = false;
-    while (i < MAX_PACKETS_PER_RX_LOOP_ && (xbee_.getResponse().isAvailable() ||
-                                            xbee_.getResponse().isError())) {
-        // goes through all xbee_ packets in buffer
-
-        if (xbee_.getResponse().isError()) {
-            // TODO - figure out whether there's anything
-            // we should do about Xbee errors
-            // #ifdef TESTING
-            //     SerialUSB.println("xbee_ error");
-            // #endif
-        } else if (xbee_.getResponse().getApiId() == ZB_RX_RESPONSE) {
-            // received command from xbee_
-            xbee_.getResponse().getZBRxResponse(rx);
-            uint8_t len = rx.getDataLength();
-            uint8_t command;
-            for (int j = 0; j < len; j++) {
-                command = rx.getData()[j];
-                // TODO - do something with the command
-            }
-
-        } else if (xbee_.getResponse().getApiId() == ZB_TX_STATUS_RESPONSE) {
-            can_send = true;
-            // If we get 2 responses in a row, implies previously we sent an
-            // extra one, so we shouldn't respond twice again.
-        }
-
-        xbee_.readPacket();
-        i++;
-    }
-    if (Hal::now_ms() - watchdog_last_send_ > WATCHDOG_SEND_INTERVAL_) {
-        can_send = true;
-    }
-    if (can_send) {
-        watchdog_last_send_ = Hal::now_ms();
-        send();
-    }
-}
-
 void RadioController::send() {
     tx_packet_.setPayloadLength(tx_q_.fillPayload(payload_));
     xbee_.send(tx_packet_);
