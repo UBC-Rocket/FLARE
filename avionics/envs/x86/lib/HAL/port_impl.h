@@ -14,9 +14,12 @@ class Serial {
     typedef StdIoController StdIO;
 
   public:
-    Serial(uint8_t const id)
-        : IO_ID_(id), buf_(),
-          buffer_regular_thread_(&Serial::buffer_send_loop, this) {}
+    Serial(uint8_t const id) : IO_ID_(id), buf_(), buffer_regular_thread_() {
+        if (id != StdIoController::DEV_NULL) {
+            buffer_regular_thread_ =
+                std::move(std::thread(&Serial::buffer_send_loop, this));
+        }
+    }
 
     void begin(long) {} // no-op for native
     int available() const { return StdIO::available(IO_ID_); }
