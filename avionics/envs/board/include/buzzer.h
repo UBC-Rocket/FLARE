@@ -33,8 +33,8 @@ class Buzzer : public IBuzzer {
      * @brief constructor
      * @param MELODY_PIN I/O pin the buzzer is hooked up to.
      */
-    Buzzer() : M_MELODY_PIN(MELODY_PIN) {
-        Hal::pinMode(MELODY_PIN, Hal::PinMode::OUTPUT);
+    Buzzer() : M_MELODY_PIN(Pin::BUZZER) {
+        Hal::pinMode(Pin::BUZZER, Hal::PinMode::OUTPUT);
     }
 
     /** void sing(SongTypes song){}
@@ -57,5 +57,5 @@ class Buzzer : public IBuzzer {
     void buzz(long frequency, long length) const;
 
   private:
-    const int M_MELODY_PIN;
+    const Pin M_MELODY_PIN;
 };

@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <type_traits>
 #include <utility>
+#include <cstring>
 
 #include "HAL/time.h"
 #include "XBee.h"

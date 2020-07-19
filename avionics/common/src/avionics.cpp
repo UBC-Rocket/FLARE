@@ -150,7 +150,7 @@ int main(void) {
     Calculator calc(sensors);
 
     StateMachine state_machine;
-    StateId state;
+    StateId state = state_machine.getState();
 
     // Timing
     Hal::t_point timestamp;
@@ -163,7 +163,7 @@ int main(void) {
     radio.sendStatus(old_time.time_since_epoch().count(), statusOfInit, sensors,
                      ignitors);
 
-    float altitude;
+    float altitude= 0;
 
     auto command_reciever = [&new_time_int, &statusOfInit, &sensors, &ignitors,
                              &radio, &state_machine, &altitude,
