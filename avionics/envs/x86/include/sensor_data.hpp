@@ -78,7 +78,8 @@ template <std::size_t data_length> class DataSpoof {
 
   private:
     std::ifstream dataStream;
-    long int t0, t1; // two variables exist only for the purpose of assert
+    long int t0 = 0; // two variables exist only for the purpose of assert
+    long int t1 = 0;
 
     float *const dat_read;
 };
