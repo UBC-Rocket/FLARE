@@ -18,51 +18,12 @@
 
 /*Includes------------------------------------------------------------*/
 #include <algorithm> //for std::copy
-#include <utility>   //for std::move
+#include <cstring>
+#include <utility> //for std::move
 
 #include "ignitor_collection.h"
 #include "radio.h"
 #include "sensor_collection.h"
-
-// #include "cameras.h"
-// #include "gpio.h"
-// #include "options.h"
-// #include "satcom.h"
-// #include "buzzer.h"
-// #include "statemachine.h"
-
-void RadioController::listenAndAct() {
-    xbee_.readPacket();
-    uint8_t i = 0;
-    while (i < MAX_PACKETS_PER_RX_LOOP_ && (xbee_.getResponse().isAvailable() ||
-                                            xbee_.getResponse().isError())) {
-        // goes through all xbee_ packets in buffer
-
-        if (xbee_.getResponse()
-                .isError()) { // TODO - figure out whether there's anything we
-                              // should do about Xbee errors
-            // #ifdef TESTING
-            //     SerialUSB.println("xbee_ error");
-            // #endif
-        } else if (xbee_.getResponse().getApiId() == ZB_RX_RESPONSE) {
-            // received command from xbee_
-            xbee_.getResponse().getZBRxResponse(rx);
-            uint8_t len = rx.getDataLength();
-            uint8_t command;
-            for (uint8_t j = 0; j < len; j++) {
-                command = rx.getData()[j];
-                // TODO - do something with the command
-            }
-
-        } else if (xbee_.getResponse().getApiId() == ZB_TX_STATUS_RESPONSE) {
-            send();
-        }
-
-        xbee_.readPacket();
-
-        i++;
-    }
-}
 
 void RadioController::send() {
     tx_packet_.setPayloadLength(tx_q_.fillPayload(payload_));
@@ -112,5 +73,14 @@ void RadioController::sendBulkSensor(uint32_t time, float alt,
     // State
     std::memcpy(buf->data() + 41, &state_id, 1);
 
+    addSubpacket(std::move(buf));
+}
+
+void RadioController::sendMessage(const uint32_t time, const char *str) {
+    SubPktPtr buf(new std::vector<uint8_t>);
+    auto strlen = std::strlen(str);
+    buf->resize(strlen + 5);
+    setupIdTime(buf.get(), Ids::message, time);
+    std::memcpy(buf->data() + 5, str, strlen);
     addSubpacket(std::move(buf));
 }

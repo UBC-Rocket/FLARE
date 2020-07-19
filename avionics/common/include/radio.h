@@ -20,7 +20,10 @@
 
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
+#include <type_traits>
+#include <utility>
 
+#include "HAL/time.h"
 #include "XBee.h"
 #include "ignitor_collection.h"
 #include "radio_queue.h"
@@ -28,7 +31,6 @@
 #include "sensors/GPS.h"
 #include "sensors/IMU.h"
 #include "sensors/accelerometer.h"
-#include "statemachine.h"
 
 /*Constants------------------------------------------------------------*/
 /* radio addressing */
@@ -59,7 +61,8 @@ class RadioController {
                     uint8_t const MAX_PACKETS_PER_RX_LOOP = 8)
         : gnd_addr_(XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB)),
           tx_q_(MAX_QUEUED_BYTES),
-          MAX_PACKETS_PER_RX_LOOP_(MAX_PACKETS_PER_RX_LOOP) {
+          MAX_PACKETS_PER_RX_LOOP_(MAX_PACKETS_PER_RX_LOOP),
+          WATCHDOG_SEND_INTERVAL_(3000), watchdog_last_send_(Hal::now_ms()) {
 
         serial_radio.begin(RADIO_BAUD_RATE);
         while (!serial_radio)
@@ -67,13 +70,63 @@ class RadioController {
         xbee_.setSerial(serial_radio.getSerial());
         tx_packet_.setAddress64(gnd_addr_);
         tx_packet_.setPayload(payload_);
+        sendMessage(Hal::millis(), "Radio initialized");
+        send();
     }
 
     /**
      * @brief Meat of the action - listens for any incoming packets, then
      * transmits data and performs rocket actions as necessary.
+     * @param act_upon Function-like object (e.g. lambda expression) that
+     * accepts an unsigned char (representing the command) and returns void.
      */
-    void listenAndAct();
+    template <typename Func> void listenAndAct(Func act_upon) {
+        static_assert(
+            can_receive_command<Func>::value,
+            "act_upon does not have the expected signature void(uint8_t)");
+
+        xbee_.readPacket();
+        int i = 0;
+        bool can_send = false;
+        while (i < MAX_PACKETS_PER_RX_LOOP_ &&
+               (xbee_.getResponse().isAvailable() ||
+                xbee_.getResponse().isError())) {
+            // goes through all xbee_ packets in buffer
+
+            if (xbee_.getResponse().isError()) {
+                // TODO - figure out whether there's anything
+                // we should do about Xbee errors
+                // #ifdef TESTING
+                //     SerialUSB.println("xbee_ error");
+                // #endif
+            } else if (xbee_.getResponse().getApiId() == ZB_RX_RESPONSE) {
+                // received command from xbee_
+                xbee_.getResponse().getZBRxResponse(rx);
+                uint8_t len = rx.getDataLength();
+                uint8_t command;
+                for (int j = 0; j < len; j++) {
+                    command = rx.getData()[j];
+                    act_upon(command);
+                }
+
+            } else if (xbee_.getResponse().getApiId() ==
+                       ZB_TX_STATUS_RESPONSE) {
+                can_send = true;
+                // If we get 2 responses in a row, implies previously we sent an
+                // extra one, so we shouldn't respond twice again.
+            }
+
+            xbee_.readPacket();
+            i++;
+        }
+        if (Hal::now_ms() - watchdog_last_send_ > WATCHDOG_SEND_INTERVAL_) {
+            can_send = true;
+        }
+        if (can_send) {
+            watchdog_last_send_ = Hal::now_ms();
+            send();
+        }
+    }
 
     /**
      * @brief Add a subpacket to the queue to be sent. Note that this is a
@@ -107,14 +160,21 @@ class RadioController {
     void sendBulkSensor(uint32_t time, float alt, Accelerometer &xl, IMU imu,
                         GPS gps, uint8_t state_id);
 
+    /**
+     * @brief Helper function to send message.
+     * @param time Timestamp, in millisconds
+     * @param str C-style string to send.
+     */
+    void sendMessage(const uint32_t time, const char *str);
+
   private:
     /**
      * @brief Fills in the ID and timestamp given a subpacket pointer.
      * Note that this method expects that the buffer has already been
      * appropreiately sized.
-     * To avoid needing to deal with move semantics, this method expects a raw
-     * pointer rather than a unique pointer, so you'll need to call the get()
-     * method of SubPktPtr.
+     * To avoid needing to deal with move semantics, this method expects a
+     * raw pointer rather than a unique pointer, so you'll need to call the
+     * get() method of SubPktPtr.
      */
     void setupIdTime(std::vector<uint8_t> *buf, Ids id, uint32_t time) {
         (*buf)[0] = static_cast<uint8_t>(id);
@@ -130,5 +190,39 @@ class RadioController {
     uint8_t payload_[RADIO_MAX_SUBPACKET_SIZE];
 
     const uint8_t MAX_PACKETS_PER_RX_LOOP_;
+    const Hal::ms WATCHDOG_SEND_INTERVAL_;
+    Hal::t_point
+        watchdog_last_send_; // Keeps track of last time sending was done.
     void send();
+
+    // A bit of magic SFINAE from stack overflow, for listenAndAct
+    // https://stackoverflow.com/a/16824239/10762409
+
+    // Primary template, used for meaningful error message
+    // Falls back to this if operator() is not present
+    template <typename T, typename...> struct can_receive_command {
+      public:
+        // type dependent false
+        static_assert(!(std::is_same<T, T>::value),
+                      "The passed in value for listenAndAct() must be callable "
+                      "( has operator() )");
+
+        static constexpr bool value = true;
+    };
+
+    // specialization that does the checking
+    template <typename T> struct can_receive_command<T> {
+      private:
+        template <typename C>
+        static constexpr auto check(C *) -> typename std::is_same<
+            decltype(std::declval<C>().operator()(std::declval<uint8_t>())),
+            void>::type;
+
+        template <typename> static constexpr std::false_type check(...);
+
+        typedef decltype(check<T>(nullptr)) is_ok;
+
+      public:
+        static constexpr bool value = is_ok::value;
+    };
 };

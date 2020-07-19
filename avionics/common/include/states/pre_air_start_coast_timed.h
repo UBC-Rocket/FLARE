@@ -30,7 +30,7 @@ class PreAirStartCoastTimed : public IState {
      */
     StateId getStateEnum(void) { return StateId::PRE_AIR_START_COAST_TIMED; }
 
-    /*
+    /**
      * @brief Return the next state, based on input data (mostly from filtered
      * sensor data)
      * @return State enumeration code, to be passed into the std::map between

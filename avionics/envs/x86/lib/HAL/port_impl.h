@@ -41,7 +41,7 @@ class Serial {
     std::array<uint8_t, BUFFER_SIZE> buf_;
     std::size_t buf_used_ = 0;
     bool buf_sent_ = false;
-    std::mutex buf_mutex_; // All  3 of the above require this mutex
+    std::mutex buf_mutex_; // All 3 of the above require this mutex
     std::thread buffer_regular_thread_;
     /**
      * \brief Loops and ensures that data is sent at least at 10 Hz.

@@ -15,8 +15,8 @@ class MainDescent : public IState {
      * @param LANDED_CHECKS number of checks to perform
      * @param LANDED_VELOCITY maximum velocity to be considered as landed
      */
-    MainDescent(std::chrono::milliseconds LANDED_TIME_INTERVAL,
-                uint8_t LANDED_CHECKS, float LANDED_VELOCITY)
+    MainDescent(long LANDED_TIME_INTERVAL, int LANDED_CHECKS,
+                float LANDED_VELOCITY)
         : M_LANDED_TIME_INTERVAL(LANDED_TIME_INTERVAL),
           M_LANDED_CHECKS(LANDED_CHECKS), M_LANDED_VELOCITY(LANDED_VELOCITY) {}
 
