@@ -81,7 +81,7 @@ void RadioController::sendMessage(const uint32_t time, const char *str) {
     auto strlen = std::strlen(str);
     buf->resize(strlen + 6);
     setupIdTime(buf.get(), Ids::message, time);
-    (*buf)[5] = strlen + 6;
+    (*buf)[5] = strlen;
     std::memcpy(buf->data() + 6, str, strlen);
     addSubpacket(std::move(buf));
 }
