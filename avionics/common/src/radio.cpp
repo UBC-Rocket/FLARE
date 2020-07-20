@@ -79,8 +79,9 @@ void RadioController::sendBulkSensor(uint32_t time, float alt,
 void RadioController::sendMessage(const uint32_t time, const char *str) {
     SubPktPtr buf(new std::vector<uint8_t>);
     auto strlen = std::strlen(str);
-    buf->resize(strlen + 5);
+    buf->resize(strlen + 6);
     setupIdTime(buf.get(), Ids::message, time);
-    std::memcpy(buf->data() + 5, str, strlen);
+    (*buf)[5] = strlen + 6;
+    std::memcpy(buf->data() + 6, str, strlen);
     addSubpacket(std::move(buf));
 }
