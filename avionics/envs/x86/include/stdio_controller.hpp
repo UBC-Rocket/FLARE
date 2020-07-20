@@ -29,7 +29,11 @@ class StdIoController {
     // variables
 
   public:
-    // StdIoController() { putConfigPacket(); }
+    /**
+     * @brief sets up SIM
+     * Things that are setup: config packet is sent, with 2 way handshake.
+     */
+    static void initialize();
 
     constexpr static uint8_t DEV_NULL = 0;
     /**
@@ -102,6 +106,7 @@ class StdIoController {
         // to being allowed
     }
 
+  private:
     /**
      * @brief Helper function for configuration packet.
      */
@@ -116,7 +121,6 @@ class StdIoController {
         putPacket(id, buf, 8);
     }
 
-  private:
     static char getCinForce() {
         char c[2];
         std::cin.getline(c, 2, '\0');
