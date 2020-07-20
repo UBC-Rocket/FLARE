@@ -3,5 +3,5 @@
 
 void env_initialize() {
     Hal::initialSystem();
-    StdIoController::putConfigPacket();
+    StdIoController::initialize();
 }

@@ -19,4 +19,9 @@ std::size_t Serial::write(const uint8_t *const inbuf, std::size_t const size) {
     buf_used_ += size;
     return size;
 }
+
+Serial SerialInst::USB{StdIoController::DEV_NULL};
+Serial SerialInst::GPS{StdIoController::DEV_NULL};
+Serial SerialInst::Radio{'R'};
+Serial SerialInst::Camera{StdIoController::DEV_NULL};
 } // namespace Hal

@@ -72,9 +72,16 @@ class Serial {
     }
 };
 
-static Serial SerialUSB(StdIoController::DEV_NULL);
-static Serial SerialGPS(StdIoController::DEV_NULL);
-static Serial SerialRadio('R');
-// static Serial IridiumSerial(4);
-static Serial SerialCamera(StdIoController::DEV_NULL);
+class SerialInst {
+    /**
+     * @brief Collection of available serial objects, collected into a class to
+     * hopefully prevent one instance from appearing for each time this file
+     * gets #included
+     */
+  public:
+    static Serial USB;
+    static Serial GPS;
+    static Serial Radio;
+    static Serial Camera;
+};
 } // namespace Hal

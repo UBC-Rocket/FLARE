@@ -117,7 +117,7 @@ int main(void) {
     constexpr unsigned int NOMINAL_POLLING_TIME_INTERVAL = 50;  // ms
 
     static Buzzer buzzer;
-    Camera cam(Hal::SerialCamera);
+    Camera cam(Hal::SerialInst::Camera);
 
     initPins();
 
@@ -145,7 +145,7 @@ int main(void) {
     RocketStatus statusOfInit = collectStatus(sensors, ignitors);
     displayStatus(statusOfInit, buzzer);
 
-    RadioController radio{Hal::SerialRadio};
+    RadioController radio{Hal::SerialInst::Radio};
 
     Calculator calc(sensors);
 

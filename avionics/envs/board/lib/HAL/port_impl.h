@@ -26,15 +26,21 @@ class Serial {
     HardwareSerial m_seri;
 };
 
-// auto static SerialUSB       = Hal::Serial(Serial); //?
-auto static SerialGPS = Hal::Serial(Serial1);
-auto static SerialRadio = Hal::Serial(Serial2);
-
-auto static SerialCamera = Hal::Serial(Serial3);
-// auto const static IridiumSerial = Hal::Serial(Serial4);
-// Annoyingly trying to make some of these SerialX const directly doesn't easily
-// work because the underlying HardwareSerial isn't const, which I think means
-// everything that uses HardwareSerial (i.e. everything useful) is not const,
-// which kind of cascades upwards.
+class SerialInst {
+    /**
+     * @brief Collection of available serial objects, collected into a class to
+     * hopefully prevent one instance from appearing for each time this file
+     * gets #included
+     */
+  public:
+    // auto static SerialUSB//?
+    static Hal::Serial GPS;
+    static Hal::Serial Radio;
+    static Hal::Serial Camera;
+    // Annoyingly trying to make some of these SerialX const directly doesn't
+    // easily work because the underlying HardwareSerial isn't const, which I
+    // think means everything that uses HardwareSerial (i.e. everything useful)
+    // is not const, which kind of cascades upwards.
+};
 
 } // namespace Hal
