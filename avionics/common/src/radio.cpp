@@ -34,7 +34,7 @@ void RadioController::sendStatus(uint32_t time, RocketStatus status,
                                  SensorCollection &sensors,
                                  IgnitorCollection &ignitors) {
     SubPktPtr buf(new std::vector<uint8_t>);
-    buf->resize(8);
+    buf->resize(10);
 
     setupIdTime(buf.get(), Ids::status_ping, time);
 
@@ -45,7 +45,6 @@ void RadioController::sendStatus(uint32_t time, RocketStatus status,
     *(buf->data() + 8) = *ignitors.getStatusBitfield();
     *(buf->data() + 9) = *(ignitors.getStatusBitfield() + 1);
 
-    // TODO Include status of E-match components
     addSubpacket(std::move(buf));
 }
 
