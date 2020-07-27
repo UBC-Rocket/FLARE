@@ -1,11 +1,12 @@
 #pragma once
 
-#include <cstring>  //for memmove
+#include <cstring> //for memmove
+#include <fstream>
 #include <iostream> //for std::cin/cout
 #include <mutex>
-#include <queue>         //for queue
-#include <thread>        //for non-blocking input
-#include <unordered_map> //for hash map
+#include <queue>         // for queue
+#include <thread>        // for non-blocking input
+#include <unordered_map> // for hash map
 #include <vector>
 
 #if defined(WIN32) || defined(_WIN32)
@@ -27,6 +28,9 @@ class StdIoController {
     static std::thread m_input; // run infinite inputLoop()
     // Everything is static but it's not a namespace b/c of the private member
     // variables
+
+    static std::ofstream out_log_; // logs happen before CRCRLF
+    static void output(char const c);
 
   public:
     /**
@@ -67,25 +71,7 @@ class StdIoController {
      * @param length Length of the data to be sent
      */
     static void putPacket(uint8_t const id, char const *c,
-                          uint16_t const length) {
-        const std::lock_guard<std::mutex> lock(m_cout);
-        // TODO - check the success of std::cout.put and other unformatted
-        // output, and possibly do something about it
-
-        // Windows converts lf -> crlf. To get around this, we force every
-        // character to be put one at a time -- this means a stream like CRLF
-        // becomes CRLFLF. Then on the reciving end replace CRLF with LF to
-        // recover the original values.
-        std::cout.put(id);                             // ID
-        std::cout.put(static_cast<char>(length >> 8)); // Length, bigendian
-        std::cout.put(static_cast<char>(length & 0xFF));
-
-        // Data
-        for (char const *end = c + length; c != end; c++)
-            std::cout.put(*c);
-
-        std::cout << std::flush;
-    }
+                          uint16_t const length);
 
     /**
      * @brief Basic level utility to put a packet into std::cout.
@@ -94,17 +80,7 @@ class StdIoController {
      * @param length Length of the data to be sent
      */
     static void putPacket(uint8_t const id, uint8_t const *c,
-                          uint16_t const length) {
-        putPacket(id, reinterpret_cast<const char *>(c), length);
-        // Shoudn't need to worry that std::cin et al thinks its pointing to a
-        // char - the bits should come out as defined by uint8_t, which would be
-        // expected. Char is defined to be a byte, so this is fine as long as a
-        // byte is 8 bits (no seriously there are some machines that have bytes
-        // with more than 8 bits.)
-        // TODO - maybe less sloppily deal with this problem without using
-        // reinterpret_cast? Although we're low enough that reinterpret is close
-        // to being allowed
-    }
+                          uint16_t const length);
 
   private:
     /**
