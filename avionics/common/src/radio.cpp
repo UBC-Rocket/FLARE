@@ -26,8 +26,10 @@
 #include "sensor_collection.h"
 
 void RadioController::send() {
-    tx_packet_.setPayloadLength(tx_q_.fillPayload(payload_));
-    xbee_.send(tx_packet_);
+    if (!tx_q_.empty()) {
+        tx_packet_.setPayloadLength(tx_q_.fillPayload(payload_));
+        xbee_.send(tx_packet_);
+    }
 }
 
 void RadioController::sendStatus(uint32_t time, RocketStatus status,

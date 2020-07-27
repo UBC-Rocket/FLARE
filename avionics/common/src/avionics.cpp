@@ -234,7 +234,9 @@ int main(void) {
 #ifdef TESTING
         Hal::sleep_ms(1000); // So you can actually read the serial output
 #endif
-#ifdef SLEEP_BECAUSE_NATIVE_CONFIGURATION
+
+#ifdef THIS_IS_NATIVE_CONFIGURATION
+        env_callbacks();
         Hal::sleep_ms((old_time + time_interval - new_time).count());
 #endif
     }

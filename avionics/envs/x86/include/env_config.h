@@ -4,5 +4,5 @@ constexpr char BAROMETER_DATA[] = "data/barometer.csv";
 constexpr char LOG_FILE_NAME[] = "datalog.csv";
 
 void env_initialize();
-
-#define SLEEP_BECAUSE_NATIVE_CONFIGURATION
+void env_callbacks();
+#define THIS_IS_NATIVE_CONFIGURATION
