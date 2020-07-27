@@ -3,10 +3,11 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if(CMAKE_HOST_APPLE)
-  set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -Wall -Wextra -pedantic")
+    set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -Wall -Wextra -pedantic")
 else()
-  set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -static-libgcc -Wall -Wextra -pedantic")
+    set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -static-libgcc -Wall -Wextra -pedantic")
 endif()
+
 # add_definitions()
 
 project(Avionics_Native)
