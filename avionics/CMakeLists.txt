@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -static-libgcc -static -l pthread -Wall -Wextra -pedantic")
+if(CMAKE_HOST_APPLE)
+  set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -Wall -Wextra -pedantic")
+else()
+  set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -static-libgcc -Wall -Wextra -pedantic")
+endif()
 # add_definitions()
 
 project(Avionics_Native)
