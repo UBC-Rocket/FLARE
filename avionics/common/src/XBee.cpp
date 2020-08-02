@@ -65,7 +65,7 @@ void XBeeResponse::setChecksum(uint8_t checksum) { _checksum = checksum; }
 
 unsigned short XBeeResponse::getFrameDataLength() { return _frameLength; }
 
-void XBeeResponse::setFrameLength(uint8_t frameLength) {
+void XBeeResponse::setFrameLength(unsigned short frameLength) {
     _frameLength = frameLength;
 }
 
@@ -1519,7 +1519,7 @@ void XBeeWithCallbacks::loopBottom() {
 uint8_t XBeeWithCallbacks::matchStatus(uint8_t frameId) {
     uint8_t id = getResponse().getApiId();
     uint8_t *data = getResponse().getFrameData();
-    uint8_t len = getResponse().getFrameDataLength();
+    unsigned short len = getResponse().getFrameDataLength();
     uint8_t offset = 0;
 
     // Figure out if this frame has a frameId and if so, where the

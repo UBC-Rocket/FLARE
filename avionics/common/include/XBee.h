@@ -232,7 +232,7 @@ class XBeeResponse {
      */
     uint8_t *getFrameData();
 
-    void setFrameLength(uint8_t frameLength);
+    void setFrameLength(unsigned short frameLength);
     // to support future 65535 byte packets I guess
     /**
      * Returns the length of the packet
@@ -336,7 +336,7 @@ class XBeeResponse {
     uint8_t _msbLength;
     uint8_t _lsbLength;
     uint8_t _checksum;
-    uint8_t _frameLength;
+    unsigned short _frameLength;
     bool _complete;
     uint8_t _errorCode;
 };
