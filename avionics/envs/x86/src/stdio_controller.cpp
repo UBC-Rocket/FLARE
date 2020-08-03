@@ -1,14 +1,14 @@
 #include <cassert>
 #include <fstream>
+#include <utility>
 
 #include "stdio_controller.hpp"
 
-std::thread StdIoController::m_input{};
-std::unordered_map<StdIoController::Id, std::mutex>
-    StdIoController::m_mutexes{};
+std::thread StdIoController::input_{};
+std::mutex StdIoController::istream_mutex_{};
 std::unordered_map<StdIoController::Id, std::queue<uint8_t>>
-    StdIoController::m_istreams{};
-std::mutex StdIoController::m_cout{};
+    StdIoController::istreams_{};
+std::mutex StdIoController::cout_mutex_{};
 std::ofstream StdIoController::out_log_{
     "FW_SIM_log", std::ios_base::out | std::ios_base::binary};
 
@@ -26,12 +26,12 @@ void StdIoController::initialize() {
     }
     putConfigPacket();
     std::thread input{&StdIoController::inputLoop};
-    m_input = std::move(input);
+    input_ = std::move(input);
 }
 
 void StdIoController::putPacket(uint8_t const id, char const *c,
                                 uint16_t const length) {
-    const std::lock_guard<std::mutex> lock(m_cout);
+    const std::lock_guard<std::mutex> lock(cout_mutex_);
     // TODO - check the success of std::cout.put and other unformatted
     // output, and possibly do something about it
 

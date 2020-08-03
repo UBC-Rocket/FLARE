@@ -17,15 +17,16 @@ class StdIoController {
   private:
     typedef char Id;
 
-    static std::unordered_map<Id, std::mutex> m_mutexes;
+    // static std::unordered_map<Id, std::mutex> m_mutexes;
+    static std::mutex istream_mutex_; // lock before accessing istreams_
     static std::unordered_map<Id, std::queue<uint8_t>>
-        m_istreams; // Note - for input only
+        istreams_; // Note - for input only
 
     // I got tired of thinking about the best way to pre-compose strings so
     // instead I'm just going to lock std::cout
-    static std::mutex m_cout;
+    static std::mutex cout_mutex_;
 
-    static std::thread m_input; // run infinite inputLoop()
+    static std::thread input_; // run infinite inputLoop()
     // Everything is static but it's not a namespace b/c of the private member
     // variables
 
@@ -49,19 +50,19 @@ class StdIoController {
      * @return True if read succeeded, false if EOF.
      */
     static bool get(uint8_t id, uint8_t &c) {
-        const std::lock_guard<std::mutex> lock(m_mutexes[id]);
+        const std::lock_guard<std::mutex> lock(istream_mutex_);
 
-        if (m_istreams[id].size() == 0) {
+        if (istreams_[id].size() == 0) {
             return false;
         }
-        c = m_istreams[id].front();
-        m_istreams[id].pop();
+        c = istreams_[id].front();
+        istreams_[id].pop();
         return true;
     }
 
     static int available(uint8_t id) {
-        const std::lock_guard<std::mutex> lock(m_mutexes[id]);
-        return m_istreams[id].size();
+        const std::lock_guard<std::mutex> lock(istream_mutex_);
+        return istreams_[id].size();
     }
 
     /**
@@ -98,19 +99,27 @@ class StdIoController {
     }
 
     static char getCinForce() {
-        char c[2];
-        std::cin.getline(c, 2, '\0');
+        char c;
+        while (true) {
+
+            // std::cin.getline(c, 2, '\0');
+            c = std::cin.get();
+            if (std::cin.fail()) {
+                std::cin.clear();
+                continue;
+            }
 // getline always appends '\0' to the end, so if the character actually is '\0'
 // then it will be discarded, but '\0' will still be returned
 #ifdef OS_IS_WINDOWS
-        // 0x0D is CR, 0x0A is LF
-        if (c[0] == 0x0D && std::cin.peek() == 0x0A) {
-            std::cin.ignore(1);
-            return 0x0A;
-        }
+            // 0x0D is CR, 0x0A is LF
+            if (c == 0x0D && std::cin.peek() == 0x0A) {
+                std::cin.ignore(1);
+                return 0x0A;
+            }
 #endif
 
-        return c[0];
+            return c;
+        }
     }
 
     static void inputLoop() {
@@ -130,9 +139,9 @@ class StdIoController {
             }
 
             { // scope for lock-guard
-                const std::lock_guard<std::mutex> lock(m_mutexes[id]);
+                const std::lock_guard<std::mutex> lock(istream_mutex_);
                 for (auto j : buf) {
-                    m_istreams[id].push(j);
+                    istreams_[id].push(j);
                 } // unlock mutex
             }
         }
