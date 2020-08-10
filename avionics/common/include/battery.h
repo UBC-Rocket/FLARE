@@ -17,13 +17,14 @@
 
 #pragma once
 
+#include "gpio.h"
 #include "status.h"
 
 class Battery {
   public: // public functions
     // Constructor. batterySensorPin is the pin for battery sensor
     // (i.e. output of the voltage divider)
-    Battery(uint8_t batterySensorPin);
+    Battery(Pin batterySensorPin);
 
     /**
      * @brief  Gets the battery voltage level. Maximum voltage readable
@@ -39,9 +40,9 @@ class Battery {
      * @param  None
      * @return Status - battery status
      */
-    ComponentStatus getStatus();
+    RocketStatus getStatus();
 
   private:
     float m_divider;
-    uint8_t m_batterySensorPin;
+    Pin m_batterySensorPin;
 };

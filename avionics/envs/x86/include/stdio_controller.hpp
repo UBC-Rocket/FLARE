@@ -1,11 +1,12 @@
 #pragma once
 
-#include <cstring>  //for memmove
+#include <cstring> //for memmove
+#include <fstream>
 #include <iostream> //for std::cin/cout
 #include <mutex>
-#include <queue>         //for queue
-#include <thread>        //for non-blocking input
-#include <unordered_map> //for hash map
+#include <queue>         // for queue
+#include <thread>        // for non-blocking input
+#include <unordered_map> // for hash map
 #include <vector>
 
 #if defined(WIN32) || defined(_WIN32)
@@ -16,20 +17,28 @@ class StdIoController {
   private:
     typedef char Id;
 
-    static std::unordered_map<Id, std::mutex> m_mutexes;
+    // static std::unordered_map<Id, std::mutex> m_mutexes;
+    static std::mutex istream_mutex_; // lock before accessing istreams_
     static std::unordered_map<Id, std::queue<uint8_t>>
-        m_istreams; // Note - for input only
+        istreams_; // Note - for input only
 
     // I got tired of thinking about the best way to pre-compose strings so
     // instead I'm just going to lock std::cout
-    static std::mutex m_cout;
+    static std::mutex cout_mutex_;
 
-    static std::thread m_input; // run infinite inputLoop()
+    static std::thread input_; // run infinite inputLoop()
     // Everything is static but it's not a namespace b/c of the private member
     // variables
 
+    static std::ofstream out_log_; // logs happen before CRCRLF
+    static void output(char const c);
+
   public:
-    // StdIoController() { putConfigPacket(); }
+    /**
+     * @brief sets up SIM
+     * Things that are setup: config packet is sent, with 2 way handshake.
+     */
+    static void initialize();
 
     constexpr static uint8_t DEV_NULL = 0;
     /**
@@ -41,19 +50,19 @@ class StdIoController {
      * @return True if read succeeded, false if EOF.
      */
     static bool get(uint8_t id, uint8_t &c) {
-        const std::lock_guard<std::mutex> lock(m_mutexes[id]);
+        const std::lock_guard<std::mutex> lock(istream_mutex_);
 
-        if (m_istreams[id].size() == 0) {
+        if (istreams_[id].size() == 0) {
             return false;
         }
-        c = m_istreams[id].front();
-        m_istreams[id].pop();
+        c = istreams_[id].front();
+        istreams_[id].pop();
         return true;
     }
 
     static int available(uint8_t id) {
-        const std::lock_guard<std::mutex> lock(m_mutexes[id]);
-        return m_istreams[id].size();
+        const std::lock_guard<std::mutex> lock(istream_mutex_);
+        return istreams_[id].size();
     }
 
     /**
@@ -63,25 +72,7 @@ class StdIoController {
      * @param length Length of the data to be sent
      */
     static void putPacket(uint8_t const id, char const *c,
-                          uint16_t const length) {
-        const std::lock_guard<std::mutex> lock(m_cout);
-        // TODO - check the success of std::cout.put and other unformatted
-        // output, and possibly do something about it
-
-        // Windows converts lf -> crlf. To get around this, we force every
-        // character to be put one at a time -- this means a stream like CRLF
-        // becomes CRLFLF. Then on the reciving end replace CRLF with LF to
-        // recover the original values.
-        std::cout.put(id);                             // ID
-        std::cout.put(static_cast<char>(length >> 8)); // Length, bigendian
-        std::cout.put(static_cast<char>(length & 0xFF));
-
-        // Data
-        for (char const *end = c + length; c != end; c++)
-            std::cout.put(*c);
-
-        std::cout << std::flush;
-    }
+                          uint16_t const length);
 
     /**
      * @brief Basic level utility to put a packet into std::cout.
@@ -90,18 +81,9 @@ class StdIoController {
      * @param length Length of the data to be sent
      */
     static void putPacket(uint8_t const id, uint8_t const *c,
-                          uint16_t const length) {
-        putPacket(id, reinterpret_cast<const char *>(c), length);
-        // Shoudn't need to worry that std::cin et al thinks its pointing to a
-        // char - the bits should come out as defined by uint8_t, which would be
-        // expected. Char is defined to be a byte, so this is fine as long as a
-        // byte is 8 bits (no seriously there are some machines that have bytes
-        // with more than 8 bits.)
-        // TODO - maybe less sloppily deal with this problem without using
-        // reinterpret_cast? Although we're low enough that reinterpret is close
-        // to being allowed
-    }
+                          uint16_t const length);
 
+  private:
     /**
      * @brief Helper function for configuration packet.
      */
@@ -116,21 +98,28 @@ class StdIoController {
         putPacket(id, buf, 8);
     }
 
-  private:
     static char getCinForce() {
-        char c[2];
-        std::cin.getline(c, 2, '\0');
+        char c;
+        while (true) {
+
+            // std::cin.getline(c, 2, '\0');
+            c = std::cin.get();
+            if (std::cin.fail()) {
+                std::cin.clear();
+                continue;
+            }
 // getline always appends '\0' to the end, so if the character actually is '\0'
 // then it will be discarded, but '\0' will still be returned
 #ifdef OS_IS_WINDOWS
-        // 0x0D is CR, 0x0A is LF
-        if (c[0] == 0x0D && std::cin.peek() == 0x0A) {
-            std::cin.ignore(1);
-            return 0x0A;
-        }
+            // 0x0D is CR, 0x0A is LF
+            if (c == 0x0D && std::cin.peek() == 0x0A) {
+                std::cin.ignore(1);
+                return 0x0A;
+            }
 #endif
 
-        return c[0];
+            return c;
+        }
     }
 
     static void inputLoop() {
@@ -150,9 +139,9 @@ class StdIoController {
             }
 
             { // scope for lock-guard
-                const std::lock_guard<std::mutex> lock(m_mutexes[id]);
+                const std::lock_guard<std::mutex> lock(istream_mutex_);
                 for (auto j : buf) {
-                    m_istreams[id].push(j);
+                    istreams_[id].push(j);
                 } // unlock mutex
             }
         }

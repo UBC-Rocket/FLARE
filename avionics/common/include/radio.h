@@ -19,6 +19,7 @@
 #pragma once
 
 /*Includes------------------------------------------------------------*/
+#include <cstring>
 #include <stdint.h>
 #include <type_traits>
 #include <utility>
@@ -87,7 +88,7 @@ class RadioController {
 
         xbee_.readPacket();
         int i = 0;
-        bool can_send = false;
+
         while (i < MAX_PACKETS_PER_RX_LOOP_ &&
                (xbee_.getResponse().isAvailable() ||
                 xbee_.getResponse().isError())) {
@@ -123,6 +124,7 @@ class RadioController {
             can_send = true;
         }
         if (can_send) {
+            can_send = false;
             watchdog_last_send_ = Hal::now_ms();
             send();
         }
@@ -193,6 +195,7 @@ class RadioController {
     const Hal::ms WATCHDOG_SEND_INTERVAL_;
     Hal::t_point
         watchdog_last_send_; // Keeps track of last time sending was done.
+    bool can_send = false;
     void send();
 
     // A bit of magic SFINAE from stack overflow, for listenAndAct

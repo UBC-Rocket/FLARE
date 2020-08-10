@@ -26,15 +26,17 @@
 #include "sensor_collection.h"
 
 void RadioController::send() {
-    tx_packet_.setPayloadLength(tx_q_.fillPayload(payload_));
-    xbee_.send(tx_packet_);
+    if (!tx_q_.empty()) {
+        tx_packet_.setPayloadLength(tx_q_.fillPayload(payload_));
+        xbee_.send(tx_packet_);
+    }
 }
 
 void RadioController::sendStatus(uint32_t time, RocketStatus status,
                                  SensorCollection &sensors,
                                  IgnitorCollection &ignitors) {
     SubPktPtr buf(new std::vector<uint8_t>);
-    buf->resize(8);
+    buf->resize(10);
 
     setupIdTime(buf.get(), Ids::status_ping, time);
 
@@ -45,7 +47,6 @@ void RadioController::sendStatus(uint32_t time, RocketStatus status,
     *(buf->data() + 8) = *ignitors.getStatusBitfield();
     *(buf->data() + 9) = *(ignitors.getStatusBitfield() + 1);
 
-    // TODO Include status of E-match components
     addSubpacket(std::move(buf));
 }
 
@@ -79,8 +80,9 @@ void RadioController::sendBulkSensor(uint32_t time, float alt,
 void RadioController::sendMessage(const uint32_t time, const char *str) {
     SubPktPtr buf(new std::vector<uint8_t>);
     auto strlen = std::strlen(str);
-    buf->resize(strlen + 5);
+    buf->resize(strlen + 6);
     setupIdTime(buf.get(), Ids::message, time);
-    std::memcpy(buf->data() + 5, str, strlen);
+    (*buf)[5] = strlen;
+    std::memcpy(buf->data() + 6, str, strlen);
     addSubpacket(std::move(buf));
 }

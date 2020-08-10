@@ -27,7 +27,7 @@
 #define R2 15150 // Nominal: 16000. Lower is larger range.
 // Maximum voltage = 3.3*(R1+R2)/R2
 
-Battery::Battery(uint8_t batterySensorPin) {
+Battery::Battery(Pin batterySensorPin) {
     m_divider = static_cast<float>(R2) / (R1 + R2);
     m_batterySensorPin = batterySensorPin;
 }
@@ -51,12 +51,12 @@ float Battery::getVoltage() {
     return batteryVoltage;
 }
 
-ComponentStatus Battery::getStatus() {
+RocketStatus Battery::getStatus() {
     float voltage = getVoltage();
     if (voltage < MINIMUM_BATTERY_VOLTAGE)
-        return Status::CRITICAL_FAILURE;
+        return RocketStatus::CRITICAL_FAILURE;
     else if (voltage < LOW_BATTERY_VOLTAGE)
-        return Status::NONCRITICAL_FAILURE;
+        return RocketStatus::NONCRITICAL_FAILURE;
     else
-        return Status::NOMINAL;
+        return RocketStatus::NOMINAL;
 }

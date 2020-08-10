@@ -30,7 +30,7 @@
 #include "status.h"
 
 #undef HIGH // TODO - see if there's a better place to undef these codes from
-            // Arduino
+#undef LOW  // Arduino
 #undef OUTPUT
 #undef LED_BUILTIN
 

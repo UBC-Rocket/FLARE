@@ -117,7 +117,7 @@ int main(void) {
     constexpr unsigned int NOMINAL_POLLING_TIME_INTERVAL = 50;  // ms
 
     static Buzzer buzzer;
-    Camera cam(Hal::SerialCamera);
+    Camera cam(Hal::SerialInst::Camera);
 
     initPins();
 
@@ -145,12 +145,12 @@ int main(void) {
     RocketStatus statusOfInit = collectStatus(sensors, ignitors);
     displayStatus(statusOfInit, buzzer);
 
-    RadioController radio{Hal::SerialRadio};
+    RadioController radio{Hal::SerialInst::Radio};
 
     Calculator calc(sensors);
 
     StateMachine state_machine;
-    StateId state;
+    StateId state = state_machine.getState();
 
     // Timing
     Hal::t_point timestamp;
@@ -163,7 +163,7 @@ int main(void) {
     radio.sendStatus(old_time.time_since_epoch().count(), statusOfInit, sensors,
                      ignitors);
 
-    float altitude;
+    float altitude = 0;
 
     auto command_reciever = [&new_time_int, &statusOfInit, &sensors, &ignitors,
                              &radio, &state_machine, &altitude,
@@ -214,12 +214,10 @@ int main(void) {
             old_time = new_time;
 
             sensors.poll(timestamp);
-
             calc.calculateValues(state, state_input, new_time);
             altitude = state_input.altitude;
 
             state_machine.update(state_input, state_aux);
-
             datalog.logData(new_time_int, sensors, state, altitude,
                             calc.getBaseAltitude());
         }
@@ -235,6 +233,11 @@ int main(void) {
 
 #ifdef TESTING
         Hal::sleep_ms(1000); // So you can actually read the serial output
+#endif
+
+#ifdef THIS_IS_NATIVE_CONFIGURATION
+        env_callbacks();
+        Hal::sleep_ms((old_time + time_interval - new_time).count());
 #endif
     }
 }

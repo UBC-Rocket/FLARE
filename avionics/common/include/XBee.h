@@ -220,7 +220,7 @@ class XBeeResponse {
      * prior to the checksum Note up to release 0.1.2, this was incorrectly
      * including the checksum in the length.
      */
-    uint8_t getFrameDataLength();
+    unsigned short getFrameDataLength();
     void setFrameData(uint8_t *frameDataPtr);
     /**
      * Returns the buffer that contains the response.
@@ -232,7 +232,7 @@ class XBeeResponse {
      */
     uint8_t *getFrameData();
 
-    void setFrameLength(uint8_t frameLength);
+    void setFrameLength(unsigned short frameLength);
     // to support future 65535 byte packets I guess
     /**
      * Returns the length of the packet
@@ -336,7 +336,7 @@ class XBeeResponse {
     uint8_t _msbLength;
     uint8_t _lsbLength;
     uint8_t _checksum;
-    uint8_t _frameLength;
+    unsigned short _frameLength;
     bool _complete;
     uint8_t _errorCode;
 };
@@ -769,7 +769,7 @@ class XBeeRequest {
      * Returns the size of the api frame (not including frame id or api id or
      * checksum).
      */
-    virtual uint8_t getFrameDataLength() = 0;
+    virtual unsigned short getFrameDataLength() = 0;
     // void reset();
   protected:
     void setApiId(uint8_t apiId);
@@ -1227,7 +1227,7 @@ class Tx16Request : public PayloadRequest {
     uint8_t getOption();
     void setOption(uint8_t option);
     uint8_t getFrameData(uint8_t pos);
-    uint8_t getFrameDataLength();
+    unsigned short getFrameDataLength() override;
 
   protected:
   private:
@@ -1264,7 +1264,7 @@ class Tx64Request : public PayloadRequest {
     uint8_t getOption();
     void setOption(uint8_t option);
     uint8_t getFrameData(uint8_t pos);
-    uint8_t getFrameDataLength();
+    unsigned short getFrameDataLength() override;
 
   private:
     XBeeAddress64 _addr64;
@@ -1316,7 +1316,7 @@ class ZBTxRequest : public PayloadRequest {
   protected:
     // declare virtual functions
     uint8_t getFrameData(uint8_t pos);
-    uint8_t getFrameDataLength();
+    unsigned short getFrameDataLength() override;
     XBeeAddress64 _addr64;
     uint16_t _addr16;
     uint8_t _broadcastRadius;
@@ -1376,7 +1376,7 @@ class ZBExplicitTxRequest : public ZBTxRequest {
   protected:
     // declare virtual functions
     uint8_t getFrameData(uint8_t pos);
-    uint8_t getFrameDataLength();
+    unsigned short getFrameDataLength() override;
 
   private:
     uint8_t _srcEndpoint;
@@ -1398,7 +1398,7 @@ class AtCommandRequest : public XBeeRequest {
     AtCommandRequest(uint8_t *command, uint8_t *commandValue,
                      uint8_t commandValueLength);
     uint8_t getFrameData(uint8_t pos);
-    uint8_t getFrameDataLength();
+    unsigned short getFrameDataLength() override;
     uint8_t *getCommand();
     void setCommand(uint8_t *command);
     uint8_t *getCommandValue();
@@ -1453,7 +1453,7 @@ class RemoteAtCommandRequest : public AtCommandRequest {
     bool getApplyChanges();
     void setApplyChanges(bool applyChanges);
     uint8_t getFrameData(uint8_t pos);
-    uint8_t getFrameDataLength();
+    unsigned short getFrameDataLength() override;
     static XBeeAddress64 broadcastAddress64;
     //	static uint16_t broadcast16Address;
   private:
