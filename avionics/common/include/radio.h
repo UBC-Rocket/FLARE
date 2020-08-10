@@ -44,6 +44,7 @@ class RadioController {
     enum class Ids {
         status_ping = 0x00,
         message = 0x01,
+        gps = 0x04,
         bulk_sensor = 0x30,
     };
 
@@ -168,6 +169,17 @@ class RadioController {
      * @param str C-style string to send.
      */
     void sendMessage(const uint32_t time, const char *str);
+
+    void sendGPS(const uint32_t time, GPS gps);
+
+    /**
+     * @brief Helper function to send single sensor. Logic of identifying sensor
+     * not included - this is only really useful as an organizer.
+     * @param time Timestamp, in milliseconds
+     * @param id ID of the sensor to send - refer to specs on Confluence
+     * @param data to be sent
+     */
+    void sendSingleSensor(const uint32_t time, uint8_t id, float data);
 
   private:
     /**
