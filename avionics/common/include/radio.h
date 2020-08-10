@@ -160,8 +160,8 @@ class RadioController {
      * @param gps GPS sensor object
      * @param state_id Current rocket state, as integer ID
      */
-    void sendBulkSensor(uint32_t time, float alt, Accelerometer &xl, IMU imu,
-                        GPS gps, uint8_t state_id);
+    void sendBulkSensor(uint32_t time, float alt, Accelerometer &xl, IMU &imu,
+                        GPS &gps, uint8_t state_id);
 
     /**
      * @brief Helper function to send message.
@@ -170,7 +170,7 @@ class RadioController {
      */
     void sendMessage(const uint32_t time, const char *str);
 
-    void sendGPS(const uint32_t time, GPS gps);
+    void sendGPS(const uint32_t time, GPS &gps);
 
     /**
      * @brief Helper function to send single sensor. Logic of identifying sensor

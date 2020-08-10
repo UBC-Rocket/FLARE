@@ -51,7 +51,7 @@ void RadioController::sendStatus(uint32_t time, RocketStatus status,
 }
 
 void RadioController::sendBulkSensor(uint32_t time, float alt,
-                                     Accelerometer &xl, IMU imu, GPS gps,
+                                     Accelerometer &xl, IMU &imu, GPS &gps,
                                      uint8_t state_id) {
     SubPktPtr buf(new std::vector<uint8_t>);
     buf->resize(42);
@@ -87,7 +87,7 @@ void RadioController::sendMessage(const uint32_t time, const char *str) {
     addSubpacket(std::move(buf));
 }
 
-void RadioController::sendGPS(const uint32_t time, GPS gps) {
+void RadioController::sendGPS(const uint32_t time, GPS &gps) {
     SubPktPtr buf(new std::vector<uint8_t>);
     buf->resize(17);
     setupIdTime(buf.get(), Ids::gps, time);
