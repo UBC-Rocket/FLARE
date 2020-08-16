@@ -237,7 +237,8 @@ int main(void) {
             radio.sendSingleSensor(new_time_int, 0x1C, altitude);
             break;
         case 0x1D:
-
+            radio.sendState(new_time_int, static_cast<uint8_t>(state));
+            break;
         case 0x1E:
             break; // Voltage sensor not implemented
         case 0x1F:

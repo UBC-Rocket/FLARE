@@ -104,3 +104,15 @@ void RadioController::sendSingleSensor(const uint32_t time, uint8_t id,
     std::memcpy(buf->data() + 5, &data, 4);
     addSubpacket(std::move(buf));
 }
+
+void RadioController::sendState(const uint32_t time, uint8_t state_id) {
+    SubPktPtr buf(new std::vector<uint8_t>);
+    buf->resize(9);
+    (*buf)[0] = 0x1D;
+    std::memcpy(buf->data() + 1, &time, 4);
+    (*buf)[5] = 0;
+    (*buf)[7] = 0;
+    (*buf)[6] = 0;
+    (*buf)[8] = state_id;
+    addSubpacket(std::move(buf));
+}

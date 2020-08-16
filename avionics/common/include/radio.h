@@ -181,6 +181,14 @@ class RadioController {
      */
     void sendSingleSensor(const uint32_t time, uint8_t id, float data);
 
+    /**
+     * @brief Helper function to send state. Falls under the spec for single
+     * sensor, but for type reasons implemented as a seperate method.
+     * @param time Timestamp, in milliseconds
+     * @param state_id Current rocket state, as integer ID
+     */
+    void sendState(const uint32_t time, uint8_t state_id);
+
   private:
     /**
      * @brief Fills in the ID and timestamp given a subpacket pointer.
