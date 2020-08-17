@@ -65,6 +65,12 @@ endif()
  
 enable_testing() 
 
+###
+### Link all tests here 
+###
+### Note: Compile project in build folder to keep unnecessarily files out from main directory
+###
+
 # Now simply link against gtest or gtest_main as needed. Eg
 add_executable(Test tests/SampleTest.cpp)
 target_link_libraries(Test gtest_main)
