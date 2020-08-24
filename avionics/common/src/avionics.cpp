@@ -150,6 +150,9 @@ int main(void) {
     Calculator calc(sensors);
 
     StateMachine state_machine;
+    if (statusOfInit == RocketStatus::CRITICAL_FAILURE) {
+        state_machine.abort();
+    }
     StateId state = state_machine.getState();
 
     // Timing
