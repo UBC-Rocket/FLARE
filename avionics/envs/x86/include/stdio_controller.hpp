@@ -96,11 +96,8 @@ class StdIoController {
                   1);  // ensures that at least one more SIM packet exists
         input_.join(); // so this won't block
 
-        while (true) {
-            // At this point program is single threaded, no need to acquire lock
-            if (istreams_['a'].size() == 0) { // haven't heard back
-                extractPacket();
-            }
+        while (istreams_['a'].size() == 0) {
+            extractPacket();
         }
         int val = istreams_['a'].front();
         istreams_['a'].pop();
@@ -109,6 +106,7 @@ class StdIoController {
         istreams_['a'].pop();
 
         // restart input loop
+        run_input_ = true;
         std::thread input{&StdIoController::inputLoop};
         input_ = std::move(input);
         return val;
@@ -171,6 +169,7 @@ class StdIoController {
             } // unlock mutex
         }
     }
+
     static void inputLoop() {
         while (run_input_) {
             extractPacket();
