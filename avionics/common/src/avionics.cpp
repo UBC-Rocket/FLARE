@@ -150,6 +150,9 @@ int main(void) {
     Calculator calc(sensors);
 
     StateMachine state_machine;
+    if (statusOfInit == RocketStatus::CRITICAL_FAILURE) {
+        state_machine.abort();
+    }
     StateId state = state_machine.getState();
 
     // Timing
@@ -167,7 +170,8 @@ int main(void) {
 
     auto command_reciever = [&new_time_int, &statusOfInit, &sensors, &ignitors,
                              &radio, &state_machine, &altitude,
-                             &state](uint8_t command) {
+                             &calc](uint8_t command) {
+        auto state = state_machine.getState();
         switch (command) {
         case 'P':
             radio.sendStatus(new_time_int, statusOfInit, sensors, ignitors);
@@ -182,6 +186,67 @@ int main(void) {
             radio.sendBulkSensor(new_time_int, altitude, sensors.accelerometer,
                                  sensors.imuSensor, sensors.gps,
                                  static_cast<uint8_t>(state));
+            break;
+        case 0x04:
+            radio.sendGPS(new_time_int, sensors.gps);
+            break;
+        case 0x10:
+            radio.sendSingleSensor(new_time_int, 0x10,
+                                   sensors.accelerometer.getData()[0]);
+            break;
+
+        case 0x11:
+            radio.sendSingleSensor(new_time_int, 0x11,
+                                   sensors.accelerometer.getData()[1]);
+            break;
+        case 0x12:
+            radio.sendSingleSensor(new_time_int, 0x12,
+                                   sensors.accelerometer.getData()[2]);
+            break;
+        case 0x13:
+            radio.sendSingleSensor(new_time_int, 0x13,
+                                   sensors.barometer.getData()[0]);
+            break;
+        case 0x14:
+            radio.sendSingleSensor(new_time_int, 0x14,
+                                   sensors.barometer.getData()[1]);
+            break;
+        case 0x15:
+            radio.sendSingleSensor(new_time_int, 0x15,
+                                   sensors.temperature.getData()[0]);
+            break;
+        case 0x16:
+            break;
+            // Not implemented - still uncertain about IMU storage
+        case 0x17:
+            break;
+            // Not implemented - still uncertain about IMU storage
+        case 0x18:
+            break;
+            // Not implemented - still uncertain about IMU storage
+        case 0x19:
+            radio.sendSingleSensor(new_time_int, 0x19,
+                                   sensors.gps.getData()[0]);
+            break;
+        case 0x1A:
+            radio.sendSingleSensor(new_time_int, 0x1A,
+                                   sensors.gps.getData()[1]);
+            break;
+        case 0x1B:
+            radio.sendSingleSensor(new_time_int, 0x1B,
+                                   sensors.gps.getData()[2]);
+            break;
+        case 0x1C:
+            radio.sendSingleSensor(new_time_int, 0x1C, altitude);
+            break;
+        case 0x1D:
+            radio.sendState(new_time_int, static_cast<uint8_t>(state));
+            break;
+        case 0x1E:
+            break; // Voltage sensor not implemented
+        case 0x1F:
+            radio.sendSingleSensor(new_time_int, 0x1F, calc.getBaseAltitude());
+            break;
         default:
             break;
         }

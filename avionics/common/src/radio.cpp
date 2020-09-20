@@ -51,7 +51,7 @@ void RadioController::sendStatus(uint32_t time, RocketStatus status,
 }
 
 void RadioController::sendBulkSensor(uint32_t time, float alt,
-                                     Accelerometer &xl, IMU imu, GPS gps,
+                                     Accelerometer &xl, IMU &imu, GPS &gps,
                                      uint8_t state_id) {
     SubPktPtr buf(new std::vector<uint8_t>);
     buf->resize(42);
@@ -84,5 +84,35 @@ void RadioController::sendMessage(const uint32_t time, const char *str) {
     setupIdTime(buf.get(), Ids::message, time);
     (*buf)[5] = strlen;
     std::memcpy(buf->data() + 6, str, strlen);
+    addSubpacket(std::move(buf));
+}
+
+void RadioController::sendGPS(const uint32_t time, GPS &gps) {
+    SubPktPtr buf(new std::vector<uint8_t>);
+    buf->resize(17);
+    setupIdTime(buf.get(), Ids::gps, time);
+    std::memcpy(buf->data() + 5, gps.getData(), 12);
+    addSubpacket(std::move(buf));
+}
+
+void RadioController::sendSingleSensor(const uint32_t time, uint8_t id,
+                                       float data) {
+    SubPktPtr buf(new std::vector<uint8_t>);
+    buf->resize(9);
+    (*buf)[0] = (id);
+    std::memcpy(buf->data() + 1, &time, 4);
+    std::memcpy(buf->data() + 5, &data, 4);
+    addSubpacket(std::move(buf));
+}
+
+void RadioController::sendState(const uint32_t time, uint8_t state_id) {
+    SubPktPtr buf(new std::vector<uint8_t>);
+    buf->resize(9);
+    (*buf)[0] = 0x1D;
+    std::memcpy(buf->data() + 1, &time, 4);
+    (*buf)[5] = 0;
+    (*buf)[7] = 0;
+    (*buf)[6] = 0;
+    (*buf)[8] = state_id;
     addSubpacket(std::move(buf));
 }

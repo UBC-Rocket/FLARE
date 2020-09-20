@@ -95,6 +95,8 @@ class StateMachine {
     StateId current_state = StateId::STANDBY;
 
   public:
+    StateMachine() : current_state(StateId::STANDBY) {}
+
     void update(const StateInput state_input, StateAuxilliaryInfo state_aux) {
         current_state =
             hash_map[current_state]->getNewState(state_input, state_aux);

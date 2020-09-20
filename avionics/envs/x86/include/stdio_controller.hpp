@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <cstring> //for memmove
 #include <fstream>
 #include <iostream> //for std::cin/cout
@@ -14,6 +15,8 @@
 #endif
 
 class StdIoController {
+    // Everything is static but it's not a namespace b/c of the private member
+    // variables
   private:
     typedef char Id;
 
@@ -26,9 +29,8 @@ class StdIoController {
     // instead I'm just going to lock std::cout
     static std::mutex cout_mutex_;
 
-    static std::thread input_; // run infinite inputLoop()
-    // Everything is static but it's not a namespace b/c of the private member
-    // variables
+    static std::thread input_;          // run infinite inputLoop()
+    static std::atomic_bool run_input_; // controls if input_ is running
 
     static std::ofstream out_log_; // logs happen before CRCRLF
     static void output(char const c);
@@ -83,6 +85,33 @@ class StdIoController {
     static void putPacket(uint8_t const id, uint8_t const *c,
                           uint16_t const length);
 
+    /**
+     * @brief Corresponds to Request Analog Read packet in Confluence spec.
+     * @param pin_id ID of the pin being read.
+     * @return Read value.
+     */
+    static int requestAnalogRead(uint8_t const pin_id) {
+        run_input_ = false; // input_ will now run at most once more
+        putPacket('a', &pin_id,
+                  1);  // ensures that at least one more SIM packet exists
+        input_.join(); // so this won't block
+
+        while (istreams_['a'].size() == 0) {
+            extractPacket();
+        }
+        int val = istreams_['a'].front();
+        istreams_['a'].pop();
+        val *= 256;
+        val += istreams_['a'].front();
+        istreams_['a'].pop();
+
+        // restart input loop
+        run_input_ = true;
+        std::thread input{&StdIoController::inputLoop};
+        input_ = std::move(input);
+        return val;
+    }
+
   private:
     /**
      * @brief Helper function for configuration packet.
@@ -101,15 +130,12 @@ class StdIoController {
     static char getCinForce() {
         char c;
         while (true) {
-
-            // std::cin.getline(c, 2, '\0');
             c = std::cin.get();
             if (std::cin.fail()) {
                 std::cin.clear();
                 continue;
             }
-// getline always appends '\0' to the end, so if the character actually is '\0'
-// then it will be discarded, but '\0' will still be returned
+
 #ifdef OS_IS_WINDOWS
             // 0x0D is CR, 0x0A is LF
             if (c == 0x0D && std::cin.peek() == 0x0A) {
@@ -122,28 +148,31 @@ class StdIoController {
         }
     }
 
-    static void inputLoop() {
+    static void extractPacket() {
         Id id;
         uint16_t length;
+        id = getCinForce();
+        length = getCinForce();
+        length <<= 8;
+        length |= getCinForce();
 
-        for (;;) {
-            id = getCinForce();
-            length = getCinForce();
-            length <<= 8;
-            length |= getCinForce();
+        auto buf = std::vector<char>();
+        buf.reserve(length);
+        for (int i = 0; i < length; i++) {
+            buf.push_back(getCinForce());
+        }
 
-            auto buf = std::vector<char>();
-            buf.reserve(length);
-            for (int i = 0; i < length; i++) {
-                buf.push_back(getCinForce());
-            }
+        { // scope for lock-guard
+            const std::lock_guard<std::mutex> lock(istream_mutex_);
+            for (auto j : buf) {
+                istreams_[id].push(j);
+            } // unlock mutex
+        }
+    }
 
-            { // scope for lock-guard
-                const std::lock_guard<std::mutex> lock(istream_mutex_);
-                for (auto j : buf) {
-                    istreams_[id].push(j);
-                } // unlock mutex
-            }
+    static void inputLoop() {
+        while (run_input_) {
+            extractPacket();
         }
     }
 };
