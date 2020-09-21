@@ -116,3 +116,14 @@ void RadioController::sendState(const uint32_t time, uint8_t state_id) {
     (*buf)[8] = state_id;
     addSubpacket(std::move(buf));
 }
+
+void RadioController::sendConfig(const uint32_t time) {
+    SubPktPtr buf(new std::vector<uint8_t>);
+    buf->resize(8);
+    setupIdTime(buf.get(), Ids::config, time);
+    (*buf)[5] = 2; // length
+    // Defined in CMakeLists/platformio.ini
+    (*buf)[6] = RADIO_CONFIG_PACKET_SIM_ACTIVE;
+    (*buf)[7] = RADIO_CONFIG_PACKET_ROCKET_ID;
+    addSubpacket(std::move(buf));
+}

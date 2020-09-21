@@ -44,6 +44,7 @@ class RadioController {
     enum class Ids {
         status_ping = 0x00,
         message = 0x01,
+        config = 0x03,
         gps = 0x04,
         bulk_sensor = 0x30,
     };
@@ -72,6 +73,7 @@ class RadioController {
         xbee_.setSerial(serial_radio.getSerial());
         tx_packet_.setAddress64(gnd_addr_);
         tx_packet_.setPayload(payload_);
+        sendConfig(Hal::millis());
         sendMessage(Hal::millis(), "Radio initialized");
         send();
     }
@@ -188,6 +190,8 @@ class RadioController {
      * @param state_id Current rocket state, as integer ID
      */
     void sendState(const uint32_t time, uint8_t state_id);
+
+    void sendConfig(const uint32_t time);
 
   private:
     /**
