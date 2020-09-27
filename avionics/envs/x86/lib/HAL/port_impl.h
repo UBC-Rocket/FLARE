@@ -3,6 +3,7 @@
 #include <array>
 #include <chrono>
 #include <cstring>
+#include <thread>
 
 #include "HAL/port.h"
 #include "stdio_controller.hpp"
