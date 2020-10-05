@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
+project(FLARE)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-if(CMAKE_HOST_APPLE)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "-pthread -Wall -Wextra -pedantic")
 else()
     set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -static-libgcc -Wall -Wextra -pedantic")
