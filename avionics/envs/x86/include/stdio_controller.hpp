@@ -40,9 +40,13 @@ class StdIoController {
     static constexpr uint8_t REQUEST_SENSOR_SIM_ID = 's';
     static constexpr uint8_t ANALOG_READ_SIM_ID = 'a';
 
-    static constexpr std::size_t FLOAT_SIZE = sizeof(float);
+    static constexpr auto FLOAT_SIZE = sizeof(float);
     static_assert(FLOAT_SIZE == 4,
                   "Code assumes floating point numbers are 4 bytes");
+
+    // at least until someone can make sure that this is the right way to do
+    // this.
+    static_assert(std::is_same<uint8_t, unsigned char>::value, "Code assumes uint8_t can be used for bytes");
 
     class BlockingRequest {
         /**
@@ -155,9 +159,9 @@ class StdIoController {
         BlockingRequest restart(REQUEST_SENSOR_SIM_ID, &sensor_id, 1);
 
         std::vector<float> sensor_data;
-        for (int f = 0; f < (int)num_floats; f++) {
+        for (std::size_t f = 0; f < num_floats; f++) {
             uint8_t packetData[FLOAT_SIZE];
-            for (int i = 0; i < FLOAT_SIZE; i++) {
+            for (std::size_t i = 0; i < FLOAT_SIZE; i++) {
                 packetData[i] = istreams_[REQUEST_SENSOR_SIM_ID].front();
                 istreams_[REQUEST_SENSOR_SIM_ID].pop();
             }
