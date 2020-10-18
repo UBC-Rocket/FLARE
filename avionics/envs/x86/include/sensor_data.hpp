@@ -5,22 +5,41 @@
 #include <limits> //for numeric_limits
 #include <stdexcept>
 #include <string>
+#include <sys/types.h>
 #include <vector>
 
 #include "HAL/time.h"
+#include "stdio_controller.hpp"
+
+template <std::size_t data_length> class DataSpoof {
+public:
+  DataSpoof(u_int8_t sensor_id, float *const extern_data_buff)
+      : sensor_id_(sensor_id), dat_read_(extern_data_buff) {}
+
+  float *getData() {
+    std::vector<float> sensorData = StdIoController::requestSensorRead(sensor_id_);
+    for(int i = 0; i < sensorData.size(); i++) {
+        dat_read_[i] = sensorData[i];
+    }
+  }
+
+private:
+  u_int8_t sensor_id_;
+  float *const dat_read_;
+};
 
 // class for linking data streams to different sensors
 // Inputted data to DataSpoof is in form of csv with first column
 // being time in ms, and the other columns being each entry of data
 // NOTE: The time in ms of the data must be aligned with the used time
-template <std::size_t data_length> class DataSpoof {
+template <std::size_t data_length> class FileDataSpoof {
   public:
     /**
      * @brief Constructor
      * @param dataFile Path to csv data file.
      * @param extern_dat_buf External data buffer.
      */
-    DataSpoof(std::string const &dataFile, float *const extern_dat_buf)
+    FileDataSpoof(std::string const &dataFile, float *const extern_dat_buf)
         : dat_read(extern_dat_buf) {
         dataStream = std::ifstream(dataFile);
 
@@ -74,7 +93,7 @@ template <std::size_t data_length> class DataSpoof {
 
     int getDataLength() { return data_length; }
 
-    ~DataSpoof() { dataStream.close(); }
+    ~FileDataSpoof() { dataStream.close(); }
 
   private:
     std::ifstream dataStream;

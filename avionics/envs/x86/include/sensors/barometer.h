@@ -21,5 +21,5 @@ class Barometer : public SensorBase<2> {
     SensorStatus getStatus() { return SensorStatus::NOMINAL; }
 
   private:
-    DataSpoof<2> dat{BAROMETER_DATA, data_};
+    FileDataSpoof<2> dat{BAROMETER_DATA, data_};
 };

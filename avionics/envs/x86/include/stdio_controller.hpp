@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <bits/stdint-uintn.h>
 #include <cstring> //for memmove
 #include <fstream>
 #include <iostream> //for std::cin/cout
@@ -34,6 +35,8 @@ class StdIoController {
 
     static std::ofstream out_log_; // logs happen before CRCRLF
     static void output(char const c);
+
+    static char const REQUEST_SENSOR_SIM_ID = 's';
 
   public:
     /**
@@ -111,6 +114,43 @@ class StdIoController {
         input_ = std::move(input);
         return val;
     }
+
+  // Converts a 
+  static float charsToFloat(uint8_t* data) {
+    float f;
+    std::memcpy(&f, &data, sizeof(f));
+    return f;
+  }
+
+  static std::vector<float> requestSensorRead(uint8_t sensor_id) {
+        run_input_ = false; // input_ will now run at most once more
+        putPacket(REQUEST_SENSOR_SIM_ID, &sensor_id,
+                  1);  // ensures that at least one more SIM packet exists
+        input_.join(); // so this won't block
+
+	// Keep polling for new packet until response is received.
+	while (istreams_[REQUEST_SENSOR_SIM_ID].size() == 0) {
+            extractPacket();
+        }
+
+	// FIXME Make sure endianness is correct
+	std::vector<float> data;
+	while (istreams_[REQUEST_SENSOR_SIM_ID].size() > 0) {
+	  uint8_t packetData[(int) sizeof(float)];
+	  for(int i = 0; i < (int) sizeof(float); i++) {
+	    packetData[i] = istreams_[REQUEST_SENSOR_SIM_ID].front();
+	    istreams_[REQUEST_SENSOR_SIM_ID].pop();
+	  }
+	  data.push_back(charsToFloat(packetData));
+	}
+
+        // restart input loop
+        run_input_ = true;
+        std::thread input{&StdIoController::inputLoop};
+        input_ = std::move(input);
+
+        return data;
+  }
 
   private:
     /**
