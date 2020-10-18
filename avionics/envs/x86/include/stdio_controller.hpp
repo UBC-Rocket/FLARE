@@ -115,14 +115,14 @@ class StdIoController {
         return val;
     }
 
-  // Converts a 
-  static float charsToFloat(uint8_t* data) {
-    float f;
-    std::memcpy(&f, &data, sizeof(f));
-    return f;
-  }
-
-  static std::vector<float> requestSensorRead(uint8_t sensor_id) {
+  /**
+   * @brief Corresponds to Request Sensor Read packet in Confluence spec.
+   * @param sensor_id ID of the desired sensor.
+   * @param num_floats the number of floats to read.
+   * @return array of sensor measurements.
+   */
+  // TODO is num_floats needed?
+  static std::vector<float> requestSensorRead(uint8_t sensor_id, std::size_t num_floats) {
         run_input_ = false; // input_ will now run at most once more
         putPacket(REQUEST_SENSOR_SIM_ID, &sensor_id,
                   1);  // ensures that at least one more SIM packet exists
@@ -134,25 +134,36 @@ class StdIoController {
         }
 
 	// FIXME Make sure endianness is correct
-	std::vector<float> data;
-	while (istreams_[REQUEST_SENSOR_SIM_ID].size() > 0) {
-	  uint8_t packetData[(int) sizeof(float)];
-	  for(int i = 0; i < (int) sizeof(float); i++) {
-	    packetData[i] = istreams_[REQUEST_SENSOR_SIM_ID].front();
-	    istreams_[REQUEST_SENSOR_SIM_ID].pop();
-	  }
-	  data.push_back(charsToFloat(packetData));
+        std::vector<float> sensor_data;
+        for (int f = 0; f < (int) num_floats; f++) {
+            uint8_t packetData[(int) sizeof(float)];
+            for (int i = 0; i < (int) sizeof(float); i++) {
+                packetData[i] = istreams_[REQUEST_SENSOR_SIM_ID].front();
+                istreams_[REQUEST_SENSOR_SIM_ID].pop();
+            }
+            sensor_data.push_back(charsToFloat(packetData));
 	}
 
-        // restart input loop
+	// restart input loop
         run_input_ = true;
         std::thread input{&StdIoController::inputLoop};
         input_ = std::move(input);
-
-        return data;
+        return sensor_data;
   }
 
   private:
+
+    /**
+     * @brief reinterprets a big endian array of 4 chars to a floating point number.
+     * @param data an array of 4 chars with the most significant byte first.
+     * @return the floating point representation
+    */
+    static float charsToFloat(uint8_t data[4]) {
+	float f;
+	std::memcpy(&f, &data, sizeof(f));
+	return f;
+    }
+
     /**
      * @brief Helper function for configuration packet.
      */

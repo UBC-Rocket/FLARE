@@ -13,15 +13,22 @@
 
 template <std::size_t data_length> class DataSpoof {
 public:
+  /**
+   * @brief Constructor
+   * @param sensor_id the sensor from which to read
+   * @param extern_dat_buf external data buffer
+   */
   DataSpoof(u_int8_t sensor_id, float *const extern_data_buff)
       : sensor_id_(sensor_id), dat_read_(extern_data_buff) {}
 
   float *getData() {
-    std::vector<float> sensorData = StdIoController::requestSensorRead(sensor_id_);
+    std::vector<float> sensorData = StdIoController::requestSensorRead(sensor_id_, data_length);
     for(int i = 0; i < sensorData.size(); i++) {
         dat_read_[i] = sensorData[i];
     }
   }
+
+  int getDataLength() { return data_length; }
 
 private:
   u_int8_t sensor_id_;

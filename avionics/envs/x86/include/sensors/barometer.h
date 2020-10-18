@@ -8,6 +8,7 @@
 #include "../env_config.h"
 #include "../sensor_data.hpp"
 #include "sensors_interface.h"
+#include <bits/stdint-uintn.h>
 
 /*Constants------------------------------------------------------------*/
 
@@ -21,5 +22,6 @@ class Barometer : public SensorBase<2> {
     SensorStatus getStatus() { return SensorStatus::NOMINAL; }
 
   private:
-    FileDataSpoof<2> dat{BAROMETER_DATA, data_};
+  const uint8_t BAROMETER_SENSOR_ID = 0x03;
+    DataSpoof<2> dat{BAROMETER_SENSOR_ID, data_};
 };
