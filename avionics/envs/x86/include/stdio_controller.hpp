@@ -41,6 +41,8 @@ class StdIoController {
     static constexpr uint8_t ANALOG_READ_SIM_ID = 'a';
 
     static constexpr std::size_t FLOAT_SIZE = sizeof(float);
+    static_assert(FLOAT_SIZE == 4,
+                  "Code assumes floating point numbers are 4 bytes");
 
     class BlockingRequest {
         /**
@@ -154,8 +156,8 @@ class StdIoController {
 
         std::vector<float> sensor_data;
         for (int f = 0; f < (int)num_floats; f++) {
-            uint8_t packetData[sizeof(float)];
-            for (int i = 0; i < sizeof(float); i++) {
+            uint8_t packetData[FLOAT_SIZE];
+            for (int i = 0; i < FLOAT_SIZE; i++) {
                 packetData[i] = istreams_[REQUEST_SENSOR_SIM_ID].front();
                 istreams_[REQUEST_SENSOR_SIM_ID].pop();
             }
@@ -174,7 +176,7 @@ class StdIoController {
      */
     static float charsToFloat(uint8_t data[4]) {
         float f;
-        std::memcpy(&f, &data, sizeof(f));
+        std::memcpy(&f, &data, FLOAT_SIZE);
         return f;
     }
 
