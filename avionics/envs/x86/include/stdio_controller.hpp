@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <bits/stdint-uintn.h>
 #include <cstring> //for memmove
 #include <fstream>
 #include <iostream> //for std::cin/cout
@@ -36,9 +37,10 @@ class StdIoController {
     static std::ofstream out_log_; // logs happen before CRCRLF
     static void output(char const c);
 
-    // these really should be an enum
-    static constexpr uint8_t REQUEST_SENSOR_SIM_ID = 's';
-    static constexpr uint8_t ANALOG_READ_SIM_ID = 'a';
+    enum class PacketIds : uint8_t {
+        analog_read = 0x61,
+        sensor_read = 0x71,
+    };
 
     static constexpr auto FLOAT_SIZE = sizeof(float);
     static_assert(FLOAT_SIZE == 4,
@@ -137,13 +139,14 @@ class StdIoController {
      * @return Read value.
      */
     static int requestAnalogRead(uint8_t const pin_id) {
-        BlockingRequest restart(ANALOG_READ_SIM_ID, &pin_id, 1);
+        uint8_t packet_id = static_cast<uint8_t>(PacketIds::analog_read);
+        BlockingRequest restart(packet_id, &pin_id, 1);
 
-        int val = istreams_['a'].front();
-        istreams_['a'].pop();
+        int val = istreams_[packet_id].front();
+        istreams_[packet_id].pop();
         val *= 256;
-        val += istreams_['a'].front();
-        istreams_['a'].pop();
+        val += istreams_[packet_id].front();
+        istreams_[packet_id].pop();
 
         return val;
     }
@@ -156,14 +159,15 @@ class StdIoController {
      */
     static std::vector<float> requestSensorRead(uint8_t sensor_id,
                                                 std::size_t num_floats) {
-        BlockingRequest restart(REQUEST_SENSOR_SIM_ID, &sensor_id, 1);
+        uint8_t packet_id = static_cast<uint8_t>(PacketIds::sensor_read);
+        BlockingRequest restart(packet_id, &sensor_id, 1);
 
         std::vector<float> sensor_data;
         for (std::size_t f = 0; f < num_floats; f++) {
             uint8_t packetData[FLOAT_SIZE];
             for (std::size_t i = 0; i < FLOAT_SIZE; i++) {
-                packetData[i] = istreams_[REQUEST_SENSOR_SIM_ID].front();
-                istreams_[REQUEST_SENSOR_SIM_ID].pop();
+                packetData[i] = istreams_[packet_id].front();
+                istreams_[packet_id].pop();
             }
             sensor_data.push_back(charsToFloat(packetData));
         }
