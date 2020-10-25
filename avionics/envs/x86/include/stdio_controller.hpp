@@ -39,7 +39,7 @@ class StdIoController {
 
     enum class PacketIds : uint8_t {
         analog_read = 0x61,
-        sensor_read = 0x71,
+        sensor_read = 0x73,
     };
 
     static constexpr auto FLOAT_SIZE = sizeof(float);
