@@ -186,7 +186,7 @@ class StdIoController {
     // NOTE Be mindful of endianess
     static float charsToFloat(uint8_t data[4]) {
         float f;
-        std::memcpy(&f, &data, FLOAT_SIZE);
+        std::memcpy(&f, data, sizeof(float));
         return f;
     }
 
