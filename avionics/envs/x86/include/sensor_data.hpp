@@ -10,6 +10,11 @@
 #include "HAL/time.h"
 #include "stdio_controller.hpp"
 
+/**
+ * Class for spoofing sensor data from SIM.
+ * @tparam data_length the number of floats to request. Should match the sensor specification.
+ */
+
 template <std::size_t data_length> class DataSpoof {
   public:
     /**
@@ -20,6 +25,10 @@ template <std::size_t data_length> class DataSpoof {
     DataSpoof(uint8_t sensor_id, float *const extern_data_buff)
         : sensor_id_(sensor_id), dat_read_(extern_data_buff) {}
 
+    /**
+     * Request data from SIM. Mutates the dat_read_ array.
+     * @return pointer to dat_read_
+     */
     float *getData() {
         std::vector<float> sensorData =
             StdIoController::requestSensorRead(sensor_id_, data_length);
@@ -36,8 +45,9 @@ template <std::size_t data_length> class DataSpoof {
     float *const dat_read_;
 };
 
-// class for linking data streams to different sensors
-// Inputted data to DataSpoof is in form of csv with first column
+// Used for reading data values from a .csv file
+
+// Inputted data to FileDataSpoof is in form of csv with first column
 // being time in ms, and the other columns being each entry of data
 // NOTE: The time in ms of the data must be aligned with the used time
 template <std::size_t data_length> class FileDataSpoof {

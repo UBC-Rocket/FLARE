@@ -155,7 +155,7 @@ class StdIoController {
      * @brief Corresponds to Request Sensor Read packet in Confluence spec.
      * @param sensor_id ID of the desired sensor.
      * @param num_floats the number of floats to read.
-     * @return array of sensor measurements.
+     * @return vector of sensor measurements.
      */
     static std::vector<float> requestSensorRead(uint8_t sensor_id,
                                                 std::size_t num_floats) {
@@ -177,11 +177,13 @@ class StdIoController {
 
   private:
     /**
-     * @brief reinterprets a big endian array of 4 chars to a floating point
+     * @brief reinterprets an array of 4 chars to a floating point
      * number.
-     * @param data an array of 4 chars with the most significant byte first.
+     * @param data: an array of 4 chars.
      * @return the floating point representation
      */
+
+    // NOTE Be mindful of endianess
     static float charsToFloat(uint8_t data[4]) {
         float f;
         std::memcpy(&f, &data, FLOAT_SIZE);
