@@ -1,7 +1,7 @@
 #pragma once
 
 #include <atomic>
-#include <bits/stdint-uintn.h>
+#include <cstdint>
 #include <cstring> //for memmove
 #include <fstream>
 #include <iostream> //for std::cin/cout
@@ -139,14 +139,14 @@ class StdIoController {
      * @return Read value.
      */
     static int requestAnalogRead(uint8_t const pin_id) {
-        uint8_t packet_id = static_cast<uint8_t>(PacketIds::analog_read);
-        BlockingRequest restart(packet_id, &pin_id, 1);
+        uint8_t const PACKET_ID = static_cast<uint8_t>(PacketIds::analog_read);
+        BlockingRequest restart(PACKET_ID, &pin_id, 1);
 
-        int val = istreams_[packet_id].front();
-        istreams_[packet_id].pop();
+        int val = istreams_[PACKET_ID].front();
+        istreams_[PACKET_ID].pop();
         val *= 256;
-        val += istreams_[packet_id].front();
-        istreams_[packet_id].pop();
+        val += istreams_[PACKET_ID].front();
+        istreams_[PACKET_ID].pop();
 
         return val;
     }
@@ -159,15 +159,15 @@ class StdIoController {
      */
     static std::vector<float> requestSensorRead(uint8_t sensor_id,
                                                 std::size_t num_floats) {
-        uint8_t packet_id = static_cast<uint8_t>(PacketIds::sensor_read);
-        BlockingRequest restart(packet_id, &sensor_id, 1);
+        uint8_t const PACKET_ID = static_cast<uint8_t>(PacketIds::sensor_read);
+        BlockingRequest restart(PACKET_ID, &sensor_id, 1);
 
         std::vector<float> sensor_data;
         for (std::size_t f = 0; f < num_floats; f++) {
             uint8_t packetData[FLOAT_SIZE];
             for (std::size_t i = 0; i < FLOAT_SIZE; i++) {
-                packetData[i] = istreams_[packet_id].front();
-                istreams_[packet_id].pop();
+                packetData[i] = istreams_[PACKET_ID].front();
+                istreams_[PACKET_ID].pop();
             }
             sensor_data.push_back(charsToFloat(packetData));
         }
@@ -182,11 +182,10 @@ class StdIoController {
      * @param data: an array of 4 chars.
      * @return the floating point representation
      */
-
-    // NOTE Be mindful of endianess
     static float charsToFloat(uint8_t data[4]) {
+        // NOTE Ground station accounts for endianness.
         float f;
-        std::memcpy(&f, data, sizeof(float));
+        std::memcpy(&f, data, FLOAT_SIZE);
         return f;
     }
 

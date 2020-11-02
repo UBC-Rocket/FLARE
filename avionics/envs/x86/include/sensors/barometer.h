@@ -8,7 +8,7 @@
 #include "../env_config.h"
 #include "../sensor_data.hpp"
 #include "sensors_interface.h"
-#include <bits/stdint-uintn.h>
+#include <cstdint>
 
 /*Constants------------------------------------------------------------*/
 
