@@ -169,7 +169,8 @@ class StdIoController {
                 packetData[i] = istreams_[PACKET_ID].front();
                 istreams_[PACKET_ID].pop();
             }
-            sensor_data.push_back(charsToFloat(packetData));
+            float float_val = charsToFloat(packetData);
+            sensor_data.push_back(float_val);
         }
 
         return sensor_data;

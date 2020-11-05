@@ -22,6 +22,6 @@ class Barometer : public SensorBase<2> {
     SensorStatus getStatus() { return SensorStatus::NOMINAL; }
 
   private:
-  const uint8_t BAROMETER_SENSOR_ID = 0x03;
+    const uint8_t BAROMETER_SENSOR_ID = 0x03;
     DataSpoof<2> dat{BAROMETER_SENSOR_ID, data_};
 };
