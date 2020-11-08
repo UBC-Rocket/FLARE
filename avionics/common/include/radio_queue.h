@@ -4,8 +4,15 @@
 #include <memory> // for std::unique_ptr
 #include <vector> // for std::vector
 
+#include "XBee.h"
+
 /*Constants------------------------------------------------------------*/
-constexpr unsigned short RADIO_MAX_SUBPACKET_SIZE = 255;
+
+/*  Many parts of the XBee library use uint8 for length (e.g. getFrameData).
+    Even though the HW likely supports more, this is the theoretical max for
+    this XBee library implementation. If we deem this was an implementation
+    error, we could PR a fix to the library and then increase this */
+constexpr unsigned short RADIO_MAX_SUBPACKET_SIZE = 255 - ZB_TX_API_LENGTH;
 
 /*Classes--------------------------------------------------------------*/
 typedef std::unique_ptr<std::vector<uint8_t>> SubPktPtr;
