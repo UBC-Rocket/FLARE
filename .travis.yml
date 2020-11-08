@@ -1,0 +1,18 @@
+branches:
+  only:
+  - dev
+  - master
+
+language: bash
+arch: amd64
+os: linux
+dist: bionic
+sudo: required
+
+install:
+
+script:
+- cd avionics
+- cmake .
+- cmake --build .
+- ctest --progress
