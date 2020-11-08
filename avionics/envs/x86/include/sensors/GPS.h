@@ -1,6 +1,7 @@
 #pragma once
 
 #include "HAL/port_impl.h"
+#include "../sensor_data.hpp"
 #include "sensors_interface.h"
 
 /*Variables------------------------------------------------------------*/
@@ -8,11 +9,14 @@
 class GPS : public SensorBase<3> {
   public:
     GPS(Hal::Serial &, float *const buf) : SensorBase(buf) {
-        data_[0] = 49;
-        data_[1] = -123;
-        data_[2] = 0;
     }
     void initSensor() {}
-    void readData() {}
+    void readData() {
+        dat.getData();
+    }
     SensorStatus getStatus() { return SensorStatus::NOMINAL; }
+
+  private:
+    const uint8_t GPS_SENSOR_ID = 0x00;
+    DataSpoof<3> dat{GPS_SENSOR_ID, data_};
 };

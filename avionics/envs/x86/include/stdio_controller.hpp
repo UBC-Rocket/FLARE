@@ -1,12 +1,14 @@
 #pragma once
 
 #include <atomic>
+#include <cstdint>
 #include <cstring> //for memmove
 #include <fstream>
 #include <iostream> //for std::cin/cout
 #include <mutex>
 #include <queue>         // for queue
 #include <thread>        // for non-blocking input
+#include <type_traits>   // for is_same
 #include <unordered_map> // for hash map
 #include <vector>
 
@@ -34,6 +36,52 @@ class StdIoController {
 
     static std::ofstream out_log_; // logs happen before CRCRLF
     static void output(char const c);
+
+    enum class PacketIds : uint8_t {
+        analog_read = 0x61,
+        sensor_read = 0x73,
+    };
+
+    static constexpr auto FLOAT_SIZE = sizeof(float);
+    static_assert(FLOAT_SIZE == 4,
+                  "Code assumes floating point numbers are 4 bytes");
+
+    // at least until someone can make sure that this is the right way to do
+    // this.
+    static_assert(std::is_same<uint8_t, unsigned char>::value, "Code assumes uint8_t can be used for bytes");
+
+    class BlockingRequest {
+        /**
+         * @brief Helper class - constructor sends a packet request on
+         *stream_id, and blocks until a response is heard. Destructor restarts
+         *the input, so as long as your instance of this object is in scope, you
+         *have clean, single-threaded access to the incoming data.
+         **/
+      public:
+        BlockingRequest(const uint8_t stream_id, const uint8_t *const packet,
+                        const std::size_t packet_len) {
+            // input_ will now run at most once more
+            StdIoController::run_input_ = false;
+            // ensures that at least one more SIM packet exists
+            StdIoController::putPacket(stream_id, packet, packet_len);
+            input_.join(); // so this won't block
+
+            // Keep polling for new packet until response is received.
+            while (istreams_[stream_id].size() == 0) {
+                extractPacket();
+            }
+        }
+
+        // Can't copy.
+        BlockingRequest(const BlockingRequest &) = delete;
+        BlockingRequest &operator=(const BlockingRequest &other) = delete;
+
+        ~BlockingRequest() {
+            StdIoController::run_input_ = true;
+            std::thread input{&StdIoController::inputLoop};
+            StdIoController::input_ = std::move(input);
+        }
+    };
 
   public:
     /**
@@ -91,28 +139,57 @@ class StdIoController {
      * @return Read value.
      */
     static int requestAnalogRead(uint8_t const pin_id) {
-        run_input_ = false; // input_ will now run at most once more
-        putPacket('a', &pin_id,
-                  1);  // ensures that at least one more SIM packet exists
-        input_.join(); // so this won't block
+        uint8_t const PACKET_ID = static_cast<uint8_t>(PacketIds::analog_read);
+        BlockingRequest restart(PACKET_ID, &pin_id, 1);
 
-        while (istreams_['a'].size() == 0) {
-            extractPacket();
-        }
-        int val = istreams_['a'].front();
-        istreams_['a'].pop();
+        int val = istreams_[PACKET_ID].front();
+        istreams_[PACKET_ID].pop();
         val *= 256;
-        val += istreams_['a'].front();
-        istreams_['a'].pop();
+        val += istreams_[PACKET_ID].front();
+        istreams_[PACKET_ID].pop();
 
-        // restart input loop
-        run_input_ = true;
-        std::thread input{&StdIoController::inputLoop};
-        input_ = std::move(input);
         return val;
     }
 
+    /**
+     * @brief Corresponds to Request Sensor Read packet in Confluence spec.
+     * @param sensor_id ID of the desired sensor.
+     * @param num_floats the number of floats to read.
+     * @return vector of sensor measurements.
+     */
+    static std::vector<float> requestSensorRead(uint8_t sensor_id,
+                                                std::size_t num_floats) {
+        uint8_t const PACKET_ID = static_cast<uint8_t>(PacketIds::sensor_read);
+        BlockingRequest restart(PACKET_ID, &sensor_id, 1);
+
+        std::vector<float> sensor_data;
+        for (std::size_t f = 0; f < num_floats; f++) {
+            uint8_t packetData[FLOAT_SIZE];
+            for (std::size_t i = 0; i < FLOAT_SIZE; i++) {
+                packetData[i] = istreams_[PACKET_ID].front();
+                istreams_[PACKET_ID].pop();
+            }
+            float float_val = charsToFloat(packetData);
+            sensor_data.push_back(float_val);
+        }
+
+        return sensor_data;
+    }
+
   private:
+    /**
+     * @brief reinterprets an array of 4 chars to a floating point
+     * number.
+     * @param data: an array of 4 chars.
+     * @return the floating point representation
+     */
+    static float charsToFloat(uint8_t data[4]) {
+        // NOTE Ground station accounts for endianness.
+        float f;
+        std::memcpy(&f, data, FLOAT_SIZE);
+        return f;
+    }
+
     /**
      * @brief Helper function for configuration packet.
      */
