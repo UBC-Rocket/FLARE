@@ -10,7 +10,7 @@
 /*Constants------------------------------------------------------------*/
 // #define TEMPERATURE_STATUS_POSITION 4
 
-class Temperature : public SensorBase<1> {
+class Temperature : public SensorBase<TEMPERATURE_DATA_LENGTH> {
   public:
     Temperature(float *const data);
     void readData();
