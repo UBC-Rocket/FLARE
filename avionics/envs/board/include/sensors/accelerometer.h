@@ -12,7 +12,7 @@
 // #define ACCELEROMETER_STATUS_POSITION 2
 // #define ACCELEROMETER_DATA_ARRAY_SIZE 3
 
-class Accelerometer : public SensorBase<3> {
+class Accelerometer : public SensorBase<ACCELEROMETER_DATA_LENGTH> {
   public:
     Accelerometer(float *const buf);
     void readData();

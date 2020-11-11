@@ -5,22 +5,22 @@
  */
 
 /*Includes------------------------------------------------------------*/
+#include "../sensor_data.hpp"
 #include "sensors_interface.h"
 
 /*Constants------------------------------------------------------------*/
 
-class Temperature : public SensorBase<1> {
-    //   private:
-    //     static constexpr int TEMPERATURE_DATA_ARRAY_SIZE = 1;
+class Temperature : public SensorBase<TEMPERATURE_DATA_LENGTH> {
 
   public:
     Temperature(float *const data) : SensorBase(data) { data_[0] = 20; }
     void initSensor() {}
-    void readData() {}
-    // uint8_t dataLength() { return TEMPERATURE_DATA_ARRAY_SIZE; }
-    // float *getData() { return data; }
-    SensorStatus getStatus() { return SensorStatus::NOMINAL; }
+    void readData() {
+        dat.getData(); // Forces DataSpoof to refresh.
+    }
 
-    //   private:
-    // float data[TEMPERATURE_DATA_ARRAY_SIZE] = {20};
+    SensorStatus getStatus() { return SensorStatus::NOMINAL; }
+  
+  private:
+    DataSpoof<TEMPERATURE_DATA_LENGTH> dat{SensorType::TEMPERATURE, data_};
 };

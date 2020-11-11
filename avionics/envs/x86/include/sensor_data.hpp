@@ -9,6 +9,7 @@
 
 #include "HAL/time.h"
 #include "stdio_controller.hpp"
+#include "sensors_interface.h"
 
 /**
  * Class for spoofing sensor data from SIM.
@@ -22,8 +23,8 @@ template <std::size_t data_length> class DataSpoof {
      * @param sensor_id the sensor from which to read
      * @param extern_dat_buf external data buffer
      */
-    DataSpoof(uint8_t sensor_id, float *const extern_data_buff)
-        : sensor_id_(sensor_id), dat_read_(extern_data_buff) {}
+    DataSpoof(SensorType sensor_id, float *const extern_data_buff)
+        : sensor_id_((uint8_t)sensor_id), dat_read_(extern_data_buff) {}
 
     /**
      * Request data from SIM. Mutates the dat_read_ array.

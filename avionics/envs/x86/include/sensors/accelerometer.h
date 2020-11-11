@@ -4,14 +4,17 @@
  */
 
 /*Includes------------------------------------------------------------*/
+#include "../sensor_data.hpp"
 #include "sensors_interface.h"
 
-class Accelerometer : public SensorBase<3> {
+class Accelerometer : public SensorBase<ACCELEROMETER_DATA_LENGTH> {
   public:
     Accelerometer(float *const buf) : SensorBase(buf) {}
-    void readData(){};
+    void readData(){
+      dat.getData(); // Forces DataSpoof to refresh.
+    }
     SensorStatus getStatus() { return SensorStatus::NOMINAL; }
 
   private:
-    int16_t x, y, z;
+    DataSpoof<ACCELEROMETER_DATA_LENGTH> dat{SensorType::ACCELEROMETER, data_};
 };
