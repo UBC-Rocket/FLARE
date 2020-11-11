@@ -5,14 +5,12 @@
  */
 
 /*Includes------------------------------------------------------------*/
-#include "../env_config.h"
 #include "../sensor_data.hpp"
 #include "sensors_interface.h"
-#include <cstdint>
 
 /*Constants------------------------------------------------------------*/
 
-class Barometer : public SensorBase<2> {
+class Barometer : public SensorBase<BAROMETER_DATA_LENGTH> {
   public:
     Barometer(float *const buf) : SensorBase(buf) {}
     void initSensor() {}
@@ -22,6 +20,5 @@ class Barometer : public SensorBase<2> {
     SensorStatus getStatus() { return SensorStatus::NOMINAL; }
 
   private:
-    const uint8_t BAROMETER_SENSOR_ID = 0x03;
-    DataSpoof<2> dat{BAROMETER_SENSOR_ID, data_};
+    DataSpoof<BAROMETER_DATA_LENGTH> dat{SensorType::BAROMETER, data_};
 };

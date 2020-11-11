@@ -78,7 +78,7 @@ PLEASE READ ME!
 
 /*Variables------------------------------------------------------------*/
 
-class GPS : public SensorBase<3> {
+class GPS : public SensorBase<GPS_DATA_LENGTH> {
   public:
     GPS(Hal::Serial &seri, float *const data);
     void readData();
