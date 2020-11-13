@@ -1,3 +1,7 @@
+Master: [![Build Status](https://travis-ci.com/UBC-Rocket/FLARE.svg?branch=master)](https://travis-ci.com/UBC-Rocket/FLARE)
+
+Dev: [![Build Status](https://travis-ci.com/UBC-Rocket/FLARE.svg?branch=dev)](https://travis-ci.com/UBC-Rocket/FLARE)
+
 # IMPORTANT WARNINGS
 
 **VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!**
