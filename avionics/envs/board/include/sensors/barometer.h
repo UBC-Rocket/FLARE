@@ -11,7 +11,7 @@
 // #define BAROMETER_STATUS_POSITION 3
 // #define BAROMETER_DATA_ARRAY_SIZE 2
 
-class Barometer : public SensorBase<2> {
+class Barometer : public SensorBase<BAROMETER_DATA_LENGTH> {
   public:
     Barometer(float *const buf);
     void readData();

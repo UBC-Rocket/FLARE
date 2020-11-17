@@ -3,6 +3,7 @@
 #include <array>
 #include <chrono>
 #include <cstring>
+#include <thread>
 
 #include "HAL/port.h"
 #include "stdio_controller.hpp"
@@ -71,8 +72,10 @@ class Serial {
      */
     inline void send_buffer() {
         // StdIO::putPacket(IO_ID_, bufs_[IO_ID_].begin(), buf_useds_[IO_ID_]);
-        StdIO::putPacket(IO_ID_, buf_.begin(), buf_used_);
-        buf_used_ = 0;
+        if (buf_used_ > 0) {
+            StdIO::putPacket(IO_ID_, buf_.begin(), buf_used_);
+            buf_used_ = 0;
+        }
         last_sent_ = Clock::now();
     }
 };

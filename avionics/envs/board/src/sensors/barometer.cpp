@@ -32,11 +32,3 @@ void Barometer::readData() {
     data_[0] = barometer.pressure();
     data_[1] = barometer.temperature();
 }
-
-// uint8_t Barometer::dataLength() {
-//     return BAROMETER_DATA_ARRAY_SIZE;
-// }
-
-// float *Barometer::getData() {
-//     return data;
-// }
