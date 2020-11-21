@@ -39,6 +39,33 @@ constexpr uint64_t GND_STN_ADDR_MSB = 0x0013A200; // Ground Station - Body
 constexpr uint64_t GND_STN_ADDR_LSB = 0x41678FC0;
 constexpr uint32_t RADIO_BAUD_RATE = 921600;
 
+class PacketBuffWriter
+{
+    public:
+        PacketBuffWriter():packet(new std::vector<uint8_t>)
+        {
+            packet->reserve(255); // To avoid overhead of resizing multiple times
+        }
+
+        void write(void const* data, size_t size)
+        {
+            if (!packet)
+                return;
+                
+            size_t old_size = packet->size();
+            packet->resize(old_size + size);
+            std::memcpy(packet->data() + old_size, data, size);
+        }
+
+        void write(uint8_t byte)
+        {
+            write(&byte, 1);
+        }
+
+        SubPktPtr packet;
+
+};
+
 class RadioController {
   private:
     enum class Ids {
@@ -73,7 +100,6 @@ class RadioController {
         xbee_.setSerial(serial_radio.getSerial());
         tx_packet_.setAddress64(gnd_addr_);
         tx_packet_.setPayload(payload_);
-        sendConfig(Hal::millis());
         sendMessage(Hal::millis(), "Radio initialized");
         send();
     }
@@ -202,9 +228,9 @@ class RadioController {
      * raw pointer rather than a unique pointer, so you'll need to call the
      * get() method of SubPktPtr.
      */
-    void setupIdTime(std::vector<uint8_t> *buf, Ids id, uint32_t time) {
-        (*buf)[0] = static_cast<uint8_t>(id);
-        std::memcpy(buf->data() + 1, &time, 4);
+    void addIdTime(PacketBuffWriter &buf, Ids id, uint32_t time) {
+        buf.write(static_cast<uint8_t>(id));
+        buf.write(&time, sizeof(time));
     }
 
     XBee xbee_;

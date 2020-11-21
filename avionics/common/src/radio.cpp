@@ -25,6 +25,8 @@
 #include "radio.h"
 #include "sensor_collection.h"
 
+#define RADIO_CONFIG_PACKET_VERSION_STR "TestVersionString" // TODO :  Grab from git and define in build system
+
 void RadioController::send() {
     if (!tx_q_.empty()) {
         tx_packet_.setPayloadLength(tx_q_.fillPayload(payload_));
@@ -35,98 +37,102 @@ void RadioController::send() {
 void RadioController::sendStatus(uint32_t time, RocketStatus status,
                                  SensorCollection &sensors,
                                  IgnitorCollection &ignitors) {
-    SubPktPtr buf(new std::vector<uint8_t>);
-    buf->resize(10);
+    PacketBuffWriter buf;
+    addIdTime(buf, Ids::status_ping, time);
 
-    setupIdTime(buf.get(), Ids::status_ping, time);
+    buf.write(&status, 1);
 
-    *(buf->data() + 5) = static_cast<uint8_t>(status);
+    buf.write(sensors.getStatusBitfield(), 1);
+    buf.write(sensors.getStatusBitfield() + 1, 1);
+    buf.write(ignitors.getStatusBitfield(), 1);
+    buf.write(ignitors.getStatusBitfield() + 1, 1);
 
-    *(buf->data() + 6) = *sensors.getStatusBitfield();
-    *(buf->data() + 7) = *(sensors.getStatusBitfield() + 1);
-    *(buf->data() + 8) = *ignitors.getStatusBitfield();
-    *(buf->data() + 9) = *(ignitors.getStatusBitfield() + 1);
-
-    addSubpacket(std::move(buf));
+    addSubpacket(std::move(buf.packet));
 }
 
 void RadioController::sendBulkSensor(uint32_t time, float alt,
                                      Accelerometer &xl, IMU &imu, GPS &gps,
                                      uint8_t state_id) {
-    SubPktPtr buf(new std::vector<uint8_t>);
-    buf->resize(42);
-
-    setupIdTime(buf.get(), Ids::bulk_sensor, time);
+    PacketBuffWriter buf;
+    addIdTime(buf, Ids::bulk_sensor, time);
 
     // Altitude
-    std::memcpy(buf->data() + 5, &alt, 4);
+    buf.write(&alt, 4);
 
     // Accelerometer
-    std::memcpy(buf->data() + 9, xl.getData(), 12);
+    buf.write(xl.getData(), 12);
 
     // IMU // TODO - check that these are the correct 3 floats to send for
     // orientation
-    std::memcpy(buf->data() + 21, imu.getData(), 12);
+    buf.write(imu.getData(), 12);
 
     // GPS
-    std::memcpy(buf->data() + 33, gps.getData(), 8);
+    buf.write(gps.getData(), 8);
 
     // State
-    std::memcpy(buf->data() + 41, &state_id, 1);
+    buf.write(&state_id, 1);
 
-    addSubpacket(std::move(buf));
+    addSubpacket(std::move(buf.packet));
 }
 
 void RadioController::sendMessage(const uint32_t time, const char *str) {
-    SubPktPtr buf(new std::vector<uint8_t>);
-    auto strlen = std::strlen(str);
-    buf->resize(strlen + 6);
-    setupIdTime(buf.get(), Ids::message, time);
-    (*buf)[5] = strlen;
-    std::memcpy(buf->data() + 6, str, strlen);
-    addSubpacket(std::move(buf));
+    PacketBuffWriter buf;
+    addIdTime(buf, Ids::message, time);
+
+    uint8_t strlen = std::strlen(str);
+    buf.write(strlen);
+    buf.write(str, strlen);
+
+    addSubpacket(std::move(buf.packet));
 }
 
 void RadioController::sendGPS(const uint32_t time, GPS &gps) {
-    SubPktPtr buf(new std::vector<uint8_t>);
-    buf->resize(17);
-    setupIdTime(buf.get(), Ids::gps, time);
-    std::memcpy(buf->data() + 5, gps.getData(), 12);
-    addSubpacket(std::move(buf));
+    PacketBuffWriter buf;
+    addIdTime(buf, Ids::gps, time);
+
+    buf.write(gps.getData(), 12);
+
+    addSubpacket(std::move(buf.packet));
 }
 
 void RadioController::sendSingleSensor(const uint32_t time, uint8_t id,
                                        float data) {
-    SubPktPtr buf(new std::vector<uint8_t>);
-    buf->resize(9);
-    (*buf)[0] = (id);
-    std::memcpy(buf->data() + 1, &time, 4);
-    std::memcpy(buf->data() + 5, &data, 4);
-    addSubpacket(std::move(buf));
+    PacketBuffWriter buf;
+    buf.write(id);
+    buf.write(&time, sizeof(time));
+
+    buf.write(&data, 4);
+    
+    addSubpacket(std::move(buf.packet));
 }
 
 void RadioController::sendState(const uint32_t time, uint8_t state_id) {
-    SubPktPtr buf(new std::vector<uint8_t>);
-    buf->resize(9);
-    (*buf)[0] = 0x1D;
-    std::memcpy(buf->data() + 1, &time, 4);
-    (*buf)[5] = 0;
-    (*buf)[7] = 0;
-    (*buf)[6] = 0;
-    (*buf)[8] = state_id;
-    addSubpacket(std::move(buf));
+    PacketBuffWriter buf;
+
+    buf.write(0x1D); // id
+    buf.write(&time, 4);
+    buf.write(0);
+    buf.write(0);
+    buf.write(0);
+    buf.write(state_id);
+
+    addSubpacket(std::move(buf.packet));
 }
 
 void RadioController::sendConfig(const uint32_t time) {
-    SubPktPtr buf(new std::vector<uint8_t>);
-    buf->resize(7);
-    setupIdTime(buf.get(), Ids::config, time);
+    PacketBuffWriter buf;
+    addIdTime(buf, Ids::config, time);
 
     // Defined in CMakeLists/platformio.ini
-    (*buf)[5] = RADIO_CONFIG_PACKET_SIM_ACTIVE;
-    (*buf)[6] = RADIO_CONFIG_PACKET_ROCKET_ID;
+    buf.write(RADIO_CONFIG_PACKET_SIM_ACTIVE);
+    buf.write(RADIO_CONFIG_PACKET_ROCKET_ID);
 
-    // TODO : Versioning information will be added here
+    constexpr size_t len = sizeof(RADIO_CONFIG_PACKET_VERSION_STR)-1; // -1 because null terminated string
+    static_assert(len <= 40, "RADIO_CONFIG_PACKET_VERSION_STR longer than 40 characters!");
+    uint8_t version_bytes[40] = {0};
+    std::memcpy(version_bytes, RADIO_CONFIG_PACKET_VERSION_STR, len);
+
+    buf.write(version_bytes, sizeof(version_bytes));
     
-    addSubpacket(std::move(buf));
+    addSubpacket(std::move(buf.packet));
 }
