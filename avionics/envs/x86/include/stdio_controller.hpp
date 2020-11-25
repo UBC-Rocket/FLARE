@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <cassert>
 #include <cstdint>
 #include <cstring> //for memmove
 #include <fstream>
@@ -12,9 +13,12 @@
 #include <unordered_map> // for hash map
 #include <vector>
 
+#include "HAL/time.h"
+
 #if defined(WIN32) || defined(_WIN32)
 #define OS_IS_WINDOWS
 #endif
+
 
 class StdIoController {
     // Everything is static but it's not a namespace b/c of the private member
@@ -40,6 +44,7 @@ class StdIoController {
     enum class PacketIds : uint8_t {
         analog_read = 0x61,
         sensor_read = 0x73,
+        time_update = 0x74,
     };
 
     static constexpr auto FLOAT_SIZE = sizeof(float);
@@ -174,6 +179,29 @@ class StdIoController {
         }
 
         return sensor_data;
+    }
+
+
+    /**
+     * @brief Corresponds to Request Time Update package in confluence spec.
+     * @param delta_us number of *microseconds* to shift clock foward by.
+     * @return the new time in *milliseconds*.
+     */
+    static uint32_t requestTimeUpdate(uint32_t delta_us = 0) {
+        uint8_t const PACKET_ID = static_cast<uint8_t>(PacketIds::time_update);
+        uint8_t chars[sizeof(uint32_t)];
+        std::memcpy(chars, &delta_us, sizeof(delta_us));
+        BlockingRequest restart(PACKET_ID, chars, sizeof(delta_us));
+
+        uint8_t packetData[sizeof(uint32_t)];
+        for (std::size_t i = 0; i < sizeof(uint32_t); i++) {
+            packetData[i] = istreams_[PACKET_ID].front();
+            istreams_[PACKET_ID].pop();
+        }
+
+        uint32_t currentTime;
+        std::memcpy(&currentTime, packetData, sizeof(uint32_t));
+        return currentTime;
     }
 
   private:
