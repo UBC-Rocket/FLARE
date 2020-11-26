@@ -1,7 +1,6 @@
 #pragma once
 
 #include <atomic>
-#include <cassert>
 #include <cstdint>
 #include <cstring> //for memmove
 #include <fstream>
@@ -12,8 +11,6 @@
 #include <type_traits>   // for is_same
 #include <unordered_map> // for hash map
 #include <vector>
-
-#include "HAL/time.h"
 
 #if defined(WIN32) || defined(_WIN32)
 #define OS_IS_WINDOWS
@@ -188,7 +185,7 @@ class StdIoController {
      * @return the new time in *milliseconds*.
      */
     static uint32_t requestTimeUpdate(uint32_t delta_us = 0) {
-        uint8_t const PACKET_ID = static_cast<uint8_t>(PacketIds::time_update);
+        auto const PACKET_ID = static_cast<uint8_t>(PacketIds::time_update);
         uint8_t chars[sizeof(uint32_t)];
         std::memcpy(chars, &delta_us, sizeof(delta_us));
         BlockingRequest restart(PACKET_ID, chars, sizeof(delta_us));
