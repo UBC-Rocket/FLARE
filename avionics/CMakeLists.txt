@@ -14,7 +14,10 @@ endif()
 project(Avionics_Native)
 
 
+project(Avionics_Native)
 add_executable(TantalusStage1 common/src/avionics.cpp)
+
+add_compile_definitions(RADIO_CONFIG_PACKET_SIM_ACTIVE=1)
 
 add_subdirectory(common)
 add_subdirectory(envs/x86)
@@ -26,6 +29,10 @@ target_include_directories(TantalusStage1 PUBLIC
     envs/x86/include
     envs/x86/lib
     rockets/tantalus_stage_1/include
+)
+
+target_compile_definitions(TantalusStage1 PUBLIC
+    RADIO_CONFIG_PACKET_ROCKET_ID=0
 )
 
 ###
