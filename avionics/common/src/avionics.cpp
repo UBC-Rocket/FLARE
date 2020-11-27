@@ -179,6 +179,9 @@ int main(void) {
         case 'A':
             state_machine.arm();
             break;
+        case 'C':
+            radio.sendConfig(new_time_int);
+            break;
         case 'D':
             state_machine.disarm();
             break;
