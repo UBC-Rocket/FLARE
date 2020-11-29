@@ -12,12 +12,7 @@ uint16_t const US_PER_MS = 1000;
  */
 void sleep_ms(uint32_t t) {
     if (t >= (std::numeric_limits<uint32_t>::max() / US_PER_MS)) {
-        try {
-            throw std::invalid_argument("The given sleep interval will cause integer overflow.");
-        }
-        catch (const std::invalid_argument &e) {
-            std::cout << e.what() << std::endl;
-        }
+        throw std::invalid_argument("The given sleep interval will cause integer overflow.");
     }
 
     uint32_t t_us = t * US_PER_MS;
