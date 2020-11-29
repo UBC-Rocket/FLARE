@@ -42,7 +42,7 @@ void initialSystem() {
 t_point now_ms() {
     uint32_t now = StdIoController::requestTimeUpdate();
     t_point now_t = t_point(std::chrono::milliseconds(now));
-    return t_point{now_t - startup_t_point};
+    return now_t;
 }
 
 uint32_t millis() {
