@@ -28,12 +28,8 @@ void sleep_us(uint32_t t) {
     StdIoController::requestTimeUpdate(t);
 }
 
-t_point startup_t_point =
-    std::chrono::time_point_cast<ms>(std::chrono::steady_clock::now());
-
 void initialSystem() {
-    startup_t_point =
-        std::chrono::time_point_cast<ms>(std::chrono::steady_clock::now());
+    // NOTE Unused - time now handled by GS.
 }
 
 /**
