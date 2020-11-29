@@ -2,20 +2,31 @@
 #include <HAL/time.h>
 
 namespace Hal {
+
+uint16_t const US_PER_MS = 1000;
+
 /**
- * @brief Sleep for some number of milliseconds.
+ * @brief Sleep for some number of milliseconds. During debug, one of
+ * Hal::sleep_ms() or Hal::sleep_us() is nessary to advance the simulated time.
  * @param t Duration to sleep for, in milliseconds.
  */
 void sleep_ms(uint32_t t) {
-    if (t >= (std::numeric_limits<uint32_t>::max() / 1000))
-        throw "The given sleep length will cause overflow.";
+    if (t >= (std::numeric_limits<uint32_t>::max() / US_PER_MS)) {
+        try {
+            throw std::invalid_argument("The given sleep interval will cause integer overflow.");
+        }
+        catch (const std::invalid_argument &e) {
+            std::cout << e.what() << std::endl;
+        }
+    }
 
-    uint32_t t_us = t * 1000;
+    uint32_t t_us = t * US_PER_MS;
     StdIoController::requestTimeUpdate(t_us);
 }
 
 /**
- * @brief Sleep for some number of microseconds.
+ * @brief Sleep for some number of microseconds. During debug, one of
+ * Hal::sleep_ms() or Hal::sleep_us() is nessary to advance the simulated time.
  * @param t Duration to sleep for, in microseconds.
  */
 void sleep_us(uint32_t t) {
