@@ -35,7 +35,9 @@ class StdIoController {
     static std::thread input_;          // run infinite inputLoop()
     static std::atomic_bool run_input_; // controls if input_ is running
 
-    static std::ofstream out_log_; // logs happen before CRCRLF
+    static std::ofstream out_log_;
+
+    static void outputFiltered(char const c);
     static void output(char const c);
 
     enum class PacketIds : uint8_t {
@@ -237,31 +239,29 @@ class StdIoController {
                 std::cin.clear();
                 continue;
             }
-
-#ifdef OS_IS_WINDOWS
-            // 0x0D is CR, 0x0A is LF
-            if (c == 0x0D && std::cin.peek() == 0x0A) {
-                std::cin.ignore(1);
-                return 0x0A;
-            }
-#endif
-
             return c;
         }
+    }
+
+    static char getFilteredCin() {
+        char msb = getCinForce() - 'A';
+        char lsb = getCinForce() - 'A';
+
+        return (msb << 4) | lsb;
     }
 
     static void extractPacket() {
         Id id;
         uint16_t length;
-        id = getCinForce();
-        length = getCinForce();
+        id = getFilteredCin();
+        length = getFilteredCin();
         length <<= 8;
-        length |= getCinForce();
+        length |= getFilteredCin();
 
         auto buf = std::vector<char>();
         buf.reserve(length);
         for (int i = 0; i < length; i++) {
-            buf.push_back(getCinForce());
+            buf.push_back(getFilteredCin());
         }
 
         { // scope for lock-guard
