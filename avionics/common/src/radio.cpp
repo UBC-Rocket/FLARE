@@ -25,8 +25,6 @@
 #include "radio.h"
 #include "sensor_collection.h"
 
-#define RADIO_CONFIG_PACKET_VERSION_STR "TestVersionString" // TODO :  Grab from git and define in build system
-
 void RadioController::send() {
     if (!tx_q_.empty()) {
         tx_packet_.setPayloadLength(tx_q_.fillPayload(payload_));
@@ -102,7 +100,7 @@ void RadioController::sendSingleSensor(const uint32_t time, uint8_t id,
     buf.write(&time, sizeof(time));
 
     buf.write(&data, 4);
-    
+
     addSubpacket(std::move(buf.packet));
 }
 
@@ -127,12 +125,13 @@ void RadioController::sendConfig(const uint32_t time) {
     buf.write(RADIO_CONFIG_PACKET_SIM_ACTIVE);
     buf.write(RADIO_CONFIG_PACKET_ROCKET_ID);
 
-    constexpr size_t len = sizeof(RADIO_CONFIG_PACKET_VERSION_STR)-1; // -1 because null terminated string
-    static_assert(len <= 40, "RADIO_CONFIG_PACKET_VERSION_STR longer than 40 characters!");
+    // -1 because null terminated string
+    constexpr size_t len = sizeof(RADIO_CONFIG_PACKET_VERSION_STR) - 1;
+    static_assert(len == 40, "RADIO_CONFIG_PACKET_VERSION_STR incorrect size!");
     uint8_t version_bytes[40] = {0};
     std::memcpy(version_bytes, RADIO_CONFIG_PACKET_VERSION_STR, len);
 
     buf.write(version_bytes, sizeof(version_bytes));
-    
+
     addSubpacket(std::move(buf.packet));
 }

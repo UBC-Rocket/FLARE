@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
-project(FLARE)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+project(FLARE)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "-pthread -Wall -Wextra -pedantic")
@@ -9,44 +9,64 @@ else()
     set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -static-libgcc -Wall -Wextra -pedantic")
 endif()
 
-# add_definitions()
-
-project(Avionics_Native)
-
-
-project(Avionics_Native)
 add_executable(TantalusStage1 common/src/avionics.cpp)
 
-add_compile_definitions(RADIO_CONFIG_PACKET_SIM_ACTIVE=1)
 
 add_subdirectory(common)
 add_subdirectory(envs/x86)
 add_subdirectory(rockets/tantalus_stage_1)
 
 target_include_directories(TantalusStage1 PUBLIC
-    common/include
-    common/lib
-    envs/x86/include
-    envs/x86/lib
-    rockets/tantalus_stage_1/include
+common/include
+common/lib
+envs/x86/include
+envs/x86/lib
+rockets/tantalus_stage_1/include
 )
 
+###
+### Setup Radio defines
+###
+
+add_compile_definitions(RADIO_CONFIG_PACKET_SIM_ACTIVE=1)
 target_compile_definitions(TantalusStage1 PUBLIC
-    RADIO_CONFIG_PACKET_ROCKET_ID=0
+RADIO_CONFIG_PACKET_ROCKET_ID=0
 )
+
+message(STATUS "Resolving GIT Version")
+message("Directory: ${CMAKE_CURRENT_LIST_DIR}")
+set(_git_build_version "unknown")
+
+# Setup git version
+find_package(Git)
+if(GIT_FOUND)
+execute_process(
+  COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
+  WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
+  OUTPUT_VARIABLE _git_build_version
+  ERROR_QUIET
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  message( STATUS "GIT hash: ${_git_build_version}")
+else()
+  message(SEND_ERROR "Git not found; unable to set Radio Config data")
+endif()
+add_compile_definitions(RADIO_CONFIG_PACKET_VERSION_STR="${_git_build_version}")
 
 ###
 ### Google Test
 ###
 
 # Download and unpack googletest at configure time
+# -Wno-dev suppresses warnings - CMake gets confused when you do this, I guess
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
-execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+execute_process(COMMAND ${CMAKE_COMMAND} -Wno-dev -G "${CMAKE_GENERATOR}" .
   RESULT_VARIABLE result
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
 if(result)
   message(FATAL_ERROR "CMake step for googletest failed: ${result}")
 endif()
+
 execute_process(COMMAND ${CMAKE_COMMAND} --build .
   RESULT_VARIABLE result
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
@@ -63,6 +83,9 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
                  ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
                  EXCLUDE_FROM_ALL)
+# Note 2020-12-20 - above add_subdirectory call throws CMake versioning errors.
+# There's a recent (as of writing) pull request in googletest upstream
+# https://github.com/google/googletest/pull/3094
 
 # The gtest/gtest_main targets carry header search path
 # dependencies automatically when using CMake 2.8.11 or
@@ -70,11 +93,11 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
 if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
 endif()
- 
-enable_testing() 
+
+enable_testing()
 
 ###
-### Link all tests here 
+### Link all tests here
 ###
 ### Note: Compile project in build folder to keep unnecessarily files out from main directory
 ###
