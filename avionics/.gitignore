@@ -1,5 +1,12 @@
+# CMake
 CMakeCache.txt
+CTestTestfile.cmake
 cmake_install.cmake
 **/CMakeFiles
 **/Makefile
+
+# Google test
+googletest-*
+
+# Miscl.
 build
