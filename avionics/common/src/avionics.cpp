@@ -77,6 +77,7 @@ PLEASE READ ME!
 #include "ignitor_collection.h"
 #include "options.h"
 #include "radio.h"
+#include "rocket.h"
 #include "sensor_collection.h"
 #include "state_machine.h"
 #include "status.h"
@@ -116,9 +117,6 @@ int main(void) {
     constexpr unsigned int LANDED_POLLING_TIME_INTERVAL = 5000; // ms
     constexpr unsigned int NOMINAL_POLLING_TIME_INTERVAL = 50;  // ms
 
-    static Buzzer buzzer;
-    Camera cam(Hal::SerialInst::Camera);
-
     initPins();
 
 /* Setup all UART comms */
@@ -130,27 +128,17 @@ int main(void) {
     SerialUSB.println("Initializing...");
 #endif
 
-    /* init sensors*/
-    SensorCollectionPtr sensors_ptr = getSensors();
-    SensorCollection &sensors = *sensors_ptr;
+    Rocket rocket;
+    // Some aliases, to reduce amount of code changed at once
+    auto &state_machine = rocket.state_machine;
+    auto &init_status = rocket.init_status;
+    auto &radio = rocket.radio;
+    auto &sensors = rocket.sensors;
+    auto &ignitors = rocket.ignitors;
+    auto &calc = rocket.calc;
+    auto &datalog = rocket.datalog;
 
-    /* init ignitors*/
-    IgnitorCollectionPtr ignitors_ptr = getIgnitors();
-    IgnitorCollection &ignitors = *ignitors_ptr;
-
-    /* init log file */
-    constexpr char LOG_FILE_NAME[] = "datalog.csv";
-    CSVWrite<CSVWriteImpl> datalog(LOG_FILE_NAME);
-
-    RocketStatus statusOfInit = collectStatus(sensors, ignitors);
-    displayStatus(statusOfInit, buzzer);
-
-    RadioController radio{Hal::SerialInst::Radio};
-
-    Calculator calc(sensors);
-
-    StateMachine state_machine;
-    if (statusOfInit == RocketStatus::CRITICAL_FAILURE) {
+    if (init_status == RocketStatus::CRITICAL_FAILURE) {
         state_machine.abort();
     }
     StateId state = state_machine.getState();
@@ -163,109 +151,21 @@ int main(void) {
     Hal::ms time_interval(NOMINAL_POLLING_TIME_INTERVAL); // ms
     Hal::t_point radio_old_time = Hal::now_ms();
     Hal::ms radio_t_interval(500); // ms //TODO - make 500 a constant somewhere
-    radio.sendStatus(old_time.time_since_epoch().count(), statusOfInit, sensors,
+    radio.sendStatus(old_time.time_since_epoch().count(), init_status, sensors,
                      ignitors);
 
     float altitude = 0;
 
-    auto command_reciever = [&new_time_int, &statusOfInit, &sensors, &ignitors,
-                             &radio, &state_machine, &altitude,
-                             &calc](uint8_t command) {
-        auto state = state_machine.getState();
-        switch (command) {
-        case 'P':
-            radio.sendStatus(new_time_int, statusOfInit, sensors, ignitors);
-            break;
-        case 'A':
-            state_machine.arm();
-            break;
-        case 'C':
-            radio.sendConfig(new_time_int);
-            break;
-        case 'D':
-            state_machine.disarm();
-            break;
-        case 0x30:
-            radio.sendBulkSensor(new_time_int, altitude, sensors.accelerometer,
-                                 sensors.imuSensor, sensors.gps,
-                                 static_cast<uint8_t>(state));
-            break;
-        case 0x04:
-            radio.sendGPS(new_time_int, sensors.gps);
-            break;
-        case 0x10:
-            radio.sendSingleSensor(new_time_int, 0x10,
-                                   sensors.accelerometer.getData()[0]);
-            break;
-
-        case 0x11:
-            radio.sendSingleSensor(new_time_int, 0x11,
-                                   sensors.accelerometer.getData()[1]);
-            break;
-        case 0x12:
-            radio.sendSingleSensor(new_time_int, 0x12,
-                                   sensors.accelerometer.getData()[2]);
-            break;
-        case 0x13:
-            radio.sendSingleSensor(new_time_int, 0x13,
-                                   sensors.barometer.getData()[0]);
-            break;
-        case 0x14:
-            radio.sendSingleSensor(new_time_int, 0x14,
-                                   sensors.barometer.getData()[1]);
-            break;
-        case 0x15:
-            radio.sendSingleSensor(new_time_int, 0x15,
-                                   sensors.temperature.getData()[0]);
-            break;
-        case 0x16:
-            break;
-            // Not implemented - still uncertain about IMU storage
-        case 0x17:
-            break;
-            // Not implemented - still uncertain about IMU storage
-        case 0x18:
-            break;
-            // Not implemented - still uncertain about IMU storage
-        case 0x19:
-            radio.sendSingleSensor(new_time_int, 0x19,
-                                   sensors.gps.getData()[0]);
-            break;
-        case 0x1A:
-            radio.sendSingleSensor(new_time_int, 0x1A,
-                                   sensors.gps.getData()[1]);
-            break;
-        case 0x1B:
-            radio.sendSingleSensor(new_time_int, 0x1B,
-                                   sensors.gps.getData()[2]);
-            break;
-        case 0x1C:
-            radio.sendSingleSensor(new_time_int, 0x1C, altitude);
-            break;
-        case 0x1D:
-            radio.sendState(new_time_int, static_cast<uint8_t>(state));
-            break;
-        case 0x1E:
-            break; // Voltage sensor not implemented
-        case 0x1F:
-            radio.sendSingleSensor(new_time_int, 0x1F, calc.getBaseAltitude());
-            break;
-        default:
-            break;
-        }
-    };
     for (;;) {
         new_time = Hal::now_ms();
-        new_time_int =
-            static_cast<uint32_t>(timestamp.time_since_epoch().count());
 
         // makes sure that even if it does somehow get accidentally changed,
         // it gets reverted
-        if (statusOfInit == RocketStatus::CRITICAL_FAILURE) {
+        if (init_status == RocketStatus::CRITICAL_FAILURE) {
             state_machine.abort();
         }
 
-        radio.listenAndAct<decltype(command_reciever)>(command_reciever);
+        radio.listenAndAct<Rocket>(rocket);
 
         state = state_machine.getState(); // convenience
 
@@ -282,11 +182,12 @@ int main(void) {
             old_time = new_time;
 
             sensors.poll(timestamp);
+            new_time_int =
+                static_cast<uint32_t>(timestamp.time_since_epoch().count());
             calc.calculateValues(state, state_input, new_time);
-            altitude = state_input.altitude;
 
             state_machine.update(state_input, state_aux);
-            datalog.logData(new_time_int, sensors, state, altitude,
+            datalog.logData(new_time_int, sensors, state, calc.altitude(),
                             calc.getBaseAltitude());
         }
 
@@ -297,7 +198,7 @@ int main(void) {
                                  static_cast<uint8_t>(state));
         }
         // LED blinks in non-critical failure
-        blinkStatusLED(statusOfInit);
+        blinkStatusLED(init_status);
 
 #ifdef TESTING
         Hal::sleep_ms(1000); // So you can actually read the serial output
@@ -314,12 +215,12 @@ int main(void) {
  * @brief  Helper function for LED blinking
  * @return None
  */
-inline void blinkStatusLED(RocketStatus statusOfInit) {
+inline void blinkStatusLED(RocketStatus init_status) {
     static Hal::t_point init_st_old_time = Hal::now_ms();
     static const Hal::ms init_st_time_interval(500);
     static bool init_st_indicator = false;
 
-    if (statusOfInit == RocketStatus::NONCRITICAL_FAILURE &&
+    if (init_status == RocketStatus::NONCRITICAL_FAILURE &&
         Hal::now_ms() - init_st_old_time > init_st_time_interval) {
         init_st_old_time = Hal::now_ms();
         init_st_indicator = !init_st_indicator;
