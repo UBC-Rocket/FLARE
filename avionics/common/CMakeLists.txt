@@ -7,6 +7,7 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/src/cameras.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/gpio.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/ignitor_collection.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/sensor_collection.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/radio.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/radio_queue.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/status.cpp
