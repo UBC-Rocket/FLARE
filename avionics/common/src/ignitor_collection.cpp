@@ -1,6 +1,6 @@
 #include "ignitor_collection.h"
 #include "gpio.h"
-// Ignitor(Pin ignitePin, Pin continuityPin, Pin continuityADCPin);
+
 IgnitorCollection::IgnitorCollection()
     : drogue(Pin::DROGUE_IGNITOR, Pin::DROGUE_CONTINUITY_TEST,
              Pin::DROGUE_CONTINUITY_READ),
@@ -15,9 +15,4 @@ IgnitorCollection::IgnitorCollection()
         status_bitfield_[0] |= 0x40;
         status_ = RocketStatus::CRITICAL_FAILURE;
     }
-}
-
-IgnitorCollectionPtr getIgnitors() {
-    std::unique_ptr<IgnitorCollection> tmp(new IgnitorCollection);
-    return std::move(tmp);
 }

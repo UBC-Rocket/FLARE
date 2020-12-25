@@ -1,10 +1,5 @@
 #include "sensor_collection.h"
 
-SensorCollectionPtr getSensors() {
-    std::unique_ptr<SensorCollection> tmp(new SensorCollection);
-    return std::move(tmp);
-}
-
 SensorCollection::SensorCollection()
     : barometer(BEGIN + BAROMETER_INDEX),
       gps(Hal::SerialInst::GPS, BEGIN + GPS_INDEX),
