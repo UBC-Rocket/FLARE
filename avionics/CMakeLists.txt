@@ -10,18 +10,25 @@ else()
 endif()
 
 add_executable(TantalusStage1 common/src/avionics.cpp)
-
+add_executable(TantalusStage2 common/src/avionics.cpp)
 
 add_subdirectory(common)
 add_subdirectory(envs/x86)
 add_subdirectory(rockets/tantalus_stage_1)
+add_subdirectory(rockets/tantalus_stage_2)
 
-target_include_directories(TantalusStage1 PUBLIC
-common/include
+include_directories(common/include
 common/lib
 envs/x86/include
 envs/x86/lib
-rockets/tantalus_stage_1/include
+)
+
+target_include_directories(TantalusStage1 PUBLIC
+  rockets/tantalus_stage_1/include
+)
+
+target_include_directories(TantalusStage2 PUBLIC
+rockets/tantalus_stage_2/include
 )
 
 ###
@@ -30,14 +37,19 @@ rockets/tantalus_stage_1/include
 
 add_compile_definitions(RADIO_CONFIG_PACKET_SIM_ACTIVE=1)
 target_compile_definitions(TantalusStage1 PUBLIC
-RADIO_CONFIG_PACKET_ROCKET_ID=0
+    RADIO_CONFIG_PACKET_ROCKET_ID=0
+)
+target_compile_definitions(TantalusStage2 PUBLIC
+    RADIO_CONFIG_PACKET_ROCKET_ID=1
 )
 
+###
+### Setup Git version
+###
 message(STATUS "Resolving GIT Version")
 message("Directory: ${CMAKE_CURRENT_LIST_DIR}")
 set(_git_build_version "unknown")
 
-# Setup git version
 find_package(Git)
 if(GIT_FOUND)
 execute_process(
@@ -52,6 +64,7 @@ else()
   message(SEND_ERROR "Git not found; unable to set Radio Config data")
 endif()
 add_compile_definitions(RADIO_CONFIG_PACKET_VERSION_STR="${_git_build_version}")
+
 
 ###
 ### Google Test
