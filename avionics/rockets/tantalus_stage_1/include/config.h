@@ -1,11 +1,5 @@
 #pragma once
 
-/* TODO - MAKE THIS NOT A CONSTANT*/
-#include "state_input_struct.h"
-
-static StateInput state_input;
-static StateAuxilliaryInfo state_aux;
-
 /* Sensors */
 #include "sensors/GPS.h"
 #include "sensors/IMU.h"
