@@ -2,10 +2,10 @@
 #include "gpio.h"
 // Ignitor(Pin ignitePin, Pin continuityPin, Pin continuityADCPin);
 IgnitorCollection::IgnitorCollection()
-    : main(Pin::MAIN_IGNITOR, Pin::MAIN_CONTINUITY_TEST,
-           Pin::MAIN_CONTINUITY_READ),
-      drogue(Pin::DROGUE_IGNITOR, Pin::DROGUE_CONTINUITY_TEST,
-             Pin::DROGUE_CONTINUITY_READ) {
+    : drogue(Pin::DROGUE_IGNITOR, Pin::DROGUE_CONTINUITY_TEST,
+             Pin::DROGUE_CONTINUITY_READ),
+      main(Pin::MAIN_IGNITOR, Pin::MAIN_CONTINUITY_TEST,
+           Pin::MAIN_CONTINUITY_READ) {
     status_ = RocketStatus::NOMINAL;
     if (main.getStatus() == ComponentStatus::FAILURE) {
         status_bitfield_[0] |= 0x80;

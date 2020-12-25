@@ -21,7 +21,7 @@ struct Rocket {
           init_status(collectStatus(sensors, ignitors)),
           radio(Hal::SerialInst::Radio), calc(sensors) {}
 
-    // WARNING - ORDER DEPENDENCY
+    // WARNING - MEMBER ORDER DEPENDENCY
     // https://isocpp.org/wiki/faq/ctors#order-dependency-in-members
     Buzzer buzzer;
     Camera cam;
