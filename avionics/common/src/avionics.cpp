@@ -154,8 +154,6 @@ int main(void) {
     radio.sendStatus(old_time.time_since_epoch().count(), init_status, sensors,
                      ignitors);
 
-    float altitude = 0;
-
     for (;;) {
         new_time = Hal::now_ms();
 
@@ -193,9 +191,9 @@ int main(void) {
 
         if (new_time - radio_old_time >= radio_t_interval) {
             radio_old_time = new_time;
-            radio.sendBulkSensor(new_time_int, altitude, sensors.accelerometer,
-                                 sensors.imuSensor, sensors.gps,
-                                 static_cast<uint8_t>(state));
+            radio.sendBulkSensor(new_time_int, calc.altitude(),
+                                 sensors.accelerometer, sensors.imuSensor,
+                                 sensors.gps, static_cast<uint8_t>(state));
         }
         // LED blinks in non-critical failure
         blinkStatusLED(init_status);
