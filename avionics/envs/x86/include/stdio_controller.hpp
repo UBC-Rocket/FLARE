@@ -21,7 +21,7 @@ class StdIoController {
     // Everything is static but it's not a namespace b/c of the private member
     // variables
   private:
-    typedef char Id;
+    typedef uint8_t Id;
 
     // static std::unordered_map<Id, std::mutex> m_mutexes;
     static std::mutex istream_mutex_; // lock before accessing istreams_
@@ -37,8 +37,8 @@ class StdIoController {
 
     static std::ofstream out_log_;
 
-    static void outputFiltered(char const c);
-    static void output(char const c);
+    static void outputFiltered(uint8_t const c);
+    static void output(uint8_t const c);
 
     enum class PacketIds : uint8_t {
         analog_read = 0x61,
@@ -49,10 +49,6 @@ class StdIoController {
     static constexpr auto FLOAT_SIZE = sizeof(float);
     static_assert(FLOAT_SIZE == 4,
                   "Code assumes floating point numbers are 4 bytes");
-
-    // at least until someone can make sure that this is the right way to do
-    // this.
-    static_assert(std::is_same<uint8_t, unsigned char>::value, "Code assumes uint8_t can be used for bytes");
 
     class BlockingRequest {
         /**
@@ -225,14 +221,14 @@ class StdIoController {
         uint32_t int_test = 0x04030201;
         float float_test = -2.0; // 0xC000 0000;
 
-        char buf[8];
+        uint8_t buf[8];
         std::memmove(buf, &int_test, 4);
         std::memmove(buf + 4, &float_test, 4);
         putPacket(id, buf, 8);
     }
 
-    static char getCinForce() {
-        char c;
+    static uint8_t getCinForce() {
+        uint8_t c;
         while (true) {
             c = std::cin.get();
             if (std::cin.fail()) {
@@ -243,9 +239,9 @@ class StdIoController {
         }
     }
 
-    static char getFilteredCin() {
-        char msb = getCinForce() - 'A';
-        char lsb = getCinForce() - 'A';
+    static uint8_t getFilteredCin() {
+        uint8_t msb = getCinForce() - 'A';
+        uint8_t lsb = getCinForce() - 'A';
 
         return (msb << 4) | lsb;
     }
@@ -258,7 +254,7 @@ class StdIoController {
         length <<= 8;
         length |= getFilteredCin();
 
-        auto buf = std::vector<char>();
+        auto buf = std::vector<uint8_t>();
         buf.reserve(length);
         for (int i = 0; i < length; i++) {
             buf.push_back(getFilteredCin());

@@ -7,7 +7,7 @@ class Buzzer : public IBuzzer {
   public:
     void sing(SongTypes song) const {
         uint8_t tmp = 1;
-        char tmpsong = static_cast<char>(song);
+        uint8_t tmpsong = static_cast<uint8_t>(song);
         StdIoController::putPacket(0x07, &tmpsong, tmp);
     }
 };
