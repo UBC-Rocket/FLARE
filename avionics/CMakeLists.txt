@@ -4,9 +4,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 project(FLARE)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "-pthread -Wall -Wextra -pedantic")
+    set(CMAKE_CXX_FLAGS "-pthread -Wall -Wextra -pedantic -g")
 else()
-    set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -static-libgcc -Wall -Wextra -pedantic")
+    set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -static-libgcc -Wall -Wextra -pedantic -g")
 endif()
 
 add_executable(TantalusStage1 common/src/avionics.cpp)
