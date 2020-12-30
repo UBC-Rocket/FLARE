@@ -108,12 +108,13 @@ class RadioController {
             can_receive_command<Actor>::value,
             "act_upon does not have the expected signature void(uint8_t)");
 
-        xbee_.readPacket();
         int read_count = 0;
-
-        while ((xbee_.getResponse().isAvailable() ||
-                xbee_.getResponse().isError())) {
-            // goes through all xbee_ packets in buffer
+        while (read_count < MAX_PACKETS_PER_RX_LOOP_) {
+            xbee_.readPacket();
+            if (!(xbee_.getResponse().isAvailable() ||
+                  xbee_.getResponse().isError())) {
+                break;
+            }
 
             if (xbee_.getResponse().isError()) {
                 // TODO - figure out whether there's anything
@@ -139,10 +140,6 @@ class RadioController {
             }
 
             read_count++;
-            if (read_count >= MAX_PACKETS_PER_RX_LOOP_) {
-                break;
-            }
-            xbee_.readPacket();
         }
         if (Hal::now_ms() - watchdog_last_send_ > WATCHDOG_SEND_INTERVAL_) {
             can_send = true;
