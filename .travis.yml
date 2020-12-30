@@ -12,6 +12,10 @@ sudo: required
 install:
 - sudo apt-get update -y
 
+# PlatformIO
+- pip install -U platformio
+- pio update
+
 # Needed for unit testing with qt https://github.com/pytest-dev/pytest-qt/issues/293
 - sudo apt-get install -y xvfb libxkbcommon-x11-0
 - sudo Xvfb :1 -screen 0 1024x768x24 </dev/null &
@@ -32,6 +36,11 @@ install:
 - cd ../FLARE
 
 script:
+# PlatformIO build
+# TODO: build all envs once possible
+- pio run --environment tantalus_stage_1
+
+# Build and unittest on x86
 - mkdir avionics/build
 - cd avionics/build
 - cmake ..
