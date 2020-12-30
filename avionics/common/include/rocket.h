@@ -12,6 +12,8 @@
 #include "sensor_collection.h"
 #include "state_machine.h"
 
+#include "HAL/time.h"
+
 struct Rocket {
   public:
     static constexpr char LOG_FILE_NAME[] = "datalog.csv";
@@ -48,14 +50,14 @@ class CommandReceiver {
         auto state = rocket_.state_machine.getState();
         switch (command) {
         case 'P':
-            rocket_.radio.sendStatus(millis(), rocket_.init_status,
+            rocket_.radio.sendStatus(Hal::millis(), rocket_.init_status,
                                      rocket_.sensors, rocket_.ignitors);
             break;
         case 'A':
             rocket_.state_machine.arm();
             break;
         case 'C':
-            rocket_.radio.sendConfig(millis());
+            rocket_.radio.sendConfig(Hal::millis());
             break;
         case 'D':
             rocket_.state_machine.disarm();
