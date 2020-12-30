@@ -129,7 +129,9 @@ int main(void) {
 #endif
 
     Rocket rocket;
-    // Some aliases, to reduce amount of code changed at once
+    CommandReceiver command_receiver(rocket);
+    // Logically, these are all unrelated variables - but to allow the command
+    // receiver to function, they need to be coalesced into one POD struct.
     auto &state_machine = rocket.state_machine;
     auto &init_status = rocket.init_status;
     auto &radio = rocket.radio;
@@ -163,7 +165,7 @@ int main(void) {
             state_machine.abort();
         }
 
-        radio.listenAndAct<Rocket>(rocket);
+        radio.listenAndAct(command_receiver);
 
         state = state_machine.getState(); // convenience
 
