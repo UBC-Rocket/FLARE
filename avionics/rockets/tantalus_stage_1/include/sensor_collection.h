@@ -85,6 +85,3 @@ class SensorCollection {
         return sensor_data;
     }
 };
-
-typedef std::unique_ptr<SensorCollection> SensorCollectionPtr;
-SensorCollectionPtr getSensors();

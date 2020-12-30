@@ -21,12 +21,12 @@ constexpr float BAROMETER_MOVING_AVERAGE_ALPHA = 2.0f / (2 * 40 + 1);
 class Calculator : public ICalculator {
   public:
     Calculator(SensorCollection &sensors)
-        : m_baro(sensors.barometer), m_imu(sensors.imuSensor) {
-        m_baro.readData();
-        m_base_alt.reset(pressureToAltitude(*(m_baro.getData())), 1,
-                         BAROMETER_MOVING_AVERAGE_ALPHA);
-        m_last_t = Hal::now_ms();
-        m_last_alt = m_base_alt.getAverage();
+        : baro_(sensors.barometer), imu_(sensors.imuSensor) {
+        baro_.readData();
+        base_alt_.reset(pressureToAltitude(*(baro_.getData())), 1,
+                        BAROMETER_MOVING_AVERAGE_ALPHA);
+        last_t_ = Hal::now_ms();
+        last_alt_ = base_alt_.getAverage();
     }
 
     void calculateValues(StateId const state, StateInput &out_state_input,
@@ -34,14 +34,14 @@ class Calculator : public ICalculator {
         StateInput &out = out_state_input; // alias
 
         /* Update altitude average and calculate altitude*/
-        const float alt = pressureToAltitude(*(m_baro.getData()));
-        const float diff = std::abs(m_base_alt.getAverage() - alt);
+        const float alt = pressureToAltitude(*(baro_.getData()));
+        const float diff = std::abs(base_alt_.getAverage() - alt);
 
         if ((state == StateId::STANDBY || state == StateId::ARMED) &&
-            diff < m_base_alt.getStandardDeviation() * 3) {
-            m_base_alt.addValue(alt);
+            diff < base_alt_.getStandardDeviation() * 3) {
+            base_alt_.addValue(alt);
         }
-        out.altitude = alt - m_base_alt.getAverage();
+        out.altitude = alt - base_alt_.getAverage();
 
         /* Do some math to figure out orientation & acceleration in relevant
          * frames*/
@@ -49,16 +49,16 @@ class Calculator : public ICalculator {
         // There may be some really clever way to do this with pointers, or at
         // least use comma initialization
         out.accel_rocket(0) =
-            m_imu.getData()[0]; //? TODO - make sure these are aligned
-        out.accel_rocket(1) = m_imu.getData()[1]; //?
-        out.accel_rocket(2) = m_imu.getData()[2]; //?
+            imu_.getData()[0]; //? TODO - make sure these are aligned
+        out.accel_rocket(1) = imu_.getData()[1]; //?
+        out.accel_rocket(2) = imu_.getData()[2]; //?
 
         Eigen::Quaternionf meas_orient(1, 0, 0, 0);
-        // TODO - initialize measured orientation with m_imu's quaternion data
+        // TODO - initialize measured orientation with imu_'s quaternion data
         // instead of dummy data
 
         // conjugate is equal to the inverse for unit quaternion
-        out.orientation = meas_orient * m_gnd_quat.conjugate();
+        out.orientation = meas_orient * gnd_quat_.conjugate();
         out.orientation.normalize();
 
         // convert into quaternion for operation
@@ -77,27 +77,33 @@ class Calculator : public ICalculator {
         /* Do velocity calculations */
         constexpr int MILLISECONDS_PER_SECOND = 1000;
         out.velocity_vertical =
-            (out.altitude - m_last_alt) / (t_ms - m_last_t).count() *
-            MILLISECONDS_PER_SECOND; // t_ms and m_last_t are of millisconds
+            (out.altitude - last_alt_) / (t_ms - last_t_).count() *
+            MILLISECONDS_PER_SECOND; // t_ms and last_t_ are of millisconds
 
-        m_last_alt = out.altitude; // in preparation for next loop
-        m_last_t = t_ms;
+        last_alt_ = out.altitude; // in preparation for next loop
+        last_t_ = t_ms;
     }
 
     /**
      * @brief Get baseline altitude (i.e. altitude of launch site above sea
      * level)
-     * @return Altitude, in metres
+     * @return Base altitude, in metres
      */
-    float getBaseAltitude() { return m_base_alt.getAverage(); }
+    float getBaseAltitude() const { return base_alt_.getAverage(); }
+
+    /**
+     * @brief Estimate of current altitude
+     * @return Altitude [metres]
+     */
+    float altitude() const { return last_alt_; }
 
   private:
-    ExponentialMovingAvg<float> m_base_alt;
-    Barometer &m_baro;
-    IMU &m_imu;
+    ExponentialMovingAvg<float> base_alt_;
+    Barometer &baro_;
+    IMU &imu_;
 
-    Eigen::Quaternionf m_gnd_quat;
+    Eigen::Quaternionf gnd_quat_;
 
-    float m_last_alt;
-    Hal::t_point m_last_t;
+    float last_alt_;
+    Hal::t_point last_t_;
 };

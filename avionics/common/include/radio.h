@@ -39,31 +39,24 @@ constexpr uint64_t GND_STN_ADDR_MSB = 0x0013A200; // Ground Station - Body
 constexpr uint64_t GND_STN_ADDR_LSB = 0x41678FC0;
 constexpr uint32_t RADIO_BAUD_RATE = 921600;
 
-class PacketBuffWriter
-{
-    public:
-        PacketBuffWriter():packet(new std::vector<uint8_t>)
-        {
-            packet->reserve(255); // To avoid overhead of resizing multiple times
-        }
+class PacketBuffWriter {
+  public:
+    PacketBuffWriter() : packet(new std::vector<uint8_t>) {
+        packet->reserve(255); // To avoid overhead of resizing multiple times
+    }
 
-        void write(void const* data, size_t size)
-        {
-            if (!packet)
-                return;
-                
-            size_t old_size = packet->size();
-            packet->resize(old_size + size);
-            std::memcpy(packet->data() + old_size, data, size);
-        }
+    void write(void const *data, size_t size) {
+        if (!packet)
+            return;
 
-        void write(uint8_t byte)
-        {
-            write(&byte, 1);
-        }
+        size_t old_size = packet->size();
+        packet->resize(old_size + size);
+        std::memcpy(packet->data() + old_size, data, size);
+    }
 
-        SubPktPtr packet;
+    void write(uint8_t byte) { write(&byte, 1); }
 
+    SubPktPtr packet;
 };
 
 class RadioController {
@@ -107,12 +100,12 @@ class RadioController {
     /**
      * @brief Meat of the action - listens for any incoming packets, then
      * transmits data and performs rocket actions as necessary.
-     * @param act_upon Function-like object (e.g. lambda expression) that
+     * @param command_receiver Object with method run_command that
      * accepts an unsigned char (representing the command) and returns void.
      */
-    template <typename Func> void listenAndAct(Func act_upon) {
+    template <typename Actor> void listenAndAct(Actor &command_receiver) {
         static_assert(
-            can_receive_command<Func>::value,
+            can_receive_command<Actor>::value,
             "act_upon does not have the expected signature void(uint8_t)");
 
         xbee_.readPacket();
@@ -136,7 +129,7 @@ class RadioController {
                 uint8_t command;
                 for (int j = 0; j < len; j++) {
                     command = rx.getData()[j];
-                    act_upon(command);
+                    command_receiver.run_command(command);
                 }
 
             } else if (xbee_.getResponse().getApiId() ==
@@ -257,8 +250,8 @@ class RadioController {
       public:
         // type dependent false
         static_assert(!(std::is_same<T, T>::value),
-                      "The passed in value for listenAndAct() must be callable "
-                      "( has operator() )");
+                      "The passed in value for listenAndAct() must have the "
+                      "method run_command ");
 
         static constexpr bool value = true;
     };
@@ -268,7 +261,7 @@ class RadioController {
       private:
         template <typename C>
         static constexpr auto check(C *) -> typename std::is_same<
-            decltype(std::declval<C>().operator()(std::declval<uint8_t>())),
+            decltype(std::declval<C>().run_command(std::declval<uint8_t>())),
             void>::type;
 
         template <typename> static constexpr std::false_type check(...);

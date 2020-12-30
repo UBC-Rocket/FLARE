@@ -1,6 +1,6 @@
 # file(GLOB common_files ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
 
-target_sources( 
+target_sources(
     TantalusStage1
     PRIVATE
         # ${common_files}
@@ -21,6 +21,6 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/src/states/pre_air_start_coast_timed.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/states/pressure_delay.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/states/standby.cpp
-        
+
         ${CMAKE_CURRENT_LIST_DIR}/src/hardware/ignitor.cpp
 )
