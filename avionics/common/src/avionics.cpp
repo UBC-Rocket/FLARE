@@ -146,10 +146,8 @@ int main(void) {
     StateId state = state_machine.getState();
 
     // Timing
-    Hal::t_point timestamp;
-    Hal::t_point old_time = Hal::now_ms(); // ms
-    Hal::t_point new_time;                 // ms
-    uint32_t new_time_int;
+    Hal::t_point old_time = Hal::now_ms();                // ms
+    Hal::t_point new_time;                                // ms
     Hal::ms time_interval(NOMINAL_POLLING_TIME_INTERVAL); // ms
     Hal::t_point radio_old_time = Hal::now_ms();
     Hal::ms radio_t_interval(500); // ms //TODO - make 500 a constant somewhere
@@ -181,21 +179,20 @@ int main(void) {
         if ((new_time - old_time) >= time_interval) {
             old_time = new_time;
 
-            sensors.poll(timestamp);
-            new_time_int =
-                static_cast<uint32_t>(timestamp.time_since_epoch().count());
-            calc.calculateValues(state, state_input, new_time);
-
+            sensors.poll();
+            calc.calculateValues(state, state_input, sensors.last_poll_time());
             state_machine.update(state_input, state_aux);
-            datalog.logData(new_time_int, sensors, state, calc.altitude(),
+            datalog.logData(Hal::tpoint_to_uint(sensors.last_poll_time()),
+                            sensors, state, calc.altitude(),
                             calc.getBaseAltitude());
         }
 
         if (new_time - radio_old_time >= radio_t_interval) {
             radio_old_time = new_time;
-            radio.sendBulkSensor(new_time_int, calc.altitude(),
-                                 sensors.accelerometer, sensors.imuSensor,
-                                 sensors.gps, static_cast<uint8_t>(state));
+            radio.sendBulkSensor(Hal::tpoint_to_uint(sensors.last_poll_time()),
+                                 calc.altitude(), sensors.accelerometer,
+                                 sensors.imuSensor, sensors.gps,
+                                 static_cast<uint8_t>(state));
         }
         // LED blinks in non-critical failure
         blinkStatusLED(init_status);

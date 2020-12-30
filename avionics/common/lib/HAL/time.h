@@ -33,4 +33,9 @@ t_point now_ms();
 uint32_t millis();
 
 void initialSystem();
+
+/**
+ * @brief Convenience function to convert a t_point variable into a uint32_t
+ */
+uint32_t tpoint_to_uint(t_point timestamp);
 } // namespace Hal

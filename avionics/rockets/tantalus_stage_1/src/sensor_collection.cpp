@@ -8,8 +8,8 @@ SensorCollection::SensorCollection()
     updateStatus();
 }
 
-void SensorCollection::poll(Hal::t_point &timestamp) {
-    timestamp = Hal::now_ms();
+void SensorCollection::poll() {
+    last_poll_time_ = Hal::now_ms();
     barometer.readData();
     gps.readData();
     accelerometer.readData();
