@@ -45,6 +45,6 @@ uint32_t millis() {
 }
 
 uint32_t tpoint_to_uint(t_point timestamp) {
-    static_cast<uint32_t>(timestamp.time_since_epoch().count());
+    return static_cast<uint32_t>(timestamp.time_since_epoch().count());
 }
 } // namespace Hal
