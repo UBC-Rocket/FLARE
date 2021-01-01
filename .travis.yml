@@ -37,7 +37,6 @@ install:
 
 script:
 # PlatformIO build
-# TODO: build all envs once possible
 - pio run
 
 # Build and unittest on x86
