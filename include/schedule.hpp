@@ -7,24 +7,37 @@
 #include <utility> // for pair
 
 #include "time_tmp.h"
-
-template <typename Dummy> class ScheduleBase {
+/**
+ * \tparam Clock satisfies a looser form of the C++ STL named requirement for
+ * Clock - specifically, there's no requirement on the types used internally; it
+ * just needs to have a ::duration type, ::time_point type, and a ::now()
+ * function.
+ *
+ * Additionally, if Clock::idle(Duration wait_time) exists, then this function
+ * will be called when waiting for the next task to be ready. If Clock::idle()
+ * does not exist, then the code will simply busy wait.
+ *
+ * \tparam MaxTasks is the maximum number of tasks that can be registered. Note
+ * that each task can only be on the schedule once, so it's also the number of
+ * tasks that can be scheduled.
+ *
+ * Call registerTask(), then run().
+ */
+template <typename Clock, int MaxTasks> class ScheduleBase {
   private:
-    static constexpr int MAX_TASKS = 32; // adjustable
+    static constexpr int MAX_TASKS = MaxTasks; // adjustable
 
   public:
-    // don't want to deal with std::chrono yet, but also want to reduce further
-    // compatibility work
-    typedef uint32_t Duration;
-    typedef uint32_t Time;
+    typedef typename Clock::duration Duration;
+    typedef typename Clock::time_point TimePoint;
     typedef void (*TaskFunction)(void *);
 
     struct Task {
         TaskFunction action;
         void *data;
-        Time period;
+        Duration period;
 
-        Task(TaskFunction act, void *dat, Time peri)
+        Task(TaskFunction act, void *dat, Duration peri)
             : action(act), data(dat), period(peri) {}
     };
     /**
@@ -64,8 +77,8 @@ template <typename Dummy> class ScheduleBase {
 
     /**
      * \brief Runs the scheduler, which will continually run tasks. This
-     * function will not return, unless there are no more tasks to run (i.e. all
-     * repeating is disabled).
+     * function will not return, unless there are no more tasks to run (i.e.
+     * all repeating is disabled).
      */
     static void run() {
         while (todo_count_ > 0) {
@@ -81,17 +94,17 @@ template <typename Dummy> class ScheduleBase {
         std::pop_heap(todo_.begin(), todo_.begin() + todo_count_);
         todo_count_--;
         // aliases
-        const Time &start_time = todo_[todo_count_].first;
+        const TimePoint &start_time = todo_[todo_count_].first;
         const int &task_id = todo_[todo_count_].second;
         const Task &task = tasks_[task_id];
 
         if (!run_early_.test(task_id)) {
-            while (Hal::millis() < start_time)
-                ; // TODO don't busy wait
+            while (Clock::now() < start_time)
+                IdleIfAvailable<Clock>::idle();
         }
 
         // currently_running_ = task_id;
-        const Time initial_time = Hal::millis();
+        const TimePoint initial_time = Clock::now();
         task.action(task.data); // actually run the task
 
         if (not repeat_.test(task_id)) {
@@ -100,8 +113,8 @@ template <typename Dummy> class ScheduleBase {
         // reschedule task
         // Note that task.action() could have rescheduled tasks, so there's no
         // guarentee on current heap structure
-        const Time current_time = Hal::millis();
-        const Time new_task_time = initial_time + task.period;
+        const TimePoint current_time = Clock::now();
+        const TimePoint new_task_time = initial_time + task.period;
         // Earliest it can be scheduled is now.
         if (new_task_time > current_time) {
             scheduleTask_(TaskTodo(new_task_time, task_id));
@@ -117,7 +130,7 @@ template <typename Dummy> class ScheduleBase {
     static void commenceTask(int id) {
         assert(!repeat_.test(id));
         repeat_.set(id);
-        scheduleTask_(TaskTodo(tasks_[id].period + Hal::millis(), id));
+        scheduleTask_(TaskTodo(tasks_[id].period + Clock::now(), id));
     }
 
     /**
@@ -129,7 +142,7 @@ template <typename Dummy> class ScheduleBase {
      * \param time What time to schedule the task for.
      * \param id What task ID to run.
      */
-    static void scheduleTask(Time time, int id) {
+    static void scheduleTask(TimePoint time, int id) {
         scheduleTask_(TaskTodo(time, id));
     }
 
@@ -202,12 +215,40 @@ template <typename Dummy> class ScheduleBase {
      */
     static int countTodo() { return todo_count_; }
 
+    /**
+     * \brief Clears all data, effectively reinitializing it to the starting
+     * clean slate.
+     */
+    static void clear() {
+        todo_count_ = 0; // Implicitly clears run queue
+        run_early_.reset();
+        repeat_.reset();
+        // No need to clear out old tasks - they're left unininitialized
+    }
+
   private:
+    /**
+     * SFINAE check for Clock::idle()
+     * IdleIfAvailable::idle() will call Clock::idle() if it exists, otherwise
+     * it returns immediately.
+     */
+    template <class T, class = void> class IdleIfAvailable {
+      public:
+        static void idle(Duration wait_time) {}
+    };
+
+    template <class T>
+    class IdleIfAvailable<T, decltype(T::idle(Clock::now() - Clock::now()),
+                                      void())> {
+      public:
+        static void idle(Duration wait_time) { Clock::idle(wait_time); }
+    };
+
     static std::bitset<MAX_TASKS> run_early_;
     static std::bitset<MAX_TASKS> repeat_; // If set, task gets repeated.
     static std::array<Task, MAX_TASKS> tasks_;
 
-    typedef std::pair<Time, int> TaskTodo;        // <time, id>
+    typedef std::pair<TimePoint, int> TaskTodo;   // <time, id>
     static std::array<TaskTodo, MAX_TASKS> todo_; // min-heap (priority queue)
     static int todo_count_; // Not quite repeat_.count(), during task scheduling
 
@@ -246,17 +287,18 @@ template <typename Dummy> class ScheduleBase {
     static int heap_child_1_(int index) { return 2 * index + 1; }
 };
 
-template <class Dummy> int ScheduleBase<Dummy>::todo_count_;
+template <typename Clock, int MaxTasks>
+int ScheduleBase<Clock, MaxTasks>::todo_count_;
 
-template <class Dummy>
-std::bitset<ScheduleBase<Dummy>::MAX_TASKS> ScheduleBase<Dummy>::repeat_;
+template <typename Clock, int MaxTasks>
+std::bitset<ScheduleBase<Clock, MaxTasks>::MAX_TASKS>
+    ScheduleBase<Clock, MaxTasks>::repeat_;
 
-template <class Dummy>
-std::bitset<ScheduleBase<Dummy>::MAX_TASKS> ScheduleBase<Dummy>::run_early_;
+template <typename Clock, int MaxTasks>
+std::bitset<ScheduleBase<Clock, MaxTasks>::MAX_TASKS>
+    ScheduleBase<Clock, MaxTasks>::run_early_;
 
-template <typename Dummy>
-std::array<typename ScheduleBase<Dummy>::TaskTodo,
-           ScheduleBase<Dummy>::MAX_TASKS>
-    ScheduleBase<Dummy>::todo_;
-
-class Schedule : public ScheduleBase<void> {};
+template <typename Clock, int MaxTasks>
+std::array<typename ScheduleBase<Clock, MaxTasks>::TaskTodo,
+           ScheduleBase<Clock, MaxTasks>::MAX_TASKS>
+    ScheduleBase<Clock, MaxTasks>::todo_;

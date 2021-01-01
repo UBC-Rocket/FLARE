@@ -69,7 +69,7 @@ enable_testing()
 ###
 
 # Now simply link against gtest or gtest_main as needed. Eg
-add_executable(testSchedule tests/test_schedule.cpp schedule.cpp)
+add_executable(testSchedule tests/test_schedule.cpp )
 target_link_libraries(testSchedule gtest_main)
 # target_include_directories(testSchedule PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(testSchedule PUBLIC include)
