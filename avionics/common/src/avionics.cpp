@@ -79,6 +79,7 @@ PLEASE READ ME!
 #include "radio.h"
 #include "rocket.h"
 #include "sensor_collection.h"
+#include "state_input_struct.h"
 #include "state_machine.h"
 #include "status.h"
 
@@ -139,6 +140,8 @@ int main(void) {
     auto &ignitors = rocket.ignitors;
     auto &calc = rocket.calc;
     auto &datalog = rocket.datalog;
+    StateInput state_input;
+    StateAuxilliaryInfo state_aux; // Output info from states
 
     if (init_status == RocketStatus::CRITICAL_FAILURE) {
         state_machine.abort();

@@ -37,8 +37,7 @@ install:
 
 script:
 # PlatformIO build
-# TODO: build all envs once possible
-- pio run --environment tantalus_stage_1
+- pio run
 
 # Build and unittest on x86
 - mkdir avionics/build
