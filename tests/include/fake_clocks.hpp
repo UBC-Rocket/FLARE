@@ -2,31 +2,74 @@
 #define FAKE_CLOCKS_HPP_CE5C3CAC8C614EB78253CD129A6DEB83
 
 #include <cstdint>
+#include <exception>
 
-class FakeClockBase {
+typedef uint32_t TimePoint;
+typedef uint32_t Duration;
+
+class IFakeClock {
+    // Pure virtual functions are a bit difficult, since a static version of
+    // this is in the FakeClock; instead have some reasonable defaults
+    //
+    // Fake clocks should generally inherit from this class and then set
+    // `FakeClock::impl` in their constructor.
+
   public:
-    typedef uint32_t duration;
-    typedef uint32_t time_point;
+    IFakeClock(TimePoint start_time) : now_val(start_time) {}
+    IFakeClock() : now_val_(0) {}
+
+    virtual TimePoint now() { return now_val_; }
+    virtual void idle(Duration dur) { now_val_++; }
+
+    virtual ~IFakeClock() {}
 
   protected:
-    static time_point now_val;
-};
-typedef FakeClockBase::time_point TimePoint;
-TimePoint FakeClockBase::now_val = 0;
-
-class FakeClock : public FakeClockBase {
-  public:
-    static time_point now() { return now_val; }
-    static void set_time(time_point new_time) { now_val = new_time; }
-    static void idle(duration) { now_val++; }
+    TimePoint now_val_;
 };
 
-class BusyWaitClock : public FakeClockBase {
+class FakeClockWrapper {
   public:
-    static time_point now() {
-        // Needs to increment time; otherwise busy wait never exists
-        return now_val++;
+    typedef Duration duration;
+    typedef TimePoint time_point;
+
+    static IFakeClock impl;
+
+    static time_point now() { return impl.now(); }
+    static void idle(duration dur) { impl.idle(dur); }
+};
+
+/**
+ * Exceptions to forcibly exit scheduler
+ */
+class ClockFinishedExc : public std::exception {};
+
+/**
+ * \brief Once the time reaches the specified stop_time, all methods will raise
+ * ClockFinishedExc, which can then be caught outside of the scheduler.
+ */
+class StoppingClock : public IFakeClock {
+  public:
+    StoppingClock(TimePoint stop_time, TimePoint start_time)
+        : stop_time_(stop_time), IFakeClock(stop_time) {}
+
+    StoppingClock(TimePoint stop_time) : stop_time_(stop_time) {}
+
+    TimePoint now() override {
+        check_stop();
+        return now_val_;
     }
+    void idle(Duration dur) override {
+        now_val_++;
+        check_stop();
+    }
+    void check_stop() {
+        if (now_val_ >= stop_time_) {
+            raise ClockFinishedExc();
+        }
+    }
+
+  private:
+    TimePoint stop_time_;
 };
 
 #endif

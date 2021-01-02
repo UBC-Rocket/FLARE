@@ -8,7 +8,7 @@
 #include "fake_tasks.hpp"
 #include "task_tracking.hpp"
 
-typedef ScheduleBase<FakeClock, 32> Schedule;
+typedef ScheduleBase<FakeClockWrapper, 32> Schedule;
 
 class ScheduleFixture : public ::testing::Test {
   protected:
