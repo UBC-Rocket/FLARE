@@ -62,7 +62,7 @@ add_executable(testSchedule tests/test_schedule.cpp )
 target_link_libraries(testSchedule gtest_main gmock_main)
 # target_link_libraries(testSchedule gmock_main)
 # target_include_directories(testSchedule PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(testSchedule PUBLIC include)
+target_include_directories(testSchedule PUBLIC include tests/include)
 add_test(NAME TestSchedule COMMAND testSchedule)
 
 # We can now call make test to run all the tests

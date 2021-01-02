@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SCHEDULE_HPP_60517DD319DD4B338F58D1F4669BBD6A
+#define SCHEDULE_HPP_60517DD319DD4B338F58D1F4669BBD6A
 
 #include <algorithm> // for heap algorithms
 #include <array>
@@ -6,7 +7,6 @@
 #include <cassert>
 #include <utility> // for pair
 
-#include "time_tmp.h"
 /**
  * \tparam Clock satisfies a looser form of the C++ STL named requirement for
  * Clock - specifically, there's no requirement on the types used internally; it
@@ -311,3 +311,5 @@ template <typename Clock, int MaxTasks>
 std::array<typename ScheduleBase<Clock, MaxTasks>::Task,
            ScheduleBase<Clock, MaxTasks>::MAX_TASKS>
     ScheduleBase<Clock, MaxTasks>::tasks_;
+
+#endif

@@ -1,35 +1,12 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
 #include <vector>
 
 #include "schedule.hpp"
 
-class FakeClockBase {
-  public:
-    typedef uint32_t duration;
-    typedef uint32_t time_point;
-
-  protected:
-    static time_point now_val;
-};
-typedef FakeClockBase::time_point TimePoint;
-TimePoint FakeClockBase::now_val = 0;
-
-class FakeClock : public FakeClockBase {
-  public:
-    static time_point now() { return now_val; }
-    static void set_time(time_point new_time) { now_val = new_time; }
-    static void idle(duration) { now_val++; }
-};
-
-class BusyWaitClock : public FakeClockBase {
-  public:
-    static time_point now() {
-        // Needs to increment time; otherwise busy wait never exists
-        return now_val++;
-    }
-};
+#include "fake_clocks.hpp"
+#include "fake_tasks.hpp"
+#include "task_tracking.hpp"
 
 typedef ScheduleBase<FakeClock, 32> Schedule;
 
@@ -58,45 +35,10 @@ TEST_F(ScheduleFixture, EnableDisable) {
     EXPECT_FALSE(Schedule::checkRunEarly(0));
 }
 
-class SimpleTask;
-class ITaskLogger {
-  public:
-    virtual ~ITaskLogger() {}
-
-    void log(SimpleTask *task);
-
-    void log(int id, int call_count) {
-        logImpl(id, call_count, FakeClock::now());
-    }
-
-    // Called after call_count incremented
-    virtual void logImpl(int id, int call_count, TimePoint time) = 0;
-};
-
-class SimpleTask {
-  public:
-    SimpleTask(int id, ITaskLogger &log) : call_count(0), id_(id), log_(log) {}
-    void action() {
-        call_count++;
-        log_.log(this);
-    }
-    int call_count;
-    int id_;
-    ITaskLogger &log_;
-    static void externAct(void *me) { static_cast<SimpleTask *>(me)->action(); }
-};
-
-void ITaskLogger::log(SimpleTask *task) {
-    { log(task->id_, task->call_count); }
-}
-
-class MockTaskLogger : public ITaskLogger {
-  public:
-    MOCK_METHOD(void, logImpl, (int, int, TimePoint), (override));
-};
-
+namespace {
 using ::testing::_;
 using ::testing::InSequence;
+} // namespace
 
 TEST_F(ScheduleFixture, CorrectOrder) {
     InSequence seq;
