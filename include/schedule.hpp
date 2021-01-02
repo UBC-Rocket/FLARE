@@ -21,12 +21,9 @@
  * that each task can only be on the schedule once, so it's also the number of
  * tasks that can be scheduled.
  *
- * Call registerTask(), then run().
+ * Call clear(), registerTask(), then run().
  */
 template <typename Clock, int MaxTasks> class ScheduleBase {
-  private:
-    static constexpr int MAX_TASKS = MaxTasks; // adjustable
-
   public:
     typedef typename Clock::duration Duration;
     typedef typename Clock::time_point TimePoint;
@@ -39,46 +36,47 @@ template <typename Clock, int MaxTasks> class ScheduleBase {
 
         Task(TaskFunction act, void *dat, Duration peri)
             : action(act), data(dat), period(peri) {}
+        Task() : Task(nullptr, nullptr, Duration(0)) {}
     };
+
+  public:
     /**
-     * \brief Registers a task.
+     * \brief Preregisters a task, but does not schedule it.
      *
      * \param id What task ID the task should be given
      * \param task Task to register
-     * \param enable True if task should be immediately enabled
+     * \param repeat True if task should be immediately enabled
      * \param run_early True if task can be run early, if it is first in line
      */
-    static void registerTask(int id, Task task, bool enable, bool run_early) {
+    static void preregisterTask(int id, Task task, bool repeat = true,
+                                bool run_early = false) {
         tasks_[id] = task;
-        if (enable) {
-            repeat_.set(id);
-        } else {
-            repeat_.reset(id);
-        }
-        if (run_early) {
-            run_early_.set(id);
-        } else {
-            run_early_.reset(id);
-        }
+        repeat_.set(id, repeat);
+        run_early_.set(id, run_early);
     }
 
+    // TODO
+    // Make it possible to register task by directly passing in
+    // parameters, rather than needing to construct a Task
+
     /**
-     * \brief Registers a task, with default to run immediately but do not run
-     * early. Equivalent to registerTask(id, task, true, false)
-     *
-     * \param id What task ID the task should be given
-     * \param task Task to register
+     * \brief Registers a task (see preregisterTask) but also schedules it to
+     * run immediately. Same parameters as preregisterTask.
      */
-    static void registerTask(int id, Task task) {
-        tasks_[id] = task;
-        repeat_.set(id);
-        run_early_.reset(id);
+    static void registerTask(int id, Task task, bool repeat = true,
+                             bool run_early = false) {
+        preregisterTask(id, task, repeat, run_early);
+        scheduleTaskNow(id);
     }
 
     /**
-     * \brief Runs the scheduler, which will continually run tasks. This
-     * function will not return, unless there are no more tasks to run (i.e.
-     * all repeating is disabled).
+     * \brief Runs the scheduler, which will continually run tasks, i.e.
+     * constantly calls runNext(). This function will not return, unless there
+     * are no more tasks to run (i.e. all repeating is disabled).
+     *
+     * If it's really important for you to exit, you could technically raise an
+     * exception - but that would most likely invalidate class invariants, so
+     * then call clear() to reset the scheduler.
      */
     static void run() {
         while (todo_count_ > 0) {
@@ -91,7 +89,7 @@ template <typename Clock, int MaxTasks> class ScheduleBase {
      * behaviour if there are no more remaining tasks.
      */
     static void runNext() {
-        std::pop_heap(todo_.begin(), todo_.begin() + todo_count_);
+        std::pop_heap(todo_.begin(), todo_.begin() + todo_count_, heapCompare_);
         todo_count_--;
         // aliases
         const TimePoint &start_time = todo_[todo_count_].first;
@@ -99,8 +97,8 @@ template <typename Clock, int MaxTasks> class ScheduleBase {
         const Task &task = tasks_[task_id];
 
         if (!run_early_.test(task_id)) {
-            while (Clock::now() < start_time)
-                IdleIfAvailable<Clock>::idle();
+            while (start_time > Clock::now())
+                IdleIfAvailable<Clock>::idle(start_time - Clock::now());
         }
 
         // currently_running_ = task_id;
@@ -135,9 +133,8 @@ template <typename Clock, int MaxTasks> class ScheduleBase {
 
     /**
      * \brief Schedule a task to run at a certain time. WARNING - this should
-     * only be used if the task is not scheduled for some reason, or if it is
-     * currently running but will not repeat. The main application for this is
-     * to run a non-repeating task, only once - it is very important to only
+     * only be used if the task is not scheduled yet, or if it is
+     * currently running but will not repeat. It is very important to only
      * call this function once.
      * \param time What time to schedule the task for.
      * \param id What task ID to run.
@@ -145,6 +142,11 @@ template <typename Clock, int MaxTasks> class ScheduleBase {
     static void scheduleTask(TimePoint time, int id) {
         scheduleTask_(TaskTodo(time, id));
     }
+
+    /**
+     * \brief Schedule the task to run now; see scheduleTask.
+     */
+    static void scheduleTaskNow(int id) { scheduleTask(Clock::now(), id); }
 
     /**
      * \brief Check if task repeats.
@@ -227,6 +229,16 @@ template <typename Clock, int MaxTasks> class ScheduleBase {
     }
 
   private:
+    static constexpr int MAX_TASKS = MaxTasks; // adjustable
+
+    static std::bitset<MAX_TASKS> run_early_;  // If set, task can run early
+    static std::bitset<MAX_TASKS> repeat_;     // If set, task gets repeated
+    static std::array<Task, MAX_TASKS> tasks_; // Where tasks are stored
+
+    typedef std::pair<TimePoint, int> TaskTodo;   // <time, id>
+    static std::array<TaskTodo, MAX_TASKS> todo_; // min-heap (priority queue)
+    static int todo_count_; // Not quite repeat_.count(), during task scheduling
+
     /**
      * SFINAE check for Clock::idle()
      * IdleIfAvailable::idle() will call Clock::idle() if it exists, otherwise
@@ -243,14 +255,6 @@ template <typename Clock, int MaxTasks> class ScheduleBase {
       public:
         static void idle(Duration wait_time) { Clock::idle(wait_time); }
     };
-
-    static std::bitset<MAX_TASKS> run_early_;
-    static std::bitset<MAX_TASKS> repeat_; // If set, task gets repeated.
-    static std::array<Task, MAX_TASKS> tasks_;
-
-    typedef std::pair<TimePoint, int> TaskTodo;   // <time, id>
-    static std::array<TaskTodo, MAX_TASKS> todo_; // min-heap (priority queue)
-    static int todo_count_; // Not quite repeat_.count(), during task scheduling
 
     // static int currently_running_; // task
 
@@ -302,3 +306,8 @@ template <typename Clock, int MaxTasks>
 std::array<typename ScheduleBase<Clock, MaxTasks>::TaskTodo,
            ScheduleBase<Clock, MaxTasks>::MAX_TASKS>
     ScheduleBase<Clock, MaxTasks>::todo_;
+
+template <typename Clock, int MaxTasks>
+std::array<typename ScheduleBase<Clock, MaxTasks>::Task,
+           ScheduleBase<Clock, MaxTasks>::MAX_TASKS>
+    ScheduleBase<Clock, MaxTasks>::tasks_;
