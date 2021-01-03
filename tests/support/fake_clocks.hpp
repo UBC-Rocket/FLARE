@@ -20,6 +20,7 @@ class IFakeClock {
 
     virtual TimePoint now() { return now_val_; }
     virtual void idle(Duration) { now_val_++; }
+    void incrementTime(Duration dur) { now_val_ += dur; }
 
     virtual ~IFakeClock() {}
 
@@ -32,10 +33,10 @@ class FakeClockWrapper {
     typedef Duration duration;
     typedef TimePoint time_point;
 
-    static IFakeClock &&impl;
+    static IFakeClock *impl;
 
-    static time_point now() { return impl.now(); }
-    static void idle(duration dur) { impl.idle(dur); }
+    static time_point now() { return impl->now(); }
+    static void idle(duration dur) { impl->idle(dur); }
 };
 
 /**
@@ -51,7 +52,7 @@ class StoppingClock : public IFakeClock {
   public:
     StoppingClock(TimePoint stop_time, TimePoint start_time)
         : IFakeClock(start_time), stop_time_(stop_time) {
-        FakeClockWrapper::impl = *this;
+        FakeClockWrapper::impl = this;
     }
 
     StoppingClock(TimePoint stop_time) : StoppingClock(stop_time, 0) {}

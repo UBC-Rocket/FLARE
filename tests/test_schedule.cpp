@@ -14,9 +14,12 @@ class ScheduleFixture : public ::testing::Test {
   protected:
     ScheduleFixture() {
         Schedule::clear();
-        FakeClock::set_time(0);
+        FakeClockWrapper::impl = &clock;
     }
     ~ScheduleFixture() { Schedule::clear(); }
+
+  private:
+    IFakeClock clock;
 };
 
 TEST_F(ScheduleFixture, EnableDisable) {
@@ -37,6 +40,8 @@ TEST_F(ScheduleFixture, EnableDisable) {
 
 namespace {
 using ::testing::_;
+using ::testing::Expectation;
+using ::testing::ExpectationSet;
 using ::testing::InSequence;
 } // namespace
 
@@ -56,7 +61,7 @@ TEST_F(ScheduleFixture, CorrectOrder) {
     for (int i = 0; i < NUM_TASKS; ++i) {
         tasks.emplace_back(i, logger);
     }
-    std::array<int, NUM_TASKS> task_order{9, 0, 2, 5, 4, 3, 7, 8, 6, 1};
+    std::array<int, NUM_TASKS> task_order{9, 0, 2, 5, 4, 3, 7, 8, 1, 6};
     for (auto i : task_order) {
         Schedule::preregisterTask(
             i, Schedule::Task(SimpleTask::externAct, &(tasks[i]), PERIOD),
@@ -64,4 +69,39 @@ TEST_F(ScheduleFixture, CorrectOrder) {
         Schedule::scheduleTask((i + 1) * PERIOD, i);
     }
     Schedule::run();
+}
+
+TEST_F(ScheduleFixture, EasyRepeat) {
+    StoppingClock stopping_clock(50); // constructor does all the work
+    MockTaskLogger logger;
+    std::vector<int> times{7, 11, 13}; // prime numbers
+    ExpectationSet expect_zeros;
+    std::vector<SimpleTask> tasks;
+
+    for (std::size_t id = 0; id < times.size(); ++id) {
+        tasks.emplace_back(id, logger);
+        expect_zeros += EXPECT_CALL(logger, logImpl(id, 1, 0)).Times(1);
+    }
+    for (std::size_t id = 0; id < times.size(); ++id) {
+        // 2nd loop needed to prevent addresses from being invalidated
+        Schedule::Task schedule_task(SimpleTask::externAct, &(tasks[id]),
+                                     times[id]);
+        Schedule::registerTask(id, schedule_task);
+    }
+
+    for (int t = 1; t < 50; t++) {
+        for (std::size_t id = 0; id < times.size(); ++id) {
+            auto &period = times[id];
+            if (t % period == 0) {
+                EXPECT_CALL(logger, logImpl(id, t / period + 1, t))
+                    .Times(1)
+                    .After(expect_zeros);
+            }
+        }
+    }
+
+    try {
+        Schedule::run();
+    } catch (ClockFinishedExc &) {
+    }
 }

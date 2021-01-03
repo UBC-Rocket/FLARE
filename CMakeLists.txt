@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+cmake_policy(SET CMP0076 NEW)
 project(rocketos)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -59,10 +60,9 @@ enable_testing()
 
 # e.g.
 add_executable(testSchedule tests/test_schedule.cpp )
+target_sources(testSchedule PUBLIC tests/support/fake_clocks.cpp)
 target_link_libraries(testSchedule gtest_main gmock_main)
-# target_link_libraries(testSchedule gmock_main)
-# target_include_directories(testSchedule PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(testSchedule PUBLIC include tests/include)
+target_include_directories(testSchedule PUBLIC include tests/support)
 add_test(NAME TestSchedule COMMAND testSchedule)
 
 # We can now call make test to run all the tests

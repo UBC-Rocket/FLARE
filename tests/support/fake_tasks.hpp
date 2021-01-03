@@ -24,4 +24,23 @@ inline ITaskLogger &operator<<(ITaskLogger &logger, SimpleTask *task) {
     return logger;
 }
 
+/**
+ * \brief This task appears to take time, by adding some time to the clock
+ * before returning.
+ */
+class LongTask {
+  public:
+    LongTask(int id, ITaskLogger &log, Duration task_length)
+        : task_(id, log), length_(task_length) {}
+
+    void action() {
+        task_.action();
+        FakeClockWrapper::impl->incrementTime(length_);
+    }
+
+  private:
+    SimpleTask task_;
+    Duration length_;
+};
+
 #endif

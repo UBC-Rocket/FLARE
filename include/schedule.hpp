@@ -265,9 +265,9 @@ template <typename Clock, int MaxTasks> class ScheduleBase {
 
     static void scheduleTask_(TaskTodo new_task) {
         todo_[todo_count_] = new_task;
+        todo_count_++;
         std::push_heap(todo_.begin(), todo_.begin() + todo_count_,
                        heapCompare_);
-        todo_count_++;
     }
 
     /**
