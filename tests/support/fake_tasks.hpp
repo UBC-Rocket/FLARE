@@ -38,9 +38,61 @@ class LongTask {
         FakeClockWrapper::impl->incrementTime(length_);
     }
 
+    static void externAct(void *me) { static_cast<LongTask *>(me)->action(); }
+
   private:
     SimpleTask task_;
     Duration length_;
+};
+
+/**
+ * In hindsight I should've just done this earlier, a single task type with
+ * several features. But oh well.
+ */
+class AdvancedTask {
+  private:
+    typedef AdvancedTask *AT; // convenience alias
+  public:
+    AdvancedTask(int id, ITaskLogger &log) : task_(id, log), length_(0) {}
+
+    // Named parameter idiom
+    /**
+     * \brief Set task length (time)
+     */
+    AT length(Duration len) {
+        length_ = len;
+        return this;
+    }
+
+    /**
+     * \brief Set other task that this task will disable, and at which call
+     * count it should be disabled at. Call counts start counting from 1; call
+     * counts of zero or below are equivalent to 1.
+     */
+    AT unscheduleOtherAt(int other_id, int at_call_count) {
+        disable_others_ = true;
+        disable_id_ = other_id;
+        disable_count_ = at_call_count;
+        return this;
+    }
+
+    /**
+     * \brief Specify call count as to when the task should try to disable
+     * itself
+     */
+    AT disableSelfAt() void action() {
+        task_.action();
+        FakeClockWrapper::impl->incrementTime(length_);
+    }
+
+    static void externAct(void *me) { static_cast<LongTask *>(me)->action(); }
+
+  private:
+    SimpleTask task_;
+    Duration length_;
+    bool disable_others_ = false;
+    int disable_id_ = 0;
+    int disable_count_ = 0;
 };
 
 #endif

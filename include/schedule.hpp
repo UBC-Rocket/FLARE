@@ -7,6 +7,9 @@
 #include <cassert>
 #include <utility> // for pair
 
+// TODO: Make a utility template that takes a class and provides a static method
+// that can be used as a TaskFunction
+
 /**
  * \tparam Clock satisfies a looser form of the C++ STL named requirement for
  * Clock - specifically, there's no requirement on the types used internally; it
@@ -91,28 +94,29 @@ template <typename Clock, int MaxTasks> class ScheduleBase {
     static void runNext() {
         std::pop_heap(todo_.begin(), todo_.begin() + todo_count_, heapCompare_);
         todo_count_--;
+
+        TimePoint start_time = todo_[todo_count_].first;
         // aliases
-        const TimePoint &start_time = todo_[todo_count_].first;
         const int &task_id = todo_[todo_count_].second;
         const Task &task = tasks_[task_id];
 
         if (!run_early_.test(task_id)) {
             while (start_time > Clock::now())
                 IdleIfAvailable<Clock>::idle(start_time - Clock::now());
+        } else if (Clock::now() < start_time) {
+            start_time = Clock::now();
         }
 
-        // currently_running_ = task_id;
-        const TimePoint initial_time = Clock::now();
         task.action(task.data); // actually run the task
 
         if (not repeat_.test(task_id)) {
-            return; // task was disabled - don't reschedule
+            return; // task does not repeat - don't reschedule
         }
-        // reschedule task
+        // reschedule task, assuming ideally that task started at start_time
         // Note that task.action() could have rescheduled tasks, so there's no
         // guarentee on current heap structure
         const TimePoint current_time = Clock::now();
-        const TimePoint new_task_time = initial_time + task.period;
+        const TimePoint new_task_time = start_time + task.period;
         // Earliest it can be scheduled is now.
         if (new_task_time > current_time) {
             scheduleTask_(TaskTodo(new_task_time, task_id));
@@ -123,10 +127,9 @@ template <typename Clock, int MaxTasks> class ScheduleBase {
 
     /**
      * \brief Enable task repeating and schedules the task. Undefined behaviour
-     * if task is already enabled, or if the task is not registered.
+     * if task is already scheduled, or if the task is not registered.
      */
     static void commenceTask(int id) {
-        assert(!repeat_.test(id));
         repeat_.set(id);
         scheduleTask_(TaskTodo(tasks_[id].period + Clock::now(), id));
     }
@@ -135,8 +138,10 @@ template <typename Clock, int MaxTasks> class ScheduleBase {
      * \brief Schedule a task to run at a certain time. WARNING - this should
      * only be used if the task is not scheduled yet, or if it is
      * currently running but will not repeat. It is very important to only
-     * call this function once.
-     * \param time What time to schedule the task for.
+     * call this function once. If for whatever reason you want to schedule the
+     * same task twice, duplicate the task in another task slot.
+     *
+     * \param time * What time to schedule the task for.
      * \param id What task ID to run.
      */
     static void scheduleTask(TimePoint time, int id) {
@@ -160,25 +165,21 @@ template <typename Clock, int MaxTasks> class ScheduleBase {
     static void enableRepeat(int id) { repeat_.set(id); }
 
     /**
-     * \brief Disable repeating the currently running task - i.e. a
-     * self-disable. Note that the task will continue to run until its end, but
-     * simply won't be rescheduled.
-     *
-     * Note that calling this function is only allowed if id is the currently
-     * running task, since it relies on the assumption that the task is not in
-     * the waiting queue.
+     * \brief Disable repeating for any task. Note that if the task is still
+     * scheduled, it will run one last time - if this is unacceptable, call
+     * unschedule().
      */
-    static void disableRepeatSelf(int id) { repeat_.reset(id); }
+    static void disableRepeat(int id) { repeat_.reset(id); }
 
     /**
-     * \brief Disable repeating for any task. Technically this will even work
-     * for invalid task IDs, but doing so is strongly discouraged. A more
-     * efficient version for disabling yourself (the current running task) is
-     * disableRepeatSelf.
+     * \brief Unschedule any task. If the task specified is not scheduled or is
+     * currently running, nothing happens. This means that if id is the
+     * currently running task, and id is set to repeat, the task will be
+     * rescheduled. It is generally preferable to disable repeating instead of
+     * unscheduling, since this method must scan through the entire scheduled
+     * queue to find the task.
      */
-    static void disableRepeat(int id) {
-        // Lazy disabling might not work, if task gets re-enabled
-        repeat_.reset(id);
+    static void unschedule(int id) {
         int i = get_todo_index_(id);
         if (i >= todo_count_) {
             return; // not found

@@ -19,7 +19,7 @@ class IFakeClock {
     IFakeClock() : now_val_(0) {}
 
     virtual TimePoint now() { return now_val_; }
-    virtual void idle(Duration) { now_val_++; }
+    virtual void idle(Duration dur) { now_val_ += dur; }
     void incrementTime(Duration dur) { now_val_ += dur; }
 
     virtual ~IFakeClock() {}
@@ -61,8 +61,8 @@ class StoppingClock : public IFakeClock {
         check_stop();
         return now_val_;
     }
-    void idle(Duration) override {
-        now_val_++;
+    void idle(Duration dur) override {
+        now_val_ += dur;
         check_stop();
     }
     void check_stop() {

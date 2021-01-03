@@ -4,17 +4,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 cmake_policy(SET CMP0076 NEW)
 project(rocketos)
 
+
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "-pthread -Wall -Wextra -pedantic")
+    set(CMAKE_CXX_FLAGS "-pthread -Wall -Wextra -pedantic -O0")
 else()
-    set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -static-libgcc -Wall -Wextra -pedantic")
+    set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -static-libgcc -Wall -Wextra -pedantic -O0")
 endif()
 
-add_executable(demo main.cpp)
-
-# target_include_directories(demo PUBLIC
-#   ${CMAKE_CURRENT_BINARY_DIR}
-# )
+# add_executable(demo main.cpp)
 
 ###
 ### Google Test
@@ -53,6 +50,7 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
 endif()
 
 
+
 ###
 ### Link all tests here
 ###
@@ -66,3 +64,15 @@ target_include_directories(testSchedule PUBLIC include tests/support)
 add_test(NAME TestSchedule COMMAND testSchedule)
 
 # We can now call make test to run all the tests
+
+
+# ###
+# ### Code coverage?
+# ###
+# set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+# include(CodeCoverage)
+# append_coverage_compiler_flags()
+# setup_target_for_coverage_gcovr_html(
+#     NAME ctest_coverage
+#     EXECUTABLE
+# )

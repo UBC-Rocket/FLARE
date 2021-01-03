@@ -8,6 +8,14 @@
 #include "fake_tasks.hpp"
 #include "task_tracking.hpp"
 
+namespace {
+using ::testing::_;
+using ::testing::Expectation;
+using ::testing::ExpectationSet;
+using ::testing::InSequence;
+using ::testing::Sequence;
+} // namespace
+
 typedef ScheduleBase<FakeClockWrapper, 32> Schedule;
 
 class ScheduleFixture : public ::testing::Test {
@@ -37,13 +45,6 @@ TEST_F(ScheduleFixture, EnableDisable) {
     EXPECT_TRUE(Schedule::checkRunEarly(1));
     EXPECT_FALSE(Schedule::checkRunEarly(0));
 }
-
-namespace {
-using ::testing::_;
-using ::testing::Expectation;
-using ::testing::ExpectationSet;
-using ::testing::InSequence;
-} // namespace
 
 TEST_F(ScheduleFixture, CorrectOrder) {
     InSequence seq;
@@ -99,6 +100,123 @@ TEST_F(ScheduleFixture, EasyRepeat) {
             }
         }
     }
+
+    try {
+        Schedule::run();
+    } catch (ClockFinishedExc &) {
+    }
+}
+
+TEST_F(ScheduleFixture, RunEarly) {
+    constexpr int REP = 0;
+    constexpr int BLK = 1;
+    MockTaskLogger logger;
+    StoppingClock says_stop_at(44);
+
+    LongTask longt(0, logger, 5);
+    SimpleTask shortt(1, logger);
+
+    Schedule::Task repeater(LongTask::externAct, &longt, 10);
+    Schedule::Task blocker(SimpleTask::externAct, &shortt, 1);
+
+    Schedule::registerTask(0, repeater, true, true);
+
+    Schedule::preregisterTask(1, blocker, false, false);
+    Schedule::preregisterTask(2, blocker, false, false);
+    Schedule::preregisterTask(3, blocker, false, false);
+    Schedule::preregisterTask(4, blocker, false, false);
+    Schedule::preregisterTask(5, blocker, false, false);
+
+    Schedule::scheduleTask(24, 1);
+    Schedule::scheduleTask(30, 2);
+    Schedule::scheduleTask(41, 3);
+    Schedule::scheduleTask(42, 4);
+    Schedule::scheduleTask(43, 5);
+
+    InSequence seq;
+    // After manually simulating
+    //                         ID   cnt time
+    EXPECT_CALL(logger, logImpl(REP, 1, 0));
+    EXPECT_CALL(logger, logImpl(REP, 2, 5));
+    EXPECT_CALL(logger, logImpl(REP, 3, 10));
+    EXPECT_CALL(logger, logImpl(REP, 4, 15));
+    EXPECT_CALL(logger, logImpl(BLK, 1, 24));
+    EXPECT_CALL(logger, logImpl(REP, 5, 24));
+    EXPECT_CALL(logger, logImpl(BLK, 2, 30));
+    EXPECT_CALL(logger, logImpl(REP, 6, 30));
+    EXPECT_CALL(logger, logImpl(REP, 7, 35));
+    EXPECT_CALL(logger, logImpl(BLK, 3, 41));
+    EXPECT_CALL(logger, logImpl(BLK, 4, 42));
+    EXPECT_CALL(logger, logImpl(BLK, 5, 43));
+    EXPECT_CALL(logger, logImpl(REP, 8, 43));
+
+    try {
+        Schedule::run();
+    } catch (ClockFinishedExc &) {
+    }
+}
+
+TEST_F(ScheduleFixture, RunLate) {
+    MockTaskLogger logger;
+    StoppingClock says_stop_at(56);
+
+    LongTask hungry(0, logger, 30);
+    Schedule::preregisterTask(
+        0, Schedule::Task(LongTask::externAct, &hungry, 0), false, false);
+    Schedule::scheduleTask(20, 0);
+
+    SimpleTask before(1, logger);
+    Schedule::preregisterTask(
+        1, Schedule::Task(SimpleTask::externAct, &before, 0), false, false);
+    Schedule::scheduleTask(19, 1);
+
+    SimpleTask before_reps(2, logger);
+    Schedule::preregisterTask(
+        2, Schedule::Task(SimpleTask::externAct, &before_reps, 15), true,
+        false);
+    Schedule::scheduleTask(10, 2);
+
+    SimpleTask midway_reps(3, logger);
+    Schedule::preregisterTask(
+        3, Schedule::Task(SimpleTask::externAct, &midway_reps, 10), true,
+        false);
+    Schedule::scheduleTask(23, 3);
+
+    SimpleTask midway(4, logger);
+    Schedule::preregisterTask(
+        4, Schedule::Task(SimpleTask::externAct, &midway, 0), false, false);
+    Schedule::scheduleTask(30, 4);
+
+    SimpleTask midlate_reps(5, logger);
+    Schedule::preregisterTask(
+        5, Schedule::Task(SimpleTask::externAct, &midlate_reps, 10), true,
+        false);
+    Schedule::scheduleTask(45, 5);
+
+    SimpleTask after(6, logger);
+    Schedule::preregisterTask(
+        6, Schedule::Task(SimpleTask::externAct, &after, 0), false, false);
+    Schedule::scheduleTask(51, 6);
+
+    // logimpl(ID, count, time)
+    EXPECT_CALL(logger, logImpl(2, 1, 10));
+    EXPECT_CALL(logger, logImpl(1, 1, 19));
+    EXPECT_CALL(logger, logImpl(0, 1, 20));
+
+    // Now long hungry task is running
+    Sequence backlog;
+    EXPECT_CALL(logger, logImpl(3, 1, 50)).InSequence(backlog);
+    EXPECT_CALL(logger, logImpl(2, 2, 50)).InSequence(backlog);
+    EXPECT_CALL(logger, logImpl(4, 1, 50)).InSequence(backlog);
+    Expectation last_backlog =
+        EXPECT_CALL(logger, logImpl(5, 1, 50)).InSequence(backlog);
+
+    // Backlog cleared, now several tasks are immediately rescheduled
+    EXPECT_CALL(logger, logImpl(3, 2, 50)).After(last_backlog);
+    EXPECT_CALL(logger, logImpl(2, 3, 50)).After(last_backlog);
+
+    EXPECT_CALL(logger, logImpl(6, 1, 51));
+    EXPECT_CALL(logger, logImpl(5, 2, 55));
 
     try {
         Schedule::run();
