@@ -186,15 +186,20 @@ template <typename Clock, int MaxTasks> class ScheduleBase {
         }
         do { // sift down, eventually remove
             const int child1 = heap_child_1_(i);
+            if (child1 >= todo_count_) {
+                break;
+            }
             const int child2 = child1 + 1;
-            if (todo_[child1].first < todo_[child2].first) { // Use child 1
+            if (child2 == todo_count_ ||
+                todo_[child1].first < todo_[child2].first) { // Use child 1
                 todo_[i] = todo_[child1];
                 i = child1;
             } else {
                 todo_[i] = todo_[child2];
                 i = child2;
             }
-        } while (i < todo_count_);
+        } while (true);
+        todo_[i] = todo_[todo_count_ - 1];
         todo_count_--;
     }
 

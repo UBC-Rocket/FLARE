@@ -1,6 +1,7 @@
 #ifndef FAKE_TASKS_HPP_5DF011EA55614771AC70289249DFEE44
 #define FAKE_TASKS_HPP_5DF011EA55614771AC70289249DFEE44
 
+#include "schedule_defn.hpp"
 #include "task_tracking.hpp"
 
 class SimpleTask;
@@ -51,7 +52,7 @@ class LongTask {
  */
 class AdvancedTask {
   private:
-    typedef AdvancedTask *AT; // convenience alias
+    typedef AdvancedTask &AT; // convenience alias
   public:
     AdvancedTask(int id, ITaskLogger &log) : task_(id, log), length_(0) {}
 
@@ -61,38 +62,57 @@ class AdvancedTask {
      */
     AT length(Duration len) {
         length_ = len;
-        return this;
+        return *this;
     }
 
     /**
-     * \brief Set other task that this task will disable, and at which call
+     * \brief Set other task that this task will unschedule, and at which call
      * count it should be disabled at. Call counts start counting from 1; call
      * counts of zero or below are equivalent to 1.
      */
     AT unscheduleOtherAt(int other_id, int at_call_count) {
-        disable_others_ = true;
-        disable_id_ = other_id;
-        disable_count_ = at_call_count;
-        return this;
+        unschedule_others_ = true;
+        unschedule_id_ = other_id;
+        unschedule_count_ = at_call_count;
+        return *this;
     }
 
     /**
-     * \brief Specify call count as to when the task should try to disable
-     * itself
+     * \brief Setup task to disable repeating for another task, at a particular
+     * call count.
      */
-    AT disableSelfAt() void action() {
-        task_.action();
-        FakeClockWrapper::impl->incrementTime(length_);
+    AT disableRepeatAt(int id, int call_count) {
+        dis_rep_ = true;
+        dis_rep_id_ = id;
+        dis_rep_count_ = call_count;
+        return *this;
     }
 
-    static void externAct(void *me) { static_cast<LongTask *>(me)->action(); }
+    void action() {
+        task_.action();
+        FakeClockWrapper::impl->incrementTime(length_);
+        if (unschedule_others_ && task_.call_count >= unschedule_count_) {
+            Schedule::unschedule(unschedule_id_);
+        }
+        if (dis_rep_ && task_.call_count >= dis_rep_count_) {
+            Schedule::disableRepeat(dis_rep_id_);
+        }
+    }
+
+    static void externAct(void *me) {
+        static_cast<AdvancedTask *>(me)->action();
+    }
 
   private:
     SimpleTask task_;
     Duration length_;
-    bool disable_others_ = false;
-    int disable_id_ = 0;
-    int disable_count_ = 0;
+    bool unschedule_others_ = false;
+    int unschedule_id_ = 0;
+    int unschedule_count_ = 0;
+
+    bool dis_rep_ = false;
+    int dis_rep_id_ = 0;
+    int dis_rep_count_ = 0;
 };
 
 #endif

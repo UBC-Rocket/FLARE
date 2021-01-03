@@ -6,6 +6,7 @@
 
 #include "fake_clocks.hpp"
 #include "fake_tasks.hpp"
+#include "schedule_defn.hpp"
 #include "task_tracking.hpp"
 
 namespace {
@@ -15,8 +16,6 @@ using ::testing::ExpectationSet;
 using ::testing::InSequence;
 using ::testing::Sequence;
 } // namespace
-
-typedef ScheduleBase<FakeClockWrapper, 32> Schedule;
 
 class ScheduleFixture : public ::testing::Test {
   protected:
@@ -223,3 +222,43 @@ TEST_F(ScheduleFixture, RunLate) {
     } catch (ClockFinishedExc &) {
     }
 }
+
+TEST_F(ScheduleFixture, DisableUnschedule) {
+    MockTaskLogger logger;
+    StoppingClock says_stop_at(150); // Should end before
+
+    SimpleTask st0(0, logger);
+    Schedule::registerTask(0, Schedule::Task(SimpleTask::externAct, &st0, 10));
+
+    SimpleTask st1(1, logger);
+    Schedule::registerTask(1, Schedule::Task(SimpleTask::externAct, &st1, 10));
+
+    auto disabler =
+        AdvancedTask(10, logger).unscheduleOtherAt(0, 1).disableRepeatAt(1, 1);
+    Schedule::preregisterTask(
+        10, Schedule::Task(AdvancedTask::externAct, &disabler, 0), false,
+        false);
+    Schedule::scheduleTask(15, 10);
+
+    EXPECT_CALL(logger, logImpl(0, 1, 0));
+    EXPECT_CALL(logger, logImpl(0, 2, 10));
+    EXPECT_CALL(logger, logImpl(1, 1, 0));
+    EXPECT_CALL(logger, logImpl(1, 2, 10));
+    EXPECT_CALL(logger, logImpl(1, 3, 20));
+
+    EXPECT_CALL(logger, logImpl(10, 1, 15));
+
+    try {
+        Schedule::run();
+    } catch (ClockFinishedExc &) {
+        ASSERT_TRUE(false) << "Timed out";
+    }
+}
+
+// TEST_F(ScheduleFixture, StopSelf) {
+//     auto disable_self = AdvancedTask(11, logger).disableRepeatAt(11, 2);
+//     Schedule::registerTask(
+//         11, Schedule::Task(AdvancedTask::externAct, &disabler, 10));
+// }
+
+// todo: make test that just runs unschedule on a bunch of tasks
