@@ -15,11 +15,11 @@ class IFakeClock {
     // `FakeClock::impl` in their constructor.
 
   public:
-    IFakeClock(TimePoint start_time) : now_val(start_time) {}
+    IFakeClock(TimePoint start_time) : now_val_(start_time) {}
     IFakeClock() : now_val_(0) {}
 
     virtual TimePoint now() { return now_val_; }
-    virtual void idle(Duration dur) { now_val_++; }
+    virtual void idle(Duration) { now_val_++; }
 
     virtual ~IFakeClock() {}
 
@@ -32,7 +32,7 @@ class FakeClockWrapper {
     typedef Duration duration;
     typedef TimePoint time_point;
 
-    static IFakeClock impl;
+    static IFakeClock &&impl;
 
     static time_point now() { return impl.now(); }
     static void idle(duration dur) { impl.idle(dur); }
@@ -50,21 +50,23 @@ class ClockFinishedExc : public std::exception {};
 class StoppingClock : public IFakeClock {
   public:
     StoppingClock(TimePoint stop_time, TimePoint start_time)
-        : stop_time_(stop_time), IFakeClock(stop_time) {}
+        : IFakeClock(start_time), stop_time_(stop_time) {
+        FakeClockWrapper::impl = *this;
+    }
 
-    StoppingClock(TimePoint stop_time) : stop_time_(stop_time) {}
+    StoppingClock(TimePoint stop_time) : StoppingClock(stop_time, 0) {}
 
     TimePoint now() override {
         check_stop();
         return now_val_;
     }
-    void idle(Duration dur) override {
+    void idle(Duration) override {
         now_val_++;
         check_stop();
     }
     void check_stop() {
         if (now_val_ >= stop_time_) {
-            raise ClockFinishedExc();
+            throw ClockFinishedExc();
         }
     }
 

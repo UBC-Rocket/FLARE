@@ -8,7 +8,7 @@ class ITaskLogger {
     virtual ~ITaskLogger() {}
 
     void log(int id, int call_count) {
-        logImpl(id, call_count, FakeClock::now());
+        logImpl(id, call_count, FakeClockWrapper::now());
     }
 
     // Called after call_count incremented
