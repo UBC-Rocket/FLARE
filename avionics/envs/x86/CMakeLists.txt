@@ -19,3 +19,9 @@ target_sources(
     PRIVATE
         ${x86_specific_files}
 )
+
+target_sources(
+    Hollyburn
+    PRIVATE
+        ${x86_specific_files}
+)

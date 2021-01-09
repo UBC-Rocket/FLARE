@@ -30,3 +30,8 @@ target_sources(
     PRIVATE
     ${common_files}
 )
+target_sources(
+    Hollyburn
+    PRIVATE
+    ${common_files}
+)
