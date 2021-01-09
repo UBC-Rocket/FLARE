@@ -255,10 +255,50 @@ TEST_F(ScheduleFixture, DisableUnschedule) {
     }
 }
 
-// TEST_F(ScheduleFixture, StopSelf) {
-//     auto disable_self = AdvancedTask(11, logger).disableRepeatAt(11, 2);
-//     Schedule::registerTask(
-//         11, Schedule::Task(AdvancedTask::externAct, &disabler, 10));
-// }
+TEST_F(ScheduleFixture, StopSelf) {
+    MockTaskLogger logger;
+    StoppingClock says_stop_at(150); // Should end before
 
-// todo: make test that just runs unschedule on a bunch of tasks
+    EXPECT_CALL(logger, logImpl(11, 1, 0));
+    EXPECT_CALL(logger, logImpl(11, 2, 10));
+
+    auto disable_self = AdvancedTask(11, logger).disableRepeatAt(11, 2);
+    Schedule::registerTask(
+        11, Schedule::Task(AdvancedTask::externAct, &disable_self, 10));
+
+    try {
+        Schedule::run();
+    } catch (ClockFinishedExc &) {
+        ASSERT_TRUE(false) << "Timed out";
+    }
+}
+
+TEST_F(ScheduleFixture, Unschedule) {
+    MockTaskLogger logger;
+
+    constexpr int NUM_TASKS = 10;
+
+    std::vector<SimpleTask> tasks;
+
+    for (int i = 0; i < NUM_TASKS; ++i) {
+        tasks.emplace_back(i, logger);
+    }
+    std::array<int, NUM_TASKS> shuffle{9, 0, 2, 5, 4, 3, 7, 8, 1, 6};
+    // Each task starts at its ID, but inserted in random order
+    for (int i = 0; i < NUM_TASKS; ++i) {
+        int j = shuffle[i];
+        Schedule::preregisterTask(
+            j, Schedule::Task(SimpleTask::externAct, &(tasks[j]), 0), false,
+            false);
+        Schedule::scheduleTask(j + 1, j);
+    }
+    for (auto i : {0, 8, 4, 6, 2}) {
+        Schedule::unschedule(i);
+    }
+    EXPECT_CALL(logger, logImpl(1, 1, 1 + 1));
+    EXPECT_CALL(logger, logImpl(3, 1, 3 + 1));
+    EXPECT_CALL(logger, logImpl(5, 1, 5 + 1));
+    EXPECT_CALL(logger, logImpl(7, 1, 7 + 1));
+    EXPECT_CALL(logger, logImpl(9, 1, 9 + 1));
+    Schedule::run();
+}

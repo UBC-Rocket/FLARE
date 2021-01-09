@@ -262,8 +262,6 @@ template <typename Clock, int MaxTasks> class ScheduleBase {
         static void idle(Duration wait_time) { Clock::idle(wait_time); }
     };
 
-    // static int currently_running_; // task
-
     static bool heapCompare_(const TaskTodo &a, const TaskTodo &b) {
         // less-than compare, for use in std heap algorithms which use max-heap
         return a.first > b.first;
