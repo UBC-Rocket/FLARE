@@ -166,7 +166,7 @@ int main(void) {
             state_machine.abort();
         }
 
-        radio.listenAndAct(command_receiver);
+        radio.forwardCommand(command_receiver);
 
         state = state_machine.getState(); // convenience
 

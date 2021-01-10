@@ -21,20 +21,98 @@
 #include <cstring>
 #include <utility> //for std::move
 
+#include "XBee.h"
+
+#include "HAL/port_impl.h"
+
 #include "ignitor_collection.h"
 #include "radio.h"
 #include "sensor_collection.h"
 
-void RadioController::send() {
-    if (!tx_q_.empty()) {
-        tx_packet_.setPayloadLength(tx_q_.fillPayload(payload_));
-        xbee_.send(tx_packet_);
+// Some defines that are actually done in CMake, but set here to get
+// Intellisense to stop yelling.
+
+#ifndef RADIO_CONFIG_PACKET_SIM_ACTIVE
+#define RADIO_CONFIG_PACKET_SIM_ACTIVE 2
+#endif
+
+#ifndef RADIO_CONFIG_PACKET_ROCKET_ID
+#define RADIO_CONFIG_PACKET_ROCKET_ID 255
+#endif
+
+#ifndef RADIO_CONFIG_PACKET_VERSION_STR
+#define RADIO_CONFIG_PACKET_VERSION_STR                                        \
+    "Fake version string; quiet Intellisense "
+#endif
+
+/**
+ * The purpose of RadioMembers is to have a set of static member variables for
+ * Radio, that are not visible from the interface (.h file), and also
+ * maintaining a mechanism similar to constructors, in that there is a defined
+ * set of operations that occurs automatically. Specifically, the instance
+ * `self` is this set of member variables.
+ *
+ * The challenge is that some private methods of Radio are used; as such
+ * RadioMembers must be a friend of Radio. In the interest of not polluting the
+ * global namespace, the type is nested. To further enforce access control, only
+ * Radio is permitted to access private members, which are the only useful
+ * component.
+ *
+ * In order to actually make RadioMembers class accessible from the outside,
+ * it's listed as a public type under the Radio class definition, but no
+ * definition is given for RadioMembers so it's not actually usable (outside of
+ * this translation unit). Technically you might be able to provide a little
+ * more protection by e.g. marking the type as protected then extracting it by
+ * inheriting from Radio, and there might be other tricks you could pull, but I
+ * couldn't think of any / was too lazy to try them.
+ */
+class Radio::RadioMembers {
+    friend class Radio;
+
+  public:
+    RadioMembers();
+
+  private:
+    XBee xbee_;
+    XBeeAddress64 gnd_addr_;
+    ZBTxRequest tx_packet_;
+    ZBRxResponse rx;
+
+    RadioQueue tx_q_; // the [ueue] is silent :)
+    uint8_t payload_[RADIO_MAX_SUBPACKET_SIZE];
+};
+static Radio::RadioMembers self;
+
+namespace {
+constexpr uint64_t GND_STN_ADDR_MSB = 0x0013A200;
+constexpr uint64_t GND_STN_ADDR_LSB = 0x41678FC0;
+constexpr uint32_t RADIO_BAUD_RATE = 921600;
+constexpr uint8_t MAX_PACKETS_PER_RX_LOOP = 8;
+constexpr int MAX_QUEUED_BYTES = 800;
+} // namespace
+
+Radio::RadioMembers::RadioMembers()
+    : gnd_addr_(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB), tx_q_(MAX_QUEUED_BYTES) {
+    auto &serial = Hal::SerialInst::Radio;
+    serial.begin(RADIO_BAUD_RATE);
+    while (!serial)
+        ;
+    xbee_.setSerial(serial.getSerial());
+    tx_packet_.setAddress64(gnd_addr_);
+    tx_packet_.setPayload(payload_);
+    Radio::sendMessage(Hal::millis(), "Radio initialized");
+    Radio::send();
+}
+
+void Radio::send() {
+    if (!self.tx_q_.empty()) {
+        self.tx_packet_.setPayloadLength(self.tx_q_.fillPayload(self.payload_));
+        self.xbee_.send(self.tx_packet_);
     }
 }
 
-void RadioController::sendStatus(uint32_t time, RocketStatus status,
-                                 SensorCollection &sensors,
-                                 IgnitorCollection &ignitors) {
+void Radio::sendStatus(uint32_t time, RocketStatus status,
+                       SensorCollection &sensors, IgnitorCollection &ignitors) {
     PacketBuffWriter buf;
     addIdTime(buf, Ids::status_ping, time);
 
@@ -45,12 +123,11 @@ void RadioController::sendStatus(uint32_t time, RocketStatus status,
     buf.write(ignitors.getStatusBitfield(), 1);
     buf.write(ignitors.getStatusBitfield() + 1, 1);
 
-    addSubpacket(std::move(buf.packet));
+    Radio::addSubpacket(std::move(buf.packet));
 }
 
-void RadioController::sendBulkSensor(uint32_t time, float alt,
-                                     Accelerometer &xl, IMU &imu, GPS &gps,
-                                     uint8_t state_id) {
+void Radio::sendBulkSensor(uint32_t time, float alt, Accelerometer &xl,
+                           IMU &imu, GPS &gps, uint8_t state_id) {
     PacketBuffWriter buf;
     addIdTime(buf, Ids::bulk_sensor, time);
 
@@ -70,10 +147,10 @@ void RadioController::sendBulkSensor(uint32_t time, float alt,
     // State
     buf.write(&state_id, 1);
 
-    addSubpacket(std::move(buf.packet));
+    Radio::addSubpacket(std::move(buf.packet));
 }
 
-void RadioController::sendMessage(const uint32_t time, const char *str) {
+void Radio::sendMessage(const uint32_t time, const char *str) {
     PacketBuffWriter buf;
     addIdTime(buf, Ids::message, time);
 
@@ -81,30 +158,29 @@ void RadioController::sendMessage(const uint32_t time, const char *str) {
     buf.write(strlen);
     buf.write(str, strlen);
 
-    addSubpacket(std::move(buf.packet));
+    Radio::addSubpacket(std::move(buf.packet));
 }
 
-void RadioController::sendGPS(const uint32_t time, GPS &gps) {
+void Radio::sendGPS(const uint32_t time, GPS &gps) {
     PacketBuffWriter buf;
     addIdTime(buf, Ids::gps, time);
 
     buf.write(gps.getData(), 12);
 
-    addSubpacket(std::move(buf.packet));
+    Radio::addSubpacket(std::move(buf.packet));
 }
 
-void RadioController::sendSingleSensor(const uint32_t time, uint8_t id,
-                                       float data) {
+void Radio::sendSingleSensor(const uint32_t time, uint8_t id, float data) {
     PacketBuffWriter buf;
     buf.write(id);
     buf.write(&time, sizeof(time));
 
     buf.write(&data, 4);
 
-    addSubpacket(std::move(buf.packet));
+    Radio::addSubpacket(std::move(buf.packet));
 }
 
-void RadioController::sendState(const uint32_t time, uint8_t state_id) {
+void Radio::sendState(const uint32_t time, uint8_t state_id) {
     PacketBuffWriter buf;
 
     buf.write(0x1D); // id
@@ -114,10 +190,10 @@ void RadioController::sendState(const uint32_t time, uint8_t state_id) {
     buf.write(0);
     buf.write(state_id);
 
-    addSubpacket(std::move(buf.packet));
+    Radio::addSubpacket(std::move(buf.packet));
 }
 
-void RadioController::sendConfig(const uint32_t time) {
+void Radio::sendConfig(const uint32_t time) {
     PacketBuffWriter buf;
     addIdTime(buf, Ids::config, time);
 
@@ -133,5 +209,40 @@ void RadioController::sendConfig(const uint32_t time) {
 
     buf.write(version_bytes, sizeof(version_bytes));
 
-    addSubpacket(std::move(buf.packet));
+    Radio::addSubpacket(std::move(buf.packet));
+}
+
+void Radio::addSubpacket(SubPktPtr dat) { self.tx_q_.push(std::move(dat)); }
+
+uint16_t Radio::readPacket(command_t *&command_dat_out,
+                           command_t &command_len_out) {
+    uint16_t result = 0;
+    while (read_count_ < MAX_PACKETS_PER_RX_LOOP) {
+        self.xbee_.readPacket();
+        read_count_++;
+        if (!(self.xbee_.getResponse().isAvailable() ||
+              self.xbee_.getResponse().isError())) {
+            break;
+        }
+
+        if (self.xbee_.getResponse().isError()) {
+            // TODO - figure out whether there's anything
+            // we should do about Xbee errors / log error
+        } else if (self.xbee_.getResponse().getApiId() ==
+                   ZB_TX_STATUS_RESPONSE) {
+            result |= CAN_SEND_FLAG;
+            // If we get 2 responses in a row, implies previously we sent an
+            // extra one, so we shouldn't respond twice again.
+        } else if (self.xbee_.getResponse().getApiId() == ZB_RX_RESPONSE) {
+            // received command from xbee_
+            self.xbee_.getResponse().getZBRxResponse(self.rx);
+            command_dat_out = self.rx.getData();
+            command_len_out = self.rx.getDataLength();
+            return result;
+        } else {
+            // TODO - log unrecognized API Id
+        }
+    }
+    result |= STOP_PARSE_FLAG;
+    return result;
 }
