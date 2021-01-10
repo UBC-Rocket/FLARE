@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include <vector>
 
-#include "schedule.hpp"
+#include "RocketSchedule/schedule.hpp"
 
 #include "fake_clocks.hpp"
 #include "fake_tasks.hpp"
