@@ -72,36 +72,19 @@ class Radio {
     class RadioMembers;
 
     typedef uint8_t command_t;
-    // /**
-    //  * @brief Constructor.
-    //  * @param SERIAL_RADIO Uninitialized HardwareSerial used for radio
-    //  (e.g.
-    //  * SerialRadio)
-    //  * @param MAX_QUEUED_BYTES Maximum number of subpacket data bytes to
-    //  queue
-    //  * before dropping the oldest subpackets.
-    //  * @param MAX_PACKETS_PER_RX_LOOP Maximum number of packets to send
-    //  every
-    //  * time forwardCommand() is called.
-    //  */
-    // RadioController(Hal::Serial &serial_radio,
-    //                 unsigned short const MAX_QUEUED_BYTES = 800,
-    //                 uint8_t const MAX_PACKETS_PER_RX_LOOP = 8)
-    //     : gnd_addr_(XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB)),
-    //       tx_q_(MAX_QUEUED_BYTES),
-    //       MAX_PACKETS_PER_RX_LOOP_(MAX_PACKETS_PER_RX_LOOP),
-    //       WATCHDOG_SEND_INTERVAL_(3000),
-    //       watchdog_last_send(Hal::now_ms()) {
-
-    //     serial_radio.begin(RADIO_BAUD_RATE);
-    //     while (!serial_radio)
-    //         ;
-    //     xbee_.setSerial(serial_radio.getSerial());
-    //     tx_packet_.setAddress64(gnd_addr_);
-    //     tx_packet_.setPayload(payload_);
-    //     sendMessage(Hal::millis(), "Radio initialized");
-    //     send();
-    // }
+    /**
+     * @brief Initializes the class.
+     * @param SERIAL_RADIO Uninitialized HardwareSerial used for radio
+     (e.g.
+     * SerialRadio)
+     * @param MAX_QUEUED_BYTES Maximum number of subpacket data bytes to
+     queue
+     * before dropping the oldest subpackets.
+     * @param MAX_PACKETS_PER_RX_LOOP Maximum number of packets to send
+     every
+     * time forwardCommand() is called.
+     */
+    static void initialize();
 
     /**
      * @brief Meat of the action - listens for any incoming packets, then

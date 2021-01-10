@@ -94,14 +94,16 @@ constexpr int MAX_QUEUED_BYTES = 800;
 constexpr Hal::ms Radio::WATCHDOG_SEND_INTERVAL;
 
 Radio::RadioMembers::RadioMembers()
-    : gnd_addr_(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB), tx_q_(MAX_QUEUED_BYTES) {
+    : gnd_addr_(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB), tx_q_(MAX_QUEUED_BYTES) {}
+
+void Radio::initialize() {
     auto &serial = Hal::SerialInst::Radio;
     serial.begin(RADIO_BAUD_RATE);
     while (!serial)
         ;
-    xbee_.setSerial(serial.getSerial());
-    tx_packet_.setAddress64(gnd_addr_);
-    tx_packet_.setPayload(payload_);
+    self.xbee_.setSerial(serial.getSerial());
+    self.tx_packet_.setAddress64(self.gnd_addr_);
+    self.tx_packet_.setPayload(self.payload_);
     Radio::sendMessage(Hal::millis(), "Radio initialized");
     Radio::send();
 }

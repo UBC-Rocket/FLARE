@@ -130,6 +130,7 @@ int main(void) {
 #endif
 
     Rocket rocket;
+    Radio::initialize();
     CommandReceiver command_receiver(rocket);
     // Logically, these are all unrelated variables - but to allow the command
     // receiver to function, they need to be coalesced into one POD struct.
