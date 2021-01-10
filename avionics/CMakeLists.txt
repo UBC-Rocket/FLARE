@@ -19,10 +19,12 @@ add_subdirectory(rockets/tantalus_stage_1)
 add_subdirectory(rockets/tantalus_stage_2)
 add_subdirectory(rockets/hollyburn)
 
-include_directories(common/include
-common/lib
-envs/x86/include
-envs/x86/lib
+include_directories(
+    common/include
+    common/lib
+    common/lib/RocketScheduler/include
+    envs/x86/include
+    envs/x86/lib
 )
 
 # Rocket-specific directories
