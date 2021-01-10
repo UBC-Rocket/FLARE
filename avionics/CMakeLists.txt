@@ -11,11 +11,13 @@ endif()
 
 add_executable(TantalusStage1 common/src/avionics.cpp)
 add_executable(TantalusStage2 common/src/avionics.cpp)
+add_executable(Hollyburn common/src/avionics.cpp)
 
 add_subdirectory(common)
 add_subdirectory(envs/x86)
 add_subdirectory(rockets/tantalus_stage_1)
 add_subdirectory(rockets/tantalus_stage_2)
+add_subdirectory(rockets/hollyburn)
 
 include_directories(common/include
 common/lib
@@ -23,12 +25,17 @@ envs/x86/include
 envs/x86/lib
 )
 
+# Rocket-specific directories
 target_include_directories(TantalusStage1 PUBLIC
   rockets/tantalus_stage_1/include
 )
 
 target_include_directories(TantalusStage2 PUBLIC
 rockets/tantalus_stage_2/include
+)
+
+target_include_directories(Hollyburn PUBLIC
+rockets/hollyburn/include
 )
 
 ###
@@ -41,6 +48,10 @@ target_compile_definitions(TantalusStage1 PUBLIC
 )
 target_compile_definitions(TantalusStage2 PUBLIC
     RADIO_CONFIG_PACKET_ROCKET_ID=1
+)
+
+target_compile_definitions(Hollyburn PUBLIC
+    RADIO_CONFIG_PACKET_ROCKET_ID=3
 )
 
 ###
