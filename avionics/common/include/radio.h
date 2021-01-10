@@ -62,9 +62,9 @@ class Radio {
         bulk_sensor = 0x30,
     };
 
-    constexpr static inline Hal::ms WATCHDOG_SEND_INTERVAL{3000};
-    constexpr static inline uint16_t STOP_PARSE_FLAG = 1 << 8;
-    constexpr static inline uint16_t CAN_SEND_FLAG = 1 << 9;
+    constexpr static Hal::ms WATCHDOG_SEND_INTERVAL{3000};
+    constexpr static uint16_t STOP_PARSE_FLAG = 1 << 8;
+    constexpr static uint16_t CAN_SEND_FLAG = 1 << 9;
 
   public:
     // type RadioMembers is public for technical reasons but cannot be used
@@ -166,7 +166,7 @@ class Radio {
 
         //     read_count++;
         // }
-        if (Hal::now_ms() - watchdog_last_send > WATCHDOG_SEND_INTERVAL_) {
+        if (Hal::now_ms() - watchdog_last_send > WATCHDOG_SEND_INTERVAL) {
             can_send = true;
         }
         if (can_send) {

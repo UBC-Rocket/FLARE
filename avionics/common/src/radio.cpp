@@ -91,6 +91,8 @@ constexpr uint8_t MAX_PACKETS_PER_RX_LOOP = 8;
 constexpr int MAX_QUEUED_BYTES = 800;
 } // namespace
 
+constexpr Hal::ms Radio::WATCHDOG_SEND_INTERVAL;
+
 Radio::RadioMembers::RadioMembers()
     : gnd_addr_(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB), tx_q_(MAX_QUEUED_BYTES) {
     auto &serial = Hal::SerialInst::Radio;
@@ -213,6 +215,8 @@ void Radio::sendConfig(const uint32_t time) {
 }
 
 void Radio::addSubpacket(SubPktPtr dat) { self.tx_q_.push(std::move(dat)); }
+
+int Radio::read_count_ = 0;
 
 uint16_t Radio::readPacket(command_t *&command_dat_out,
                            command_t &command_len_out) {
