@@ -21,12 +21,13 @@
 #include <cstring>
 #include <utility> //for std::move
 
-#include "XBee.h"
+#include "radio.h"
 
 #include "HAL/port_impl.h"
 
+#include "XBee.h"
 #include "ignitor_collection.h"
-#include "radio.h"
+#include "radio_queue.h"
 #include "sensor_collection.h"
 
 // Some defines that are actually done in CMake, but set here to get
@@ -44,6 +45,15 @@
 #define RADIO_CONFIG_PACKET_VERSION_STR                                        \
     "Fake version string; quiet Intellisense "
 #endif
+
+namespace {
+constexpr uint64_t GND_STN_ADDR_MSB = 0x0013A200;
+constexpr uint64_t GND_STN_ADDR_LSB = 0x41678FC0;
+constexpr uint32_t RADIO_BAUD_RATE = 921600;
+constexpr uint8_t MAX_PACKETS_PER_RX_LOOP = 8;
+constexpr int MAX_QUEUED_BYTES = 800;
+
+} // namespace
 
 /**
  * The purpose of RadioMembers is to have a set of static member variables for
@@ -82,14 +92,6 @@ class Radio::RadioMembers {
     uint8_t payload_[RADIO_MAX_SUBPACKET_SIZE];
 };
 static Radio::RadioMembers self;
-
-namespace {
-constexpr uint64_t GND_STN_ADDR_MSB = 0x0013A200;
-constexpr uint64_t GND_STN_ADDR_LSB = 0x41678FC0;
-constexpr uint32_t RADIO_BAUD_RATE = 921600;
-constexpr uint8_t MAX_PACKETS_PER_RX_LOOP = 8;
-constexpr int MAX_QUEUED_BYTES = 800;
-} // namespace
 
 constexpr Hal::ms Radio::WATCHDOG_SEND_INTERVAL;
 

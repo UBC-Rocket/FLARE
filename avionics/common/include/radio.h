@@ -26,11 +26,11 @@
 
 #include "HAL/time.h"
 #include "ignitor_collection.h"
-#include "radio_queue.h"
 #include "sensor_collection.h"
 #include "sensors/GPS.h"
 #include "sensors/IMU.h"
 #include "sensors/accelerometer.h"
+#include "subpktptr.h"
 
 class PacketBuffWriter {
   public:
@@ -51,7 +51,6 @@ class PacketBuffWriter {
 
     SubPktPtr packet;
 };
-
 class Radio {
   private:
     enum class Ids {
