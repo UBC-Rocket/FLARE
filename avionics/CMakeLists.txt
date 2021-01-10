@@ -21,8 +21,8 @@ add_subdirectory(rockets/hollyburn)
 
 include_directories(
     common/include
-    common/lib
     common/lib/RocketScheduler/include
+    common/lib
     envs/x86/include
     envs/x86/lib
 )

@@ -62,49 +62,36 @@ PLEASE READ ME!
  */
 
 /* Includes------------------------------------------------------------*/
-#include <functional> //for std::reference_wrapper
-#include <string.h>
-
 #include "HAL/pin_util.h"
-#include <HAL/port_impl.h> // <> vs "" for HAL ??
+#include "HAL/time.h"
 
-#include "CSVWriteImpl.h"
-#include "CSVwrite.h"
-#include "buzzer.h"
-#include "calculations.h"
-#include "cameras.h"
-#include "gpio.h"
-#include "ignitor_collection.h"
-#include "options.h"
 #include "radio.h"
 #include "rocket.h"
-#include "sensor_collection.h"
 #include "state_input_struct.h"
-#include "state_machine.h"
-#include "status.h"
+#include "state_interface.h"
 
 #include "config.h"
 #include "env_config.h"
 
 /* Errors---------------------------------------------------------------*/
-#if defined NOSECONE && defined BODY
-#error Only one of NOSECONE and BODY may be defined!
-#elif !(defined NOSECONE || defined BODY)
-#error Define one of NOSECONE or BODY!
-#endif
+// #if defined NOSECONE && defined BODY
+// #error Only one of NOSECONE and BODY may be defined!
+// #elif !(defined NOSECONE || defined BODY)
+// #error Define one of NOSECONE or BODY!
+// #endif
 
-#if defined POW && defined SERVO
-#error Only one of POW and SERVO may be defined!
-#elif !(defined POW || defined SERVO)
-#error Define one of POW or SERVO!
-#endif
+// #if defined POW && defined SERVO
+// #error Only one of POW and SERVO may be defined!
+// #elif !(defined POW || defined SERVO)
+// #error Define one of POW or SERVO!
+// #endif
 
-#if defined TESTING
-#warning TESTING is defined! Do not fly this code
-#endif
-#if defined GROUND_TEST
-#warning GROUND_TEST is defined! Do not fly this code
-#endif
+// #if defined TESTING
+// #warning TESTING is defined! Do not fly this code
+// #endif
+// #if defined GROUND_TEST
+// #warning GROUND_TEST is defined! Do not fly this code
+// #endif
 
 /* Variables------------------------------------------------------------*/
 
