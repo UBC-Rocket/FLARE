@@ -65,6 +65,8 @@ PLEASE READ ME!
 #include "HAL/pin_util.h"
 #include "HAL/time.h"
 
+#include "schedule_adapter.hpp"
+
 #include "radio.h"
 #include "rocket.h"
 #include "state_input_struct.h"
@@ -93,10 +95,49 @@ PLEASE READ ME!
 // #warning GROUND_TEST is defined! Do not fly this code
 // #endif
 
-/* Variables------------------------------------------------------------*/
+/* Task IDs =========================================================== */
+enum class TaskID {
+    MainLoop = 0,
+    Radio = 1,
+    LEDBlinker = 5,
+};
 
-/* Functions------------------------------------------------------------*/
-void blinkStatusLED(RocketStatus);
+/* Tasks ============================================================== */
+
+/**
+ * @brief Responsbile for blinking the status LED on non-critical failure.
+ */
+class LEDBlinker {
+  private:
+    static bool led_on;
+
+  public:
+    static void toggle(void *) {
+        if (led_on)
+            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HIGH);
+        else
+            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LOW);
+
+        led_on = !led_on;
+    }
+};
+bool LEDBlinker::led_on = true;
+
+// /**
+//  * @brief  Helper function for LED blinking
+//  * @return None
+//  */
+// inline void blinkStatusLED(RocketStatus init_status) {
+//     static Hal::t_point init_st_old_time = Hal::now_ms();
+//     static const Hal::ms init_st_time_interval(500);
+//     static bool init_st_indicator = false;
+
+//     if (init_status == RocketStatus::NONCRITICAL_FAILURE &&
+//         Hal::now_ms() - init_st_old_time > init_st_time_interval) {
+//         init_st_old_time = Hal::now_ms();
+//         init_st_indicator = !init_st_indicator;
+//     }
+// }
 
 int main(void) {
     // Before anything else there's some environment specific setup to be done
@@ -135,86 +176,70 @@ int main(void) {
     }
     StateId state = state_machine.getState();
 
-    // Timing
-    Hal::t_point old_time = Hal::now_ms();                // ms
-    Hal::t_point new_time;                                // ms
-    Hal::ms time_interval(NOMINAL_POLLING_TIME_INTERVAL); // ms
-    Hal::t_point radio_old_time = Hal::now_ms();
-    Hal::ms radio_t_interval(500); // ms //TODO - make 500 a constant somewhere
-    Radio::sendStatus(old_time.time_since_epoch().count(), init_status, sensors,
-                      ignitors);
+    // // Timing
+    // Hal::t_point old_time = Hal::now_ms();                // ms
+    // Hal::t_point new_time;                                // ms
+    // Hal::ms time_interval(NOMINAL_POLLING_TIME_INTERVAL); // ms
+    // Hal::t_point radio_old_time = Hal::now_ms();
+    // Hal::ms radio_t_interval(500); // ms //TODO - make 500 a constant
+    // somewhere
 
-    for (;;) {
-        new_time = Hal::now_ms();
+    Radio::sendStatus(Hal::millis(), init_status, sensors, ignitors);
 
-        // makes sure that even if it does somehow get accidentally changed,
-        // it gets reverted
-        if (init_status == RocketStatus::CRITICAL_FAILURE) {
-            state_machine.abort();
-        }
+    Scheduler::run();
+    //     for (;;) {
+    //         new_time = Hal::now_ms();
 
-        Radio::forwardCommand(command_receiver);
+    //         // makes sure that even if it does somehow get accidentally
+    //         changed,
+    //         // it gets reverted
+    //         if (init_status == RocketStatus::CRITICAL_FAILURE) {
+    //             state_machine.abort();
+    //         }
 
-        state = state_machine.getState(); // convenience
+    //         Radio::forwardCommand(command_receiver);
 
-        // Polling time intervals need to be variable, since in LANDED
-        // there's a lot of data that'll be recorded
-        if (state == StateId::LANDED)
-            time_interval = Hal::ms(LANDED_POLLING_TIME_INTERVAL);
-        else
-            time_interval = Hal::ms(NOMINAL_POLLING_TIME_INTERVAL);
+    //         state = state_machine.getState(); // convenience
 
-        // Core functionality of rocket - take data, process it,
-        // run the state machine, and log the data
-        if ((new_time - old_time) >= time_interval) {
-            old_time = new_time;
+    //         // Polling time intervals need to be variable, since in LANDED
+    //         // there's a lot of data that'll be recorded
+    //         if (state == StateId::LANDED)
+    //             time_interval = Hal::ms(LANDED_POLLING_TIME_INTERVAL);
+    //         else
+    //             time_interval = Hal::ms(NOMINAL_POLLING_TIME_INTERVAL);
 
-            sensors.poll();
-            calc.calculateValues(state, state_input, sensors.last_poll_time());
-            state_machine.update(state_input, state_aux);
-            datalog.logData(Hal::tpoint_to_uint(sensors.last_poll_time()),
-                            sensors, state, calc.altitude(),
-                            calc.getBaseAltitude());
-        }
+    //         // Core functionality of rocket - take data, process it,
+    //         // run the state machine, and log the data
+    //         if ((new_time - old_time) >= time_interval) {
+    //             old_time = new_time;
 
-        if (new_time - radio_old_time >= radio_t_interval) {
-            radio_old_time = new_time;
-            Radio::sendBulkSensor(Hal::tpoint_to_uint(sensors.last_poll_time()),
-                                  calc.altitude(), sensors.accelerometer,
-                                  sensors.imuSensor, sensors.gps,
-                                  static_cast<uint8_t>(state));
-        }
-        // LED blinks in non-critical failure
-        blinkStatusLED(init_status);
+    //             sensors.poll();
+    //             calc.calculateValues(state, state_input,
+    //             sensors.last_poll_time()); state_machine.update(state_input,
+    //             state_aux);
+    //             datalog.logData(Hal::tpoint_to_uint(sensors.last_poll_time()),
+    //                             sensors, state, calc.altitude(),
+    //                             calc.getBaseAltitude());
+    //         }
 
-#ifdef TESTING
-        Hal::sleep_ms(1000); // So you can actually read the serial output
-#endif
+    //         if (new_time - radio_old_time >= radio_t_interval) {
+    //             radio_old_time = new_time;
+    //             Radio::sendBulkSensor(Hal::tpoint_to_uint(sensors.last_poll_time()),
+    //                                   calc.altitude(), sensors.accelerometer,
+    //                                   sensors.imuSensor, sensors.gps,
+    //                                   static_cast<uint8_t>(state));
+    //         }
+    //         // LED blinks in non-critical failure
+    //         blinkStatusLED(init_status);
 
-#ifdef THIS_IS_NATIVE_CONFIGURATION
-        env_callbacks();
-        Hal::sleep_ms((old_time + time_interval - new_time).count());
-#endif
-    }
-}
+    // #ifdef TESTING
+    //         Hal::sleep_ms(1000); // So you can actually read the serial
+    //         output
+    // #endif
 
-/**
- * @brief  Helper function for LED blinking
- * @return None
- */
-inline void blinkStatusLED(RocketStatus init_status) {
-    static Hal::t_point init_st_old_time = Hal::now_ms();
-    static const Hal::ms init_st_time_interval(500);
-    static bool init_st_indicator = false;
-
-    if (init_status == RocketStatus::NONCRITICAL_FAILURE &&
-        Hal::now_ms() - init_st_old_time > init_st_time_interval) {
-        init_st_old_time = Hal::now_ms();
-        init_st_indicator = !init_st_indicator;
-
-        if (init_st_indicator)
-            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HIGH);
-        else
-            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LOW);
-    }
+    // #ifdef THIS_IS_NATIVE_CONFIGURATION
+    //         env_callbacks();
+    //         Hal::sleep_ms((old_time + time_interval - new_time).count());
+    // #endif
+    //     }
 }
