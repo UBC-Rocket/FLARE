@@ -63,8 +63,8 @@ class Radio {
     };
 
     constexpr static Hal::ms WATCHDOG_SEND_INTERVAL{3000};
-    constexpr static uint16_t STOP_PARSE_FLAG = 1 << 8;
-    constexpr static uint16_t CAN_SEND_FLAG = 1 << 9;
+    constexpr static uint16_t STOP_PARSE_FLAG = 1 << 0;
+    constexpr static uint16_t CAN_SEND_FLAG = 1 << 1;
 
   public:
     // type RadioMembers is public for technical reasons but cannot be used
@@ -116,39 +116,6 @@ class Radio {
                 command_receiver.run_command(command_data[i]);
             }
         }
-        //
-        // while (read_count < MAX_PACKETS_PER_RX_LOOP_) {
-        //     xbee_.readPacket();
-        //     if (!(xbee_.getResponse().isAvailable() ||
-        //           xbee_.getResponse().isError())) {
-        //         break;
-        //     }
-
-        //     if (xbee_.getResponse().isError()) {
-        //         // TODO - figure out whether there's anything
-        //         // we should do about Xbee errors
-        //         // #ifdef TESTING
-        //         //     SerialUSB.println("xbee_ error");
-        //         // #endif
-        //     } else if (xbee_.getResponse().getApiId() ==
-        //                ZB_TX_STATUS_RESPONSE) {
-        //         can_send = true;
-        //         // If we get 2 responses in a row, implies previously we sent
-        //         an
-        //         // extra one, so we shouldn't respond twice again.
-        //     } else if (xbee_.getResponse().getApiId() == ZB_RX_RESPONSE) {
-        //         // received command from xbee_
-        //         xbee_.getResponse().getZBRxResponse(rx);
-        //         uint8_t len = rx.getDataLength();
-        //         uint8_t command;
-        //         for (int j = 0; j < len; j++) {
-        //             command = rx.getData()[j];
-        //             command_receiver.run_command(command);
-        //         }
-        //     }
-
-        //     read_count++;
-        // }
         if (Hal::now_ms() - watchdog_last_send > WATCHDOG_SEND_INTERVAL) {
             can_send = true;
         }
