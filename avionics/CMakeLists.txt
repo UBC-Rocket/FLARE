@@ -25,7 +25,7 @@ envs/x86/include
 envs/x86/lib
 )
 
-# Specif rocket-specific directories
+# Rocket-specific directories
 target_include_directories(TantalusStage1 PUBLIC
   rockets/tantalus_stage_1/include
 )
