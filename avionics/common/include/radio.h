@@ -70,7 +70,9 @@ class Radio {
     // (especially since no definition is given)
     class RadioMembers;
 
+    // Loose type to more explicitly indicate what variables are commands.
     typedef uint8_t command_t;
+
     /**
      * @brief Initializes the class.
      * @param SERIAL_RADIO Uninitialized HardwareSerial used for radio
@@ -220,6 +222,10 @@ class Radio {
         buf.write(&time, sizeof(time));
     }
 
+    /**
+     * @brief Actually writes out data to the radio serial line; this is done
+     * infrequently to maximize usage of radio packets.
+     */
     static void send();
 
     // A bit of magic SFINAE from stack overflow, for forwardCommand
