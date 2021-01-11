@@ -101,53 +101,24 @@ static Rocket rocket;
 /* Task IDs =========================================================== */
 enum class TaskID {
     ReadEvalLog = 0,
-    RadioTransmitBulk = 1,
+    RadioTxBulk = 1,
     LEDBlinker = 5,
 };
 
 /* Tasks ============================================================== */
 
 /**
- * @brief Responsbile for blinking the status LED on non-critical failure.
+ * @brief Main sensor read, state estimation, run state machine, log data loop
  */
-class LEDBlinker {
-  private:
-    static bool led_on;
-
-  public:
-    static void toggle(void *) {
-        if (led_on)
-            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HIGH);
-        else
-            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LOW);
-
-        led_on = !led_on;
-    }
-};
-bool LEDBlinker::led_on = true;
-
-// /**
-//  * @brief  Helper function for LED blinking
-//  * @return None
-//  */
-// inline void blinkStatusLED(RocketStatus init_status) {
-//     static Hal::t_point init_st_old_time = Hal::now_ms();
-//     static const Hal::ms init_st_time_interval(500);
-//     static bool init_st_indicator = false;
-
-//     if (init_status == RocketStatus::NONCRITICAL_FAILURE &&
-//         Hal::now_ms() - init_st_old_time > init_st_time_interval) {
-//         init_st_old_time = Hal::now_ms();
-//         init_st_indicator = !init_st_indicator;
-//     }
-// }
-
 class ReadEvalLog {
   private:
     Rocket &rocket_;
     CommandReceiver command_receiver;
     // TODO - see if state_aux is actually used / wheter it should be used
     StateAuxilliaryInfo state_aux; // Output info from states
+
+    constexpr static unsigned int LANDED_POLLING_TIME_INTERVAL = 5000; // ms
+    constexpr static unsigned int NOMINAL_POLLING_TIME_INTERVAL = 50;  // ms
 
     void run() {
         auto &state_machine = rocket_.state_machine;
@@ -175,13 +146,16 @@ class ReadEvalLog {
     }
 
   public:
-    ReadEvalLog(Rocket rocket) : rocket_(rocket), command_receiver(rocket) {}
+    ReadEvalLog(Rocket &rocket) : rocket_(rocket), command_receiver(rocket) {}
     static void run(void *self) {
         reinterpret_cast<ReadEvalLog *>(self)->run();
     }
 };
 
-class RadioTransmitBulk {
+/**
+ * @brief Responsible for periodically sending bulk sensor data through radio
+ */
+class RadioTxBulk {
   public:
     static void run(void *) {
         StateId state = rocket.state_machine.getState();
@@ -191,14 +165,46 @@ class RadioTransmitBulk {
             rocket.sensors.imuSensor, rocket.sensors.gps,
             static_cast<uint8_t>(state));
     }
-};
 
+    static constexpr Hal::ms freq{500};
+};
+constexpr Hal::ms RadioTxBulk::freq; // C++ is weird sometimes
+
+/**
+ * @brief Responsbile for blinking the status LED on non-critical failure.
+ */
+class LEDBlinker {
+  private:
+    static bool led_on;
+
+  public:
+    static void toggle(void *) {
+        if (led_on)
+            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HIGH);
+        else
+            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LOW);
+
+        led_on = !led_on;
+    }
+
+    static constexpr Hal::ms freq{500};
+};
+constexpr Hal::ms LEDBlinker::freq;
+bool LEDBlinker::led_on = true;
+
+/**
+ * @brief Helper function that makes things less verbose; basically saves the
+ * static_cast call
+ */
+void registerTask(TaskID id, Scheduler::Task task, bool repeat = true,
+                  bool early = false) {
+    Scheduler::registerTask(static_cast<int>(id), task, repeat, early);
+}
+
+/* Main function ====================================================== */
 int main(void) {
     // Before anything else there's some environment specific setup to be done
     env_initialize();
-
-    constexpr unsigned int LANDED_POLLING_TIME_INTERVAL = 5000; // ms
-    constexpr unsigned int NOMINAL_POLLING_TIME_INTERVAL = 50;  // ms
 
     initPins();
 
@@ -210,6 +216,7 @@ int main(void) {
     }
     SerialUSB.println("Initializing...");
 #endif
+
     Radio::initialize();
     // Logically, these are all unrelated variables - but to allow the command
     // receiver to function, they need to be coalesced into one POD struct.
@@ -217,49 +224,35 @@ int main(void) {
     auto &init_status = rocket.init_status;
     auto &sensors = rocket.sensors;
     auto &ignitors = rocket.ignitors;
-    auto &calc = rocket.calc;
-    auto &datalog = rocket.datalog;
+
     StateInput state_input;
     StateAuxilliaryInfo state_aux; // Output info from states
 
     if (init_status == RocketStatus::CRITICAL_FAILURE) {
         state_machine.abort();
     }
-    StateId state = state_machine.getState();
-
-    // // Timing
-    // Hal::t_point old_time = Hal::now_ms();                // ms
-    // Hal::t_point new_time;                                // ms
-    // Hal::ms time_interval(NOMINAL_POLLING_TIME_INTERVAL); // ms
-    // Hal::t_point radio_old_time = Hal::now_ms();
-    // Hal::ms radio_t_interval(500); // ms //TODO - make 500 a constant
-    // somewhere
 
     Radio::sendStatus(Hal::millis(), init_status, sensors, ignitors);
 
+    /* Register all tasks */
+    typedef Scheduler::Task Task;
+
+    ReadEvalLog read_eval_logger(rocket);
+    Task read_eval_log(ReadEvalLog::run, &read_eval_logger, Hal::ms(50));
+    registerTask(TaskID::ReadEvalLog, read_eval_log);
+
+    Task radio_tx(RadioTxBulk::run, nullptr, RadioTxBulk::freq);
+    registerTask(TaskID::RadioTxBulk, radio_tx);
+
+    Task led_blink(LEDBlinker::toggle, nullptr, LEDBlinker::freq);
+    registerTask(TaskID::LEDBlinker, led_blink);
+
     Scheduler::run();
-    //     for (;;) {
-    //         new_time = Hal::now_ms();
 
-    //         // makes sure that even if it does somehow get accidentally
-    //         changed,
-    //         // it gets reverted
-    //
-
-    //         // Polling time intervals need to be variable, since in LANDED
-    //         // there's a lot of data that'll be recorded
-    //         if (state == StateId::LANDED)
-    //             time_interval = Hal::ms(LANDED_POLLING_TIME_INTERVAL);
-    //         else
-    //             time_interval = Hal::ms(NOMINAL_POLLING_TIME_INTERVAL);
-    // #ifdef TESTING
-    //         Hal::sleep_ms(1000); // So you can actually read the serial
-    //         output
-    // #endif
-
-    // #ifdef THIS_IS_NATIVE_CONFIGURATION
-    //         env_callbacks();
-    //         Hal::sleep_ms((old_time + time_interval - new_time).count());
-    // #endif
-    //     }
+    // // Polling time intervals need to be variable, since in LANDED
+    // // there's a lot of data that'll be recorded
+    // if (state == StateId::LANDED)
+    //     time_interval = Hal::ms(LANDED_POLLING_TIME_INTERVAL);
+    // else
+    //     time_interval = Hal::ms(NOMINAL_POLLING_TIME_INTERVAL);
 }
