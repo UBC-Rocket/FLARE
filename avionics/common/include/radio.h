@@ -53,6 +53,7 @@ class PacketBuffWriter {
 };
 class Radio {
   private:
+    typedef uint16_t fwd_cmd_t;
     enum class Ids {
         status_ping = 0x00,
         message = 0x01,
@@ -62,8 +63,8 @@ class Radio {
     };
 
     constexpr static Hal::ms WATCHDOG_SEND_INTERVAL{3000};
-    constexpr static uint16_t STOP_PARSE_FLAG = 1 << 0;
-    constexpr static uint16_t CAN_SEND_FLAG = 1 << 1;
+    constexpr static fwd_cmd_t STOP_PARSE_FLAG = 1 << 0;
+    constexpr static fwd_cmd_t CAN_SEND_FLAG = 1 << 1;
 
   public:
     // type RadioMembers is public for technical reasons but cannot be used
@@ -104,7 +105,7 @@ class Radio {
 
         bool can_send = false;
         read_count_ = 0; // resetting
-        uint16_t result;
+        fwd_cmd_t result;
 
         while (true) {
             command_t *command_data;
@@ -206,8 +207,8 @@ class Radio {
      * @return Bitfield; see FLAG constants. Additionally, if a command was
      * found, the two outparams are set.
      */
-    static uint16_t readPacket(command_t *&command_dat_out,
-                               command_t &command_len_out);
+    static fwd_cmd_t readPacket(command_t *&command_dat_out,
+                                command_t &command_len_out);
 
     /**
      * @brief Fills in the ID and timestamp given a subpacket pointer.

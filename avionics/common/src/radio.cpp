@@ -222,9 +222,9 @@ void Radio::addSubpacket(SubPktPtr dat) { self.tx_q_.push(std::move(dat)); }
 
 int Radio::read_count_ = 0;
 
-uint16_t Radio::readPacket(command_t *&command_dat_out,
-                           command_t &command_len_out) {
-    uint16_t result = 0;
+fwd_cmd_t Radio::readPacket(command_t *&command_dat_out,
+                            command_t &command_len_out) {
+    fwd_cmd_t result = 0;
     while (read_count_ < MAX_PACKETS_PER_RX_LOOP) {
         self.xbee_.readPacket();
         read_count_++;
