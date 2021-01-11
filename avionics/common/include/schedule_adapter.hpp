@@ -10,7 +10,10 @@ class SchedulerClock {
     static time_point now() { return Hal::now_ms(); }
 
 #ifdef THIS_IS_NATIVE_CONFIGURATION
-    static void idle(duration dur) { Hal::sleep_ms(dur.count()); }
+    static void idle(duration dur) {
+        env_callbacks();
+        Hal::sleep_ms(dur.count());
+    }
 #endif
 };
 

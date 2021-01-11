@@ -95,10 +95,13 @@ PLEASE READ ME!
 // #warning GROUND_TEST is defined! Do not fly this code
 // #endif
 
+/* Variables ========================================================== */
+static Rocket rocket;
+
 /* Task IDs =========================================================== */
 enum class TaskID {
     ReadEvalLog = 0,
-    Radio = 1,
+    RadioTransmitBulk = 1,
     LEDBlinker = 5,
 };
 
@@ -142,6 +145,7 @@ bool LEDBlinker::led_on = true;
 class ReadEvalLog {
   private:
     Rocket &rocket_;
+    CommandReceiver command_receiver;
     // TODO - see if state_aux is actually used / wheter it should be used
     StateAuxilliaryInfo state_aux; // Output info from states
 
@@ -152,6 +156,12 @@ class ReadEvalLog {
         auto &calc = rocket_.calc;
         auto &datalog = rocket_.datalog;
 
+        // ensures that if state somehow gets accidentally changed, state
+        // reverts to aborted
+        if (init_status == RocketStatus::CRITICAL_FAILURE) {
+            state_machine.abort();
+        }
+
         StateId state = state_machine.getState();
         StateInput state_input;
 
@@ -160,12 +170,26 @@ class ReadEvalLog {
         state_machine.update(state_input, state_aux);
         datalog.logData(Hal::tpoint_to_uint(sensors.last_poll_time()), sensors,
                         state, calc.altitude(), calc.getBaseAltitude());
+
+        Radio::forwardCommand(command_receiver);
     }
 
   public:
-    ReadEvalLog(Rocket rocket) : rocket_(rocket) {}
+    ReadEvalLog(Rocket rocket) : rocket_(rocket), command_receiver(rocket) {}
     static void run(void *self) {
         reinterpret_cast<ReadEvalLog *>(self)->run();
+    }
+};
+
+class RadioTransmitBulk {
+  public:
+    static void run(void *) {
+        StateId state = rocket.state_machine.getState();
+        Radio::sendBulkSensor(
+            Hal::tpoint_to_uint(rocket.sensors.last_poll_time()),
+            rocket.calc.altitude(), rocket.sensors.accelerometer,
+            rocket.sensors.imuSensor, rocket.sensors.gps,
+            static_cast<uint8_t>(state));
     }
 };
 
@@ -186,10 +210,7 @@ int main(void) {
     }
     SerialUSB.println("Initializing...");
 #endif
-
-    Rocket rocket;
     Radio::initialize();
-    CommandReceiver command_receiver(rocket);
     // Logically, these are all unrelated variables - but to allow the command
     // receiver to function, they need to be coalesced into one POD struct.
     auto &state_machine = rocket.state_machine;
@@ -223,13 +244,7 @@ int main(void) {
     //         // makes sure that even if it does somehow get accidentally
     //         changed,
     //         // it gets reverted
-    //         if (init_status == RocketStatus::CRITICAL_FAILURE) {
-    //             state_machine.abort();
-    //         }
-
-    //         Radio::forwardCommand(command_receiver);
-
-    //         state = state_machine.getState(); // convenience
+    //
 
     //         // Polling time intervals need to be variable, since in LANDED
     //         // there's a lot of data that'll be recorded
@@ -237,31 +252,6 @@ int main(void) {
     //             time_interval = Hal::ms(LANDED_POLLING_TIME_INTERVAL);
     //         else
     //             time_interval = Hal::ms(NOMINAL_POLLING_TIME_INTERVAL);
-
-    //         // Core functionality of rocket - take data, process it,
-    //         // run the state machine, and log the data
-    //         if ((new_time - old_time) >= time_interval) {
-    //             old_time = new_time;
-
-    //             sensors.poll();
-    //             calc.calculateValues(state, state_input,
-    //             sensors.last_poll_time()); state_machine.update(state_input,
-    //             state_aux);
-    //             datalog.logData(Hal::tpoint_to_uint(sensors.last_poll_time()),
-    //                             sensors, state, calc.altitude(),
-    //                             calc.getBaseAltitude());
-    //         }
-
-    //         if (new_time - radio_old_time >= radio_t_interval) {
-    //             radio_old_time = new_time;
-    //             Radio::sendBulkSensor(Hal::tpoint_to_uint(sensors.last_poll_time()),
-    //                                   calc.altitude(), sensors.accelerometer,
-    //                                   sensors.imuSensor, sensors.gps,
-    //                                   static_cast<uint8_t>(state));
-    //         }
-    //         // LED blinks in non-critical failure
-    //         blinkStatusLED(init_status);
-
     // #ifdef TESTING
     //         Hal::sleep_ms(1000); // So you can actually read the serial
     //         output
