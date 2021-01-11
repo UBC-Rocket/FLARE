@@ -97,7 +97,7 @@ PLEASE READ ME!
 
 /* Task IDs =========================================================== */
 enum class TaskID {
-    MainLoop = 0,
+    ReadEvalLog = 0,
     Radio = 1,
     LEDBlinker = 5,
 };
@@ -138,6 +138,36 @@ bool LEDBlinker::led_on = true;
 //         init_st_indicator = !init_st_indicator;
 //     }
 // }
+
+class ReadEvalLog {
+  private:
+    Rocket &rocket_;
+    // TODO - see if state_aux is actually used / wheter it should be used
+    StateAuxilliaryInfo state_aux; // Output info from states
+
+    void run() {
+        auto &state_machine = rocket_.state_machine;
+        auto &init_status = rocket_.init_status;
+        auto &sensors = rocket_.sensors;
+        auto &calc = rocket_.calc;
+        auto &datalog = rocket_.datalog;
+
+        StateId state = state_machine.getState();
+        StateInput state_input;
+
+        rocket_.sensors.poll();
+        calc.calculateValues(state, state_input, sensors.last_poll_time());
+        state_machine.update(state_input, state_aux);
+        datalog.logData(Hal::tpoint_to_uint(sensors.last_poll_time()), sensors,
+                        state, calc.altitude(), calc.getBaseAltitude());
+    }
+
+  public:
+    ReadEvalLog(Rocket rocket) : rocket_(rocket) {}
+    static void run(void *self) {
+        reinterpret_cast<ReadEvalLog *>(self)->run();
+    }
+};
 
 int main(void) {
     // Before anything else there's some environment specific setup to be done
