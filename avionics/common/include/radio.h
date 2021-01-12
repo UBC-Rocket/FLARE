@@ -32,6 +32,16 @@
 #include "sensors/accelerometer.h"
 #include "subpktptr.h"
 
+enum class EventId : uint16_t {
+    LAUNCH,
+    MACH_LOCK_ENTER,
+    MACH_LOCK_EXIT,
+    STAGE_SEPARATION,
+    DROGUE_DEPLOY,
+    MAIN_DEPLOY,
+    LAND,
+};
+
 class PacketBuffWriter {
   public:
     PacketBuffWriter() : packet(new std::vector<uint8_t>) {
@@ -57,6 +67,7 @@ class Radio {
     enum class Ids {
         status_ping = 0x00,
         message = 0x01,
+        event = 0x02,
         config = 0x03,
         gps = 0x04,
         bulk_sensor = 0x30,
@@ -188,6 +199,13 @@ class Radio {
     static void sendState(const uint32_t time, uint8_t state_id);
 
     static void sendConfig(const uint32_t time);
+
+    /**
+     * @brief Helper function to send an event. See radio specification.
+     * @param time Timestamp, in milliseconds
+     * @param event, the event id to send
+     */
+    static void sendEvent(const uint32_t time, const EventId event);
 
   private:
     /**

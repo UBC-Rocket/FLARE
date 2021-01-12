@@ -1,5 +1,6 @@
 #include "states/armed.h"
 
+
 StateId State::Armed::getNewState(StateInput const &input,
                                   StateAuxilliaryInfo &) {
     static uint8_t armed_count = 0;

@@ -218,6 +218,13 @@ void Radio::sendConfig(const uint32_t time) {
     Radio::addSubpacket(std::move(buf.packet));
 }
 
+void Radio::sendEvent(const uint32_t time, const EventId event) {
+    PacketBuffWriter buf;
+    addIdTime(buf, Ids::event, time);
+    buf.write(&event, sizeof(uint16_t));
+    Radio::addSubpacket(std::move(buf.packet));
+}
+
 void Radio::addSubpacket(SubPktPtr dat) { self.tx_q_.push(std::move(dat)); }
 
 int Radio::read_count_ = 0;
