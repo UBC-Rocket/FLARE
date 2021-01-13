@@ -31,12 +31,14 @@
 #include "sensors/IMU.h"
 #include "sensors/accelerometer.h"
 #include "subpktptr.h"
+#include "state_interface.h"
 
 enum class EventId : uint16_t {
     LAUNCH,
+    STAGE_SEPARATION,
     MACH_LOCK_ENTER,
     MACH_LOCK_EXIT,
-    STAGE_SEPARATION,
+    APOGEE,
     DROGUE_DEPLOY,
     MAIN_DEPLOY,
     LAND,
@@ -78,6 +80,8 @@ class Radio {
     constexpr static fwd_cmd_t CAN_SEND_FLAG = 1 << 1;
 
   public:
+    static const std::unordered_map<StateId, EventId> state_change_events;
+
     // type RadioMembers is public for technical reasons but cannot be used
     // (especially since no definition is given)
     class RadioMembers;
@@ -206,7 +210,14 @@ class Radio {
      * @param event, the event id to send
      */
     static void sendEvent(const uint32_t time, const EventId event);
+    // TODO: Implement stage separation packet when separation implemented.
 
+    /**
+     * @brief Send event corresponding to state change.
+     * @param time Timestamp, in milliseconds
+     * @param state, the new StateID
+     */
+    static void sendEventStateChange(const uint32_t time, const StateId state);
   private:
     /**
      * @brief How many packets have been read in forwardCommand; primarily used

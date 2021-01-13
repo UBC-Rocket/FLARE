@@ -93,6 +93,16 @@ class Radio::RadioMembers {
 };
 static Radio::RadioMembers self;
 
+const std::unordered_map<StateId, EventId> Radio::state_change_events = {
+        {StateId::POWERED_ASCENT, EventId::LAUNCH},
+        {StateId::MACH_LOCK, EventId::MACH_LOCK_ENTER},
+        {StateId::ASCENT_TO_APOGEE, EventId::MACH_LOCK_EXIT},
+        {StateId::PRESSURE_DELAY, EventId::APOGEE},
+        {StateId::DROGUE_DESCENT, EventId::DROGUE_DEPLOY},
+        {StateId::MAIN_DESCENT, EventId::MAIN_DEPLOY},
+        {StateId::LANDED, EventId::LAND}
+    };
+
 constexpr Hal::ms Radio::WATCHDOG_SEND_INTERVAL;
 
 Radio::RadioMembers::RadioMembers()
@@ -223,6 +233,11 @@ void Radio::sendEvent(const uint32_t time, const EventId event) {
     addIdTime(buf, Ids::event, time);
     buf.write(&event, sizeof(uint16_t));
     Radio::addSubpacket(std::move(buf.packet));
+}
+
+void Radio::sendEventStateChange(const uint32_t time, const StateId state) {
+    EventId event = state_change_events.find(state)->second;
+    sendEvent(time, event);
 }
 
 void Radio::addSubpacket(SubPktPtr dat) { self.tx_q_.push(std::move(dat)); }
