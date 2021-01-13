@@ -130,12 +130,12 @@ int main(void) {
 #endif
 
     Rocket rocket;
+    Radio::initialize();
     CommandReceiver command_receiver(rocket);
     // Logically, these are all unrelated variables - but to allow the command
     // receiver to function, they need to be coalesced into one POD struct.
     auto &state_machine = rocket.state_machine;
     auto &init_status = rocket.init_status;
-    auto &radio = rocket.radio;
     auto &sensors = rocket.sensors;
     auto &ignitors = rocket.ignitors;
     auto &calc = rocket.calc;
@@ -154,8 +154,8 @@ int main(void) {
     Hal::ms time_interval(NOMINAL_POLLING_TIME_INTERVAL); // ms
     Hal::t_point radio_old_time = Hal::now_ms();
     Hal::ms radio_t_interval(500); // ms //TODO - make 500 a constant somewhere
-    radio.sendStatus(old_time.time_since_epoch().count(), init_status, sensors,
-                     ignitors);
+    Radio::sendStatus(old_time.time_since_epoch().count(), init_status, sensors,
+                      ignitors);
 
     for (;;) {
         new_time = Hal::now_ms();
@@ -166,7 +166,7 @@ int main(void) {
             state_machine.abort();
         }
 
-        radio.listenAndAct(command_receiver);
+        Radio::forwardCommand(command_receiver);
 
         state = state_machine.getState(); // convenience
 
@@ -192,10 +192,10 @@ int main(void) {
 
         if (new_time - radio_old_time >= radio_t_interval) {
             radio_old_time = new_time;
-            radio.sendBulkSensor(Hal::tpoint_to_uint(sensors.last_poll_time()),
-                                 calc.altitude(), sensors.accelerometer,
-                                 sensors.imuSensor, sensors.gps,
-                                 static_cast<uint8_t>(state));
+            Radio::sendBulkSensor(Hal::tpoint_to_uint(sensors.last_poll_time()),
+                                  calc.altitude(), sensors.accelerometer,
+                                  sensors.imuSensor, sensors.gps,
+                                  static_cast<uint8_t>(state));
         }
         // LED blinks in non-critical failure
         blinkStatusLED(init_status);

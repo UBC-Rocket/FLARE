@@ -5,6 +5,7 @@
 #include <vector> // for std::vector
 
 #include "XBee.h"
+#include "subpktptr.h"
 
 /*Constants------------------------------------------------------------*/
 
@@ -15,7 +16,6 @@
 constexpr unsigned short RADIO_MAX_SUBPACKET_SIZE = 255 - ZB_TX_API_LENGTH;
 
 /*Classes--------------------------------------------------------------*/
-typedef std::unique_ptr<std::vector<uint8_t>> SubPktPtr;
 
 class RadioQueue {
   public:
