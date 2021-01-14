@@ -80,8 +80,6 @@ class Radio {
     constexpr static fwd_cmd_t CAN_SEND_FLAG = 1 << 1;
 
   public:
-    static const std::unordered_map<StateId, EventId> state_change_events;
-
     // type RadioMembers is public for technical reasons but cannot be used
     // (especially since no definition is given)
     class RadioMembers;
