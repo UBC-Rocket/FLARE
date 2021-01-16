@@ -245,7 +245,18 @@ int main(void) {
     registerTask(TaskID::RadioTxBulk, radio_tx);
 
     Task led_blink(LEDBlinker::toggle, nullptr, LEDBlinker::freq);
-    registerTask(TaskID::LEDBlinker, led_blink);
+
+    switch (init_status) {
+    case RocketStatus::NOMINAL:
+        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LOW);
+        break;
+    case RocketStatus::NONCRITICAL_FAILURE:
+        registerTask(TaskID::LEDBlinker, led_blink);
+        break;
+    case RocketStatus::CRITICAL_FAILURE:
+        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LOW);
+        break;
+    }
 
     Scheduler::run();
 
