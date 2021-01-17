@@ -234,6 +234,12 @@ template <typename Clock, int MaxTasks> class ScheduleBase {
         // No need to clear out old tasks - they're left unininitialized
     }
 
+    /**
+     * \brief Returns a non-const reference to a task, so its parameters can
+     * edited.
+     */
+    static Task &get_task(int id) { return tasks_[id]; }
+
   private:
     static constexpr int MAX_TASKS = MaxTasks; // adjustable
 
