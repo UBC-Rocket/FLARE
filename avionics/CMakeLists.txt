@@ -129,8 +129,11 @@ enable_testing()
 ###
 
 # Now simply link against gtest or gtest_main as needed. Eg
-add_executable(Test tests/SampleTest.cpp)
-target_link_libraries(Test gtest_main)
-add_test(NAME SampleTest COMMAND Test)
+add_executable(testexe_LedBlinker
+    tests/unit_LedBlinker.cpp
+    common/src/tasks/led_blinker.cpp
+)
+target_link_libraries(testexe_LedBlinker gtest_main)
+add_test(NAME test_LedBlinker COMMAND testexe_LedBlinker)
 
 # We can now call make test to run all the tests
