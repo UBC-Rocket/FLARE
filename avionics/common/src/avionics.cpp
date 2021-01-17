@@ -96,7 +96,6 @@ PLEASE READ ME!
 // #endif
 
 /* Variables ========================================================== */
-static Rocket rocket;
 
 /* Tasks ============================================================== */
 
@@ -150,7 +149,15 @@ class ReadEvalLog {
  */
 class RadioTxBulk {
   public:
-    static void run(void *) {
+    static void run(void *self) {
+        reinterpret_cast<RadioTxBulk *>(self)->run();
+    }
+
+    RadioTxBulk(Rocket &rkt) : rocket(rkt) {}
+    static constexpr Hal::ms freq{500};
+
+  private:
+    void run() {
         StateId state = rocket.state_machine.getState();
         Radio::sendBulkSensor(
             Hal::tpoint_to_uint(rocket.sensors.last_poll_time()),
@@ -159,7 +166,7 @@ class RadioTxBulk {
             static_cast<uint8_t>(state));
     }
 
-    static constexpr Hal::ms freq{500};
+    Rocket &rocket;
 };
 constexpr Hal::ms RadioTxBulk::freq; // C++ is weird sometimes
 
@@ -198,7 +205,6 @@ void registerTask(TaskID id, Scheduler::Task task, bool repeat = true,
 int main(void) {
     // Before anything else there's some environment specific setup to be done
     env_initialize();
-
     initPins();
 
 /* Setup all UART comms */
@@ -211,6 +217,7 @@ int main(void) {
 #endif
 
     Radio::initialize();
+    Rocket rocket;
     // Logically, these are all unrelated variables - but to allow the command
     // receiver to function, they need to be coalesced into one POD struct.
     auto &state_machine = rocket.state_machine;
@@ -234,7 +241,8 @@ int main(void) {
     Task read_eval_log(ReadEvalLog::run, &read_eval_logger, Hal::ms(50));
     registerTask(TaskID::ReadEvalLog, read_eval_log);
 
-    Task radio_tx(RadioTxBulk::run, nullptr, RadioTxBulk::freq);
+    RadioTxBulk radio_txer(rocket);
+    Task radio_tx(RadioTxBulk::run, &radio_txer, RadioTxBulk::freq);
     registerTask(TaskID::RadioTxBulk, radio_tx);
 
     Task led_blink(LEDBlinker::toggle, nullptr, LEDBlinker::freq);
