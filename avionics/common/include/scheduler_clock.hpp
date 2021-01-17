@@ -1,3 +1,6 @@
+#ifndef SCHEDULER_CLOCK_HPP_7BA322CFFDDE4E3EB2CBA99E36951D6A
+#define SCHEDULER_CLOCK_HPP_7BA322CFFDDE4E3EB2CBA99E36951D6A
+
 #include "HAL/time.h"
 #include "RocketSchedule/schedule.hpp"
 #include "env_config.h"
@@ -17,4 +20,4 @@ class SchedulerClock {
 #endif
 };
 
-typedef ScheduleBase<SchedulerClock, 16> Scheduler;
+#endif

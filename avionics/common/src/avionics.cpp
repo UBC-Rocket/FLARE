@@ -65,7 +65,7 @@ PLEASE READ ME!
 #include "HAL/pin_util.h"
 #include "HAL/time.h"
 
-#include "schedule_adapter.hpp"
+#include "scheduler.hpp"
 
 #include "radio.h"
 #include "rocket.h"
@@ -98,13 +98,6 @@ PLEASE READ ME!
 /* Variables ========================================================== */
 static Rocket rocket;
 
-/* Task IDs =========================================================== */
-enum class TaskID {
-    ReadEvalLog = 0,
-    RadioTxBulk = 1,
-    LEDBlinker = 5,
-};
-
 /* Tasks ============================================================== */
 
 /**
@@ -117,8 +110,8 @@ class ReadEvalLog {
     // TODO - see if state_aux is actually used / wheter it should be used
     StateAuxilliaryInfo state_aux; // Output info from states
 
-    constexpr static unsigned int LANDED_POLLING_TIME_INTERVAL = 5000; // ms
-    constexpr static unsigned int NOMINAL_POLLING_TIME_INTERVAL = 50;  // ms
+    constexpr static unsigned int NOMINAL_POLLING_TIME_INTERVAL = 50; // ms
+    // MainDescent state updates this to 5000 ms - see main_descent.cpp
 
     void run() {
         auto &state_machine = rocket_.state_machine;
@@ -259,11 +252,4 @@ int main(void) {
     }
 
     Scheduler::run();
-
-    // // Polling time intervals need to be variable, since in LANDED
-    // // there's a lot of data that'll be recorded
-    // if (state == StateId::LANDED)
-    //     time_interval = Hal::ms(LANDED_POLLING_TIME_INTERVAL);
-    // else
-    //     time_interval = Hal::ms(NOMINAL_POLLING_TIME_INTERVAL);
 }
