@@ -133,5 +133,3 @@ class CommandReceiver {
         }
     }
 };
-
-constexpr char Rocket::LOG_FILE_NAME[];

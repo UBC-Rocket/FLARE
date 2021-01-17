@@ -7,7 +7,7 @@
 
 #include <Eigen/Geometry> //quaternions
 
-#include "CalcHelpers/barometric.h"
+#include "CalcHelpers/barometric.hpp"
 #include "CalcHelpers/exponential_moving_avg.h"
 #include "calculations_interface.h"
 #include "sensor_collection.h"

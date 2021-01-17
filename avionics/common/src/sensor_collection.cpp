@@ -1,5 +1,7 @@
 #include "sensor_collection.h"
 
+constexpr char SensorCollection::LOG_FILE_HEADER[];
+
 SensorCollection::SensorCollection()
     : barometer(BEGIN + BAROMETER_INDEX),
       gps(Hal::SerialInst::GPS, BEGIN + GPS_INDEX),
