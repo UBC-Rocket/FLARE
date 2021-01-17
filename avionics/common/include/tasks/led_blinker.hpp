@@ -5,6 +5,10 @@
 #include "HAL/time.h"
 #include "gpio.h"
 
+// for some reason these somehow reappear
+#undef LOW
+#undef HIGH
+
 /**
  * @brief Responsbile for blinking the status LED on non-critical failure.
  */
