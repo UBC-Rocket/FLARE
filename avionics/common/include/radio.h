@@ -31,17 +31,23 @@
 #include "sensors/IMU.h"
 #include "sensors/accelerometer.h"
 #include "subpktptr.h"
-#include "state_interface.h"
 
+// TODO If this enum grows in size, it should be extracted to it's own header
+// file.
+// NOTE This enum MUST match that defined on the ground station
 enum class EventId : uint16_t {
+    ARMED,
+    DISARMED,
     LAUNCH,
     STAGE_SEPARATION,
     MACH_LOCK_ENTER,
     MACH_LOCK_EXIT,
-    APOGEE,
-    DROGUE_DEPLOY,
-    MAIN_DEPLOY,
-    LAND,
+    APOGEE_REACHED,
+    DROGUE_DEPLOYED,
+    MAIN_DEPLOYED,
+    LANDED,
+    ABORTED,
+    IGNITOR_FIRE,
 };
 
 class PacketBuffWriter {
@@ -210,13 +216,6 @@ class Radio {
     static void sendEvent(const uint32_t time, const EventId event);
     // TODO: Implement stage separation packet when separation implemented.
 
-    /**
-     * @brief Send event corresponding to state change.
-     * @param time Timestamp, in milliseconds
-     * @param state, the new StateID
-     */
-    static void sendEventStateChange(const uint32_t time, const StateId state);
-  private:
     /**
      * @brief How many packets have been read in forwardCommand; primarily used
      * by readPacket()

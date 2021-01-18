@@ -1,6 +1,7 @@
 /*Includes------------------------------------------------------------*/
 #include <HAL/pin_util.h>
 #include <HAL/time.h>
+#include "radio.h"
 
 #include "hardware/ignitor.h"
 
@@ -31,4 +32,8 @@ void Ignitor::fire() {
     Hal::digitalWrite(ignitePin_, Hal::PinDigital::HIGH);
     Hal::sleep_ms(IGNITOR_DELAY);
     Hal::digitalWrite(ignitePin_, Hal::PinDigital::LOW);
+
+    // TODO(akoen) This could be expanded to support different events for
+    // different ignitions.
+    Radio::sendEvent(Hal::tpoint_to_uint(Hal::now_ms()), EventId::IGNITOR_FIRE);
 }

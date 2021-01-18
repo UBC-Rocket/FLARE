@@ -88,8 +88,6 @@ class Radio::RadioMembers {
     ZBTxRequest tx_packet_;
     ZBRxResponse rx;
 
-    std::unordered_map<StateId, EventId> state_change_events;
-
     RadioQueue tx_q_; // the [ueue] is silent :)
     uint8_t payload_[RADIO_MAX_SUBPACKET_SIZE];
 };
@@ -100,16 +98,7 @@ constexpr Hal::ms Radio::WATCHDOG_SEND_INTERVAL;
 // Initializes radio member variables;
 Radio::RadioMembers::RadioMembers()
     : gnd_addr_(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB),
-      tx_q_(MAX_QUEUED_BYTES),
-      state_change_events ({
-          {StateId::POWERED_ASCENT, EventId::LAUNCH},
-          {StateId::MACH_LOCK, EventId::MACH_LOCK_ENTER},
-          {StateId::ASCENT_TO_APOGEE, EventId::MACH_LOCK_EXIT},
-          {StateId::PRESSURE_DELAY, EventId::APOGEE},
-          {StateId::DROGUE_DESCENT, EventId::DROGUE_DEPLOY},
-          {StateId::MAIN_DESCENT, EventId::MAIN_DEPLOY},
-          {StateId::LANDED, EventId::LAND}
-}) {}
+      tx_q_(MAX_QUEUED_BYTES) {}
 
 void Radio::initialize() {
     auto &serial = Hal::SerialInst::Radio;
@@ -236,11 +225,6 @@ void Radio::sendEvent(const uint32_t time, const EventId event) {
     addIdTime(buf, Ids::event, time);
     buf.write(&event, sizeof(uint16_t));
     Radio::addSubpacket(std::move(buf.packet));
-}
-
-void Radio::sendEventStateChange(const uint32_t time, const StateId state) {
-    EventId event = self.state_change_events.find(state)->second;
-    sendEvent(time, event);
 }
 
 void Radio::addSubpacket(SubPktPtr dat) { self.tx_q_.push(std::move(dat)); }
