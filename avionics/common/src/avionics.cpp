@@ -148,6 +148,7 @@ int main(void) {
         state_machine.abort();
     }
     StateId state = state_machine.getState();
+    StateId old_state = state;
 
     // Timing
     Hal::t_point old_time = Hal::now_ms();                // ms
@@ -169,7 +170,6 @@ int main(void) {
 
         Radio::forwardCommand(command_receiver);
 
-        StateId last_state = state;
         state = state_machine.getState(); // convenience
 
         // Polling time intervals need to be variable, since in LANDED
@@ -183,6 +183,11 @@ int main(void) {
         // run the state machine, and log the data
         if ((new_time - old_time) >= time_interval) {
             old_time = new_time;
+
+            if (state != old_state) {
+                State::sendStateChangeEvent(state);
+            }
+            old_state = state;
 
             sensors.poll();
             calc.calculateValues(state, state_input, sensors.last_poll_time());
@@ -198,11 +203,6 @@ int main(void) {
                                   calc.altitude(), sensors.accelerometer,
                                   sensors.imuSensor, sensors.gps,
                                   static_cast<uint8_t>(state));
-
-            // Send event packet over radio if state has changed.
-            if (state != last_state) {
-                State::sendStateChangeEvent(state);
-            }
         }
         // LED blinks in non-critical failure
         blinkStatusLED(init_status);

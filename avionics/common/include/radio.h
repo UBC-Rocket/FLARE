@@ -32,8 +32,6 @@
 #include "sensors/accelerometer.h"
 #include "subpktptr.h"
 
-// TODO If this enum grows in size, it should be extracted to it's own header
-// file.
 // NOTE This enum MUST match that defined on the ground station
 enum class EventId : uint16_t {
     ARMED,
