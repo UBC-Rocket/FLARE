@@ -9,9 +9,9 @@ namespace State {
         {StateId::POWERED_ASCENT, EventId::LAUNCH},
         {StateId::MACH_LOCK, EventId::MACH_LOCK_ENTER},
         {StateId::ASCENT_TO_APOGEE, EventId::MACH_LOCK_EXIT},
-        {StateId::PRESSURE_DELAY, EventId::APOGEE_REACHED},
-        {StateId::DROGUE_DESCENT, EventId::DROGUE_DEPLOYED},
-        {StateId::MAIN_DESCENT, EventId::MAIN_DEPLOYED},
+        {StateId::PRESSURE_DELAY, EventId::APOGEE},
+        {StateId::DROGUE_DESCENT, EventId::DROGUE_DEPLOY},
+        {StateId::MAIN_DESCENT, EventId::MAIN_DEPLOY},
         {StateId::LANDED, EventId::LANDED},
         {StateId::WINTER_CONTINGENCY, EventId::ABORTED}
     };

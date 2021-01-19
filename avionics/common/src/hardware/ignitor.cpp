@@ -35,5 +35,5 @@ void Ignitor::fire() {
 
     // TODO(akoen) This could be expanded to support different events for
     // different ignitions.
-    Radio::sendEvent(Hal::tpoint_to_uint(Hal::now_ms()), EventId::IGNITOR_FIRE);
+    Radio::sendEvent(Hal::tpoint_to_uint(Hal::now_ms()), EventId::IGNITOR_FIRED);
 }

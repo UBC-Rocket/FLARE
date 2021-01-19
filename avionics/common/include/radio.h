@@ -40,12 +40,12 @@ enum class EventId : uint16_t {
     STAGE_SEPARATION,
     MACH_LOCK_ENTER,
     MACH_LOCK_EXIT,
-    APOGEE_REACHED,
-    DROGUE_DEPLOYED,
-    MAIN_DEPLOYED,
+    APOGEE,
+    DROGUE_DEPLOY,
+    MAIN_DEPLOY,
     LANDED,
     ABORTED,
-    IGNITOR_FIRE,
+    IGNITOR_FIRED,
 };
 
 class PacketBuffWriter {
