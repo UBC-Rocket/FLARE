@@ -233,8 +233,8 @@ inline void blinkStatusLED(RocketStatus init_status) {
         init_st_indicator = !init_st_indicator;
 
         if (init_st_indicator)
-            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HIGH);
+            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::PIN_HIGH);
         else
-            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LOW);
+            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::PIN_LOW);
     }
 }

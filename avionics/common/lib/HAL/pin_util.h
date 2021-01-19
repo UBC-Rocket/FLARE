@@ -13,7 +13,7 @@
 namespace Hal {
 enum class PinMode { INPUT = 0, OUTPUT = 1 };
 
-enum class PinDigital { LOW = 0, HIGH = 1 };
+enum class PinDigital { PIN_LOW = 0, PIN_HIGH = 1 };
 
 void pinMode(::Pin pin, PinMode mode);
 void digitalWrite(::Pin pin, PinDigital val);

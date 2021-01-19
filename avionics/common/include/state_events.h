@@ -1,3 +1,5 @@
+#pragma once
+
 #include "HAL/time.h"
 #include "radio.h"
 #include "state_interface.h"
