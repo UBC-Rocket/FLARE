@@ -71,8 +71,8 @@ struct StateMachineConfig {
     State::PressureDelay pres_delay =
         State::PressureDelay(StateId::DROGUE_DESCENT, APOGEE_PRESSURE_DELAY);
 
-    State::DrogueDescent drogue =
-        State::DrogueDescent(MAIN_DEPLOY_ALTITUDE, MAIN_DEPLOY_CHECKS);
+    State::DrogueDescent drogue = State::DrogueDescent(
+        StateId::MAIN_DESCENT, MAIN_DEPLOY_ALTITUDE, MAIN_DEPLOY_CHECKS);
 
     State::MainDescent main = State::MainDescent(
         LAND_CHECK_TIME_INTERVAL, LAND_CHECKS, LAND_VELOCITY_THRESHOLD);

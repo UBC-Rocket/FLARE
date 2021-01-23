@@ -12,9 +12,10 @@ class DrogueDescent : public IState {
      * @param MAIN_DEPLOY_ALTITUDE altitude to deploy main parachute at, in
      * metres
      */
-    DrogueDescent(float const MAIN_DEPLOY_ALTITUDE, int8_t DEPLOY_CHECKS)
-        : M_MAIN_DEPLOY_ALTITUDE(MAIN_DEPLOY_ALTITUDE),
-          M_DEPLOY_CHECKS(DEPLOY_CHECKS) {}
+    DrogueDescent(StateId post_descent, float const MAIN_DEPLOY_ALTITUDE,
+                  int8_t DEPLOY_CHECKS)
+        : MAIN_DEPLOY_ALTITUDE_(MAIN_DEPLOY_ALTITUDE),
+          DEPLOY_CHECKS_(DEPLOY_CHECKS), post_descent_(post_descent) {}
 
     /*
      * @brief Return the assigned enumeration code.
@@ -32,8 +33,9 @@ class DrogueDescent : public IState {
                         StateAuxilliaryInfo &state_aux);
 
   private:
-    float const M_MAIN_DEPLOY_ALTITUDE;
-    int8_t const M_DEPLOY_CHECKS;
+    float const MAIN_DEPLOY_ALTITUDE_;
+    int8_t const DEPLOY_CHECKS_;
+    const StateId post_descent_;
 };
 
 } // namespace State
