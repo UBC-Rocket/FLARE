@@ -12,7 +12,7 @@
 #include "states/standby.h"
 #include "states/winter_contingency.h"
 
-class StateMachine {
+struct StateMachineConfig {
   private:
     /* Configuration constants */
     constexpr static int STANDBY_LAUNCH_CHECKS = 4;
@@ -62,7 +62,8 @@ class StateMachine {
 
     State::WinterContingency contingency{};
 
-    std::unordered_map<StateId, IState *> hash_map = {
+  public:
+    std::unordered_map<StateId, IState *> state_map = {
         {StateId::STANDBY, &standby},
         {StateId::ARMED, &armed},
         {StateId::ASCENT_TO_APOGEE, &coast},
@@ -73,46 +74,5 @@ class StateMachine {
         {StateId::LANDED, &landed},
         {StateId::WINTER_CONTINGENCY, &contingency}};
 
-    StateId current_state = StateId::STANDBY;
-
-  public:
-    StateMachine() : current_state(StateId::STANDBY) {}
-
-    void update(const StateInput state_input, StateAuxilliaryInfo state_aux) {
-        current_state =
-            hash_map[current_state]->getNewState(state_input, state_aux);
-    }
-
-    /**
-     * Arm the state machine. Only allowed if in STANDBY.
-     * Returns true if arming was successful, false otherwise (i.e. not in
-     * STANDBY)
-     */
-    bool arm() {
-        if (current_state == StateId::STANDBY) {
-            current_state = StateId::ARMED;
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Disarm the state machine. Only allowed if in ARMED.
-     * Returns true if disarming was successful, false otherwise (i.e. not in
-     * ARMED)
-     */
-    bool disarm() {
-        if (current_state == StateId::ARMED) {
-            current_state = StateId::STANDBY;
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Set the state machine to a failsafe state
-     */
-    void abort() { current_state = StateId::WINTER_CONTINGENCY; }
-
-    const StateId &getState() const { return current_state; }
+    StateId initial_state = StateId::STANDBY;
 };

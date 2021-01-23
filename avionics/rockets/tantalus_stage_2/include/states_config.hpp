@@ -8,13 +8,11 @@
 #include "states/landed.h"
 #include "states/mach_lock.h"
 #include "states/main_descent.h"
-#include "states/powered_ascent.h"
-#include "states/pre_air_start_coast_timed.h"
 #include "states/pressure_delay.h"
 #include "states/standby.h"
 #include "states/winter_contingency.h"
 
-class StateMachine {
+struct StateMachineConfig {
   private:
     /* Configuration constants */
     constexpr static int STANDBY_LAUNCH_CHECKS = 4;
@@ -24,13 +22,6 @@ class StateMachine {
     constexpr static int MACH_UNLOCK_CHECKS = 10;
     constexpr static int APOGEE_CHECKS = 5;
     constexpr static int MAIN_DEPLOY_CHECKS = 5;
-
-    constexpr static long POST_BURNOUT_COAST_TIME = 3000;           // ms
-    constexpr static float PRESTAGE_MAX_ALTITUDE = 5000;            // m
-    constexpr static float PRESTAGE_MIN_ALTITUDE = 1000;            // m
-    constexpr static float PRESTAGE_MAX_VERTICAL_ACCEL = 20;        // m/s^2
-    constexpr static float PRESTAGE_MIN_VERTICAL_ACCEL = -50;       // m/s^2
-    constexpr static float PRESTAGE_MAX_ANGLE_FROM_VERTICAL = 1.57; // radians
 
     constexpr static float LAUNCH_THRESHOLD = 25;                // m
     constexpr static float MACH_LOCK_VELOCITY_THRESHOLD = 155;   // m/s
@@ -47,18 +38,10 @@ class StateMachine {
 
     /* States */
     State::Standby standby = State::Standby(
-        StateId::POWERED_ASCENT, STANDBY_LAUNCH_CHECKS, LAUNCH_THRESHOLD);
+        StateId::ASCENT_TO_APOGEE, STANDBY_LAUNCH_CHECKS, LAUNCH_THRESHOLD);
 
-    State::Armed armed = State::Armed(StateId::POWERED_ASCENT,
+    State::Armed armed = State::Armed(StateId::ASCENT_TO_APOGEE,
                                       ARMED_LAUNCH_CHECKS, LAUNCH_THRESHOLD);
-
-    State::PoweredAscent powered_ascent = State::PoweredAscent(
-        StateId::PRE_AIR_START_COAST_TIMED, MOTOR_BURNOUT_CHECKS);
-
-    State::PreAirStartCoastTimed prestage_coast = State::PreAirStartCoastTimed(
-        POST_BURNOUT_COAST_TIME, PRESTAGE_MAX_ALTITUDE, PRESTAGE_MIN_ALTITUDE,
-        PRESTAGE_MAX_VERTICAL_ACCEL, PRESTAGE_MIN_VERTICAL_ACCEL,
-        PRESTAGE_MAX_ANGLE_FROM_VERTICAL);
 
     State::AscentToApogee coast = State::AscentToApogee(
         APOGEE_CHECKS, MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD);
@@ -79,11 +62,10 @@ class StateMachine {
 
     State::WinterContingency contingency{};
 
-    std::unordered_map<StateId, IState *> hash_map = {
+  public:
+    std::unordered_map<StateId, IState *> state_map = {
         {StateId::STANDBY, &standby},
         {StateId::ARMED, &armed},
-        {StateId::POWERED_ASCENT, &powered_ascent},
-        {StateId::PRE_AIR_START_COAST_TIMED, &prestage_coast},
         {StateId::ASCENT_TO_APOGEE, &coast},
         {StateId::MACH_LOCK, &mach_lock},
         {StateId::PRESSURE_DELAY, &pres_delay},
@@ -92,46 +74,5 @@ class StateMachine {
         {StateId::LANDED, &landed},
         {StateId::WINTER_CONTINGENCY, &contingency}};
 
-    StateId current_state = StateId::STANDBY;
-
-  public:
-    StateMachine() : current_state(StateId::STANDBY) {}
-
-    void update(const StateInput state_input, StateAuxilliaryInfo state_aux) {
-        current_state =
-            hash_map[current_state]->getNewState(state_input, state_aux);
-    }
-
-    /**
-     * Arm the state machine. Only allowed if in STANDBY.
-     * Returns true if arming was successful, false otherwise (i.e. not in
-     * STANDBY)
-     */
-    bool arm() {
-        if (current_state == StateId::STANDBY) {
-            current_state = StateId::ARMED;
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Disarm the state machine. Only allowed if in ARMED.
-     * Returns true if disarming was successful, false otherwise (i.e. not in
-     * ARMED)
-     */
-    bool disarm() {
-        if (current_state == StateId::ARMED) {
-            current_state = StateId::STANDBY;
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Set the state machine to a failsafe state
-     */
-    void abort() { current_state = StateId::WINTER_CONTINGENCY; }
-
-    const StateId &getState() const { return current_state; }
+    StateId initial_state = StateId::STANDBY;
 };

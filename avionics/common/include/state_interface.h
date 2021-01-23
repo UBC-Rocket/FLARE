@@ -1,7 +1,8 @@
 #pragma once
 
-#include "state_input_struct.h"
 #include <functional> //for std::hash specialization (need to specialize)
+
+#include "state_input_struct.h"
 
 enum class StateId {
     STANDBY,
@@ -29,13 +30,13 @@ template <> struct hash<StateId> {
 
 class IState {
   public:
-    /*
+    /**
      * @brief Return the assigned enumeration code.
      * @return Enumeration code.
      */
     virtual StateId getStateEnum(void) = 0;
 
-    /*
+    /**
      * @brief Return the next state, based on input data (mostly from filtered
      * sensor data)
      * @return State enumeration code, to be passed into the std::map between
@@ -43,4 +44,10 @@ class IState {
      */
     virtual StateId getNewState(const StateInput &input,
                                 StateAuxilliaryInfo &state_aux) = 0;
+
+    /**
+     * @brief Optional method that runs when entering a state from a different
+     * state.
+     */
+    virtual void onEntry(){};
 };
