@@ -24,7 +24,7 @@ class Calculator : public ICalculator {
         base_alt_.reset(pressureToAltitude(*(baro_.getData())), 1,
                         BAROMETER_MOVING_AVERAGE_ALPHA);
         last_t_ = Hal::now_ms();
-        last_alt_ = base_alt_.getAverage();
+        altitude_ = base_alt_.getAverage();
     }
 
     void calculateValues(StateId const state, StateInput &out_state_input,
@@ -39,16 +39,18 @@ class Calculator : public ICalculator {
             diff < base_alt_.getStandardDeviation() * 3) {
             base_alt_.addValue(alt);
         }
-        out.altitude = alt - base_alt_.getAverage();
+        auto new_alt = alt - base_alt_.getAverage();
 
         constexpr int MILLISECONDS_PER_SECOND = 1000;
-        out.velocity_vertical = (out.altitude - last_alt_) /
-                                (t_ms - last_t_).count() *
-                                MILLISECONDS_PER_SECOND;
-        // t_ms and last_t_ are of millisconds
+        velocity_z_ = (new_alt - altitude_) / (t_ms - last_t_).count() *
+                      MILLISECONDS_PER_SECOND;
 
-        last_alt_ = out.altitude; // in preparation for next loop
+        altitude_ = new_alt;
+
+        // t_ms and last_t_ are of millisconds
         last_t_ = t_ms;
+        out.altitude = altitude_; // in preparation for next loop
+        out.velocity_vertical = velocity_z_;
     }
 
     /**
@@ -62,11 +64,19 @@ class Calculator : public ICalculator {
      * @brief Estimate of current altitude
      * @return Altitude [metres]
      */
-    float altitude() const { return last_alt_; }
+    float altitude() const { return altitude_; }
+
+    /**
+     * @brief Estimate of current velocity in z direction (vertical)
+     * @return Velocity [m/s]
+     */
+    float velocity_z() const { return velocity_z_; }
 
   private:
     ExponentialMovingAvg<float> base_alt_;
     Barometer &baro_;
-    float last_alt_;
+    float altitude_;
+    float velocity_z_;
+
     Hal::t_point last_t_;
 };
