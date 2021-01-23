@@ -15,10 +15,11 @@ class MainDescent : public IState {
      * @param LANDED_CHECKS number of checks to perform
      * @param LANDED_VELOCITY maximum velocity to be considered as landed
      */
-    MainDescent(long LANDED_TIME_INTERVAL, int LANDED_CHECKS,
-                float LANDED_VELOCITY)
-        : M_LANDED_TIME_INTERVAL(LANDED_TIME_INTERVAL),
-          M_LANDED_CHECKS(LANDED_CHECKS), M_LANDED_VELOCITY(LANDED_VELOCITY) {}
+    MainDescent(StateId landed_state, long LANDED_TIME_INTERVAL,
+                int LANDED_CHECKS, float LANDED_VELOCITY)
+        : LANDED_TIME_INTERVAL_(LANDED_TIME_INTERVAL),
+          LANDED_CHECKS_(LANDED_CHECKS), LANDED_VELOCITY_(LANDED_VELOCITY),
+          landed_state_(landed_state) {}
 
     /**
      * @brief Return the assigned enumeration code.
@@ -36,9 +37,10 @@ class MainDescent : public IState {
                         StateAuxilliaryInfo &state_aux);
 
   private:
-    std::chrono::milliseconds M_LANDED_TIME_INTERVAL;
-    uint8_t M_LANDED_CHECKS;
-    float M_LANDED_VELOCITY;
+    const std::chrono::milliseconds LANDED_TIME_INTERVAL_;
+    const uint8_t LANDED_CHECKS_;
+    const float LANDED_VELOCITY_;
+    const StateId landed_state_;
 };
 
 } // namespace State

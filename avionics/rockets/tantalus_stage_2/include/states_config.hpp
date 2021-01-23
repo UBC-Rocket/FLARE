@@ -57,8 +57,9 @@ struct StateMachineConfig {
     State::DrogueDescent drogue = State::DrogueDescent(
         StateId::MAIN_DESCENT, MAIN_DEPLOY_ALTITUDE, MAIN_DEPLOY_CHECKS);
 
-    State::MainDescent main = State::MainDescent(
-        LAND_CHECK_TIME_INTERVAL, LAND_CHECKS, LAND_VELOCITY_THRESHOLD);
+    State::MainDescent main =
+        State::MainDescent(StateId::LANDED, LAND_CHECK_TIME_INTERVAL,
+                           LAND_CHECKS, LAND_VELOCITY_THRESHOLD);
 
     State::Landed landed = State::Landed();
 
