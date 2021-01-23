@@ -9,7 +9,7 @@ class StateMachine {
     typedef std::unordered_map<StateId, IState *> StateMap;
 
     StateMachine(StateMap map, StateId initial_state_)
-        : current_id_(StateId::STANDBY), state_map_(map) {
+        : current_id_(initial_state_), state_map_(map) {
         assert(map.count(StateId::STANDBY) != 0);
         assert(map.count(StateId::ARMED) != 0);
         assert(map.count(StateId::WINTER_CONTINGENCY) != 0);
@@ -58,6 +58,6 @@ class StateMachine {
     const StateId &getState() const { return current_id_; }
 
   private:
-    StateMap state_map_;
     StateId current_id_;
+    StateMap state_map_;
 };
