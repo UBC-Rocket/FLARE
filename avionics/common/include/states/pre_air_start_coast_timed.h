@@ -17,7 +17,7 @@ class PreAirStartCoastTimed : public IState {
                           float MAX_ACCEPT_VERTICAL_ACCEL,
                           float MIN_ACCEPT_VERTICAL_ACCEL,
                           float MAX_ACCEPT_ANGLE_FROM_VERTICAL)
-        : M_DELAY_TIME_MS(DELAY_TIME_MS),
+        : DELAY_TIME_MS_(DELAY_TIME_MS),
           M_MAX_ACCEPT_ALTITUDE(MAX_ACCEPT_ALTITUDE),
           M_MIN_ACCEPT_ALTITUDE(MIN_ACCEPT_ALTITUDE),
           M_MAX_ACCEPT_VERTICAL_ACCEL(MAX_ACCEPT_VERTICAL_ACCEL),
@@ -42,7 +42,7 @@ class PreAirStartCoastTimed : public IState {
         typedef std::chrono::milliseconds ms;
         static auto start_time = Hal::now_ms();
 
-        if (Hal::now_ms() - start_time > ms(M_DELAY_TIME_MS)) {
+        if (Hal::now_ms() - start_time > ms(DELAY_TIME_MS_)) {
             state_aux.in_abort = !flightNominal(input);
             return StateId::ASCENT_TO_APOGEE;
         }
@@ -50,7 +50,7 @@ class PreAirStartCoastTimed : public IState {
     }
 
   private:
-    uint32_t M_DELAY_TIME_MS;
+    uint32_t DELAY_TIME_MS_;
     float M_MAX_ACCEPT_ALTITUDE;
     float M_MIN_ACCEPT_ALTITUDE;
     float M_MAX_ACCEPT_VERTICAL_ACCEL;
