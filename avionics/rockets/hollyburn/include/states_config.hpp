@@ -2,6 +2,7 @@
 
 #include <unordered_map> //for std::unordered_map (hash map)
 
+#include "ignitor_collection.h"
 #include "states/armed.h"
 #include "states/ascent_to_apogee.h"
 #include "states/drogue_descent.h"
@@ -44,7 +45,8 @@ struct StateMachineConfig {
                                       ARMED_LAUNCH_CHECKS, LAUNCH_THRESHOLD);
 
     State::AscentToApogee coast = State::AscentToApogee(
-        APOGEE_CHECKS, MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD);
+        StateId::PRESSURE_DELAY, StateId::MACH_LOCK, APOGEE_CHECKS,
+        MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD);
 
     State::MachLock mach_lock =
         State::MachLock(MACH_UNLOCK_CHECKS, MACH_UNLOCK_VELOCITY_THRESHOLD);

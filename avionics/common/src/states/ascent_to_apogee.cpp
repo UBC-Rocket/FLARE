@@ -8,7 +8,7 @@ StateId State::AscentToApogee::getNewState(const StateInput &input,
 
     if (input.velocity_vertical > M_MACH_LOCK_VELOCITY) {
         if (++mach_checks >= M_MACH_LOCK_CHECKS) {
-            return StateId::MACH_LOCK;
+            return mach_lock_id_;
         }
     } else {
         mach_checks = 0;
@@ -22,7 +22,7 @@ StateId State::AscentToApogee::getNewState(const StateInput &input,
     last_alt = input.altitude;
 
     if (apogee_checks >= M_APOGEE_CHECKS) {
-        return StateId::PRESSURE_DELAY;
+        return post_apogee_id_;
     } else {
         return StateId::ASCENT_TO_APOGEE;
     }

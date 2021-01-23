@@ -8,10 +8,12 @@ namespace State {
 
 class AscentToApogee : public IState {
   public:
-    AscentToApogee(uint8_t const APOGEE_CHECKS, uint8_t const MACH_LOCK_CHECKS,
+    AscentToApogee(StateId post_apogee_id, StateId mach_lock_id,
+                   uint8_t const APOGEE_CHECKS, uint8_t const MACH_LOCK_CHECKS,
                    float MACH_LOCK_VELOCITY)
         : M_APOGEE_CHECKS(APOGEE_CHECKS), M_MACH_LOCK_CHECKS(MACH_LOCK_CHECKS),
-          M_MACH_LOCK_VELOCITY(MACH_LOCK_VELOCITY) {}
+          M_MACH_LOCK_VELOCITY(MACH_LOCK_VELOCITY),
+          post_apogee_id_(post_apogee_id), mach_lock_id_(mach_lock_id) {}
 
     /*
      * @brief Return the assigned enumeration code.
@@ -32,6 +34,8 @@ class AscentToApogee : public IState {
     uint8_t M_APOGEE_CHECKS;
     uint8_t M_MACH_LOCK_CHECKS;
     float M_MACH_LOCK_VELOCITY;
+    StateId post_apogee_id_;
+    StateId mach_lock_id_;
 };
 
 } // namespace State
