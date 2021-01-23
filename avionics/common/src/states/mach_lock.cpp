@@ -2,10 +2,9 @@
 
 StateId State::MachLock::getNewState(const StateInput &input,
                                      StateAuxilliaryInfo &) {
-    static uint8_t unlock_checks = 0;
     if (input.velocity_vertical < M_MACH_UNLOCK_VELOCITY) {
         if (++unlock_checks >= M_MACH_UNLOCK_CHECKS) {
-            return StateId::ASCENT_TO_APOGEE;
+            return ascent_state_;
         }
     } else {
         unlock_checks = 0;
