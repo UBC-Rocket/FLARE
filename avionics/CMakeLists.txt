@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+cmake_policy(SET CMP0076 NEW)
+
 project(FLARE)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -127,12 +129,19 @@ enable_testing()
 ### Note: Compile project in build folder to keep unnecessarily files out from main directory
 ###
 
-# Now simply link against gtest or gtest_main as needed. Eg
-add_executable(testexe_LedBlinker
-    tests/unit_LedBlinker.cpp
-    common/src/tasks/led_blinker.cpp
-)
-target_link_libraries(testexe_LedBlinker gtest_main)
-add_test(NAME test_LedBlinker COMMAND testexe_LedBlinker)
+# Helper function that does some boilderplate
+function(ROCKET_CREATE_TEST TEST_NAME)
+    add_executable(testexe_${TEST_NAME}
+        tests/unit_${TEST_NAME}
+    )
+    target_link_libraries(testexe_${TEST_NAME} gtest_main)
+    target_include_directories(testexe_${TEST_NAME} BEFORE PUBLIC tests/fake_include)
+    add_test(NAME test_${TEST_NAME} COMMAND testexe_${TEST_NAME})
+endfunction()
+
+ROCKET_CREATE_TEST(LedBlinker)
+target_sources(testexe_LedBlinker PUBLIC common/src/tasks/led_blinker.cpp)
+
+ROCKET_CREATE_TEST(RepeatChecksState)
 
 # We can now call make test to run all the tests

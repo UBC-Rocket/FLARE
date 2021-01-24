@@ -48,10 +48,9 @@ struct StateMachineConfig {
         StateId::PRESSURE_DELAY, StateId::MACH_LOCK, APOGEE_CHECKS,
         MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD);
 
-    State::MachLock mach_lock = State::MachLock(
+    State::MachLock mach_lock =
         State::MachLock(StateId::ASCENT_TO_APOGEE, MACH_UNLOCK_CHECKS,
                         MACH_UNLOCK_VELOCITY_THRESHOLD);
-        , MACH_UNLOCK_CHECKS, MACH_UNLOCK_VELOCITY_THRESHOLD);
 
     State::PressureDelay pres_delay =
         State::PressureDelay(StateId::DROGUE_DESCENT, APOGEE_PRESSURE_DELAY);

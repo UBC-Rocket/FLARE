@@ -2,21 +2,8 @@
 
 #include <functional> //for std::hash specialization (need to specialize)
 
+#include "state_id_enum.hpp"
 #include "state_input_struct.h"
-
-enum class StateId {
-    STANDBY,
-    ARMED,
-    POWERED_ASCENT,
-    PRE_AIR_START_COAST_TIMED,
-    ASCENT_TO_APOGEE,
-    MACH_LOCK,
-    PRESSURE_DELAY,
-    DROGUE_DESCENT,
-    MAIN_DESCENT,
-    LANDED,
-    WINTER_CONTINGENCY
-};
 
 // Need to specify hash for StateId, since scoped enums aren't allowed as hash
 // keys until C++14

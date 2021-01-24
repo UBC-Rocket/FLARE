@@ -33,8 +33,8 @@ class MachLock : public IState {
 
   private:
     const StateId ascent_state_;
-    const uint8_t M_MACH_UNLOCK_CHECKS;
     const float M_MACH_UNLOCK_VELOCITY;
+    const uint8_t M_MACH_UNLOCK_CHECKS;
     uint8_t unlock_checks;
 };
 } // namespace State

@@ -9,7 +9,9 @@ namespace State {
 /**
  * @brief Template class for states that have a single exit point, which they go
  * to after some condition is checked a fixed number of times. Treat this as an
- * interface class, with the following methods that can be overridden:
+ * interface class, with the following methods that can be overridden (must be
+ * visible to the base class, so either make them public or declare the base
+ * class as a friend):
  *
  * bool accept(const StateInput& input) - returns true if input is acceptable.
  * Pure virtual.
@@ -27,8 +29,9 @@ namespace State {
  * Inherit from this class, passing your own derived class's name as Derived.
  * E.g.
  *
- * class Standby : RepeatedCheckBase<StateId::STANDBY, StateId::ASCENT, 5,
- * Standby> {
+ * class Standby : public RepeatedCheckBase<StateId::STANDBY, StateId::ASCENT,
+ *      5, Standby> {
+ * public:
  *     bool accept(){ ... }
  * };
  */
@@ -40,7 +43,7 @@ class RepeatedCheckBase : public IState {
         if (accept(input)) {
             ++checks_;
             if (checks_ >= num_checks) {
-                optionalOnExit();
+                optionalExtraExit();
                 return next_id;
             }
         } else {
@@ -49,15 +52,17 @@ class RepeatedCheckBase : public IState {
         return my_id;
     }
 
+    StateId getStateEnum(void) final override { return my_id; }
+
     void onEntry() final override {
         checks_ = 0;
-        optionalOnEntry();
+        optionalExtraEntry();
     }
 
   private:
     //   Constructor is private to help force correct usage of the CRTP pattern
     RepeatedCheckBase() : checks_(0) {}
-    friend class Derived;
+    friend Derived;
 
     int checks_;
 
