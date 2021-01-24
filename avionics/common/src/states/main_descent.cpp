@@ -22,9 +22,6 @@ StateId State::MainDescent::getNewState(const StateInput &input,
         }
 
         if (num_checks < LANDED_CHECKS_) {
-            constexpr static unsigned int LANDED_POLLING_INTERVAL = 5000;
-            Scheduler::get_task(static_cast<int>(TaskID::ReadEvalLog)).period =
-                Hal::ms(LANDED_POLLING_INTERVAL);
             return StateId::MAIN_DESCENT;
         }
         prev_time = curr_time;

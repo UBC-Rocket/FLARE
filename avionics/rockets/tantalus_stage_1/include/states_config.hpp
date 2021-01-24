@@ -3,16 +3,14 @@
 #include <unordered_map> //for std::unordered_map (hash map)
 
 #include "ignitor_collection.h"
-#include "states/armed.h"
+#include "states/repeated_checks.hpp"
+
 #include "states/ascent_to_apogee.h"
-#include "states/drogue_descent.h"
 #include "states/landed.h"
-#include "states/mach_lock.h"
 #include "states/main_descent.h"
 #include "states/powered_ascent.h"
 #include "states/pre_air_start_coast_timed.h"
 #include "states/pressure_delay.h"
-#include "states/standby.h"
 #include "states/winter_contingency.h"
 
 struct StateMachineConfig {
@@ -47,11 +45,11 @@ struct StateMachineConfig {
     constexpr static long TOGGLE_CAMERA_INTERVAL = 200;
 
     /* States */
-    State::Standby standby = State::Standby(
-        StateId::POWERED_ASCENT, STANDBY_LAUNCH_CHECKS, LAUNCH_THRESHOLD);
+    State::Standby<StateId::ASCENT_TO_APOGEE, STANDBY_LAUNCH_CHECKS> standby{
+        LAUNCH_THRESHOLD};
 
-    State::Armed armed = State::Armed(StateId::POWERED_ASCENT,
-                                      ARMED_LAUNCH_CHECKS, LAUNCH_THRESHOLD);
+    State::Armed<StateId::ASCENT_TO_APOGEE, ARMED_LAUNCH_CHECKS> armed{
+        LAUNCH_THRESHOLD};
 
     State::PoweredAscent powered_ascent = State::PoweredAscent(
         StateId::PRE_AIR_START_COAST_TIMED, MOTOR_BURNOUT_CHECKS);
@@ -65,15 +63,14 @@ struct StateMachineConfig {
         StateId::PRESSURE_DELAY, StateId::MACH_LOCK, APOGEE_CHECKS,
         MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD);
 
-    State::MachLock mach_lock =
-        State::MachLock(StateId::ASCENT_TO_APOGEE, MACH_UNLOCK_CHECKS,
-                        MACH_UNLOCK_VELOCITY_THRESHOLD);
+    State::MachLock<StateId::ASCENT_TO_APOGEE, MACH_UNLOCK_CHECKS> mach_lock{
+        MACH_UNLOCK_VELOCITY_THRESHOLD};
 
     State::PressureDelay pres_delay =
         State::PressureDelay(StateId::DROGUE_DESCENT, APOGEE_PRESSURE_DELAY);
 
-    State::DrogueDescent drogue = State::DrogueDescent(
-        StateId::MAIN_DESCENT, MAIN_DEPLOY_ALTITUDE, MAIN_DEPLOY_CHECKS);
+    State::DrogueDescent<StateId::MAIN_DESCENT, MAIN_DEPLOY_CHECKS> drogue{
+        MAIN_DEPLOY_ALTITUDE};
 
     State::MainDescent main =
         State::MainDescent(StateId::LANDED, LAND_CHECK_TIME_INTERVAL,

@@ -29,8 +29,9 @@ class Landed : public IState {
 
     void onEntry() override {
         // TODO: Turn off cameras and camera cycling task
+        constexpr static unsigned int LANDED_POLLING_INTERVAL = 5000;
         Scheduler::get_task(static_cast<int>(TaskID::ReadEvalLog)).period =
-            Hal::ms(5000);
+            Hal::ms(LANDED_POLLING_INTERVAL);
     }
 };
 
