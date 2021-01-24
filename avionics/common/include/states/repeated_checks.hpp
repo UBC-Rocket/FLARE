@@ -1,5 +1,7 @@
 #ifndef STATES_REPEATED_CHECKS_HPP_5A521F841076442ABBD5520A3B85FC2B
 #define STATES_REPEATED_CHECKS_HPP_5A521F841076442ABBD5520A3B85FC2B
+
+#include "hardware/ignitor.h"
 #include "repeated_check_base.hpp"
 
 namespace State {
@@ -55,15 +57,19 @@ class DrogueDescent
     : public RepeatedCheckBase<StateId::DROGUE_DESCENT, next_id, num_checks,
                                DrogueDescent<next_id, num_checks>> {
   public:
-    DrogueDescent(const float main_altitude) : main_altitude_(main_altitude) {}
+    DrogueDescent(const float main_altitude, Ignitor &main_ignitor)
+        : main_altitude_(main_altitude), ignitor_(main_ignitor) {}
 
   private:
     friend RepeatedCheckBase<StateId::DROGUE_DESCENT, next_id, num_checks,
                              DrogueDescent<next_id, num_checks>>;
     float main_altitude_;
+    Ignitor &ignitor_;
     bool accept(const StateInput &input) {
         return input.altitude < main_altitude_;
     }
+
+    void extraOnExit() { ignitor_.fire(); }
 };
 
 } // namespace State

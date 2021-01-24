@@ -43,9 +43,7 @@ struct StateMachineConfig {
     State::Armed<StateId::ASCENT_TO_APOGEE, ARMED_LAUNCH_CHECKS> armed{
         LAUNCH_THRESHOLD};
 
-    State::AscentToApogee coast = State::AscentToApogee(
-        StateId::PRESSURE_DELAY, StateId::MACH_LOCK, APOGEE_CHECKS,
-        MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD);
+    State::AscentToApogee coast;
 
     State::MachLock<StateId::ASCENT_TO_APOGEE, MACH_UNLOCK_CHECKS> mach_lock{
         MACH_UNLOCK_VELOCITY_THRESHOLD};
@@ -53,8 +51,7 @@ struct StateMachineConfig {
     State::PressureDelay pres_delay =
         State::PressureDelay(StateId::DROGUE_DESCENT, APOGEE_PRESSURE_DELAY);
 
-    State::DrogueDescent<StateId::MAIN_DESCENT, MAIN_DEPLOY_CHECKS> drogue{
-        MAIN_DEPLOY_ALTITUDE};
+    State::DrogueDescent<StateId::MAIN_DESCENT, MAIN_DEPLOY_CHECKS> drogue;
 
     State::MainDescent main;
 
@@ -63,8 +60,12 @@ struct StateMachineConfig {
     State::WinterContingency contingency{};
 
   public:
-    StateMachineConfig(const Calculator &calc)
-        : main(StateId::LANDED, LAND_CHECK_TIME_INTERVAL, LAND_CHECKS,
+    StateMachineConfig(const Calculator &calc, IgnitorCollection &ignitors)
+        : coast(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, APOGEE_CHECKS,
+                MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD,
+                ignitors.drogue),
+          drogue(MAIN_DEPLOY_ALTITUDE, ignitors.main),
+          main(StateId::LANDED, LAND_CHECK_TIME_INTERVAL, LAND_CHECKS,
                LAND_VELOCITY_THRESHOLD, calc) {}
 
     std::unordered_map<StateId, IState *> state_map = {

@@ -22,7 +22,8 @@ struct Rocket {
     Rocket()
         : cam(Hal::SerialInst::Camera), datalog(LOG_FILE_NAME),
           init_status(collectStatus(sensors, ignitors)), calc(sensors),
-          config(calc), state_machine(config.state_map, config.initial_state) {}
+          config(calc, ignitors),
+          state_machine(config.state_map, config.initial_state) {}
 
     // WARNING - MEMBER ORDER DEPENDENCY
     // https://isocpp.org/wiki/faq/ctors#order-dependency-in-members

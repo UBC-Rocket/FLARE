@@ -19,6 +19,7 @@ StateId State::AscentToApogee::getNewState(const StateInput &input,
     last_alt = input.altitude;
 
     if (apogee_checks >= APOGEE_CHECKS_) {
+        drogue_ignitor_.fire();
         return post_apogee_id_;
     } else {
         return StateId::ASCENT_TO_APOGEE;
