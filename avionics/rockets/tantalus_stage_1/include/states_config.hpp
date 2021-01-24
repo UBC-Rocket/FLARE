@@ -2,6 +2,7 @@
 
 #include <unordered_map> //for std::unordered_map (hash map)
 
+#include "calculations.h"
 #include "ignitor_collection.h"
 #include "states/repeated_checks.hpp"
 
@@ -71,16 +72,17 @@ struct StateMachineConfig {
 
     State::DrogueDescent<StateId::MAIN_DESCENT, MAIN_DEPLOY_CHECKS> drogue{
         MAIN_DEPLOY_ALTITUDE};
+    State::MainDescent main;
 
-    State::MainDescent main =
-        State::MainDescent(StateId::LANDED, LAND_CHECK_TIME_INTERVAL,
-                           LAND_CHECKS, LAND_VELOCITY_THRESHOLD);
-
-    State::Landed landed = State::Landed();
+    State::Landed landed;
 
     State::WinterContingency contingency{};
 
   public:
+    StateMachineConfig(const Calculator &calc)
+        : main(StateId::LANDED, LAND_CHECK_TIME_INTERVAL, LAND_CHECKS,
+               LAND_VELOCITY_THRESHOLD, calc) {}
+
     std::unordered_map<StateId, IState *> state_map = {
         {StateId::STANDBY, &standby},
         {StateId::ARMED, &armed},

@@ -11,8 +11,8 @@ class AscentToApogee : public IState {
     AscentToApogee(StateId post_apogee_id, StateId mach_lock_id,
                    uint8_t const APOGEE_CHECKS, uint8_t const MACH_LOCK_CHECKS,
                    float MACH_LOCK_VELOCITY)
-        : M_APOGEE_CHECKS(APOGEE_CHECKS), M_MACH_LOCK_CHECKS(MACH_LOCK_CHECKS),
-          M_MACH_LOCK_VELOCITY(MACH_LOCK_VELOCITY),
+        : APOGEE_CHECKS_(APOGEE_CHECKS), MACH_LOCK_CHECKS_(MACH_LOCK_CHECKS),
+          MACH_LOCK_VELOCITY_(MACH_LOCK_VELOCITY),
           post_apogee_id_(post_apogee_id), mach_lock_id_(mach_lock_id) {}
 
     /*
@@ -30,12 +30,22 @@ class AscentToApogee : public IState {
     StateId getNewState(const StateInput &input,
                         StateAuxilliaryInfo &state_aux);
 
+    void onEntry() override {
+        apogee_checks = 0;
+        mach_checks = 0;
+        // Awkward to pass in first value - 0-initialize works with checks.
+        last_alt = 0;
+    }
+
   private:
-    uint8_t M_APOGEE_CHECKS;
-    uint8_t M_MACH_LOCK_CHECKS;
-    float M_MACH_LOCK_VELOCITY;
-    StateId post_apogee_id_;
-    StateId mach_lock_id_;
+    const uint8_t APOGEE_CHECKS_;
+    const uint8_t MACH_LOCK_CHECKS_;
+    const float MACH_LOCK_VELOCITY_;
+    const StateId post_apogee_id_;
+    const StateId mach_lock_id_;
+    uint8_t apogee_checks{0};
+    uint8_t mach_checks{0};
+    float last_alt{0};
 };
 
 } // namespace State
