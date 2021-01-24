@@ -63,20 +63,18 @@ message(STATUS "Resolving GIT Version")
 message("Directory: ${CMAKE_CURRENT_LIST_DIR}")
 set(_git_build_version "unknown")
 
-find_package(Git)
-if(GIT_FOUND)
+find_package(Python3 COMPONENTS Interpreter)
+if(Python3_FOUND)
 execute_process(
-  COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
-  WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
+  COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_LIST_DIR}/../custom_tools/git_rev_macro.py" "x86"
   OUTPUT_VARIABLE _git_build_version
-  ERROR_QUIET
-  OUTPUT_STRIP_TRAILING_WHITESPACE
+  WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
   )
-  message( STATUS "GIT hash: ${_git_build_version}")
+  message(STATUS "Git hash: ${_git_build_version}")
+  add_compile_definitions(RADIO_CONFIG_PACKET_VERSION_STR="${_git_build_version}")
 else()
-  message(SEND_ERROR "Git not found; unable to set Radio Config data")
+  message(SEND_ERROR "Python not found; unable to set Radio Config data")
 endif()
-add_compile_definitions(RADIO_CONFIG_PACKET_VERSION_STR="${_git_build_version}")
 
 
 ###
