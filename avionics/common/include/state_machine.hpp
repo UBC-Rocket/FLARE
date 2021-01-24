@@ -32,6 +32,7 @@ class StateMachine {
     bool arm() {
         if (current_id_ == StateId::STANDBY) {
             current_id_ = StateId::ARMED;
+            state_map_[current_id_]->onEntry();
             return true;
         }
         return false;
@@ -45,6 +46,7 @@ class StateMachine {
     bool disarm() {
         if (current_id_ == StateId::ARMED) {
             current_id_ = StateId::STANDBY;
+            state_map_[current_id_]->onEntry();
             return true;
         }
         return false;
@@ -53,7 +55,10 @@ class StateMachine {
     /**
      * Set the state machine to a failsafe state
      */
-    void abort() { current_id_ = StateId::WINTER_CONTINGENCY; }
+    void abort() {
+        current_id_ = StateId::WINTER_CONTINGENCY;
+        state_map_[current_id_]->onEntry();
+    }
 
     const StateId &getState() const { return current_id_; }
 
