@@ -43,7 +43,7 @@ class RepeatedCheckBase : public IState {
         if (accept(input)) {
             ++checks_;
             if (checks_ >= num_checks) {
-                optionalExtraExit();
+                static_cast<Derived *>(this)->extraOnExit();
                 return next_id;
             }
         } else {
@@ -56,8 +56,14 @@ class RepeatedCheckBase : public IState {
 
     void onEntry() final override {
         checks_ = 0;
-        optionalExtraEntry();
+        static_cast<Derived *>(this)->extraOnEntry();
     }
+
+  protected:
+    // Automatically get overrided, since it's Derived that's calling these
+    // methods.
+    void extraOnEntry() {}
+    void extraOnExit() {}
 
   private:
     //   Constructor is private to help force correct usage of the CRTP pattern
@@ -71,81 +77,6 @@ class RepeatedCheckBase : public IState {
      */
     bool accept(const StateInput &input) {
         return static_cast<Derived *>(this)->accept(input);
-    }
-
-    /**
-     * The optional functions use SFINAE to detect whether extraEntry() and
-     *      extraExit() exist.
-     *
-     * By the way CRTP works, this class is instantiated while Derived
-     * is still an incomplete type: (below snippet from Wikipedia)
-     *     class Derived : public Base<Derived> {
-     *                            ^^^^^^^^^^^^^
-     * So, checking needs to be deferred until Base gets instantiated; this
-     * means we can't directly (immediately) use an SFINAE error to try to
-     * detect extra* - the compiler doesn't know if that method exists yet,
-     * since Derived is incomplete.
-     *
-     * To get around this, some indirection needs to be used, hence the helper
-     * checking types. See stackoverflow.com/questions/13401716 for why dummy
-     * types need to be used.
-     */
-
-    /**
-     * Default version (false)
-     */
-    template <typename CheckedType, typename Dummy = void>
-    class HasOnEntry : public std::false_type {};
-
-    /**
-     * Specialized variant (true)
-     */
-    template <typename CheckedType>
-    class HasOnEntry<CheckedType, decltype(&CheckedType::extraOnEntry, void())>
-        : public std::true_type {};
-
-    /**
-     * @brief No-op default version.
-     */
-    template <class Dummy = Derived>
-    typename std::enable_if<!HasOnEntry<Dummy>::value>::type
-    optionalExtraEntry() {}
-
-    /**
-     * @brief Used if extraOnEntry exists.
-     */
-    template <class Dummy = Derived>
-    typename std::enable_if<HasOnEntry<Dummy>::value>::type
-    optionalExtraEntry() {
-        static_cast<Derived *>(this)->extraOnEntry();
-    }
-
-    /**
-     * Default version (false)
-     */
-    template <typename CheckedType, typename Dummy = void>
-    class HasOnExit : public std::false_type {};
-
-    /**
-     * Specialized variant (true)
-     */
-    template <typename CheckedType>
-    class HasOnExit<CheckedType, decltype(&CheckedType::extraOnExit, void())>
-        : public std::true_type {};
-
-    /**
-     * @brief No-op default version.
-     */
-    template <class Dummy = Derived>
-    typename std::enable_if<!HasOnExit<Dummy>::value>::type
-    optionalExtraExit() {}
-
-    /**
-     * @brief Used if extraOnEntry exists.
-     */
-    template <class Dummy = Derived>
-    typename std::enable_if<HasOnExit<Dummy>::value>::type optionalExtraExit() {
-        static_cast<Derived *>(this)->extraOnExit();
     }
 };
 } // namespace State
