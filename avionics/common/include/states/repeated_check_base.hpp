@@ -8,7 +8,29 @@ namespace State {
 
 /**
  * @brief Template class for states that have a single exit point, which they go
- * to after some condition is checked a fixed number of times.
+ * to after some condition is checked a fixed number of times. Treat this as an
+ * interface class, with the following methods that can be overridden:
+ *
+ * bool accept(const StateInput& input) - returns true if input is acceptable.
+ * Pure virtual.
+ *
+ * bool extraOnEntry() - runs on entry. Overriding is optional.
+ * bool extraOnExit() - runs on exit. Overriding is optional.
+ *
+ * Additionally, there are some template parameters:
+ * \tparam my_id StateId of this state.
+ * \tparam next_id The StateId to exit to
+ * \tparam num_checks Number of checks to perform
+ * \tparam Derived - derived class name - see below
+ *
+ * How to use:
+ * Inherit from this class, passing your own derived class's name as Derived.
+ * E.g.
+ *
+ * class Standby : RepeatedCheckBase<StateId::STANDBY, StateId::ASCENT, 5,
+ * Standby> {
+ *     bool accept(){ ... }
+ * };
  */
 template <StateId my_id, StateId next_id, int num_checks, class Derived>
 class RepeatedCheckBase : public IState {
@@ -32,9 +54,11 @@ class RepeatedCheckBase : public IState {
         optionalOnEntry();
     }
 
-    RepeatedCheckBase() checks_(0) {}
-
   private:
+    //   Constructor is private to help force correct usage of the CRTP pattern
+    RepeatedCheckBase() : checks_(0) {}
+    friend class Derived;
+
     int checks_;
 
     /**
