@@ -1,8 +1,6 @@
 import subprocess
 import sys
 
-subprocess.run(["git","submodule", "update", "--init", "--recursive"])
-
 revision = (
         subprocess.check_output(["git", "rev-parse", "HEAD"])
             .strip()
