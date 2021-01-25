@@ -19,10 +19,12 @@ add_subdirectory(rockets/tantalus_stage_1)
 add_subdirectory(rockets/tantalus_stage_2)
 add_subdirectory(rockets/hollyburn)
 
-include_directories(common/include
-common/lib
-envs/x86/include
-envs/x86/lib
+include_directories(
+    common/include
+    common/lib/RocketScheduler/include
+    common/lib
+    envs/x86/include
+    envs/x86/lib
 )
 
 # Rocket-specific directories
@@ -61,20 +63,19 @@ message(STATUS "Resolving GIT Version")
 message("Directory: ${CMAKE_CURRENT_LIST_DIR}")
 set(_git_build_version "unknown")
 
-find_package(Git)
-if(GIT_FOUND)
+find_package(Python3 COMPONENTS Interpreter)
+if(Python3_FOUND)
+execute_process(COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_LIST_DIR}/../custom_tools/get_submodule.py")
 execute_process(
-  COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
-  WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
+  COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_LIST_DIR}/../custom_tools/git_rev_macro.py" "x86"
   OUTPUT_VARIABLE _git_build_version
-  ERROR_QUIET
-  OUTPUT_STRIP_TRAILING_WHITESPACE
+  WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
   )
-  message( STATUS "GIT hash: ${_git_build_version}")
+  message(STATUS "Git hash: ${_git_build_version}")
+  add_compile_definitions(RADIO_CONFIG_PACKET_VERSION_STR="${_git_build_version}")
 else()
-  message(SEND_ERROR "Git not found; unable to set Radio Config data")
+  message(SEND_ERROR "Python not found; unable to set Radio Config data")
 endif()
-add_compile_definitions(RADIO_CONFIG_PACKET_VERSION_STR="${_git_build_version}")
 
 
 ###
@@ -127,8 +128,11 @@ enable_testing()
 ###
 
 # Now simply link against gtest or gtest_main as needed. Eg
-add_executable(Test tests/SampleTest.cpp)
-target_link_libraries(Test gtest_main)
-add_test(NAME SampleTest COMMAND Test)
+add_executable(testexe_LedBlinker
+    tests/unit_LedBlinker.cpp
+    common/src/tasks/led_blinker.cpp
+)
+target_link_libraries(testexe_LedBlinker gtest_main)
+add_test(NAME test_LedBlinker COMMAND testexe_LedBlinker)
 
 # We can now call make test to run all the tests

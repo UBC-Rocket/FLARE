@@ -1,5 +1,4 @@
-#pragma once
-#include <cmath>
+#include "CalcHelpers/barometric.hpp"
 
 float pressureToAltitude(float const pres) {
     constexpr float Pb = 101325;
