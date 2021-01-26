@@ -46,8 +46,7 @@ struct StateMachineConfig {
     constexpr static long TOGGLE_CAMERA_INTERVAL = 200;
 
     /* States */
-    State::Standby<StateId::ASCENT_TO_APOGEE, STANDBY_LAUNCH_CHECKS> standby{
-        LAUNCH_THRESHOLD};
+    State::Standby<StateId::ASCENT_TO_APOGEE, STANDBY_LAUNCH_CHECKS> standby;
 
     State::Armed<StateId::ASCENT_TO_APOGEE, ARMED_LAUNCH_CHECKS> armed{
         LAUNCH_THRESHOLD};
@@ -77,8 +76,10 @@ struct StateMachineConfig {
     State::WinterContingency contingency{};
 
   public:
-    StateMachineConfig(const Calculator &calc, IgnitorCollection &ignitors)
-        : coast(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, APOGEE_CHECKS,
+    StateMachineConfig(const Calculator &calc, IgnitorCollection &ignitors,
+                       Camera &camera)
+        : standby(LAUNCH_THRESHOLD, camera),
+          coast(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, APOGEE_CHECKS,
                 MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD,
                 ignitors.drogue),
           drogue(MAIN_DEPLOY_ALTITUDE, ignitors.main),

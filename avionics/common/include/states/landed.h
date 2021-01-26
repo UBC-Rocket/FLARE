@@ -1,6 +1,7 @@
 #pragma once
 
 /*Includes------------------------------------------------------------*/
+#include "cameras.h"
 #include "scheduler.hpp"
 #include "state_input_struct.h"
 #include "state_interface.h"
