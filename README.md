@@ -1,6 +1,4 @@
-Master: [![Build Status](https://travis-ci.com/UBC-Rocket/FLARE.svg?branch=master)](https://travis-ci.com/UBC-Rocket/FLARE)
-
-Dev: [![Build Status](https://travis-ci.com/UBC-Rocket/FLARE.svg?branch=dev)](https://travis-ci.com/UBC-Rocket/FLARE)
+[![Build Status](https://circleci.com/gh/UBC-Rocket/FLARE.svg?style=shield)](https://app.circleci.com/pipelines/github/UBC-Rocket/FLARE)
 
 # IMPORTANT WARNINGS
 
