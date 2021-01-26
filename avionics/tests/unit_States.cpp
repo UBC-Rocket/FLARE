@@ -7,14 +7,6 @@ struct Ignitor {
     bool fired = false;
 };
 
-// Mock StateId
-#define STATE_ID_ENUM_HPP_765961F431844F469A0F1086D132018F
-enum class StateId {
-    ASCENT_TO_APOGEE,
-    MACH_LOCK,
-    PRESSURE_DELAY,
-};
-
 // Mock (or rather have a consistent) state input struct
 #define STATE_INPUT_STRUCT_HPP_4A01F791ECBA4E3CB8BC12436C41ABC9
 struct StateInput {
@@ -25,6 +17,7 @@ struct StateInput {
 struct StateAuxilliaryInfo {};
 
 #include "states/ascent_to_apogee.h"
+#include "states/repeated_checks.hpp"
 
 TEST(AscentToApogee, FireIgnitor) {
     // Simulate free fall (uniform acceleration), with data every 50ms
@@ -51,4 +44,33 @@ TEST(AscentToApogee, FireIgnitor) {
     }
     EXPECT_TRUE(iggy.fired);
     EXPECT_TRUE(-1 < t && t < 1);
+}
+
+TEST(DrogueDescent, FireIgnitor) {
+    // Simulate falling at terminal velocity of 30 m/s
+    constexpr float TERM_VEL = -30;
+    constexpr float period = 50e-3;
+    StateInput data;
+    StateAuxilliaryInfo aux;
+    auto &alt = data.altitude;
+    auto &vel = data.velocity_vertical;
+    vel = TERM_VEL;
+    Ignitor iggy;
+
+    constexpr float main_alt = 500;
+    State::DrogueDescent<StateId::MAIN_DESCENT, 5> state(main_alt, iggy);
+
+    alt = main_alt + 50;
+    bool ok = false;
+    while (alt > main_alt - 50) {
+        StateId result = state.getNewState(data, aux);
+        if (result == StateId::MAIN_DESCENT) {
+            ok = true;
+            break; // exited
+        }
+        EXPECT_FALSE(iggy.fired);
+        alt += vel * period;
+    }
+    EXPECT_TRUE(ok);
+    EXPECT_TRUE(iggy.fired);
 }
