@@ -11,6 +11,7 @@
 #include "sensor_collection.h"
 #include "sensors/barometer.h"
 #include "state_input_struct.h"
+#undef abs
 
 // following recomendation for alpha = 2/(2N + 1)
 constexpr float BAROMETER_MOVING_AVERAGE_ALPHA = 2.0f / (2 * 40 + 1);
