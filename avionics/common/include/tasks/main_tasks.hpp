@@ -2,6 +2,7 @@
 #define MAIN_TASKS_HPP_6FADFAE876EC4E6D8B5A9394585FE936
 #include "radio.h"
 #include "rocket.h"
+#include "state_events.h"
 #include "state_input_struct.h"
 
 /**
@@ -11,6 +12,8 @@ class ReadEvalLog {
   private:
     Rocket &rocket_;
     CommandReceiver command_receiver;
+    StateId state_;
+    StateId oldState_;
     // TODO - see if state_aux is actually used / wheter it should be used
     StateAuxilliaryInfo state_aux; // Output info from states
 
@@ -30,20 +33,25 @@ class ReadEvalLog {
             state_machine.abort();
         }
 
-        StateId state = state_machine.getState();
+        state_ = state_machine.getState();
+        if(state_ != oldState_) {
+            Radio::sendStateChangeEvent(state_);
+            oldState_ = state_;
+        }
+
         StateInput state_input;
 
         sensors.poll();
-        calc.calculateValues(state, state_input, sensors.last_poll_time());
+        calc.calculateValues(state_, state_input, sensors.last_poll_time());
         state_machine.update(state_input, state_aux);
         datalog.logData(Hal::tpoint_to_uint(sensors.last_poll_time()), sensors,
-                        state, calc.altitude(), calc.getBaseAltitude());
+                        state_, calc.altitude(), calc.getBaseAltitude());
 
         Radio::forwardCommand(command_receiver);
     }
 
   public:
-    ReadEvalLog(Rocket &rocket) : rocket_(rocket), command_receiver(rocket) {}
+    ReadEvalLog(Rocket &rocket) : rocket_(rocket), command_receiver(rocket), state_(rocket.state_machine.getState()), oldState_(state_) {}
     static void run(void *self) {
         reinterpret_cast<ReadEvalLog *>(self)->run();
     }

@@ -29,6 +29,8 @@
 #include "ignitor_collection.h"
 #include "radio_queue.h"
 #include "sensor_collection.h"
+#include "state_events.h"
+#include "state_id_enum.hpp"
 
 // Some defines that are actually done in CMake, but set here to get
 // Intellisense to stop yelling.
@@ -225,6 +227,10 @@ void Radio::sendEvent(const uint32_t time, const EventId event) {
     addIdTime(buf, Ids::event, time);
     buf.write(&event, sizeof(uint16_t));
     Radio::addSubpacket(std::move(buf.packet));
+}
+
+void Radio::sendStateChangeEvent(const StateId new_state) {
+    Radio::sendEvent(Hal::tpoint_to_uint(Hal::now_ms()), State::STATE_CHANGE_EVENTS.find(new_state)->second);
 }
 
 void Radio::addSubpacket(SubPktPtr dat) { self.tx_q_.push(std::move(dat)); }
