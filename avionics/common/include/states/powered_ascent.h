@@ -9,15 +9,15 @@ namespace State {
 class PoweredAscent : public IState {
   public:
     PoweredAscent(StateId const post_ascent_id, int const BURNOUT_CHECKS)
-        : m_post_ascent_id(post_ascent_id), M_BURNOUT_CHECKS(BURNOUT_CHECKS) {}
+        : post_ascent_id_(post_ascent_id), M_BURNOUT_CHECKS(BURNOUT_CHECKS) {}
 
-    /*
+    /**
      * @brief Return the assigned enumeration code.
      * @return Enumeration code.
      */
     StateId getStateEnum(void) { return StateId::POWERED_ASCENT; }
 
-    /*
+    /**
      * @brief Return the next state, based on input data (mostly from filtered
      * sensor data)
      * @return State enumeration code, to be passed into the std::map between
@@ -35,14 +35,14 @@ class PoweredAscent : public IState {
         }
 
         if (burnout_checks >= M_BURNOUT_CHECKS) {
-            return m_post_ascent_id;
+            return post_ascent_id_;
         } else {
             return StateId::POWERED_ASCENT;
         }
     }
 
   private:
-    StateId m_post_ascent_id;
+    StateId post_ascent_id_;
     int M_BURNOUT_CHECKS;
 };
 

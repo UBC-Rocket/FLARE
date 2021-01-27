@@ -2,13 +2,10 @@
 
 StateId State::AscentToApogee::getNewState(const StateInput &input,
                                            StateAuxilliaryInfo &) {
-    static uint8_t apogee_checks = 0;
-    static uint8_t mach_checks = 0;
-    static float last_alt = input.altitude;
 
-    if (input.velocity_vertical > M_MACH_LOCK_VELOCITY) {
-        if (++mach_checks >= M_MACH_LOCK_CHECKS) {
-            return StateId::MACH_LOCK;
+    if (input.velocity_vertical > MACH_LOCK_VELOCITY_) {
+        if (++mach_checks >= MACH_LOCK_CHECKS_) {
+            return mach_lock_id_;
         }
     } else {
         mach_checks = 0;
@@ -21,8 +18,8 @@ StateId State::AscentToApogee::getNewState(const StateInput &input,
     }
     last_alt = input.altitude;
 
-    if (apogee_checks >= M_APOGEE_CHECKS) {
-        return StateId::PRESSURE_DELAY;
+    if (apogee_checks >= APOGEE_CHECKS_) {
+        return post_apogee_id_;
     } else {
         return StateId::ASCENT_TO_APOGEE;
     }

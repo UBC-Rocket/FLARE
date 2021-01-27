@@ -1,6 +1,7 @@
 #pragma once
 
 /*Includes------------------------------------------------------------*/
+#include "scheduler.hpp"
 #include "state_input_struct.h"
 #include "state_interface.h"
 
@@ -24,6 +25,13 @@ class Landed : public IState {
      */
     StateId getNewState(const StateInput &, StateAuxilliaryInfo &) {
         return StateId::LANDED;
+    }
+
+    void onEntry() override {
+        // TODO: Turn off cameras and camera cycling task
+        constexpr static unsigned int LANDED_POLLING_INTERVAL = 5000;
+        Scheduler::get_task(static_cast<int>(TaskID::ReadEvalLog)).period =
+            Hal::ms(LANDED_POLLING_INTERVAL);
     }
 };
 
