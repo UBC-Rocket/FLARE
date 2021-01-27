@@ -1,0 +1,19 @@
+version: 2.1
+
+jobs:
+  test:
+    machine:
+      image: ubuntu-2004:202010-01
+    steps:
+      - checkout:
+          path: FLARE
+      - run:
+          name: "Run ci.sh"
+          command: source ci.sh
+          path: FLARE
+
+
+workflows:
+  main:
+    jobs:
+      - test
