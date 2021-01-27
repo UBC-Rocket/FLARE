@@ -6,9 +6,9 @@ cmake_policy(SET CMP0076 NEW)
 project(FLARE)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "-pthread -Wall -Wextra -pedantic -g")
+    set(CMAKE_CXX_FLAGS "-pthread -Wall -Wextra -g")
 else()
-    set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -static-libgcc -Wall -Wextra -pedantic -g")
+    set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -static-libgcc -Wall -Wextra -g")
 endif()
 
 add_executable(TantalusStage1 common/src/avionics.cpp)
