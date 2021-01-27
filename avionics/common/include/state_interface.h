@@ -1,21 +1,9 @@
 #pragma once
 
-#include "state_input_struct.h"
 #include <functional> //for std::hash specialization (need to specialize)
 
-enum class StateId {
-    STANDBY,
-    ARMED,
-    POWERED_ASCENT,
-    PRE_AIR_START_COAST_TIMED,
-    ASCENT_TO_APOGEE,
-    MACH_LOCK,
-    PRESSURE_DELAY,
-    DROGUE_DESCENT,
-    MAIN_DESCENT,
-    LANDED,
-    WINTER_CONTINGENCY
-};
+#include "state_id_enum.hpp"
+#include "state_input_struct.h"
 
 // Need to specify hash for StateId, since scoped enums aren't allowed as hash
 // keys until C++14
@@ -29,13 +17,13 @@ template <> struct hash<StateId> {
 
 class IState {
   public:
-    /*
+    /**
      * @brief Return the assigned enumeration code.
      * @return Enumeration code.
      */
     virtual StateId getStateEnum(void) = 0;
 
-    /*
+    /**
      * @brief Return the next state, based on input data (mostly from filtered
      * sensor data)
      * @return State enumeration code, to be passed into the std::map between
@@ -43,4 +31,10 @@ class IState {
      */
     virtual StateId getNewState(const StateInput &input,
                                 StateAuxilliaryInfo &state_aux) = 0;
+
+    /**
+     * @brief Optional method that runs when entering a state from a different
+     * state.
+     */
+    virtual void onEntry(){};
 };

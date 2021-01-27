@@ -2,19 +2,19 @@
 
 #include <unordered_map> //for std::unordered_map (hash map)
 
-#include "states/armed.h"
+#include "calculations.h"
+#include "ignitor_collection.h"
+#include "states/repeated_checks.hpp"
+
 #include "states/ascent_to_apogee.h"
-#include "states/drogue_descent.h"
 #include "states/landed.h"
-#include "states/mach_lock.h"
 #include "states/main_descent.h"
 #include "states/powered_ascent.h"
 #include "states/pre_air_start_coast_timed.h"
 #include "states/pressure_delay.h"
-#include "states/standby.h"
 #include "states/winter_contingency.h"
 
-class StateMachine {
+struct StateMachineConfig {
   private:
     /* Configuration constants */
     constexpr static int STANDBY_LAUNCH_CHECKS = 4;
@@ -46,11 +46,11 @@ class StateMachine {
     constexpr static long TOGGLE_CAMERA_INTERVAL = 200;
 
     /* States */
-    State::Standby standby = State::Standby(
-        StateId::POWERED_ASCENT, STANDBY_LAUNCH_CHECKS, LAUNCH_THRESHOLD);
+    State::Standby<StateId::ASCENT_TO_APOGEE, STANDBY_LAUNCH_CHECKS> standby{
+        LAUNCH_THRESHOLD};
 
-    State::Armed armed = State::Armed(StateId::POWERED_ASCENT,
-                                      ARMED_LAUNCH_CHECKS, LAUNCH_THRESHOLD);
+    State::Armed<StateId::ASCENT_TO_APOGEE, ARMED_LAUNCH_CHECKS> armed{
+        LAUNCH_THRESHOLD};
 
     State::PoweredAscent powered_ascent = State::PoweredAscent(
         StateId::PRE_AIR_START_COAST_TIMED, MOTOR_BURNOUT_CHECKS);
@@ -61,25 +61,29 @@ class StateMachine {
         PRESTAGE_MAX_ANGLE_FROM_VERTICAL);
 
     State::AscentToApogee coast = State::AscentToApogee(
-        APOGEE_CHECKS, MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD);
+        StateId::PRESSURE_DELAY, StateId::MACH_LOCK, APOGEE_CHECKS,
+        MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD);
 
-    State::MachLock mach_lock =
-        State::MachLock(MACH_UNLOCK_CHECKS, MACH_UNLOCK_VELOCITY_THRESHOLD);
+    State::MachLock<StateId::ASCENT_TO_APOGEE, MACH_UNLOCK_CHECKS> mach_lock{
+        MACH_UNLOCK_VELOCITY_THRESHOLD};
 
     State::PressureDelay pres_delay =
-        State::PressureDelay(APOGEE_PRESSURE_DELAY);
+        State::PressureDelay(StateId::DROGUE_DESCENT, APOGEE_PRESSURE_DELAY);
 
-    State::DrogueDescent drogue =
-        State::DrogueDescent(MAIN_DEPLOY_ALTITUDE, MAIN_DEPLOY_CHECKS);
+    State::DrogueDescent<StateId::MAIN_DESCENT, MAIN_DEPLOY_CHECKS> drogue{
+        MAIN_DEPLOY_ALTITUDE};
+    State::MainDescent main;
 
-    State::MainDescent main = State::MainDescent(
-        LAND_CHECK_TIME_INTERVAL, LAND_CHECKS, LAND_VELOCITY_THRESHOLD);
-
-    State::Landed landed = State::Landed();
+    State::Landed landed;
 
     State::WinterContingency contingency{};
 
-    std::unordered_map<StateId, IState *> hash_map = {
+  public:
+    StateMachineConfig(const Calculator &calc)
+        : main(StateId::LANDED, LAND_CHECK_TIME_INTERVAL, LAND_CHECKS,
+               LAND_VELOCITY_THRESHOLD, calc) {}
+
+    std::unordered_map<StateId, IState *> state_map = {
         {StateId::STANDBY, &standby},
         {StateId::ARMED, &armed},
         {StateId::POWERED_ASCENT, &powered_ascent},
@@ -92,46 +96,5 @@ class StateMachine {
         {StateId::LANDED, &landed},
         {StateId::WINTER_CONTINGENCY, &contingency}};
 
-    StateId current_state = StateId::STANDBY;
-
-  public:
-    StateMachine() : current_state(StateId::STANDBY) {}
-
-    void update(const StateInput state_input, StateAuxilliaryInfo state_aux) {
-        current_state =
-            hash_map[current_state]->getNewState(state_input, state_aux);
-    }
-
-    /**
-     * Arm the state machine. Only allowed if in STANDBY.
-     * Returns true if arming was successful, false otherwise (i.e. not in
-     * STANDBY)
-     */
-    bool arm() {
-        if (current_state == StateId::STANDBY) {
-            current_state = StateId::ARMED;
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Disarm the state machine. Only allowed if in ARMED.
-     * Returns true if disarming was successful, false otherwise (i.e. not in
-     * ARMED)
-     */
-    bool disarm() {
-        if (current_state == StateId::ARMED) {
-            current_state = StateId::STANDBY;
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Set the state machine to a failsafe state
-     */
-    void abort() { current_state = StateId::WINTER_CONTINGENCY; }
-
-    const StateId &getState() const { return current_state; }
+    StateId initial_state = StateId::STANDBY;
 };

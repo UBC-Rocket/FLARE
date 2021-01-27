@@ -10,7 +10,8 @@
 #include "cameras.h"
 #include "radio.h"
 #include "sensor_collection.h"
-#include "state_machine.h"
+#include "state_machine.hpp"
+#include "states_config.hpp"
 
 #include "HAL/time.h"
 
@@ -20,7 +21,8 @@ struct Rocket {
 
     Rocket()
         : cam(Hal::SerialInst::Camera), datalog(LOG_FILE_NAME),
-          init_status(collectStatus(sensors, ignitors)), calc(sensors) {}
+          init_status(collectStatus(sensors, ignitors)), calc(sensors),
+          config(calc), state_machine(config.state_map, config.initial_state) {}
 
     // WARNING - MEMBER ORDER DEPENDENCY
     // https://isocpp.org/wiki/faq/ctors#order-dependency-in-members
@@ -31,6 +33,7 @@ struct Rocket {
     CSVWrite<CSVWriteImpl> datalog;
     RocketStatus init_status;
     Calculator calc;
+    StateMachineConfig config;
     StateMachine state_machine;
 };
 class CommandReceiver {
@@ -133,5 +136,3 @@ class CommandReceiver {
         }
     }
 };
-
-constexpr char Rocket::LOG_FILE_NAME[];

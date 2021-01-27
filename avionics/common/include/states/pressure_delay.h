@@ -1,6 +1,8 @@
 #pragma once
 
 /*Includes------------------------------------------------------------*/
+#include "HAL/time.h"
+
 #include "state_input_struct.h"
 #include "state_interface.h"
 
@@ -8,8 +10,8 @@ namespace State {
 
 class PressureDelay : public IState {
   public:
-    PressureDelay(uint32_t const DELAY_TIME_MS)
-        : M_DELAY_TIME_MS(DELAY_TIME_MS) {}
+    PressureDelay(StateId post_delay, uint32_t const DELAY_TIME_MS)
+        : DELAY_TIME_MS_(DELAY_TIME_MS), post_delay_(post_delay) {}
 
     /*
      * @brief Return the assigned enumeration code.
@@ -26,8 +28,12 @@ class PressureDelay : public IState {
     StateId getNewState(const StateInput &input,
                         StateAuxilliaryInfo &state_aux);
 
+    void onEntry() { start_time_ = Hal::now_ms(); }
+
   private:
-    uint32_t const M_DELAY_TIME_MS;
+    uint32_t const DELAY_TIME_MS_;
+    Hal::t_point start_time_;
+    const StateId post_delay_;
 };
 
 } // namespace State

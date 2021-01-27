@@ -22,7 +22,6 @@ method that flushes the buffer.
 // TODO: Add Impl class or integrate in this class.
 // TODO: Figure out how to interface with SD Card
 
-constexpr char SensorCollection::LOG_FILE_HEADER[];
 // https://stackoverflow.com/questions/8016780/undefined-reference-to-static-constexpr-char
 // :/
 

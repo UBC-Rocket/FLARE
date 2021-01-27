@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+cmake_policy(SET CMP0076 NEW)
+
 project(FLARE)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -19,10 +21,12 @@ add_subdirectory(rockets/tantalus_stage_1)
 add_subdirectory(rockets/tantalus_stage_2)
 add_subdirectory(rockets/hollyburn)
 
-include_directories(common/include
-common/lib
-envs/x86/include
-envs/x86/lib
+include_directories(
+    common/include
+    common/lib/RocketScheduler/include
+    common/lib
+    envs/x86/include
+    envs/x86/lib
 )
 
 # Rocket-specific directories
@@ -61,20 +65,19 @@ message(STATUS "Resolving GIT Version")
 message("Directory: ${CMAKE_CURRENT_LIST_DIR}")
 set(_git_build_version "unknown")
 
-find_package(Git)
-if(GIT_FOUND)
+find_package(Python3 COMPONENTS Interpreter)
+if(Python3_FOUND)
+execute_process(COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_LIST_DIR}/../custom_tools/get_submodule.py")
 execute_process(
-  COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
-  WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
+  COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_LIST_DIR}/../custom_tools/git_rev_macro.py" "x86"
   OUTPUT_VARIABLE _git_build_version
-  ERROR_QUIET
-  OUTPUT_STRIP_TRAILING_WHITESPACE
+  WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
   )
-  message( STATUS "GIT hash: ${_git_build_version}")
+  message(STATUS "Git hash: ${_git_build_version}")
+  add_compile_definitions(RADIO_CONFIG_PACKET_VERSION_STR="${_git_build_version}")
 else()
-  message(SEND_ERROR "Git not found; unable to set Radio Config data")
+  message(SEND_ERROR "Python not found; unable to set Radio Config data")
 endif()
-add_compile_definitions(RADIO_CONFIG_PACKET_VERSION_STR="${_git_build_version}")
 
 
 ###
@@ -126,9 +129,19 @@ enable_testing()
 ### Note: Compile project in build folder to keep unnecessarily files out from main directory
 ###
 
-# Now simply link against gtest or gtest_main as needed. Eg
-add_executable(Test tests/SampleTest.cpp)
-target_link_libraries(Test gtest_main)
-add_test(NAME SampleTest COMMAND Test)
+# Helper function that does some boilderplate
+function(ROCKET_CREATE_TEST TEST_NAME)
+    add_executable(testexe_${TEST_NAME}
+        tests/unit_${TEST_NAME}
+    )
+    target_link_libraries(testexe_${TEST_NAME} gtest_main)
+    target_include_directories(testexe_${TEST_NAME} BEFORE PUBLIC tests/fake_include)
+    add_test(NAME test_${TEST_NAME} COMMAND testexe_${TEST_NAME})
+endfunction()
+
+ROCKET_CREATE_TEST(LedBlinker)
+target_sources(testexe_LedBlinker PUBLIC common/src/tasks/led_blinker.cpp)
+
+ROCKET_CREATE_TEST(RepeatChecksState)
 
 # We can now call make test to run all the tests
