@@ -6,7 +6,7 @@
 #include "event_id_enum.hpp"
 
 namespace State {
-    const std::unordered_map<StateId, EventId> STATE_CHANGE_EVENTS = {
+    const std::unordered_map<StateId, EventId> STATE_CHANGE_EVENTS {
         {StateId::STANDBY, EventId::STANDBY},
         {StateId::ARMED, EventId::ARMED},
         {StateId::POWERED_ASCENT, EventId::POWERED_ASCENT},
