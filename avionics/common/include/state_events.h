@@ -1,12 +1,15 @@
 #pragma once
 
 #include "HAL/time.h"
-#include <unordered_map>
+#include <map>
 #include "state_id_enum.hpp"
 #include "event_id_enum.hpp"
 
 namespace State {
-    std::unordered_map<StateId, EventId> STATE_CHANGE_EVENTS {
+
+    // REVIEW: An unorderd_map should work here, but causes compilation errors
+    // for an unknown reason.
+    const std::map<StateId, EventId> UPDATE_EVENTS {
         {StateId::STANDBY, EventId::STANDBY},
         {StateId::ARMED, EventId::ARMED},
         {StateId::POWERED_ASCENT, EventId::POWERED_ASCENT},

@@ -230,7 +230,7 @@ void Radio::sendEvent(const uint32_t time, const EventId event) {
 }
 
 void Radio::sendStateChangeEvent(const StateId new_state) {
-    Radio::sendEvent(Hal::tpoint_to_uint(Hal::now_ms()), State::STATE_CHANGE_EVENTS.find(new_state)->second);
+    Radio::sendEvent(Hal::tpoint_to_uint(Hal::now_ms()), State::UPDATE_EVENTS.at(new_state));
 }
 
 void Radio::addSubpacket(SubPktPtr dat) { self.tx_q_.push(std::move(dat)); }
