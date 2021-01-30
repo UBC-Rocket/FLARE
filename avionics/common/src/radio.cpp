@@ -29,7 +29,6 @@
 #include "ignitor_collection.h"
 #include "radio_queue.h"
 #include "sensor_collection.h"
-#include "state_events.h"
 #include "state_id_enum.hpp"
 
 // Some defines that are actually done in CMake, but set here to get
@@ -190,7 +189,7 @@ void Radio::sendSingleSensor(const uint32_t time, uint8_t id, float data) {
     Radio::addSubpacket(std::move(buf.packet));
 }
 
-void Radio::sendState(const uint32_t time, uint8_t state_id) {
+void Radio::sendState(const uint32_t time, uint16_t state_id) {
     PacketBuffWriter buf;
 
     buf.write(0x1D); // id
@@ -227,10 +226,6 @@ void Radio::sendEvent(const uint32_t time, const EventId event) {
     addIdTime(buf, Ids::event, time);
     buf.write(&event, sizeof(uint16_t));
     Radio::addSubpacket(std::move(buf.packet));
-}
-
-void Radio::sendStateChangeEvent(const StateId new_state) {
-    Radio::sendEvent(Hal::tpoint_to_uint(Hal::now_ms()), State::UPDATE_EVENTS.at(new_state));
 }
 
 void Radio::addSubpacket(SubPktPtr dat) { self.tx_q_.push(std::move(dat)); }

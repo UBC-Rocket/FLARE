@@ -2,7 +2,6 @@
 #define MAIN_TASKS_HPP_6FADFAE876EC4E6D8B5A9394585FE936
 #include "radio.h"
 #include "rocket.h"
-#include "state_events.h"
 #include "state_input_struct.h"
 
 /**
@@ -35,7 +34,7 @@ class ReadEvalLog {
 
         state_ = state_machine.getState();
         if(state_ != oldState_) {
-            Radio::sendStateChangeEvent(state_);
+            Radio::sendState(Hal::tpoint_to_uint(Hal::now_ms()), static_cast<uint16_t>(state_));
             oldState_ = state_;
         }
 

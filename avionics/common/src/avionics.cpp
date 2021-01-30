@@ -72,7 +72,6 @@ PLEASE READ ME!
 #include "radio.h"
 #include "rocket.h"
 #include "state_input_struct.h"
-#include "state_events.h"
 #include "status.h"
 
 #include "config.h"

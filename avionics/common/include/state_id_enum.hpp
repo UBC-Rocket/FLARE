@@ -1,7 +1,8 @@
 #ifndef STATE_ID_ENUM_HPP_765961F431844F469A0F1086D132018F
 #define STATE_ID_ENUM_HPP_765961F431844F469A0F1086D132018F
+#include <cstdint>
 
-enum class StateId {
+enum class StateId : uint16_t {
     STANDBY,
     ARMED,
     POWERED_ASCENT,

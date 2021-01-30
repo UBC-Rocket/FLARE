@@ -188,7 +188,7 @@ class Radio {
      * @param time Timestamp, in milliseconds
      * @param state_id Current rocket state, as integer ID
      */
-    static void sendState(const uint32_t time, uint8_t state_id);
+    static void sendState(const uint32_t time, uint16_t state_id);
 
     static void sendConfig(const uint32_t time);
 
@@ -199,13 +199,6 @@ class Radio {
      */
     static void sendEvent(const uint32_t time, const EventId event);
     // TODO: Implement stage separation packet when separation implemented.
-
-
-    /**
-     * @brief Sends the event packet associated with the transition to new_state
-     * @param new_state the new state
-     */
-    static void sendStateChangeEvent(StateId new_state);
 
     /**
      * @brief How many packets have been read in forwardCommand; primarily used
