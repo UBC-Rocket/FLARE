@@ -84,7 +84,8 @@ struct StateMachineConfig {
                 ignitors.drogue),
           drogue(MAIN_DEPLOY_ALTITUDE, ignitors.main),
           main(StateId::LANDED, LAND_CHECK_TIME_INTERVAL, LAND_CHECKS,
-               LAND_VELOCITY_THRESHOLD, calc) {}
+               LAND_VELOCITY_THRESHOLD, calc),
+          landed(camera) {}
 
     std::unordered_map<StateId, IState *> state_map = {
         {StateId::STANDBY, &standby},
