@@ -32,11 +32,14 @@ void StdIoController::initialize() {
 
 void StdIoController::putPacket(uint8_t const id, uint8_t const *c,
                                 uint16_t const length) {
+    if (id == DEV_NULL) {
+        return;
+    }
     const std::lock_guard<std::mutex> lock(cout_mutex_);
     // TODO - check the success of std::cout.put and other unformatted
     // output, and possibly do something about it
 
-    outputFiltered(id);                             // ID
+    outputFiltered(id);                                // ID
     outputFiltered(static_cast<uint8_t>(length >> 8)); // Length, bigendian
     outputFiltered(static_cast<uint8_t>(length & 0xFF));
 
@@ -62,7 +65,7 @@ void StdIoController::putPacket(uint8_t const id, char const *c,
 
 void StdIoController::outputFiltered(uint8_t const c) {
     // Sends each byte in two bytes to reduce ascii range to [A, A + 16)
-    // Effectively avoiding all special characters that may have varying 
+    // Effectively avoiding all special characters that may have varying
     // behavior depending on the OS
 
     uint8_t msb = (c >> 4) + 'A';
