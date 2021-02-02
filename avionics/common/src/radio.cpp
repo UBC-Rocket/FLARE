@@ -189,7 +189,7 @@ void Radio::sendSingleSensor(const uint32_t time, uint8_t id, float data) {
     Radio::addSubpacket(std::move(buf.packet));
 }
 
-void Radio::sendState(const uint32_t time, uint16_t state_id) {
+void Radio::sendState(const uint32_t time, uint8_t state_id) {
     PacketBuffWriter buf;
 
     buf.write(0x1D); // id
