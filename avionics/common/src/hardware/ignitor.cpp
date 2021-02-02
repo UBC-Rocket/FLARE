@@ -10,16 +10,16 @@ Ignitor::Ignitor(Pin ignitePin, Pin continuityPin, Pin continuityADCPin)
       continuityADCPin_(continuityADCPin) {
     /*init ignitor*/
     Hal::pinMode(ignitePin_, Hal::PinMode::OUTPUT);
-    Hal::digitalWrite(ignitePin_, Hal::PinDigital::PIN_LOW);
+    Hal::digitalWrite(ignitePin_, Hal::PinDigital::VOLTAGE_LOW);
 
     /*continuity check */
     Hal::pinMode(continuityPin_, Hal::PinMode::OUTPUT);
 
-    Hal::digitalWrite(continuityPin_, Hal::PinDigital::PIN_HIGH);
+    Hal::digitalWrite(continuityPin_, Hal::PinDigital::VOLTAGE_HIGH);
     Hal::sleep_us(CONTINUITY_CHECK_DELAY);
 
     int continuity = Hal::analogRead(continuityADCPin);
-    Hal::digitalWrite(continuityPin_, Hal::PinDigital::PIN_LOW);
+    Hal::digitalWrite(continuityPin_, Hal::PinDigital::VOLTAGE_LOW);
 
     if (continuity <= DISCONTINUOUS_THRESHOLD) {
         status = HardwareStatus::FAILURE;
@@ -29,9 +29,9 @@ Ignitor::Ignitor(Pin ignitePin, Pin continuityPin, Pin continuityADCPin)
 }
 
 void Ignitor::fire() {
-    Hal::digitalWrite(ignitePin_, Hal::PinDigital::PIN_HIGH);
+    Hal::digitalWrite(ignitePin_, Hal::PinDigital::VOLTAGE_HIGH);
     Hal::sleep_ms(IGNITOR_DELAY);
-    Hal::digitalWrite(ignitePin_, Hal::PinDigital::PIN_LOW);
+    Hal::digitalWrite(ignitePin_, Hal::PinDigital::VOLTAGE_LOW);
 
     // TODO(akoen) This could be expanded to support different events for
     // different ignitions.
