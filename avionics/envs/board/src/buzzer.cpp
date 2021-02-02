@@ -176,7 +176,7 @@ void Buzzer::buzz(long frequency, long length) const {
         Hal::sleep_us(delayValue);  // wait for the calculated delay value
         Hal::digitalWrite(
             M_MELODY_PIN,
-            Hal::PinDigital::VOLTAGE_LOW); // write low to pull back the diaphram
+            Hal::PinDigital::LO); // write low to pull back the diaphram
         Hal::sleep_us(delayValue); // wait for the calculated delay value
     }
 }

@@ -19,9 +19,9 @@ class LEDBlinker {
   public:
     static void toggle(void *) {
         if (led_on)
-            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::VOLTAGE_HIGH);
+            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HI);
         else
-            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::VOLTAGE_LOW);
+            Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
 
         led_on = !led_on;
     }

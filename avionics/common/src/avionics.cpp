@@ -134,13 +134,13 @@ int main(void) {
 
     switch (init_status) {
     case RocketStatus::NOMINAL:
-        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::VOLTAGE_LOW);
+        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
         break;
     case RocketStatus::NONCRITICAL_FAILURE:
         registerTask(TaskID::LEDBlinker, led_blink);
         break;
     case RocketStatus::CRITICAL_FAILURE:
-        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::VOLTAGE_LOW);
+        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
         break;
     }
 
