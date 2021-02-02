@@ -56,7 +56,7 @@
 void initPins(void) {
     /* Initialize and startup power status LEDs */
     Hal::pinMode(Pin::POWER_LED, Hal::PinMode::OUTPUT);
-    Hal::digitalWrite(Pin::POWER_LED, Hal::PinDigital::VOLTAGE_HIGH);
+    Hal::digitalWrite(Pin::POWER_LED, Hal::PinDigital::HI);
 
     /* Initialize and startup flight status LEDs */
     Hal::pinMode(Pin::FLIGHT_LED, Hal::PinMode::OUTPUT);
