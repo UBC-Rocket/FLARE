@@ -10,7 +10,7 @@ template <StateId next_id, int num_checks>
 class Standby : public RepeatedCheckBase<StateId::STANDBY, next_id, num_checks,
                                          Standby<next_id, num_checks>> {
   public:
-    Standby(const float launch_threshold, Camera camera)
+    Standby(const float launch_threshold, Camera &camera)
         : launch_threshold_(launch_threshold), camera_(camera) {}
 
   private:
