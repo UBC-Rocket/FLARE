@@ -66,6 +66,9 @@ class Serial {
         }
     }
 
+    Serial(const Serial &other) = delete;
+    Serial &operator=(const Serial &other) = delete;
+
     /**
      * \brief Sends all data in the buffer. NOT THREAD SAFE
      * Before calling, acquire a std::lock_guard on `buf_mutex_`.
