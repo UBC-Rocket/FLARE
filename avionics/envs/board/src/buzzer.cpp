@@ -172,11 +172,11 @@ void Buzzer::buzz(long frequency, long length) const {
     for (long i = 0; i < numCycles; i++) { // for the calculated length of time
         Hal::digitalWrite(
             M_MELODY_PIN,
-            Hal::PinDigital::HIGH); // write high to push out the diaphram
+            Hal::PinDigital::HI); // write high to push out the diaphram
         Hal::sleep_us(delayValue);  // wait for the calculated delay value
         Hal::digitalWrite(
             M_MELODY_PIN,
-            Hal::PinDigital::LOW); // write low to pull back the diaphram
+            Hal::PinDigital::LO); // write low to pull back the diaphram
         Hal::sleep_us(delayValue); // wait for the calculated delay value
     }
 }

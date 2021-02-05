@@ -21,9 +21,9 @@ TEST(LedBlinker, Blinker) {
     ASSERT_EQ(write_log.size(), 10);
     for (int i = 0; i < 10; ++i) {
         if (i % 2 == 0) { // starts with high
-            EXPECT_EQ(write_log[i], Hal::PinDigital::HIGH);
+            EXPECT_EQ(write_log[i], Hal::PinDigital::HI);
         } else {
-            EXPECT_EQ(write_log[i], Hal::PinDigital::LOW);
+            EXPECT_EQ(write_log[i], Hal::PinDigital::LO);
         }
     }
 }

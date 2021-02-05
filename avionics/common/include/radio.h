@@ -30,6 +30,8 @@
 #include "sensors/GPS.h"
 #include "sensors/IMU.h"
 #include "sensors/accelerometer.h"
+#include "state_id_enum.hpp"
+#include "event_id_enum.hpp"
 #include "subpktptr.h"
 
 class PacketBuffWriter {
@@ -57,6 +59,7 @@ class Radio {
     enum class Ids {
         status_ping = 0x00,
         message = 0x01,
+        event = 0x02,
         config = 0x03,
         gps = 0x04,
         bulk_sensor = 0x30,
@@ -189,7 +192,14 @@ class Radio {
 
     static void sendConfig(const uint32_t time);
 
-  private:
+    /**
+     * @brief Helper function to send an event. See radio specification.
+     * @param time Timestamp, in milliseconds
+     * @param event, the event id to send
+     */
+    static void sendEvent(const uint32_t time, const EventId event);
+    // TODO: Implement stage separation packet when separation implemented.
+
     /**
      * @brief How many packets have been read in forwardCommand; primarily used
      * by readPacket()

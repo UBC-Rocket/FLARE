@@ -72,7 +72,7 @@ PLEASE READ ME!
 #include "radio.h"
 #include "rocket.h"
 #include "state_input_struct.h"
-#include "state_interface.h"
+#include "status.h"
 
 #include "config.h"
 #include "env_config.h"
@@ -134,13 +134,13 @@ int main(void) {
 
     switch (init_status) {
     case RocketStatus::NOMINAL:
-        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LOW);
+        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
         break;
     case RocketStatus::NONCRITICAL_FAILURE:
         registerTask(TaskID::LEDBlinker, led_blink);
         break;
     case RocketStatus::CRITICAL_FAILURE:
-        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LOW);
+        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
         break;
     }
 

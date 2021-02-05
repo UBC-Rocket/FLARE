@@ -29,6 +29,7 @@
 #include "ignitor_collection.h"
 #include "radio_queue.h"
 #include "sensor_collection.h"
+#include "state_id_enum.hpp"
 
 // Some defines that are actually done in CMake, but set here to get
 // Intellisense to stop yelling.
@@ -95,8 +96,10 @@ static Radio::RadioMembers self;
 
 constexpr Hal::ms Radio::WATCHDOG_SEND_INTERVAL;
 
+// Initializes radio member variables;
 Radio::RadioMembers::RadioMembers()
-    : gnd_addr_(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB), tx_q_(MAX_QUEUED_BYTES) {}
+    : gnd_addr_(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB),
+      tx_q_(MAX_QUEUED_BYTES) {}
 
 void Radio::initialize() {
     auto &serial = Hal::SerialInst::Radio;
@@ -215,6 +218,13 @@ void Radio::sendConfig(const uint32_t time) {
 
     buf.write(version_bytes, sizeof(version_bytes));
 
+    Radio::addSubpacket(std::move(buf.packet));
+}
+
+void Radio::sendEvent(const uint32_t time, const EventId event) {
+    PacketBuffWriter buf;
+    addIdTime(buf, Ids::event, time);
+    buf.write(&event, sizeof(uint16_t));
     Radio::addSubpacket(std::move(buf.packet));
 }
 
