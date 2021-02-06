@@ -25,13 +25,13 @@
 #include <utility>
 
 #include "HAL/time.h"
+#include "event_id_enum.hpp"
 #include "ignitor_collection.h"
 #include "sensor_collection.h"
 #include "sensors/GPS.h"
 #include "sensors/IMU.h"
 #include "sensors/accelerometer.h"
 #include "state_id_enum.hpp"
-#include "event_id_enum.hpp"
 #include "subpktptr.h"
 
 class PacketBuffWriter {
@@ -200,6 +200,7 @@ class Radio {
     static void sendEvent(const uint32_t time, const EventId event);
     // TODO: Implement stage separation packet when separation implemented.
 
+  private:
     /**
      * @brief How many packets have been read in forwardCommand; primarily used
      * by readPacket()
