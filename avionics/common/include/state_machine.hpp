@@ -3,6 +3,8 @@
 #include <unordered_map> //for std::unordered_map (hash map)
 
 #include "state_interface.h"
+#include "HAL/time.h"
+#include "radio.h"
 
 class StateMachine {
   public:
@@ -20,6 +22,7 @@ class StateMachine {
         StateId new_id = current_state->getNewState(state_input, state_aux);
         if (new_id != current_id_) {
             state_map_[new_id]->onEntry();
+            Radio::sendState(Hal::tpoint_to_uint(Hal::now_ms()), static_cast<uint16_t>(new_id));
             current_id_ = new_id;
         }
     }
@@ -63,6 +66,6 @@ class StateMachine {
     const StateId &getState() const { return current_id_; }
 
   private:
-    StateId current_id_;
     StateMap state_map_;
+    StateId current_id_;
 };
