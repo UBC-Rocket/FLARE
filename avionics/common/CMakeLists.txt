@@ -1,8 +1,8 @@
 # file(GLOB common_files ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
 
 target_sources( 
-    TantalusStage1
-    PRIVATE
+    myLib
+    PUBLIC
         # ${common_files}
         ${CMAKE_CURRENT_LIST_DIR}/src/cameras.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/gpio.cpp
@@ -23,4 +23,5 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/src/states/standby.cpp
         
         ${CMAKE_CURRENT_LIST_DIR}/src/hardware/ignitor.cpp
+
 )

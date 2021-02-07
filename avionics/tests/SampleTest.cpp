@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-
+#include "iostream"
 /*
  * Sample Test Template
  * 
@@ -12,7 +12,6 @@
 
 TEST(SampleTest, SampleTestTemplate)
 {
-    EXPECT_EQ(2, 2);
     ASSERT_EQ(3, 3);
     ASSERT_TRUE(true);
 }

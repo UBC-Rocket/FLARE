@@ -2,8 +2,8 @@
 # file(GLOB x86_HAL ${CMAKE_CURRENT_LIST_DIR}/lib/HAL/*.cpp)
 
 target_sources( 
-    TantalusStage1
-    PRIVATE
+    myLib
+    PUBLIC
         # ${x86_files}
         # ${x86_HAL}
         ${CMAKE_CURRENT_LIST_DIR}/lib/HAL/pin_util.cpp

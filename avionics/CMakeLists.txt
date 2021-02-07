@@ -13,19 +13,27 @@ endif()
 
 project(Avionics_Native)
 
+add_library(myLib "")
 
-add_executable(TantalusStage1 common/src/avionics.cpp)
-
-add_subdirectory(common)
-add_subdirectory(envs/x86)
-add_subdirectory(rockets/tantalus_stage_1)
-
-target_include_directories(TantalusStage1 PUBLIC
+target_include_directories(myLib PUBLIC
     common/include
     common/lib
     envs/x86/include
     envs/x86/lib
     rockets/tantalus_stage_1/include
+)
+
+add_subdirectory(common)
+add_subdirectory(envs/x86)
+add_subdirectory(rockets/tantalus_stage_1)
+
+add_executable(TantalusStage1 common/src/avionics.cpp)
+target_link_libraries(TantalusStage1 myLib)
+
+add_compile_definitions(RADIO_CONFIG_PACKET_SIM_ACTIVE=1)
+
+target_compile_definitions(TantalusStage1 PUBLIC
+    RADIO_CONFIG_PACKET_ROCKET_ID=0
 )
 
 ###
@@ -73,8 +81,12 @@ enable_testing()
 ###
 
 # Now simply link against gtest or gtest_main as needed. Eg
-add_executable(Test tests/SampleTest.cpp)
+add_executable(Test tests/mach_lock_test.cpp)
+#add_executable(Test tests/SampleTest.cpp)
 target_link_libraries(Test gtest_main)
-add_test(NAME SampleTest COMMAND Test)
+target_link_libraries(Test myLib)
+
+add_test(NAME MACH_LOCK_TEST COMMAND Test)
+#add_test(NAME Sample COMMAND Test)
 
 # We can now call make test to run all the tests
