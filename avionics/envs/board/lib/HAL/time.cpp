@@ -18,4 +18,7 @@ void sleep_ms(uint32_t t) { delay(t); }
  */
 void sleep_us(uint32_t t) { delayMicroseconds(t); }
 
+uint32_t tpoint_to_uint(t_point timestamp) {
+    return static_cast<uint32_t>(timestamp.time_since_epoch().count());
+}
 } // namespace Hal

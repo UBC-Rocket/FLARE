@@ -49,6 +49,7 @@ class SensorCollection {
 
     RocketStatus status_;
     uint8_t status_bitfield_[2];
+    Hal::t_point last_poll_time_;
 
   public:
     constexpr static std::size_t NUM_SENSORS = 5;
@@ -67,10 +68,14 @@ class SensorCollection {
 
     /**
      * @brief Polls all the sensors
-     * @param timestamp pointer to store the timestamp value
      * @return void
      */
-    void poll(Hal::t_point &timestamp);
+    void poll();
+
+    /**
+     * @brief Return the recorded time when the sensors were last polled
+     */
+    Hal::t_point last_poll_time() { return last_poll_time_; }
 
     /**
      * @brief Gets sensor status
@@ -85,6 +90,3 @@ class SensorCollection {
         return sensor_data;
     }
 };
-
-typedef std::unique_ptr<SensorCollection> SensorCollectionPtr;
-SensorCollectionPtr getSensors();

@@ -25,108 +25,108 @@
 #include <utility>
 
 #include "HAL/time.h"
-#include "XBee.h"
+#include "event_id_enum.hpp"
 #include "ignitor_collection.h"
-#include "radio_queue.h"
 #include "sensor_collection.h"
 #include "sensors/GPS.h"
 #include "sensors/IMU.h"
 #include "sensors/accelerometer.h"
+#include "state_id_enum.hpp"
+#include "subpktptr.h"
 
-/*Constants------------------------------------------------------------*/
-/* radio addressing */
-constexpr uint64_t GND_STN_ADDR_MSB = 0x0013A200; // Ground Station - Body
-constexpr uint64_t GND_STN_ADDR_LSB = 0x41678FC0;
-constexpr uint32_t RADIO_BAUD_RATE = 921600;
+class PacketBuffWriter {
+  public:
+    PacketBuffWriter() : packet(new std::vector<uint8_t>) {
+        packet->reserve(255); // To avoid overhead of resizing multiple times
+    }
 
-class RadioController {
+    void write(void const *data, size_t size) {
+        if (!packet)
+            return;
+
+        size_t old_size = packet->size();
+        packet->resize(old_size + size);
+        std::memcpy(packet->data() + old_size, data, size);
+    }
+
+    void write(uint8_t byte) { write(&byte, 1); }
+
+    SubPktPtr packet;
+};
+class Radio {
   private:
+    typedef uint16_t fwd_cmd_t;
     enum class Ids {
         status_ping = 0x00,
         message = 0x01,
+        event = 0x02,
+        config = 0x03,
         gps = 0x04,
         bulk_sensor = 0x30,
     };
 
-  public:
-    /**
-     * @brief Constructor.
-     * @param SERIAL_RADIO Uninitialized HardwareSerial used for radio (e.g.
-     * SerialRadio)
-     * @param MAX_QUEUED_BYTES Maximum number of subpacket data bytes to queue
-     * before dropping the oldest subpackets.
-     * @param MAX_PACKETS_PER_RX_LOOP Maximum number of packets to send every
-     * time listenAndAct() is called.
-     */
-    RadioController(Hal::Serial &serial_radio,
-                    unsigned short const MAX_QUEUED_BYTES = 800,
-                    uint8_t const MAX_PACKETS_PER_RX_LOOP = 8)
-        : gnd_addr_(XBeeAddress64(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB)),
-          tx_q_(MAX_QUEUED_BYTES),
-          MAX_PACKETS_PER_RX_LOOP_(MAX_PACKETS_PER_RX_LOOP),
-          WATCHDOG_SEND_INTERVAL_(3000), watchdog_last_send_(Hal::now_ms()) {
+    constexpr static Hal::ms WATCHDOG_SEND_INTERVAL{3000};
+    constexpr static fwd_cmd_t STOP_PARSE_FLAG = 1 << 0;
+    constexpr static fwd_cmd_t CAN_SEND_FLAG = 1 << 1;
 
-        serial_radio.begin(RADIO_BAUD_RATE);
-        while (!serial_radio)
-            ;
-        xbee_.setSerial(serial_radio.getSerial());
-        tx_packet_.setAddress64(gnd_addr_);
-        tx_packet_.setPayload(payload_);
-        sendMessage(Hal::millis(), "Radio initialized");
-        send();
-    }
+  public:
+    // type RadioMembers is public for technical reasons but cannot be used
+    // (especially since no definition is given)
+    class RadioMembers;
+
+    // Loose type to more explicitly indicate what variables are commands.
+    typedef uint8_t command_t;
+
+    /**
+     * @brief Initializes the class.
+     * @param SERIAL_RADIO Uninitialized HardwareSerial used for radio
+     (e.g.
+     * SerialRadio)
+     * @param MAX_QUEUED_BYTES Maximum number of subpacket data bytes to
+     queue
+     * before dropping the oldest subpackets.
+     * @param MAX_PACKETS_PER_RX_LOOP Maximum number of packets to send
+     every
+     * time forwardCommand() is called.
+     */
+    static void initialize();
 
     /**
      * @brief Meat of the action - listens for any incoming packets, then
      * transmits data and performs rocket actions as necessary.
-     * @param act_upon Function-like object (e.g. lambda expression) that
+     * @param command_receiver Object with method run_command that
      * accepts an unsigned char (representing the command) and returns void.
      */
-    template <typename Func> void listenAndAct(Func act_upon) {
+    template <typename Actor>
+    static void forwardCommand(Actor &command_receiver) {
         static_assert(
-            can_receive_command<Func>::value,
+            can_receive_command<Actor>::value,
             "act_upon does not have the expected signature void(uint8_t)");
 
-        xbee_.readPacket();
-        int i = 0;
+        // Keeps track of last time sending was done.
+        static Hal::t_point watchdog_last_send = Hal::now_ms();
 
-        while (i < MAX_PACKETS_PER_RX_LOOP_ &&
-               (xbee_.getResponse().isAvailable() ||
-                xbee_.getResponse().isError())) {
-            // goes through all xbee_ packets in buffer
+        bool can_send = false;
+        read_count_ = 0; // resetting
+        fwd_cmd_t result;
 
-            if (xbee_.getResponse().isError()) {
-                // TODO - figure out whether there's anything
-                // we should do about Xbee errors
-                // #ifdef TESTING
-                //     SerialUSB.println("xbee_ error");
-                // #endif
-            } else if (xbee_.getResponse().getApiId() == ZB_RX_RESPONSE) {
-                // received command from xbee_
-                xbee_.getResponse().getZBRxResponse(rx);
-                uint8_t len = rx.getDataLength();
-                uint8_t command;
-                for (int j = 0; j < len; j++) {
-                    command = rx.getData()[j];
-                    act_upon(command);
-                }
-
-            } else if (xbee_.getResponse().getApiId() ==
-                       ZB_TX_STATUS_RESPONSE) {
-                can_send = true;
-                // If we get 2 responses in a row, implies previously we sent an
-                // extra one, so we shouldn't respond twice again.
+        while (true) {
+            command_t *command_data;
+            command_t command_len;
+            result = readPacket(command_data, command_len);
+            if (result & STOP_PARSE_FLAG) {
+                break;
             }
-
-            xbee_.readPacket();
-            i++;
+            for (int i = 0; i < command_len; ++i) {
+                command_receiver.run_command(command_data[i]);
+            }
         }
-        if (Hal::now_ms() - watchdog_last_send_ > WATCHDOG_SEND_INTERVAL_) {
+        if (Hal::now_ms() - watchdog_last_send > WATCHDOG_SEND_INTERVAL) {
             can_send = true;
         }
         if (can_send) {
             can_send = false;
-            watchdog_last_send_ = Hal::now_ms();
+            watchdog_last_send = Hal::now_ms();
             send();
         }
     }
@@ -139,7 +139,7 @@ class RadioController {
      * need to use std::move(dat).
      * @param dat A SubPktPtr (refer to typedef) containing the data.
      */
-    void addSubpacket(SubPktPtr dat) { tx_q_.push(std::move(dat)); }
+    static void addSubpacket(SubPktPtr dat);
 
     /**
      * @brief Helper function to send status.
@@ -148,8 +148,9 @@ class RadioController {
      * @param sensors Sensor collection, from which detailed status information
      * is extracted
      */
-    void sendStatus(uint32_t time, RocketStatus status,
-                    SensorCollection &sensors, IgnitorCollection &ignitors);
+    static void sendStatus(uint32_t time, RocketStatus status,
+                           SensorCollection &sensors,
+                           IgnitorCollection &ignitors);
 
     /**
      * @brief Helper function to send bulk sensor data.
@@ -160,17 +161,17 @@ class RadioController {
      * @param gps GPS sensor object
      * @param state_id Current rocket state, as integer ID
      */
-    void sendBulkSensor(uint32_t time, float alt, Accelerometer &xl, IMU &imu,
-                        GPS &gps, uint8_t state_id);
+    static void sendBulkSensor(uint32_t time, float alt, Accelerometer &xl,
+                               IMU &imu, GPS &gps, uint8_t state_id);
 
     /**
      * @brief Helper function to send message.
      * @param time Timestamp, in millisconds
      * @param str C-style string to send.
      */
-    void sendMessage(const uint32_t time, const char *str);
+    static void sendMessage(const uint32_t time, const char *str);
 
-    void sendGPS(const uint32_t time, GPS &gps);
+    static void sendGPS(const uint32_t time, GPS &gps);
 
     /**
      * @brief Helper function to send single sensor. Logic of identifying sensor
@@ -179,7 +180,7 @@ class RadioController {
      * @param id ID of the sensor to send - refer to specs on Confluence
      * @param data to be sent
      */
-    void sendSingleSensor(const uint32_t time, uint8_t id, float data);
+    static void sendSingleSensor(const uint32_t time, uint8_t id, float data);
 
     /**
      * @brief Helper function to send state. Falls under the spec for single
@@ -187,9 +188,39 @@ class RadioController {
      * @param time Timestamp, in milliseconds
      * @param state_id Current rocket state, as integer ID
      */
-    void sendState(const uint32_t time, uint8_t state_id);
+    static void sendState(const uint32_t time, uint8_t state_id);
+
+    static void sendConfig(const uint32_t time);
+
+    /**
+     * @brief Helper function to send an event. See radio specification.
+     * @param time Timestamp, in milliseconds
+     * @param event, the event id to send
+     */
+    static void sendEvent(const uint32_t time, const EventId event);
+    // TODO: Implement stage separation packet when separation implemented.
 
   private:
+    /**
+     * @brief How many packets have been read in forwardCommand; primarily used
+     * by readPacket()
+     */
+    static int read_count_;
+
+    /**
+     * @brief Helper function for forwardCommand, primarily around to
+     * increase separation between interface (header) and implementation
+     * (cpp)
+     * @param command_dat_out Gets overwritten with a pointer to commands
+     * received.
+     * @param command_len_out Gets overwritten with the length of commands
+     * received.
+     * @return Bitfield; see FLAG constants. Additionally, if a command was
+     * found, the two outparams are set.
+     */
+    static fwd_cmd_t readPacket(command_t *&command_dat_out,
+                                command_t &command_len_out);
+
     /**
      * @brief Fills in the ID and timestamp given a subpacket pointer.
      * Note that this method expects that the buffer has already been
@@ -198,27 +229,18 @@ class RadioController {
      * raw pointer rather than a unique pointer, so you'll need to call the
      * get() method of SubPktPtr.
      */
-    void setupIdTime(std::vector<uint8_t> *buf, Ids id, uint32_t time) {
-        (*buf)[0] = static_cast<uint8_t>(id);
-        std::memcpy(buf->data() + 1, &time, 4);
+    static void addIdTime(PacketBuffWriter &buf, Ids id, uint32_t time) {
+        buf.write(static_cast<uint8_t>(id));
+        buf.write(&time, sizeof(time));
     }
 
-    XBee xbee_;
-    XBeeAddress64 gnd_addr_;
-    ZBTxRequest tx_packet_;
-    ZBRxResponse rx;
+    /**
+     * @brief Actually writes out data to the radio serial line; this is done
+     * infrequently to maximize usage of radio packets.
+     */
+    static void send();
 
-    RadioQueue tx_q_; // the [ueue] is silent :)
-    uint8_t payload_[RADIO_MAX_SUBPACKET_SIZE];
-
-    const uint8_t MAX_PACKETS_PER_RX_LOOP_;
-    const Hal::ms WATCHDOG_SEND_INTERVAL_;
-    Hal::t_point
-        watchdog_last_send_; // Keeps track of last time sending was done.
-    bool can_send = false;
-    void send();
-
-    // A bit of magic SFINAE from stack overflow, for listenAndAct
+    // A bit of magic SFINAE from stack overflow, for forwardCommand
     // https://stackoverflow.com/a/16824239/10762409
 
     // Primary template, used for meaningful error message
@@ -227,8 +249,8 @@ class RadioController {
       public:
         // type dependent false
         static_assert(!(std::is_same<T, T>::value),
-                      "The passed in value for listenAndAct() must be callable "
-                      "( has operator() )");
+                      "The passed in value for forwardCommand() must have the "
+                      "method run_command ");
 
         static constexpr bool value = true;
     };
@@ -238,7 +260,7 @@ class RadioController {
       private:
         template <typename C>
         static constexpr auto check(C *) -> typename std::is_same<
-            decltype(std::declval<C>().operator()(std::declval<uint8_t>())),
+            decltype(std::declval<C>().run_command(std::declval<uint8_t>())),
             void>::type;
 
         template <typename> static constexpr std::false_type check(...);

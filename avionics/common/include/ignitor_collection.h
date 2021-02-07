@@ -17,6 +17,3 @@ class IgnitorCollection {
     uint8_t status_bitfield_[2];
     RocketStatus status_;
 };
-
-typedef std::unique_ptr<IgnitorCollection> IgnitorCollectionPtr;
-IgnitorCollectionPtr getIgnitors();

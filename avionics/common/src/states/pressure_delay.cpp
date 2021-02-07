@@ -3,10 +3,8 @@
 
 StateId State::PressureDelay::getNewState(const StateInput &,
                                           StateAuxilliaryInfo &) {
-    static auto start_time = Hal::now_ms();
-    if (Hal::now_ms() - start_time >=
-        std::chrono::milliseconds(M_DELAY_TIME_MS)) {
-        return StateId::DROGUE_DESCENT;
+    if (Hal::now_ms() - start_time_ >= Hal::ms(DELAY_TIME_MS_)) {
+        return post_delay_;
     } else {
         return StateId::PRESSURE_DELAY;
     }

@@ -13,7 +13,9 @@
 namespace Hal {
 enum class PinMode { INPUT = 0, OUTPUT = 1 };
 
-enum class PinDigital { LOW = 0, HIGH = 1 };
+// TODO HIGH and LOW conflict with existing macro. We should adopt a better
+// naming convention for enums.
+enum class PinDigital { LO = 0, HI = 1 };
 
 void pinMode(::Pin pin, PinMode mode);
 void digitalWrite(::Pin pin, PinDigital val);

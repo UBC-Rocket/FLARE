@@ -1,6 +1,9 @@
 .pio/*
-.vscode/**
+.vscode/
 /common/build/*
 *.DS_Store
 
 *.csv
+.ccls-cache/
+.clangd/
+.idea/

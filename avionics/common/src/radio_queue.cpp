@@ -46,13 +46,11 @@ uint8_t RadioQueue::dumpAllIntoPayload(uint8_t *payload) {
 uint8_t RadioQueue::dispenseIntoPayload(uint8_t *payload) {
     unsigned short used = 0;
     SubPktPtr i;
-    while (true) {
-        if (used + m_subpacket_q.front()->size() <= RADIO_MAX_SUBPACKET_SIZE) {
-            i = popFront();
-            payload = std::copy(i->begin(), i->end(), payload);
-            used += m_subpacket_q.front()->size();
-        } else {
-            return used; // implicit break
-        }
+    while (used + m_subpacket_q.front()->size() <= RADIO_MAX_SUBPACKET_SIZE) {
+        i = popFront();
+        payload = std::copy(i->begin(), i->end(), payload);
+        used += i->size();
     }
+
+    return used;
 }

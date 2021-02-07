@@ -1,3 +1,5 @@
+[![Build Status](https://circleci.com/gh/UBC-Rocket/FLARE.svg?style=shield)](https://app.circleci.com/pipelines/github/UBC-Rocket/FLARE)
+
 # IMPORTANT WARNINGS
 
 **VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME!**

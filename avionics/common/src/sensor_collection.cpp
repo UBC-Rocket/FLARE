@@ -1,9 +1,6 @@
 #include "sensor_collection.h"
 
-SensorCollectionPtr getSensors() {
-    std::unique_ptr<SensorCollection> tmp(new SensorCollection);
-    return std::move(tmp);
-}
+constexpr char SensorCollection::LOG_FILE_HEADER[];
 
 SensorCollection::SensorCollection()
     : barometer(BEGIN + BAROMETER_INDEX),
@@ -13,8 +10,8 @@ SensorCollection::SensorCollection()
     updateStatus();
 }
 
-void SensorCollection::poll(Hal::t_point &timestamp) {
-    timestamp = Hal::now_ms();
+void SensorCollection::poll() {
+    last_poll_time_ = Hal::now_ms();
     barometer.readData();
     gps.readData();
     accelerometer.readData();
