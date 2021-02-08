@@ -67,7 +67,10 @@ set(_git_build_version "unknown")
 
 find_package(Python3 COMPONENTS Interpreter)
 if(Python3_FOUND)
-execute_process(COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_LIST_DIR}/../custom_tools/get_submodule.py")
+execute_process(
+  COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_LIST_DIR}/../custom_tools/get_submodule.py"
+  WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+)
 execute_process(
   COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_LIST_DIR}/../custom_tools/git_rev_macro.py" "x86"
   OUTPUT_VARIABLE _git_build_version
