@@ -62,6 +62,7 @@ class Radio {
         event = 0x02,
         config = 0x03,
         gps = 0x04,
+        state = 0x05,
         bulk_sensor = 0x30,
     };
 
