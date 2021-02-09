@@ -191,14 +191,8 @@ void Radio::sendSingleSensor(const uint32_t time, uint8_t id, float data) {
 
 void Radio::sendState(const uint32_t time, uint8_t state_id) {
     PacketBuffWriter buf;
-
-    buf.write(0x1D); // id
-    buf.write(&time, 4);
-    buf.write(0);
-    buf.write(0);
-    buf.write(0);
-    buf.write(state_id);
-
+    addIdTime(buf, Ids::state, time);
+    buf.write(&state_id, sizeof(uint16_t));
     Radio::addSubpacket(std::move(buf.packet));
 }
 
