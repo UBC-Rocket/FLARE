@@ -6,6 +6,11 @@ std::vector<Serial *> Serial::serials_{};
 constexpr std::chrono::milliseconds Serial::MAX_SEND_PERIOD_;
 
 int Serial::read() {
+    if (IO_ID_ == StdIoController::DEV_NULL) {
+        // TODO log error
+        return -1;
+    }
+
     uint8_t c;
     if (StdIO::get(IO_ID_, c))
         return c;
@@ -13,6 +18,9 @@ int Serial::read() {
 }
 
 std::size_t Serial::write(const uint8_t *const inbuf, std::size_t const size) {
+    if (IO_ID_ == StdIoController::DEV_NULL) {
+        return size;
+    }
     if (size + buf_used_ > BUFFER_SIZE) {
         send_buffer();
     }

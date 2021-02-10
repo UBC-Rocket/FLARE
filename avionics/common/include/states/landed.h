@@ -1,6 +1,7 @@
 #pragma once
 
 /*Includes------------------------------------------------------------*/
+#include "cameras.h"
 #include "scheduler.hpp"
 #include "state_input_struct.h"
 #include "state_interface.h"
@@ -9,7 +10,7 @@ namespace State {
 
 class Landed : public IState {
   public:
-    Landed() {}
+    Landed(Camera &cam) : cam_(cam) {}
 
     /*
      * @brief Return the assigned enumeration code.
@@ -32,7 +33,11 @@ class Landed : public IState {
         constexpr static unsigned int LANDED_POLLING_INTERVAL = 5000;
         Scheduler::get_task(static_cast<int>(TaskID::ReadEvalLog)).period =
             Hal::ms(LANDED_POLLING_INTERVAL);
+        cam_.stop_record();
     }
+
+  private:
+    Camera &cam_;
 };
 
 } // namespace State

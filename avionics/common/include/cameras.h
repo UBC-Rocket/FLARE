@@ -42,6 +42,10 @@ class Camera {
     void start_record();
     void stop_record();
 
+    // Can't copy.
+    Camera(const Camera &other) = delete;
+    Camera &operator=(const Camera &other) = delete;
+
   private:
     uint8_t crc_calculator(uint8_t *command, uint8_t len);
     uint8_t crc8_dvb_s2(uint8_t crc, unsigned char a);

@@ -147,4 +147,7 @@ target_sources(testexe_LedBlinker PUBLIC common/src/tasks/led_blinker.cpp)
 
 ROCKET_CREATE_TEST(RepeatChecksState)
 
+ROCKET_CREATE_TEST(States)
+
+
 # We can now call make test to run all the tests

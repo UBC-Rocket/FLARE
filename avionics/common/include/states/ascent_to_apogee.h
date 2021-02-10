@@ -1,6 +1,7 @@
 #pragma once
 
 /*Includes------------------------------------------------------------*/
+#include "hardware/ignitor.h"
 #include "state_input_struct.h"
 #include "state_interface.h"
 
@@ -10,10 +11,11 @@ class AscentToApogee : public IState {
   public:
     AscentToApogee(StateId post_apogee_id, StateId mach_lock_id,
                    uint8_t const APOGEE_CHECKS, uint8_t const MACH_LOCK_CHECKS,
-                   float MACH_LOCK_VELOCITY)
+                   float MACH_LOCK_VELOCITY, Ignitor &drogue_ignitor)
         : APOGEE_CHECKS_(APOGEE_CHECKS), MACH_LOCK_CHECKS_(MACH_LOCK_CHECKS),
           MACH_LOCK_VELOCITY_(MACH_LOCK_VELOCITY),
-          post_apogee_id_(post_apogee_id), mach_lock_id_(mach_lock_id) {}
+          post_apogee_id_(post_apogee_id), mach_lock_id_(mach_lock_id),
+          drogue_ignitor_(drogue_ignitor) {}
 
     /*
      * @brief Return the assigned enumeration code.
@@ -28,7 +30,29 @@ class AscentToApogee : public IState {
      * codes and used states. Note that the returned code may be the same state.
      */
     StateId getNewState(const StateInput &input,
-                        StateAuxilliaryInfo &state_aux);
+                        StateAuxilliaryInfo &state_aux) {
+        if (input.velocity_vertical > MACH_LOCK_VELOCITY_) {
+            if (++mach_checks >= MACH_LOCK_CHECKS_) {
+                return mach_lock_id_;
+            }
+        } else {
+            mach_checks = 0;
+        }
+
+        if (input.altitude < last_alt) {
+            apogee_checks++;
+        } else if (apogee_checks > 0) {
+            apogee_checks--;
+        }
+        last_alt = input.altitude;
+
+        if (apogee_checks >= APOGEE_CHECKS_) {
+            drogue_ignitor_.fire();
+            return post_apogee_id_;
+        } else {
+            return StateId::ASCENT_TO_APOGEE;
+        }
+    }
 
     void onEntry() override {
         apogee_checks = 0;
@@ -43,6 +67,8 @@ class AscentToApogee : public IState {
     const float MACH_LOCK_VELOCITY_;
     const StateId post_apogee_id_;
     const StateId mach_lock_id_;
+    Ignitor &drogue_ignitor_;
+
     uint8_t apogee_checks{0};
     uint8_t mach_checks{0};
     float last_alt{0};

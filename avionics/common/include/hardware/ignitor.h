@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HARDWARE_IGNITOR_HPP_A22E53F7BA764FAC8FA3CEAB90131013
+#define HARDWARE_IGNITOR_HPP_A22E53F7BA764FAC8FA3CEAB90131013
 
 /**
  * Ignitor Class
@@ -44,3 +45,5 @@ class Ignitor : public IIgnitor {
     Pin continuityPin_;
     Pin continuityADCPin_;
 };
+
+#endif

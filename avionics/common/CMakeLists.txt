@@ -11,7 +11,6 @@ set(common_files
     ${CMAKE_CURRENT_LIST_DIR}/src/status.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/XBee.cpp
 
-    ${CMAKE_CURRENT_LIST_DIR}/src/states/ascent_to_apogee.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/states/main_descent.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/states/pressure_delay.cpp
 
