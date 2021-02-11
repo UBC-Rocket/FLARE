@@ -189,7 +189,7 @@ class Radio {
      * @param time Timestamp, in milliseconds
      * @param state_id Current rocket state, as integer ID
      */
-    static void sendState(const uint32_t time, uint8_t state_id);
+    static void sendState(const uint32_t time, uint16_t state_id);
 
     static void sendConfig(const uint32_t time);
 
