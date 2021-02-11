@@ -70,7 +70,7 @@ class CommandReceiver {
             Radio::sendBulkSensor(
                 sensor_poll_time, rocket_.calc.altitude(),
                 rocket_.sensors.accelerometer, rocket_.sensors.imuSensor,
-                rocket_.sensors.gps, static_cast<uint8_t>(state));
+                rocket_.sensors.gps, static_cast<uint16_t>(state));
             break;
         case 0x04:
             Radio::sendGPS(sensor_poll_time, rocket_.sensors.gps);

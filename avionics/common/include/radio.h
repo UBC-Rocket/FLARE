@@ -163,7 +163,7 @@ class Radio {
      * @param state_id Current rocket state, as integer ID
      */
     static void sendBulkSensor(uint32_t time, float alt, Accelerometer &xl,
-                               IMU &imu, GPS &gps, uint8_t state_id);
+                               IMU &imu, GPS &gps, uint16_t state_id);
 
     /**
      * @brief Helper function to send message.
