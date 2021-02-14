@@ -68,7 +68,7 @@ class RadioTxBulk {
             Hal::tpoint_to_uint(rocket.sensors.last_poll_time()),
             rocket.calc.altitude(), rocket.sensors.accelerometer,
             rocket.sensors.imuSensor, rocket.sensors.gps,
-            static_cast<uint8_t>(state));
+            static_cast<uint16_t>(state));
     }
 
     Rocket &rocket;
