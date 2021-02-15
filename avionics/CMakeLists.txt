@@ -27,6 +27,7 @@ include_directories(
     common/lib
     envs/x86/include
     envs/x86/lib
+    extra
 )
 
 # Rocket-specific directories
@@ -148,6 +149,9 @@ target_sources(testexe_LedBlinker PUBLIC common/src/tasks/led_blinker.cpp)
 ROCKET_CREATE_TEST(RepeatChecksState)
 
 ROCKET_CREATE_TEST(States)
+
+ROCKET_CREATE_TEST(Barometric)
+target_sources(testexe_Barometric PUBLIC common/lib/CalcHelpers/barometric.cpp)
 
 
 # We can now call make test to run all the tests
