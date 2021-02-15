@@ -20,8 +20,7 @@ template <typename T> class ExponentialMovingAvg {
         reset(init, var, alpha);
     }
 
-    ExponentialMovingAvg() {
-    } // Dummy constructor that doesn't do anything - must call reset later.
+    ExponentialMovingAvg() {}
 
     /**
      * @brief Resets the averager, reinitializing all relevant variables
