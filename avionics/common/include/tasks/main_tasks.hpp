@@ -2,7 +2,6 @@
 #define MAIN_TASKS_HPP_6FADFAE876EC4E6D8B5A9394585FE936
 #include "radio.h"
 #include "rocket.h"
-#include "state_input_struct.h"
 
 /**
  * @brief Main sensor read, state estimation, run state machine, log data loop
@@ -11,8 +10,6 @@ class ReadEvalLog {
   private:
     Rocket &rocket_;
     CommandReceiver command_receiver;
-    // TODO - see if state_aux is actually used / wheter it should be used
-    StateAuxilliaryInfo state_aux; // Output info from states
 
     constexpr static unsigned int NOMINAL_POLLING_TIME_INTERVAL = 50; // ms
     // MainDescent state updates this to 5000 ms - see main_descent.cpp
@@ -31,13 +28,12 @@ class ReadEvalLog {
         }
 
         StateId state = state_machine.getState();
-        StateInput state_input;
 
         sensors.poll();
-        calc.calculateValues(state, state_input, sensors.last_poll_time());
-        state_machine.update(state_input, state_aux);
+        calc.update(state, sensors.last_poll_time());
+        state_machine.update(calc);
         datalog.logData(Hal::tpoint_to_uint(sensors.last_poll_time()), sensors,
-                        state, calc.altitude(), calc.getBaseAltitude());
+                        state, calc.altitude(), calc.altitudeBase());
 
         Radio::forwardCommand(command_receiver);
     }

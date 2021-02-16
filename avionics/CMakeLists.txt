@@ -34,14 +34,19 @@ include_directories(
 target_include_directories(TantalusStage1 PUBLIC
   rockets/tantalus_stage_1/include
 )
+target_sources(TantalusStage1 PUBLIC extra/src/altitude_avg.cpp)
 
 target_include_directories(TantalusStage2 PUBLIC
 rockets/tantalus_stage_2/include
 )
+target_sources(TantalusStage2 PUBLIC extra/src/altitude_avg.cpp)
+
 
 target_include_directories(Hollyburn PUBLIC
 rockets/hollyburn/include
 )
+
+target_sources(Hollyburn PUBLIC extra/src/altitude_avg.cpp)
 
 ###
 ### Setup Radio defines

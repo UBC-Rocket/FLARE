@@ -7,15 +7,6 @@ struct Ignitor {
     bool fired = false;
 };
 
-// Mock (or rather have a consistent) state input struct
-#define STATE_INPUT_STRUCT_HPP_4A01F791ECBA4E3CB8BC12436C41ABC9
-struct StateInput {
-    float altitude;          // metres
-    float velocity_vertical; // m/s, vertical
-};
-
-struct StateAuxilliaryInfo {};
-
 #include "states/ascent_to_apogee.h"
 #include "states/repeated_checks.hpp"
 
@@ -23,10 +14,10 @@ TEST(AscentToApogee, FireIgnitor) {
     // Simulate free fall (uniform acceleration), with data every 50ms
     constexpr float grav = -9.81;
     constexpr float period = 50e-3;
-    StateInput data;
-    StateAuxilliaryInfo aux;
-    auto &alt = data.altitude;
-    auto &vel = data.velocity_vertical;
+    Calculator data;
+
+    auto &alt = data.alt;
+    auto &vel = data.vel_gnd_z;
     alt = 1000;
     vel = -2 * grav;
     Ignitor iggy;
@@ -35,7 +26,7 @@ TEST(AscentToApogee, FireIgnitor) {
     state.onEntry();
     float t;
     for (t = -2; t <= 2; t += period) {
-        StateId result = state.getNewState(data, aux);
+        StateId result = state.getNewState(data);
         if (result == StateId::PRESSURE_DELAY)
             break; // exited
         EXPECT_FALSE(iggy.fired);
@@ -50,10 +41,10 @@ TEST(DrogueDescent, FireIgnitor) {
     // Simulate falling at terminal velocity of 30 m/s
     constexpr float TERM_VEL = -30;
     constexpr float period = 50e-3;
-    StateInput data;
-    StateAuxilliaryInfo aux;
-    auto &alt = data.altitude;
-    auto &vel = data.velocity_vertical;
+    Calculator data;
+
+    auto &alt = data.alt;
+    auto &vel = data.vel_gnd_z;
     vel = TERM_VEL;
     Ignitor iggy;
 
@@ -63,7 +54,7 @@ TEST(DrogueDescent, FireIgnitor) {
     alt = main_alt + 50;
     bool ok = false;
     while (alt > main_alt - 50) {
-        StateId result = state.getNewState(data, aux);
+        StateId result = state.getNewState(data);
         if (result == StateId::MAIN_DESCENT) {
             ok = true;
             break; // exited

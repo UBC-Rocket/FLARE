@@ -1,7 +1,6 @@
 #pragma once
 
 #include "HAL/time.h"           //for Hal::t_point
-#include "state_input_struct.h" //found in rocket-specific folders
 #include "state_interface.h"
 /*Classes--------------------------------------------------------------*/
 
