@@ -29,6 +29,7 @@ void Barometer::readData() {
     barometer.readSensor();
 #endif
 
-    data_[0] = barometer.pressure();
+    // barometer.pressure() returns mbar; we want Pa
+    data_[0] = barometer.pressure() * 100;
     data_[1] = barometer.temperature();
 }

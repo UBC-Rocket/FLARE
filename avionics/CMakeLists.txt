@@ -155,5 +155,10 @@ target_sources(testexe_Barometric PUBLIC common/lib/CalcHelpers/barometric.cpp)
 
 ROCKET_CREATE_TEST(CalcHelpers)
 
+ROCKET_CREATE_TEST(Estimators)
+target_sources(testexe_Estimators PUBLIC
+    common/lib/CalcHelpers/barometric.cpp
+    )
+
 
 # We can now call make test to run all the tests

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BAROMETER_HPP_E5BACDD72523463B88A01C9A5C9F31FE
+#define BAROMETER_HPP_E5BACDD72523463B88A01C9A5C9F31FE
 
 /**
  * Barometer Sensor Class
@@ -22,3 +23,5 @@ class Barometer : public SensorBase<BAROMETER_DATA_LENGTH> {
   private:
     DataSpoof<BAROMETER_DATA_LENGTH> dat{SensorType::BAROMETER, data_};
 };
+
+#endif
