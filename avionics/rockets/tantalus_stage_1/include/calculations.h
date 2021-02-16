@@ -13,7 +13,6 @@ typedef extra::estimator::AltitudeAvg Calculator;
 // #include <Eigen/Geometry> //quaternions
 
 // #include "CalcHelpers/barometric.hpp"
-// #include "CalcHelpers/exponential_moving_avg.h"
 // #include "calculations_interface.h"
 // #include "sensor_collection.h"
 // #include "sensors/IMU.h"

@@ -2,7 +2,7 @@
 #define EXTRA_ALTITUDE_AVG_HPP_FD593D19A99D494D953E99E48E3C89BF
 
 #include "CalcHelpers/barometric.hpp"
-#include "CalcHelpers/exponential_moving_avg.h"
+#include "CalcHelpers/exponential_moving_avg.hpp"
 #include "CalcHelpers/simple_moving_avg.hpp"
 #include "HAL/time.h"
 #include "sensor_collection.h"

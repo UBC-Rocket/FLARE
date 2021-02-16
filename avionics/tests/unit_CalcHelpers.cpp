@@ -3,7 +3,7 @@
 #include <cmath>
 #include <vector>
 
-#include "CalcHelpers/exponential_moving_avg.h"
+#include "CalcHelpers/exponential_moving_avg.hpp"
 #include "CalcHelpers/simple_moving_avg.hpp"
 
 TEST(ExponentialMovingAvg, Basic) {
