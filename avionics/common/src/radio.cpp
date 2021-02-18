@@ -81,7 +81,10 @@ class Radio::RadioMembers {
     friend class Radio;
 
   public:
-    RadioMembers();
+    RadioMembers() : 
+        gnd_addr_(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB),
+        tx_q_(MAX_QUEUED_BYTES)
+        {}
 
   private:
     XBee xbee_;
@@ -95,11 +98,7 @@ class Radio::RadioMembers {
 static Radio::RadioMembers self;
 
 constexpr Hal::ms Radio::WATCHDOG_SEND_INTERVAL;
-
-// Initializes radio member variables;
-Radio::RadioMembers::RadioMembers()
-    : gnd_addr_(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB),
-      tx_q_(MAX_QUEUED_BYTES) {}
+bool Radio::m_can_send = true;
 
 void Radio::initialize() {
     auto &serial = Hal::SerialInst::Radio;
@@ -233,8 +232,10 @@ void Radio::addSubpacket(SubPktPtr dat) { self.tx_q_.push(std::move(dat)); }
 int Radio::read_count_ = 0;
 
 Radio::fwd_cmd_t Radio::readPacket(command_t *&command_dat_out,
-                                   command_t &command_len_out) {
+                                   uint8_t &command_len_out) {
     fwd_cmd_t result = 0;
+    command_len_out = 0;
+
     while (read_count_ < MAX_PACKETS_PER_RX_LOOP) {
         self.xbee_.readPacket();
         read_count_++;
