@@ -1,11 +1,12 @@
 #pragma once
 
+#include <cassert>
 #include <unordered_map> //for std::unordered_map (hash map)
 
-#include "calculations.h"
-#include "state_interface.h"
 #include "HAL/time.h"
+#include "calculations.h"
 #include "radio.h"
+#include "state_interface.h"
 
 class StateMachine {
   public:
@@ -23,7 +24,8 @@ class StateMachine {
         StateId new_id = current_state->getNewState(calc);
         if (new_id != current_id_) {
             state_map_[new_id]->onEntry();
-            Radio::sendState(Hal::tpoint_to_uint(Hal::now_ms()), static_cast<uint16_t>(new_id));
+            Radio::sendState(Hal::tpoint_to_uint(Hal::now_ms()),
+                             static_cast<uint16_t>(new_id));
             current_id_ = new_id;
         }
     }
