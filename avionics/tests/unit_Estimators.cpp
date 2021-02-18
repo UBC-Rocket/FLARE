@@ -32,13 +32,13 @@ TEST(AltitudeAvg, Application) {
     Barometer &baro = sensors.barometer;
 
     // Corresponds to ~ 1600 m above sea level
-    baro.pressure_ = 83550;
+    baro.pressure_ = 835.50;
     extra::estimator::AltitudeAvg estimator(sensors,
                                             Hal::t_point(Hal::ms(-50)));
 
     // Standard mersenne_twister_engine with consistent seed
     std::mt19937 gen(314159);
-    std::uniform_real_distribution<> dis(83500, 83600);
+    std::uniform_real_distribution<> dis(835.00, 836.00);
 
     // Develop initial state
     int n = 0;
@@ -55,7 +55,7 @@ TEST(AltitudeAvg, Application) {
     auto ground_alt = estimator.altitudeBase();
 
     for (; n < 1050; ++n) {
-        baro.pressure_ = 83520;
+        baro.pressure_ = 835.20;
         estimator.update(StateId::LANDED, Hal::t_point(Hal::ms(n * 50)));
     }
 
@@ -63,10 +63,10 @@ TEST(AltitudeAvg, Application) {
 
     // Base altitude shouldn't change with drastic updates, but AGL alt should.
     // Simulate upwards motion @ 200 m/s, data rate 20 Hz
-    std::vector<float> const data{83524, 83421, 83318, 83216, 83113, 83011,
-                                  82909, 82809, 82705, 82603, 82501, 82400,
-                                  82298, 82197, 82095, 81994, 81893, 81792,
-                                  81691, 81590, 81489};
+    std::vector<float> const data{835.24, 834.21, 833.18, 832.16, 831.13, 830.11,
+                                  829.09, 828.09, 827.05, 826.03, 825.01, 824.00,
+                                  822.98, 821.97, 820.95, 819.94, 818.93, 817.92,
+                                  816.91, 815.90, 814.89};
     for (auto dat : data) {
         baro.pressure_ = dat;
         estimator.update(StateId::ASCENT_TO_APOGEE,
