@@ -1,5 +1,11 @@
 #include "CalcHelpers/barometric.hpp"
 
+/**
+ * @brief Returns the altitude above sea-level given pressure.
+ * See https://en.wikipedia.org/wiki/Barometric_formula
+ * @param pascals Pressure, in [Pa]
+ * @return Altitude above sea level [m]
+ */
 float /* m */ pressureToAltitude(float pres /* mbar */) {
     constexpr float Pb = 101325;
     constexpr float Tb = 288.15;

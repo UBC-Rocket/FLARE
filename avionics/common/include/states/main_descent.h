@@ -2,7 +2,6 @@
 
 /*Includes------------------------------------------------------------*/
 #include "calculations.h"
-#include "state_input_struct.h"
 #include "state_interface.h"
 #include <chrono>
 
@@ -35,8 +34,7 @@ class MainDescent : public IState {
      * @return State enumeration code, to be passed into the std::map between
      * codes and used states. Note that the returned code may be the same state.
      */
-    StateId getNewState(const StateInput &input,
-                        StateAuxilliaryInfo &state_aux);
+    StateId getNewState(Calculator const &);
 
     void onEntry() override { prev_altitude = calc_.altitude(); }
 

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef BAROMETER_HPP_E5BACDD72523463B88A01C9A5C9F31FE
+#define BAROMETER_HPP_E5BACDD72523463B88A01C9A5C9F31FE
+
 /**
  * Barometer Sensor Class
  */
@@ -19,3 +21,5 @@ class Barometer : public SensorBase<BAROMETER_DATA_LENGTH> {
   private:
     MS_5803 barometer;
 };
+
+#endif

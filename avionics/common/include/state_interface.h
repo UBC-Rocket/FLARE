@@ -2,8 +2,8 @@
 
 #include <functional> //for std::hash specialization (need to specialize)
 
+#include "calculations.h"
 #include "state_id_enum.hpp"
-#include "state_input_struct.h"
 
 // Need to specify hash for StateId, since scoped enums aren't allowed as hash
 // keys until C++14
@@ -29,8 +29,7 @@ class IState {
      * @return State enumeration code, to be passed into the std::map between
      * codes and used states. Note that the returned code may be the same state.
      */
-    virtual StateId getNewState(const StateInput &input,
-                                StateAuxilliaryInfo &state_aux) = 0;
+    virtual StateId getNewState(Calculator const &input) = 0;
 
     /**
      * @brief Optional method that runs when entering a state from a different

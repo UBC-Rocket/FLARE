@@ -1,10 +1,12 @@
 #pragma once
 
+#include <cassert>
 #include <unordered_map> //for std::unordered_map (hash map)
 
-#include "state_interface.h"
 #include "HAL/time.h"
+#include "calculations.h"
 #include "radio.h"
+#include "state_interface.h"
 
 class StateMachine {
   public:
@@ -17,12 +19,13 @@ class StateMachine {
         assert(map.count(StateId::WINTER_CONTINGENCY) != 0);
     }
 
-    void update(const StateInput state_input, StateAuxilliaryInfo state_aux) {
+    void update(Calculator const &calc) {
         IState *current_state = state_map_[current_id_];
-        StateId new_id = current_state->getNewState(state_input, state_aux);
+        StateId new_id = current_state->getNewState(calc);
         if (new_id != current_id_) {
             state_map_[new_id]->onEntry();
-            Radio::sendState(Hal::tpoint_to_uint(Hal::now_ms()), static_cast<uint16_t>(new_id));
+            Radio::sendState(Hal::tpoint_to_uint(Hal::now_ms()),
+                             static_cast<uint16_t>(new_id));
             current_id_ = new_id;
         }
     }

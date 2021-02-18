@@ -21,7 +21,7 @@ struct Rocket {
 
     Rocket()
         : cam(Hal::SerialInst::Camera), datalog(LOG_FILE_NAME),
-          init_status(collectStatus(sensors, ignitors)), calc(sensors),
+          init_status(collectStatus(sensors, ignitors)), calc(sensors, Hal::now_ms()),
           config(calc, ignitors, cam),
           state_machine(config.state_map, config.initial_state) {}
 
@@ -132,7 +132,7 @@ class CommandReceiver {
             break; // Voltage sensor not implemented
         case 0x1F:
             Radio::sendSingleSensor(sensor_poll_time, 0x1F,
-                                    rocket_.calc.getBaseAltitude());
+                                    rocket_.calc.altitudeBase());
             break;
         default:
             break;
