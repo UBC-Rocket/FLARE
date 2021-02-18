@@ -62,6 +62,7 @@ class Radio {
         event = 0x02,
         config = 0x03,
         gps = 0x04,
+        state = 0x05,
         bulk_sensor = 0x30,
     };
 
@@ -166,7 +167,7 @@ class Radio {
      * @param state_id Current rocket state, as integer ID
      */
     static void sendBulkSensor(uint32_t time, float alt, Accelerometer &xl,
-                               IMU &imu, GPS &gps, uint8_t state_id);
+                               IMU &imu, GPS &gps, uint16_t state_id);
 
     /**
      * @brief Helper function to send message.
@@ -192,7 +193,7 @@ class Radio {
      * @param time Timestamp, in milliseconds
      * @param state_id Current rocket state, as integer ID
      */
-    static void sendState(const uint32_t time, uint8_t state_id);
+    static void sendState(const uint32_t time, uint16_t state_id);
 
     static void sendConfig(const uint32_t time);
 

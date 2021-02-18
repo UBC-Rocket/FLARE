@@ -135,7 +135,7 @@ void Radio::sendStatus(uint32_t time, RocketStatus status,
 }
 
 void Radio::sendBulkSensor(uint32_t time, float alt, Accelerometer &xl,
-                           IMU &imu, GPS &gps, uint8_t state_id) {
+                           IMU &imu, GPS &gps, uint16_t state_id) {
     PacketBuffWriter buf;
     addIdTime(buf, Ids::bulk_sensor, time);
 
@@ -153,7 +153,7 @@ void Radio::sendBulkSensor(uint32_t time, float alt, Accelerometer &xl,
     buf.write(gps.getData(), 8);
 
     // State
-    buf.write(&state_id, 1);
+    buf.write(&state_id, sizeof(uint16_t));
 
     Radio::addSubpacket(std::move(buf.packet));
 }
@@ -188,16 +188,10 @@ void Radio::sendSingleSensor(const uint32_t time, uint8_t id, float data) {
     Radio::addSubpacket(std::move(buf.packet));
 }
 
-void Radio::sendState(const uint32_t time, uint8_t state_id) {
+void Radio::sendState(const uint32_t time, uint16_t state_id) {
     PacketBuffWriter buf;
-
-    buf.write(0x1D); // id
-    buf.write(&time, 4);
-    buf.write(0);
-    buf.write(0);
-    buf.write(0);
-    buf.write(state_id);
-
+    addIdTime(buf, Ids::state, time);
+    buf.write(&state_id, sizeof(uint16_t));
     Radio::addSubpacket(std::move(buf.packet));
 }
 
