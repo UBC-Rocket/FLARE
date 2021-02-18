@@ -3,7 +3,6 @@
 /*Includes------------------------------------------------------------*/
 #include "cameras.h"
 #include "scheduler.hpp"
-#include "state_input_struct.h"
 #include "state_interface.h"
 
 namespace State {
@@ -24,9 +23,7 @@ class Landed : public IState {
      * @return State enumeration code, to be passed into the std::map between
      * codes and used states. Note that the returned code may be the same state.
      */
-    StateId getNewState(const StateInput &, StateAuxilliaryInfo &) {
-        return StateId::LANDED;
-    }
+    StateId getNewState(Calculator const &) { return StateId::LANDED; }
 
     void onEntry() override {
         // TODO: Turn off cameras and camera cycling task

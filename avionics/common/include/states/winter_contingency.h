@@ -1,7 +1,6 @@
 #pragma once
 
 /*Includes------------------------------------------------------------*/
-#include "state_input_struct.h"
 #include "state_interface.h"
 
 namespace State {
@@ -22,7 +21,7 @@ class WinterContingency : public IState {
      * @return State enumeration code, to be passed into the std::map between
      * codes and used states. Note that the returned code may be the same state.
      */
-    StateId getNewState(const StateInput &, StateAuxilliaryInfo &) {
+    StateId getNewState(Calculator const &) {
         return StateId::WINTER_CONTINGENCY;
     }
 };

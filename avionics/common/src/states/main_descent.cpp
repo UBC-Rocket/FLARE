@@ -2,14 +2,13 @@
 #include "HAL/time.h"
 #include "scheduler.hpp"
 
-StateId State::MainDescent::getNewState(const StateInput &input,
-                                        StateAuxilliaryInfo &) {
+StateId State::MainDescent::getNewState(Calculator const &input) {
     typedef std::chrono::milliseconds ms;
 
     if (curr_time - prev_time >= LANDED_TIME_INTERVAL_) {
         auto dt_ms =
             std::chrono::duration_cast<ms>(curr_time - prev_time).count();
-        if (abs(input.altitude - prev_altitude) * 1000 / dt_ms <
+        if (abs(input.altitude() - prev_altitude) * 1000 / dt_ms <
             LANDED_VELOCITY_) {
             num_checks++;
         } else {

@@ -27,20 +27,26 @@ include_directories(
     common/lib
     envs/x86/include
     envs/x86/lib
+    extra
 )
 
 # Rocket-specific directories
 target_include_directories(TantalusStage1 PUBLIC
   rockets/tantalus_stage_1/include
 )
+target_sources(TantalusStage1 PUBLIC extra/src/altitude_avg.cpp)
 
 target_include_directories(TantalusStage2 PUBLIC
 rockets/tantalus_stage_2/include
 )
+target_sources(TantalusStage2 PUBLIC extra/src/altitude_avg.cpp)
+
 
 target_include_directories(Hollyburn PUBLIC
 rockets/hollyburn/include
 )
+
+target_sources(Hollyburn PUBLIC extra/src/altitude_avg.cpp)
 
 ###
 ### Setup Radio defines
@@ -148,6 +154,16 @@ target_sources(testexe_LedBlinker PUBLIC common/src/tasks/led_blinker.cpp)
 ROCKET_CREATE_TEST(RepeatChecksState)
 
 ROCKET_CREATE_TEST(States)
+
+ROCKET_CREATE_TEST(Barometric)
+target_sources(testexe_Barometric PUBLIC common/lib/CalcHelpers/barometric.cpp)
+
+ROCKET_CREATE_TEST(CalcHelpers)
+
+ROCKET_CREATE_TEST(Estimators)
+target_sources(testexe_Estimators PUBLIC
+    common/lib/CalcHelpers/barometric.cpp
+    )
 
 
 # We can now call make test to run all the tests

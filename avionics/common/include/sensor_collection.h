@@ -1,3 +1,6 @@
+#ifndef SENSOR_COLLECTION_HPP_C433414CA96E4AB8A2065CE9C7E10AA3
+#define SENSOR_COLLECTION_HPP_C433414CA96E4AB8A2065CE9C7E10AA3
+
 /*
  * Sensor collection
  *
@@ -13,8 +16,6 @@
  *
  * Distributed as-is; no warranty is given.
  */
-
-#pragma once
 
 /*Includes------------------------------------------------------------*/
 #include "HAL/time.h"
@@ -90,3 +91,5 @@ class SensorCollection {
         return sensor_data;
     }
 };
+
+#endif

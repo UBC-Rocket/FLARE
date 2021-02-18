@@ -3,7 +3,6 @@
 /*Includes------------------------------------------------------------*/
 #include "HAL/time.h"
 
-#include "state_input_struct.h"
 #include "state_interface.h"
 
 namespace State {
@@ -25,8 +24,7 @@ class PressureDelay : public IState {
      * @return State enumeration code, to be passed into the std::map between
      * codes and used states. Note that the returned code may be the same state.
      */
-    StateId getNewState(const StateInput &input,
-                        StateAuxilliaryInfo &state_aux);
+    StateId getNewState(Calculator const &);
 
     void onEntry() { start_time_ = Hal::now_ms(); }
 

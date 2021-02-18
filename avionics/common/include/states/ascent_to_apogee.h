@@ -2,7 +2,6 @@
 
 /*Includes------------------------------------------------------------*/
 #include "hardware/ignitor.h"
-#include "state_input_struct.h"
 #include "state_interface.h"
 
 namespace State {
@@ -29,9 +28,8 @@ class AscentToApogee : public IState {
      * @return State enumeration code, to be passed into the std::map between
      * codes and used states. Note that the returned code may be the same state.
      */
-    StateId getNewState(const StateInput &input,
-                        StateAuxilliaryInfo &state_aux) {
-        if (input.velocity_vertical > MACH_LOCK_VELOCITY_) {
+    StateId getNewState(Calculator const &input) {
+        if (input.velocityGroundZ() > MACH_LOCK_VELOCITY_) {
             if (++mach_checks >= MACH_LOCK_CHECKS_) {
                 return mach_lock_id_;
             }
@@ -39,12 +37,12 @@ class AscentToApogee : public IState {
             mach_checks = 0;
         }
 
-        if (input.altitude < last_alt) {
+        if (input.altitude() < last_alt) {
             apogee_checks++;
         } else if (apogee_checks > 0) {
             apogee_checks--;
         }
-        last_alt = input.altitude;
+        last_alt = input.altitude();
 
         if (apogee_checks >= APOGEE_CHECKS_) {
             drogue_ignitor_.fire();
