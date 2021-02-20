@@ -3,6 +3,7 @@
 
 struct StateInput {
     float altitude;
+    float velocity_vertical;
 };
 
 struct StateAuxilliaryInfo {};

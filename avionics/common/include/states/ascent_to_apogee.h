@@ -33,6 +33,7 @@ class AscentToApogee : public IState {
     void onEntry() override {
         apogee_checks = 0;
         mach_checks = 0;
+        initial_time = 0;
         // Awkward to pass in first value - 0-initialize works with checks.
         last_alt = 0;
     }
@@ -45,6 +46,7 @@ class AscentToApogee : public IState {
     const StateId mach_lock_id_;
     uint8_t apogee_checks{0};
     uint8_t mach_checks{0};
+    uint32_t initial_time;
     float last_alt{0};
 };
 

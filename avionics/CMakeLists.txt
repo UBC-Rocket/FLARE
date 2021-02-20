@@ -64,12 +64,11 @@ target_compile_definitions(Hollyburn PUBLIC
 message(STATUS "Resolving GIT Version")
 message("Directory: ${CMAKE_CURRENT_LIST_DIR}")
 set(_git_build_version "unknown")
-
-find_package(Python3 COMPONENTS Interpreter)
-if(Python3_FOUND)
-execute_process(COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_LIST_DIR}/../custom_tools/get_submodule.py")
+find_package(Python COMPONENTS Interpreter)
+if(Python_FOUND)
+execute_process(COMMAND ${Python_EXECUTABLE} "${CMAKE_CURRENT_LIST_DIR}/../custom_tools/get_submodule.py")
 execute_process(
-  COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_LIST_DIR}/../custom_tools/git_rev_macro.py" "x86"
+  COMMAND ${Python_EXECUTABLE} "${CMAKE_CURRENT_LIST_DIR}/../custom_tools/git_rev_macro.py" "x86"
   OUTPUT_VARIABLE _git_build_version
   WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
   )
@@ -78,7 +77,6 @@ execute_process(
 else()
   message(SEND_ERROR "Python not found; unable to set Radio Config data")
 endif()
-
 
 ###
 ### Google Test
@@ -141,6 +139,11 @@ endfunction()
 
 ROCKET_CREATE_TEST(LedBlinker)
 target_sources(testexe_LedBlinker PUBLIC common/src/tasks/led_blinker.cpp)
+
+ROCKET_CREATE_TEST(MachTest)
+target_sources(testexe_MachTest PUBLIC common/src/states/ascent_to_apogee.cpp)
+target_sources(testexe_MachTest PUBLIC envs/x86/lib/HAL/time.cpp)
+target_sources(testexe_MachTest PUBLIC envs/x86/src/stdio_controller.cpp)
 
 ROCKET_CREATE_TEST(RepeatChecksState)
 
