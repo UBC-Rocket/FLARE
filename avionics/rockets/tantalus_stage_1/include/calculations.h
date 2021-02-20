@@ -4,10 +4,6 @@
 
 typedef extra::estimator::AltitudeAvg Calculator;
 
-
-// #undef abs // TODO This macro gets defined somewhere with Teensy and I'm not
-//            // sure where or whether there's a better way around it
-
 // #include <cmath> //std::abs
 
 // #include <Eigen/Geometry> //quaternions
@@ -63,7 +59,8 @@ typedef extra::estimator::AltitudeAvg Calculator;
 //         /* Do some math to figure out orientation & acceleration in relevant
 //          * frames*/
 //         // TODO - check state to only do these calculations when necessary
-//         // There may be some really clever way to do this with pointers, or at
+//         // There may be some really clever way to do this with pointers, or
+//         at
 //         // least use comma initialization
 //         out.accel_rocket(0) =
 //             imu_.getData()[0]; //? TODO - make sure these are aligned
@@ -81,7 +78,8 @@ typedef extra::estimator::AltitudeAvg Calculator;
 //         // convert into quaternion for operation
 //         const Eigen::Quaternionf xl_rocket_quat(
 //             0, out.accel_rocket(0), out.accel_rocket(1),
-//             out.accel_rocket(2)); // There may be some really clever way to do
+//             out.accel_rocket(2)); // There may be some really clever way to
+//             do
 //                                   // this with more pointers
 
 //         // conjugate to rotate
@@ -89,7 +87,8 @@ typedef extra::estimator::AltitudeAvg Calculator;
 //             out.orientation.conjugate() * xl_rocket_quat * out.orientation;
 
 //         // turn back into vector
-//         out.accel_ground << xl_gnd_quat.x(), xl_gnd_quat.y(), xl_gnd_quat.z();
+//         out.accel_ground << xl_gnd_quat.x(), xl_gnd_quat.y(),
+//         xl_gnd_quat.z();
 //     }
 
 //     /**

@@ -36,8 +36,6 @@ void StdIoController::putPacket(uint8_t const id, uint8_t const *c,
         return;
     }
     const std::lock_guard<std::mutex> lock(cout_mutex_);
-    // TODO - check the success of std::cout.put and other unformatted
-    // output, and possibly do something about it
 
     outputFiltered(id);                                // ID
     outputFiltered(static_cast<uint8_t>(length >> 8)); // Length, bigendian
