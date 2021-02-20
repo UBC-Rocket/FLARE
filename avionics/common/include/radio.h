@@ -70,7 +70,7 @@ class Radio {
     constexpr static fwd_cmd_t STOP_PARSE_FLAG = 1 << 0;
     constexpr static fwd_cmd_t CAN_SEND_FLAG = 1 << 1;
     
-    static bool m_can_send; // Is XBee available to send
+    static bool can_send_; // Is XBee available to send
 
   public:
     // type RadioMembers is public for technical reasons but cannot be used
@@ -116,7 +116,7 @@ class Radio {
             command_t *command_data;
             uint8_t command_len;
             result = readPacket(command_data, command_len);
-            m_can_send |= result & CAN_SEND_FLAG;
+            can_send_ |= result & CAN_SEND_FLAG;
             if (result & STOP_PARSE_FLAG) {
                 break;
             }
@@ -126,11 +126,11 @@ class Radio {
         }
 
         if (Hal::now_ms() - watchdog_last_send > WATCHDOG_SEND_INTERVAL) {
-            m_can_send = true;
+            can_send_ = true;
         }
         
-        if (m_can_send) {
-            m_can_send = false;
+        if (can_send_) {
+            can_send_ = false;
             watchdog_last_send = Hal::now_ms();
             send();
         }

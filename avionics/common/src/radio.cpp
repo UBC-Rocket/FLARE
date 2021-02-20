@@ -98,7 +98,7 @@ class Radio::RadioMembers {
 static Radio::RadioMembers self;
 
 constexpr Hal::ms Radio::WATCHDOG_SEND_INTERVAL;
-bool Radio::m_can_send = true;
+bool Radio::can_send_ = true;
 
 void Radio::initialize() {
     auto &serial = Hal::SerialInst::Radio;
