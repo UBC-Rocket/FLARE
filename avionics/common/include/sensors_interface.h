@@ -2,8 +2,6 @@
 
 #include "HAL/port_impl.h"
 #include <cstdint>
-#include <functional> //for std::reference_wrapper
-#include <vector>     //for std::vector
 
 #include "status_enums.h"
 
