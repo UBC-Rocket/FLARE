@@ -1,7 +1,6 @@
 #pragma once
 
 /*Includes------------------------------------------------------------*/
-#include "state_input_struct.h"
 #include "state_interface.h"
 
 namespace State {
@@ -23,8 +22,7 @@ class PoweredAscent : public IState {
      * @return State enumeration code, to be passed into the std::map between
      * codes and used states. Note that the returned code may be the same state.
      */
-    StateId getNewState(StateInput const &input,
-                        StateAuxilliaryInfo &state_aux) {
+    StateId getNewState(Calculator const &input) {
         static uint8_t burnout_checks = 0;
 
         if (input.accel_rocket(0) < 0) {

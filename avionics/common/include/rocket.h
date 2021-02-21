@@ -21,8 +21,9 @@ struct Rocket {
 
     Rocket()
         : cam(Hal::SerialInst::Camera), datalog(LOG_FILE_NAME),
-          init_status(collectStatus(sensors, ignitors)), calc(sensors),
-          config(calc), state_machine(config.state_map, config.initial_state) {}
+          init_status(collectStatus(sensors, ignitors)), calc(sensors, Hal::now_ms()),
+          config(calc, ignitors, cam),
+          state_machine(config.state_map, config.initial_state) {}
 
     // WARNING - MEMBER ORDER DEPENDENCY
     // https://isocpp.org/wiki/faq/ctors#order-dependency-in-members
@@ -56,18 +57,20 @@ class CommandReceiver {
             break;
         case 'A':
             rocket_.state_machine.arm();
+            rocket_.cam.start_record();
             break;
         case 'C':
             Radio::sendConfig(Hal::millis());
             break;
         case 'D':
             rocket_.state_machine.disarm();
+            rocket_.cam.stop_record();
             break;
         case 0x30:
             Radio::sendBulkSensor(
                 sensor_poll_time, rocket_.calc.altitude(),
                 rocket_.sensors.accelerometer, rocket_.sensors.imuSensor,
-                rocket_.sensors.gps, static_cast<uint8_t>(state));
+                rocket_.sensors.gps, static_cast<uint16_t>(state));
             break;
         case 0x04:
             Radio::sendGPS(sensor_poll_time, rocket_.sensors.gps);
@@ -123,13 +126,13 @@ class CommandReceiver {
                                     rocket_.calc.altitude());
             break;
         case 0x1D:
-            Radio::sendState(sensor_poll_time, static_cast<uint8_t>(state));
+            Radio::sendState(sensor_poll_time, static_cast<uint16_t>(state));
             break;
         case 0x1E:
             break; // Voltage sensor not implemented
         case 0x1F:
             Radio::sendSingleSensor(sensor_poll_time, 0x1F,
-                                    rocket_.calc.getBaseAltitude());
+                                    rocket_.calc.altitudeBase());
             break;
         default:
             break;

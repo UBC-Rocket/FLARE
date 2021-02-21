@@ -38,8 +38,7 @@ namespace State {
 template <StateId my_id, StateId next_id, int num_checks, class Derived>
 class RepeatedCheckBase : public IState {
   public:
-    StateId getNewState(StateInput const &input,
-                        StateAuxilliaryInfo &) final override {
+    StateId getNewState(Calculator const &input) final override {
         if (accept(input)) {
             ++checks_;
             if (checks_ >= num_checks) {
@@ -75,7 +74,7 @@ class RepeatedCheckBase : public IState {
     /**
      * @brief Alias for underlying `accept` function.
      */
-    bool accept(const StateInput &input) {
+    bool accept(Calculator const &input) {
         return static_cast<Derived *>(this)->accept(input);
     }
 };

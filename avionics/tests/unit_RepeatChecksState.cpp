@@ -13,76 +13,75 @@ class SimpleTestState
 
     friend State::RepeatedCheckBase<StateId::kSimple, StateId::kExit,
                                     kNumChecks, SimpleTestState>;
-    bool accept(const StateInput &input) { return input.altitude > 10; };
+    bool accept(Calculator const &input) { return input.altitude() > 10; };
 };
 
 TEST(RepeatedChecksState, Simple) {
     SimpleTestState state;
-    StateInput input;
-    StateAuxilliaryInfo aux;
-    input.altitude = 5;
+    Calculator input;
+    input.alt = 5;
 
     for (int i = 0; i < kNumChecks * 10; ++i) {
-        EXPECT_EQ(state.getNewState(input, aux), StateId::kSimple);
+        EXPECT_EQ(state.getNewState(input), StateId::kSimple);
     }
 
-    input.altitude = 15;
+    input.alt = 15;
 
     for (int i = 1; i < kNumChecks; ++i) {
-        EXPECT_EQ(state.getNewState(input, aux), StateId::kSimple);
+        EXPECT_EQ(state.getNewState(input), StateId::kSimple);
     }
-    EXPECT_EQ(state.getNewState(input, aux), StateId::kExit);
+    EXPECT_EQ(state.getNewState(input), StateId::kExit);
 
     // Suppose we re-enter state
     state.onEntry();
     for (int i = 1; i < kNumChecks; ++i) {
-        EXPECT_EQ(state.getNewState(input, aux), StateId::kSimple);
+        EXPECT_EQ(state.getNewState(input), StateId::kSimple);
     }
-    EXPECT_EQ(state.getNewState(input, aux), StateId::kExit);
+    EXPECT_EQ(state.getNewState(input), StateId::kExit);
 
     // Re-enter state again
     state.onEntry();
-    input.altitude = 5;
+    input.alt = 5;
 
     for (int i = 0; i < kNumChecks * 10; ++i) {
-        EXPECT_EQ(state.getNewState(input, aux), StateId::kSimple);
+        EXPECT_EQ(state.getNewState(input), StateId::kSimple);
     }
 
-    input.altitude = 15;
+    input.alt = 15;
 
     for (int i = 1; i < kNumChecks; ++i) {
-        EXPECT_EQ(state.getNewState(input, aux), StateId::kSimple);
+        EXPECT_EQ(state.getNewState(input), StateId::kSimple);
     }
-    EXPECT_EQ(state.getNewState(input, aux), StateId::kExit);
+    EXPECT_EQ(state.getNewState(input), StateId::kExit);
 }
 
 TEST(RepeatedChecksState, Fluke) {
     SimpleTestState state;
-    StateInput input;
-    StateAuxilliaryInfo aux;
-    input.altitude = 15;
-    EXPECT_EQ(state.getNewState(input, aux), StateId::kSimple);
+    Calculator input;
 
-    input.altitude = 5;
-    EXPECT_EQ(state.getNewState(input, aux), StateId::kSimple);
-    input.altitude = 15;
+    input.alt = 15;
+    EXPECT_EQ(state.getNewState(input), StateId::kSimple);
+
+    input.alt = 5;
+    EXPECT_EQ(state.getNewState(input), StateId::kSimple);
+    input.alt = 15;
     for (int i = 1; i < kNumChecks; ++i) {
-        EXPECT_EQ(state.getNewState(input, aux), StateId::kSimple);
+        EXPECT_EQ(state.getNewState(input), StateId::kSimple);
     }
-    EXPECT_EQ(state.getNewState(input, aux), StateId::kExit);
+    EXPECT_EQ(state.getNewState(input), StateId::kExit);
 
     state.onEntry();
     for (int i = 1; i < kNumChecks; ++i) {
-        EXPECT_EQ(state.getNewState(input, aux), StateId::kSimple);
+        EXPECT_EQ(state.getNewState(input), StateId::kSimple);
     }
-    input.altitude = 5; // break chain
-    EXPECT_EQ(state.getNewState(input, aux), StateId::kSimple);
+    input.alt = 5; // break chain
+    EXPECT_EQ(state.getNewState(input), StateId::kSimple);
 
-    input.altitude = 15;
+    input.alt = 15;
     for (int i = 1; i < kNumChecks; ++i) {
-        EXPECT_EQ(state.getNewState(input, aux), StateId::kSimple);
+        EXPECT_EQ(state.getNewState(input), StateId::kSimple);
     }
-    EXPECT_EQ(state.getNewState(input, aux), StateId::kExit);
+    EXPECT_EQ(state.getNewState(input), StateId::kExit);
 }
 
 class ExtraActionTestState
@@ -91,7 +90,7 @@ class ExtraActionTestState
 
     friend State::RepeatedCheckBase<StateId::kSimple, StateId::kExit,
                                     kNumChecks, ExtraActionTestState>;
-    bool accept(const StateInput &input) { return input.altitude > 10; };
+    bool accept(Calculator const &input) { return input.altitude() > 10; };
 
     void extraOnEntry() { enterCalled = true; }
     void extraOnExit() { exitCalled = true; }
@@ -103,27 +102,27 @@ class ExtraActionTestState
 };
 TEST(RepeatedChecksState, ExtraActions) {
     ExtraActionTestState state;
-    StateInput input;
-    StateAuxilliaryInfo aux;
+    Calculator input;
+
     state.onEntry();
 
     EXPECT_TRUE(state.enterCalled);
     state.enterCalled = false;
 
-    input.altitude = 15;
+    input.alt = 15;
     // almost but not quite exit
     for (int i = 1; i < kNumChecks; ++i) {
-        state.getNewState(input, aux);
+        state.getNewState(input);
     }
-    input.altitude = 5; // reset checks
-    state.getNewState(input, aux);
+    input.alt = 5; // reset checks
+    state.getNewState(input);
 
-    input.altitude = 15;
+    input.alt = 15;
     for (int i = 1; i < kNumChecks; ++i) {
-        state.getNewState(input, aux);
+        state.getNewState(input);
     }
     EXPECT_FALSE(state.exitCalled);
-    state.getNewState(input, aux);
+    state.getNewState(input);
 
     EXPECT_TRUE(state.exitCalled);
     EXPECT_FALSE(state.enterCalled);
