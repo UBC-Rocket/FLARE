@@ -37,14 +37,8 @@
 /*Constants------------------------------------------------------------*/
 
 /*Variables------------------------------------------------------------*/
-// CSVWrite datalog; //MOVED TO ENV_CONFIG
 
 /*Functions------------------------------------------------------------*/
-/**
- * @brief  Initializes all the sensors
- * @param  sensors The sensors to initialize
- * @return void
- */
 
 void raiseToStatus(RocketStatus &currentStatus, RocketStatus incomingStatus) {
     if (incomingStatus > currentStatus) {
@@ -60,7 +54,6 @@ void raiseToStatus(RocketStatus &currentStatus, RocketStatus incomingStatus) {
  * @return void
  */
 void displayStatus(RocketStatus status, IBuzzer &buzzer) {
-    // TODO: Make response dependent on e-match success
     SongTypes song;
     switch (status) {
     case RocketStatus::NOMINAL:
