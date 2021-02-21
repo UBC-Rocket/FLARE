@@ -7,8 +7,8 @@ enum class TaskID {
     ReadEvalLog = 0,
     RadioTxBulk = 1,
     LEDBlinker = 2,
-    kLast,
+    kNum,
 };
 
-typedef ScheduleBase<SchedulerClock, static_cast<int>(TaskID::kLast)> Scheduler;
+typedef ScheduleBase<SchedulerClock, static_cast<int>(TaskID::kNum)> Scheduler;
 #endif
