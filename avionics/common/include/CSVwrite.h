@@ -19,12 +19,6 @@ thing as print, except put a newline character at the end. -Has void flush(void)
 method that flushes the buffer.
 */
 
-// TODO: Add Impl class or integrate in this class.
-// TODO: Figure out how to interface with SD Card
-
-// https://stackoverflow.com/questions/8016780/undefined-reference-to-static-constexpr-char
-// :/
-
 template <typename Impl> class CSVWrite {
   public:
     /**
