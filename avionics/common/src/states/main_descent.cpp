@@ -15,11 +15,12 @@ StateId State::MainDescent::getNewState(Calculator const &input) {
             num_checks = 0;
         }
 
-        if (num_checks < LANDED_CHECKS_) {
-            return StateId::MAIN_DESCENT;
+        if (num_checks >= LANDED_CHECKS_) {
+            return landed_state_;
         }
+
         prev_time = curr_time;
     }
 
-    return landed_state_;
+    return StateId::MAIN_DESCENT;
 }
