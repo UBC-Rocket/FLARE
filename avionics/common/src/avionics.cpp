@@ -122,9 +122,13 @@ int main(void) {
     Task read_eval_log(ReadEvalLog::run, &read_eval_logger, Hal::ms(50));
     registerTask(TaskID::ReadEvalLog, read_eval_log);
 
+    // Radio needs to be scheduled later; sensors need to be read first
     RadioTxBulk radio_txer(rocket);
     Task radio_tx(RadioTxBulk::run, &radio_txer, RadioTxBulk::freq);
-    registerTask(TaskID::RadioTxBulk, radio_tx);
+    Scheduler::preregisterTask(static_cast<int>(TaskID::RadioTxBulk), radio_tx,
+                               true, false);
+    Scheduler::scheduleTask(Hal::now_ms() + Hal::ms(1),
+                            static_cast<int>(TaskID::RadioTxBulk));
 
     Task led_blink(LEDBlinker::toggle, nullptr, LEDBlinker::freq);
 
