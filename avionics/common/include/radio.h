@@ -69,6 +69,8 @@ class Radio {
     constexpr static Hal::ms WATCHDOG_SEND_INTERVAL{3000};
     constexpr static fwd_cmd_t STOP_PARSE_FLAG = 1 << 0;
     constexpr static fwd_cmd_t CAN_SEND_FLAG = 1 << 1;
+    
+    static bool can_send_; // Is XBee available to send
 
   public:
     // type RadioMembers is public for technical reasons but cannot be used
@@ -107,14 +109,14 @@ class Radio {
         // Keeps track of last time sending was done.
         static Hal::t_point watchdog_last_send = Hal::now_ms();
 
-        bool can_send = false;
         read_count_ = 0; // resetting
         fwd_cmd_t result;
 
         while (true) {
             command_t *command_data;
-            command_t command_len;
+            uint8_t command_len;
             result = readPacket(command_data, command_len);
+            can_send_ |= result & CAN_SEND_FLAG;
             if (result & STOP_PARSE_FLAG) {
                 break;
             }
@@ -122,11 +124,13 @@ class Radio {
                 command_receiver.run_command(command_data[i]);
             }
         }
+
         if (Hal::now_ms() - watchdog_last_send > WATCHDOG_SEND_INTERVAL) {
-            can_send = true;
+            can_send_ = true;
         }
-        if (can_send) {
-            can_send = false;
+        
+        if (can_send_) {
+            can_send_ = false;
             watchdog_last_send = Hal::now_ms();
             send();
         }
@@ -220,7 +224,7 @@ class Radio {
      * found, the two outparams are set.
      */
     static fwd_cmd_t readPacket(command_t *&command_dat_out,
-                                command_t &command_len_out);
+                                uint8_t &command_len_out);
 
     /**
      * @brief Fills in the ID and timestamp given a subpacket pointer.

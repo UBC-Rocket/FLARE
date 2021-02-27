@@ -1,11 +1,8 @@
-
-#undef abs // TODO This macro gets defined somewhere with Teensy and I'm not
-           // sure where or whether there's a better way around it
+#undef abs
 #include <cmath> //std::abs
 
 #include "CalcHelpers/barometric.hpp"
 #include "extra/altitude_avg.hpp"
-
 #undef abs
 
 namespace extra {
