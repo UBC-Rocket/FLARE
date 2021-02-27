@@ -3,6 +3,7 @@
 /*Includes------------------------------------------------------------*/
 #include "hardware/ignitor.h"
 #include "state_interface.h"
+#include "HAL/time.h"
 
 namespace State {
 
@@ -10,9 +11,9 @@ class AscentToApogee : public IState {
   public:
     AscentToApogee(StateId post_apogee_id, StateId mach_lock_id,
                    uint8_t const APOGEE_CHECKS, uint8_t const MACH_LOCK_CHECKS,
-                   float MACH_LOCK_VELOCITY, Ignitor &drogue_ignitor)
+                   float MACH_LOCK_VELOCITY, uint32_t MACH_LOCK_TIME, Ignitor &drogue_ignitor)
         : APOGEE_CHECKS_(APOGEE_CHECKS), MACH_LOCK_CHECKS_(MACH_LOCK_CHECKS),
-          MACH_LOCK_VELOCITY_(MACH_LOCK_VELOCITY),
+          MACH_LOCK_VELOCITY_(MACH_LOCK_VELOCITY), MACH_LOCK_TIME_(MACH_LOCK_TIME),
           post_apogee_id_(post_apogee_id), mach_lock_id_(mach_lock_id),
           drogue_ignitor_(drogue_ignitor) {}
 
@@ -31,7 +32,7 @@ class AscentToApogee : public IState {
     StateId getNewState(Calculator const &input) {
         if (input.velocityGroundZ() > MACH_LOCK_VELOCITY_) {
             if (++mach_checks >= MACH_LOCK_CHECKS_) {
-                return mach_lock_id_;
+                return mach_timeout();
             }
         } else {
             mach_checks = 0;
@@ -60,17 +61,30 @@ class AscentToApogee : public IState {
         last_alt = 0;
     }
 
+    StateId mach_timeout() {
+        if (mach_checks == MACH_LOCK_CHECKS_) {
+            initial_time = Hal::millis();
+            return mach_lock_id_;
+        }
+        else if (Hal::millis() - initial_time > MACH_LOCK_TIME_) {
+            mach_checks = 0;
+            return StateId::ASCENT_TO_APOGEE;
+        }
+        return mach_lock_id_;
+    }
+
   private:
     const uint8_t APOGEE_CHECKS_;
     const uint8_t MACH_LOCK_CHECKS_;
     const float MACH_LOCK_VELOCITY_;
+    const uint32_t MACH_LOCK_TIME_;
     const StateId post_apogee_id_;
     const StateId mach_lock_id_;
     Ignitor &drogue_ignitor_;
 
     uint8_t apogee_checks{0};
     uint8_t mach_checks{0};
-    uint32_t initial_time;
+    uint32_t initial_time{0};
     float last_alt{0};
 };
 

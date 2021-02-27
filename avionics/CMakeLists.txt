@@ -150,13 +150,13 @@ endfunction()
 ROCKET_CREATE_TEST(LedBlinker)
 target_sources(testexe_LedBlinker PUBLIC common/src/tasks/led_blinker.cpp)
 
-ROCKET_CREATE_TEST(MachTest)
-target_sources(testexe_MachTest PUBLIC envs/x86/lib/HAL/time.cpp)
-target_sources(testexe_MachTest PUBLIC envs/x86/src/stdio_controller.cpp)
-
 ROCKET_CREATE_TEST(RepeatChecksState)
 
 ROCKET_CREATE_TEST(States)
+target_sources(testexe_States PUBLIC
+      #envs/x86/lib/HAL/time.cpp
+      #envs/x86/src/stdio_controller.cpp
+    )
 
 ROCKET_CREATE_TEST(Barometric)
 target_sources(testexe_Barometric PUBLIC common/lib/CalcHelpers/barometric.cpp)
