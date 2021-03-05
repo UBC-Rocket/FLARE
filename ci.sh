@@ -52,7 +52,7 @@ pio run
 mkdir avionics/build
 cd avionics/build
 cmake ..
-cmake --build .
+cmake --build . -j 2
 ctest --progress
 
 # SIM Integration tests
