@@ -165,5 +165,10 @@ target_sources(testexe_Estimators PUBLIC
     common/lib/CalcHelpers/barometric.cpp
     )
 
+ROCKET_CREATE_TEST(Roar)
+target_Sources(testexe_Roar PUBLIC
+    common/src/roar/buffer.cpp
+    )
+
 
 # We can now call make test to run all the tests

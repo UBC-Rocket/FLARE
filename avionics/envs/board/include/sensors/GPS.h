@@ -71,6 +71,7 @@ PLEASE READ ME!
 /*Includes------------------------------------------------------------*/
 #include <HAL/port_impl.h>
 #include <TinyGPS.h>
+#include <array>
 
 #include "sensors_interface.h"
 
