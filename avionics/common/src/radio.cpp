@@ -18,6 +18,7 @@
 
 /*Includes------------------------------------------------------------*/
 #include <algorithm> //for std::copy
+#include <cassert>
 #include <cstring>
 #include <utility> //for std::move
 
@@ -49,8 +50,8 @@
 namespace {
 constexpr uint64_t kFlaregunAddrMsb = 0x0013A200;
 constexpr uint64_t kFlaregunAddrLsb = 0x41678FC0;
-constexpr uint32_t RADIO_BAUD_RATE = 921600;
-constexpr uint8_t MAX_PACKETS_PER_RX_LOOP = 8;
+constexpr uint32_t kRadioBaudRate = 921600;
+constexpr uint8_t kMaxPacketsPerRxLoop = 8;
 constexpr int kMaxQueuedBytes = 800;
 // 20 bytes per subpkt on average
 constexpr int kMaxQueuedSubpkts = kMaxQueuedBytes / 20;
@@ -110,7 +111,7 @@ bool Radio::can_send_ = true;
 
 void Radio::initialize() {
     auto &serial = Hal::SerialInst::Radio;
-    serial.begin(RADIO_BAUD_RATE);
+    serial.begin(kRadioBaudRate);
     while (!serial)
         ;
     self.xbee_.setSerial(serial.getSerial());
@@ -118,6 +119,11 @@ void Radio::initialize() {
     self.tx_packet_.setPayload(self.payload_);
     Radio::sendMessage(Hal::millis(), "Radio initialized");
     Radio::send();
+}
+
+void Radio::addIdTime(Ids id, uint32_t time) {
+    self.tx_q_.write(static_cast<uint8_t>(id));
+    self.tx_q_.write((&time), sizeof(time));
 }
 
 void Radio::send() {
@@ -129,109 +135,89 @@ void Radio::send() {
 
 void Radio::sendStatus(uint32_t time, RocketStatus status,
                        SensorCollection &sensors, IgnitorCollection &ignitors) {
-    PacketBuffWriter buf;
-    addIdTime(buf, Ids::status_ping, time);
+    self.tx_q_.allocSubpkt(10);
+    addIdTime(Ids::status_ping, time);
 
-    buf.write(&status, 1);
-
-    buf.write(sensors.getStatusBitfield(), 1);
-    buf.write(sensors.getStatusBitfield() + 1, 1);
-    buf.write(ignitors.getStatusBitfield(), 1);
-    buf.write(ignitors.getStatusBitfield() + 1, 1);
-
-    Radio::addSubpacket(std::move(buf.packet));
+    self.tx_q_.write(static_cast<uint8_t>(status));
+    self.tx_q_.write(sensors.getStatusBitfield(), 2);
+    self.tx_q_.write(ignitors.getStatusBitfield(), 2);
 }
 
 void Radio::sendBulkSensor(uint32_t time, float alt, Accelerometer &xl,
                            IMU &imu, GPS &gps, uint16_t state_id) {
-    PacketBuffWriter buf;
-    addIdTime(buf, Ids::bulk_sensor, time);
+    self.tx_q_.allocSubpkt(43);
+    addIdTime(Ids::bulk_sensor, time);
 
     // Altitude
-    buf.write(&alt, 4);
+    self.tx_q_.write(&alt, 4);
 
     // Accelerometer
-    buf.write(xl.getData(), 12);
+    self.tx_q_.write(xl.getData(), 12);
 
     // IMU // TODO - check that these are the correct 3 floats to send for
     // orientation
-    buf.write(imu.getData(), 12);
+    self.tx_q_.write(imu.getData(), 12);
 
     // GPS
-    buf.write(gps.getData(), 8);
+    self.tx_q_.write(gps.getData(), 8);
 
     // State
-    buf.write(&state_id, sizeof(uint16_t));
-
-    Radio::addSubpacket(std::move(buf.packet));
+    self.tx_q_.write(&state_id, sizeof(uint16_t));
 }
 
 void Radio::sendMessage(const uint32_t time, const char *str) {
-    PacketBuffWriter buf;
-    addIdTime(buf, Ids::message, time);
+    auto strlen = std::strlen(str);
+    assert(strlen + 5 <= kPacketPayloadSpace);
 
-    uint8_t strlen = std::strlen(str);
-    buf.write(strlen);
-    buf.write(str, strlen);
+    self.tx_q_.allocSubpkt(6 + strlen);
+    addIdTime(Ids::message, time);
 
-    Radio::addSubpacket(std::move(buf.packet));
+    self.tx_q_.write(strlen);
+    self.tx_q_.write(str, strlen);
 }
 
 void Radio::sendGPS(const uint32_t time, GPS &gps) {
-    PacketBuffWriter buf;
-    addIdTime(buf, Ids::gps, time);
+    self.tx_q_.allocSubpkt(17);
 
-    buf.write(gps.getData(), 12);
-
-    Radio::addSubpacket(std::move(buf.packet));
+    addIdTime(Ids::gps, time);
+    self.tx_q_.write(gps.getData(), 12);
 }
 
 void Radio::sendSingleSensor(const uint32_t time, uint8_t id, float data) {
-    PacketBuffWriter buf;
-    buf.write(id);
-    buf.write(&time, sizeof(time));
+    self.tx_q_.allocSubpkt(9);
 
-    buf.write(&data, 4);
-
-    Radio::addSubpacket(std::move(buf.packet));
+    self.tx_q_.write(id);
+    self.tx_q_.write(&time, sizeof(time));
+    self.tx_q_.write(&data, 4);
 }
 
 void Radio::sendState(const uint32_t time, uint16_t state_id) {
-    PacketBuffWriter buf;
-    addIdTime(buf, Ids::state, time);
-    buf.write(&state_id, sizeof(uint16_t));
-    Radio::addSubpacket(std::move(buf.packet));
+    self.tx_q_.allocSubpkt(7);
+
+    addIdTime(Ids::state, time);
+    self.tx_q_.write(&state_id, sizeof(state_id));
 }
 
 void Radio::sendConfig(const uint32_t time) {
-    PacketBuffWriter buf;
-    addIdTime(buf, Ids::config, time);
+    self.tx_q_.allocSubpkt(47);
+    addIdTime(Ids::config, time);
 
     // Defined in CMakeLists/platformio.ini
-    buf.write(RADIO_CONFIG_PACKET_SIM_ACTIVE);
-    buf.write(RADIO_CONFIG_PACKET_ROCKET_ID);
+    self.tx_q_.write(RADIO_CONFIG_PACKET_SIM_ACTIVE);
+    self.tx_q_.write(RADIO_CONFIG_PACKET_ROCKET_ID);
 
     // -1 because null terminated string
     constexpr size_t len = sizeof(RADIO_CONFIG_PACKET_VERSION_STR) - 1;
     static_assert(len == 40, "RADIO_CONFIG_PACKET_VERSION_STR incorrect size!");
-    uint8_t version_bytes[40] = {0};
-    std::memcpy(version_bytes, RADIO_CONFIG_PACKET_VERSION_STR, len);
 
-    buf.write(version_bytes, sizeof(version_bytes));
-
-    Radio::addSubpacket(std::move(buf.packet));
+    self.tx_q_.write(RADIO_CONFIG_PACKET_VERSION_STR, len);
 }
 
 void Radio::sendEvent(const uint32_t time, const EventId event) {
-    PacketBuffWriter buf;
-    addIdTime(buf, Ids::event, time);
-    buf.write(&event, sizeof(uint16_t));
-    Radio::addSubpacket(std::move(buf.packet));
-}
+    self.tx_q_.allocSubpkt(7);
 
-void Radio::addSubpacket(SubPktPtr dat) {
-    self.tx_q_.allocSubpkt(dat->size());
-    self.tx_q_.write(dat->data(), dat->size());
+    addIdTime(Ids::event, time);
+    self.tx_q_.write(&event, sizeof(uint16_t));
 }
 
 int Radio::read_count_ = 0;
@@ -241,7 +227,7 @@ Radio::fwd_cmd_t Radio::readPacket(command_t *&command_dat_out,
     fwd_cmd_t result = 0;
     command_len_out = 0;
 
-    while (read_count_ < MAX_PACKETS_PER_RX_LOOP) {
+    while (read_count_ < kMaxPacketsPerRxLoop) {
         self.xbee_.readPacket();
         read_count_++;
         if (!(self.xbee_.getResponse().isAvailable() ||
