@@ -13,8 +13,11 @@ TEST(RoarBuffer, HappyPath) {
     roar::Buffer buff(kPktSize, kBuffSize, 16);
 
     EXPECT_EQ(buff.usage(), 0);
+    EXPECT_TRUE(buff.empty());
+
     EXPECT_EQ(buff.allocSubpkt(16), 0);
     EXPECT_EQ(buff.usage(), 16);
+    EXPECT_FALSE(buff.empty());
 
     for (int i = 0; i < 8; ++i) {
         buff.write(i);
@@ -35,6 +38,7 @@ TEST(RoarBuffer, HappyPath) {
         buff.write(dat.data(), 8);
     }
     EXPECT_EQ(buff.usage(), 24);
+    EXPECT_FALSE(buff.empty());
 
     const std::vector<uint8_t> payloadDefault(64, 255);
     // Padded with 255 to detect out-of-bounds writes
@@ -42,6 +46,7 @@ TEST(RoarBuffer, HappyPath) {
 
     EXPECT_EQ(buff.fillPayload(payload.data() + 16), 24);
     EXPECT_EQ(buff.usage(), 0);
+    EXPECT_TRUE(buff.empty());
 
     for (int i = 0; i < 16; ++i) {
         EXPECT_EQ(payload[i], 255);
@@ -181,6 +186,7 @@ TEST(RoarBuffer, OverflowSubpackets) {
     }
     EXPECT_EQ(*it, 255);
     EXPECT_EQ(buff.usage(), 0);
+    EXPECT_TRUE(buff.empty());
 }
 
 /**
