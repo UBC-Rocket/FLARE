@@ -31,21 +31,21 @@ class AscentToApogee : public IState {
      */
     StateId getNewState(Calculator const &input) {
         if (input.velocityGroundZ() > MACH_LOCK_VELOCITY_) {
-            if (++mach_checks >= MACH_LOCK_CHECKS_) {
-                return mach_timeout();
+            if (++mach_checks_ >= MACH_LOCK_CHECKS_) {
+                return machTimeout();
             }
         } else {
-            mach_checks = 0;
+            mach_checks_ = 0;
         }
 
-        if (input.altitude() < last_alt) {
-            apogee_checks++;
-        } else if (apogee_checks > 0) {
-            apogee_checks--;
+        if (input.altitude() < last_alt_) {
+            apogee_checks_++;
+        } else if (apogee_checks_ > 0) {
+            apogee_checks_--;
         }
-        last_alt = input.altitude();
+        last_alt_ = input.altitude();
 
-        if (apogee_checks >= APOGEE_CHECKS_) {
+        if (apogee_checks_ >= APOGEE_CHECKS_) {
             drogue_ignitor_.fire();
             return post_apogee_id_;
         } else {
@@ -54,23 +54,11 @@ class AscentToApogee : public IState {
     }
 
     void onEntry() override {
-        apogee_checks = 0;
-        mach_checks = 0;
-        initial_time = 0;
+        apogee_checks_ = 0;
+        mach_checks_ = 0;
+        initial_time_ = 0;
         // Awkward to pass in first value - 0-initialize works with checks.
-        last_alt = 0;
-    }
-
-    StateId mach_timeout() {
-        if (mach_checks == MACH_LOCK_CHECKS_) {
-            initial_time = Hal::millis();
-            return mach_lock_id_;
-        }
-        else if (Hal::millis() - initial_time > MACH_LOCK_TIME_) {
-            mach_checks = 0;
-            return StateId::ASCENT_TO_APOGEE;
-        }
-        return mach_lock_id_;
+        last_alt_ = 0;
     }
 
   private:
@@ -82,10 +70,22 @@ class AscentToApogee : public IState {
     const StateId mach_lock_id_;
     Ignitor &drogue_ignitor_;
 
-    uint8_t apogee_checks{0};
-    uint8_t mach_checks{0};
-    uint32_t initial_time{0};
-    float last_alt{0};
+    uint8_t apogee_checks_{0};
+    uint8_t mach_checks_{0};
+    uint32_t initial_time_{0};
+    float last_alt_{0};
+
+    StateId machTimeout() {
+        if (mach_checks_ == MACH_LOCK_CHECKS_) {
+            initial_time_ = Hal::millis();
+            return mach_lock_id_;
+        }
+        else if (Hal::millis() - initial_time_ > MACH_LOCK_TIME_) {
+            mach_checks_ = 0;
+            return StateId::ASCENT_TO_APOGEE;
+        }
+        return mach_lock_id_;
+    }
 };
 
 } // namespace State
