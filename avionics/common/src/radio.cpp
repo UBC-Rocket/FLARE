@@ -51,7 +51,9 @@ constexpr uint64_t kFlaregunAddrMsb = 0x0013A200;
 constexpr uint64_t kFlaregunAddrLsb = 0x41678FC0;
 constexpr uint32_t RADIO_BAUD_RATE = 921600;
 constexpr uint8_t MAX_PACKETS_PER_RX_LOOP = 8;
-constexpr int MAX_QUEUED_BYTES = 800;
+constexpr int kMaxQueuedBytes = 800;
+// 20 bytes per subpkt on average
+constexpr int kMaxQueuedSubpkts = kMaxQueuedBytes / 20;
 
 } // namespace
 
@@ -84,7 +86,7 @@ class Radio::RadioMembers {
   public:
     RadioMembers()
         : gnd_addr_(kFlaregunAddrMsb, kFlaregunAddrLsb),
-          tx_q_(kPacketPayloadSpace, 800, 40) {}
+          tx_q_(kPacketPayloadSpace, kMaxQueuedBytes, kMaxQueuedSubpkts) {}
 
   private:
     XBee xbee_;
