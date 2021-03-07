@@ -65,6 +65,11 @@ class Buffer {
      */
     int usage();
 
+    /**
+     * @brief Returns true if no data is in the buffer.
+     */
+    bool empty();
+
   private:
     class DataIt;
     class SubpktIt;
@@ -80,7 +85,7 @@ class Buffer {
     void dumpContiguous(uint8_t *dest, DataIt src, int len) const;
 
     /**
-     * @brief Dispenses at most RADIO_MAX_SUBPACKET_SIZE (255) bytes worth of
+     * @brief Dispenses at most pkt_size_ bytes worth of
      * subpackets into payload.
      * @return Size of payload data filled in.
      */

@@ -32,6 +32,11 @@ int Buffer::usage() {
 }
 
 /**
+ * @brief Returns true if no data is in the buffer.
+ */
+bool Buffer::empty() { return subpkt_count_ == 0; }
+
+/**
  * @brief Allocates space for a subpacket of specified `size`. Future calls
  * to write() will be done for the allocated subpacket.
  *
