@@ -26,6 +26,7 @@ struct StateMachineConfig {
     constexpr static float LAUNCH_THRESHOLD = 25;                // m
     constexpr static float MACH_LOCK_VELOCITY_THRESHOLD = 155;   // m/s
     constexpr static float MACH_UNLOCK_VELOCITY_THRESHOLD = 150; // m/s
+    constexpr static float MACH_LOCK_TIME_THRESHOLD = 12000; // ms
     constexpr static float MAIN_DEPLOY_ALTITUDE = 488;           // m == 1500 ft
 
     constexpr static long LAND_CHECK_TIME_INTERVAL = 10000; // ms
@@ -63,7 +64,7 @@ struct StateMachineConfig {
                        Camera &camera)
         : standby(LAUNCH_THRESHOLD, camera),
           coast(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, APOGEE_CHECKS,
-                MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD,
+                MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD, MACH_LOCK_TIME_THRESHOLD,
                 ignitors.drogue),
           drogue(MAIN_DEPLOY_ALTITUDE, ignitors.main),
           main(StateId::LANDED, LAND_CHECK_TIME_INTERVAL, LAND_CHECKS,
