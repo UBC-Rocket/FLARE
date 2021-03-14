@@ -78,7 +78,7 @@ execute_process(
   WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
 )
 execute_process(
-  COMMAND ${Python_EXECUTABLE} "${CMAKE_CURRENT_LIST_DIR}/../custom_tools/git_rev_macro.py" "x86"
+  COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_LIST_DIR}/../custom_tools/git_rev_macro.py" "x86"
   OUTPUT_VARIABLE _git_build_version
   WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
   )
