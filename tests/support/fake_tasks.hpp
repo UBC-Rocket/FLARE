@@ -1,6 +1,7 @@
 #ifndef FAKE_TASKS_HPP_5DF011EA55614771AC70289249DFEE44
 #define FAKE_TASKS_HPP_5DF011EA55614771AC70289249DFEE44
 
+#include "RocketSchedule/fake_clocks.hpp"
 #include "schedule_defn.hpp"
 #include "task_tracking.hpp"
 

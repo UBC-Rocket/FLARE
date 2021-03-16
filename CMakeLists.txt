@@ -58,7 +58,7 @@ enable_testing()
 
 # e.g.
 add_executable(testSchedule tests/test_schedule.cpp )
-target_sources(testSchedule PUBLIC tests/support/fake_clocks.cpp)
+target_sources(testSchedule PUBLIC include/RocketSchedule/fake_clocks.cpp)
 target_link_libraries(testSchedule gtest_main gmock_main)
 target_include_directories(testSchedule PUBLIC include tests/support)
 add_test(NAME TestSchedule COMMAND testSchedule)

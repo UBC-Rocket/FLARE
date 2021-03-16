@@ -7,6 +7,8 @@
 typedef uint32_t TimePoint;
 typedef uint32_t Duration;
 
+namespace FakeClocks {
+
 class IFakeClock {
     // Pure virtual functions are a bit difficult, since a static version of
     // this is in the FakeClock; instead have some reasonable defaults
@@ -14,7 +16,7 @@ class IFakeClock {
     // Fake clocks should generally inherit from this class and then set
     // `FakeClock::impl` in their constructor.
 
-  public:
+public:
     IFakeClock(TimePoint start_time) : now_val_(start_time) {}
     IFakeClock() : now_val_(0) {}
 
@@ -24,12 +26,12 @@ class IFakeClock {
 
     virtual ~IFakeClock() {}
 
-  protected:
+protected:
     TimePoint now_val_;
 };
 
 class FakeClockWrapper {
-  public:
+public:
     typedef Duration duration;
     typedef TimePoint time_point;
 
@@ -40,16 +42,16 @@ class FakeClockWrapper {
 };
 
 /**
- * Exceptions to forcibly exit scheduler
- */
+    * Exceptions to forcibly exit scheduler
+    */
 class ClockFinishedExc : public std::exception {};
 
 /**
- * \brief Once the time reaches the specified stop_time, all methods will raise
- * ClockFinishedExc, which can then be caught outside of the scheduler.
- */
+    * \brief Once the time reaches the specified stop_time, all methods will raise
+    * ClockFinishedExc, which can then be caught outside of the scheduler.
+    */
 class StoppingClock : public IFakeClock {
-  public:
+public:
     StoppingClock(TimePoint stop_time, TimePoint start_time)
         : IFakeClock(start_time), stop_time_(stop_time) {
         FakeClockWrapper::impl = this;
@@ -71,8 +73,9 @@ class StoppingClock : public IFakeClock {
         }
     }
 
-  private:
+private:
     TimePoint stop_time_;
 };
 
+}  // namespace FakeClocks
 #endif

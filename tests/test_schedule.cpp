@@ -2,9 +2,9 @@
 #include "gtest/gtest.h"
 #include <vector>
 
+#include "RocketSchedule/fake_clocks.hpp"
 #include "RocketSchedule/schedule.hpp"
 
-#include "fake_clocks.hpp"
 #include "fake_tasks.hpp"
 #include "schedule_defn.hpp"
 #include "task_tracking.hpp"
@@ -21,12 +21,12 @@ class ScheduleFixture : public ::testing::Test {
   protected:
     ScheduleFixture() {
         Schedule::clear();
-        FakeClockWrapper::impl = &clock;
+        FakeClocks::FakeClockWrapper::impl = &clock;
     }
     ~ScheduleFixture() { Schedule::clear(); }
 
   private:
-    IFakeClock clock;
+    FakeClocks::IFakeClock clock;
 };
 
 TEST_F(ScheduleFixture, EnableDisable) {
@@ -72,7 +72,7 @@ TEST_F(ScheduleFixture, CorrectOrder) {
 }
 
 TEST_F(ScheduleFixture, EasyRepeat) {
-    StoppingClock stopping_clock(50); // constructor does all the work
+    FakeClocks::StoppingClock stopping_clock(50); // constructor does all the work
     MockTaskLogger logger;
     std::vector<int> times{7, 11, 13}; // prime numbers
     ExpectationSet expect_zeros;
@@ -102,7 +102,7 @@ TEST_F(ScheduleFixture, EasyRepeat) {
 
     try {
         Schedule::run();
-    } catch (ClockFinishedExc &) {
+    } catch (FakeClocks::ClockFinishedExc &) {
     }
 }
 
@@ -110,7 +110,7 @@ TEST_F(ScheduleFixture, RunEarly) {
     constexpr int REP = 0;
     constexpr int BLK = 1;
     MockTaskLogger logger;
-    StoppingClock says_stop_at(44);
+    FakeClocks::StoppingClock says_stop_at(44);
 
     LongTask longt(0, logger, 5);
     SimpleTask shortt(1, logger);
@@ -151,13 +151,13 @@ TEST_F(ScheduleFixture, RunEarly) {
 
     try {
         Schedule::run();
-    } catch (ClockFinishedExc &) {
+    } catch (FakeClocks::ClockFinishedExc &) {
     }
 }
 
 TEST_F(ScheduleFixture, RunLate) {
     MockTaskLogger logger;
-    StoppingClock says_stop_at(56);
+    FakeClocks::StoppingClock says_stop_at(56);
 
     LongTask hungry(0, logger, 30);
     Schedule::preregisterTask(
@@ -219,13 +219,13 @@ TEST_F(ScheduleFixture, RunLate) {
 
     try {
         Schedule::run();
-    } catch (ClockFinishedExc &) {
+    } catch (FakeClocks::ClockFinishedExc &) {
     }
 }
 
 TEST_F(ScheduleFixture, DisableUnschedule) {
     MockTaskLogger logger;
-    StoppingClock says_stop_at(150); // Should end before
+    FakeClocks::StoppingClock says_stop_at(150); // Should end before
 
     SimpleTask st0(0, logger);
     Schedule::registerTask(0, Schedule::Task(SimpleTask::externAct, &st0, 10));
@@ -250,14 +250,14 @@ TEST_F(ScheduleFixture, DisableUnschedule) {
 
     try {
         Schedule::run();
-    } catch (ClockFinishedExc &) {
+    } catch (FakeClocks::ClockFinishedExc &) {
         ASSERT_TRUE(false) << "Timed out";
     }
 }
 
 TEST_F(ScheduleFixture, StopSelf) {
     MockTaskLogger logger;
-    StoppingClock says_stop_at(150); // Should end before
+    FakeClocks::StoppingClock says_stop_at(150); // Should end before
 
     EXPECT_CALL(logger, logImpl(11, 1, 0));
     EXPECT_CALL(logger, logImpl(11, 2, 10));
@@ -268,7 +268,7 @@ TEST_F(ScheduleFixture, StopSelf) {
 
     try {
         Schedule::run();
-    } catch (ClockFinishedExc &) {
+    } catch (FakeClocks::ClockFinishedExc &) {
         ASSERT_TRUE(false) << "Timed out";
     }
 }
