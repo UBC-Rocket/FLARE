@@ -7,74 +7,75 @@
 typedef uint32_t TimePoint;
 typedef uint32_t Duration;
 
-namespace FakeClocks {
-    class IFakeClock {
-        // Pure virtual functions are a bit difficult, since a static version of
-        // this is in the FakeClock; instead have some reasonable defaults
-        //
-        // Fake clocks should generally inherit from this class and then set
-        // `FakeClock::impl` in their constructor.
+namespace RocketSchedule {
 
-    public:
-        IFakeClock(TimePoint start_time) : now_val_(start_time) {}
-        IFakeClock() : now_val_(0) {}
+class IFakeClock {
+    // Pure virtual functions are a bit difficult, since a static version of
+    // this is in the FakeClock; instead have some reasonable defaults
+    //
+    // Fake clocks should generally inherit from this class and then set
+    // `FakeClock::impl` in their constructor.
 
-        virtual TimePoint now() { return now_val_; }
-        virtual void idle(Duration dur) { now_val_ += dur; }
-        void incrementTime(Duration dur) { now_val_ += dur; }
+  public:
+    IFakeClock(TimePoint start_time) : now_val_(start_time) {}
+    IFakeClock() : now_val_(0) {}
 
-        virtual ~IFakeClock() {}
+    virtual TimePoint now() { return now_val_; }
+    virtual void idle(Duration dur) { now_val_ += dur; }
+    void incrementTime(Duration dur) { now_val_ += dur; }
 
-    protected:
-        TimePoint now_val_;
-    };
+    virtual ~IFakeClock() {}
 
-    class FakeClockWrapper {
-    public:
-        typedef Duration duration;
-        typedef TimePoint time_point;
+  protected:
+    TimePoint now_val_;
+};
 
-        static IFakeClock *impl;
+class FakeClockWrapper {
+  public:
+    typedef Duration duration;
+    typedef TimePoint time_point;
 
-        static time_point now() { return impl->now(); }
-        static void idle(duration dur) { impl->idle(dur); }
-    };
+    static IFakeClock *impl;
 
-    /**
-     * Exceptions to forcibly exit scheduler
-     */
-    class ClockFinishedExc : public std::exception {};
+    static time_point now() { return impl->now(); }
+    static void idle(duration dur) { impl->idle(dur); }
+};
 
-    /**
-     * \brief Once the time reaches the specified stop_time, all methods will raise
-     * ClockFinishedExc, which can then be caught outside of the scheduler.
-     */
-    class StoppingClock : public IFakeClock {
-    public:
-        StoppingClock(TimePoint stop_time, TimePoint start_time)
-            : IFakeClock(start_time), stop_time_(stop_time) {
-            FakeClockWrapper::impl = this;
+/**
+ * Exceptions to forcibly exit scheduler
+ */
+class ClockFinishedExc : public std::exception {};
+
+/**
+ * \brief Once the time reaches the specified stop_time, all methods will raise
+ * ClockFinishedExc, which can then be caught outside of the scheduler.
+ */
+class StoppingClock : public IFakeClock {
+  public:
+    StoppingClock(TimePoint stop_time, TimePoint start_time)
+        : IFakeClock(start_time), stop_time_(stop_time) {
+        FakeClockWrapper::impl = this;
+    }
+
+    StoppingClock(TimePoint stop_time) : StoppingClock(stop_time, 0) {}
+
+    TimePoint now() override {
+        check_stop();
+        return now_val_;
+    }
+    void idle(Duration dur) override {
+        now_val_ += dur;
+        check_stop();
+    }
+    void check_stop() {
+        if (now_val_ >= stop_time_) {
+            throw ClockFinishedExc();
         }
+    }
 
-        StoppingClock(TimePoint stop_time) : StoppingClock(stop_time, 0) {}
+  private:
+    TimePoint stop_time_;
+};
 
-        TimePoint now() override {
-            check_stop();
-            return now_val_;
-        }
-        void idle(Duration dur) override {
-            now_val_ += dur;
-            check_stop();
-        }
-        void check_stop() {
-            if (now_val_ >= stop_time_) {
-                throw ClockFinishedExc();
-            }
-        }
-
-    private:
-        TimePoint stop_time_;
-    };
-
-}  // namespace FakeClocks
+} // namespace RocketSchedule
 #endif

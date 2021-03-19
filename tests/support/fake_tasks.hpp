@@ -5,6 +5,8 @@
 #include "schedule_defn.hpp"
 #include "task_tracking.hpp"
 
+namespace RocketSchedule {
+
 class SimpleTask;
 inline ITaskLogger &operator<<(ITaskLogger &logger, SimpleTask *task);
 
@@ -116,4 +118,5 @@ class AdvancedTask {
     int dis_rep_count_ = 0;
 };
 
+} // namespace RocketSchedule
 #endif

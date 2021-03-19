@@ -1,3 +1,5 @@
 #include "fake_clocks.hpp"
 
-FakeClocks::IFakeClock *FakeClocks::FakeClockWrapper::impl;
+namespace RocketSchedule {
+IFakeClock *FakeClockWrapper::impl;
+}
