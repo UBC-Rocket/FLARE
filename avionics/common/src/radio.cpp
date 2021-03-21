@@ -57,6 +57,12 @@ constexpr int kMaxQueuedSubpkts = kMaxQueuedBytes / 20;
 
 } // namespace
 
+/*  Many parts of the XBee library use uint8 for length (e.g. getFrameData).
+    Even though the HW likely supports more, this is the theoretical max for
+    this XBee library implementation.
+
+    TODO: If we deem this was an implementation error, we could PR a fix to the
+    library and then increase this */
 constexpr unsigned short kPacketPayloadSpace = 255 - ZB_TX_API_LENGTH;
 
 /**
