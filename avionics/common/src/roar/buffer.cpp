@@ -84,11 +84,17 @@ int Buffer::allocSubpkt(int size) {
 }
 
 void Buffer::write(uint8_t byte) {
+    // make sure that we haven't overflowed the allocated space for a subpkt
+    assert(pos_ != deref(addIt(subpkt_begin_, subpkt_count_)));
+
     deref(pos_) = byte;
     pos_ = addIt(pos_, 1);
 }
 
 void Buffer::write(uint8_t *dat, int len) {
+    // make sure that we haven't overflowed the allocated space for a subpkt
+    assert(subIt(deref(addIt(subpkt_begin_, subpkt_count_)), pos_) >= len);
+
     int space_remain = data_cap_ - pos_.index;
     if (len <= space_remain) {
         // fits within remaining space
