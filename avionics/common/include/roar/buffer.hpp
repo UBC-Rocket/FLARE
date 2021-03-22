@@ -141,6 +141,11 @@ class Buffer {
         bool operator==(const DataIt &other) const {
             return other.index == index;
         };
+
+        bool operator!=(const DataIt &other) const {
+            return other.index != index;
+        };
+
         int index;
     };
 
@@ -151,6 +156,11 @@ class Buffer {
         bool operator==(const SubpktIt &other) const {
             return other.index == index;
         };
+
+        bool operator!=(const SubpktIt &other) const {
+            return other.index != index;
+        };
+
         int index;
     };
 
@@ -182,9 +192,6 @@ class Buffer {
     const int data_cap_;
     // one larger than constructor parameter - see .cpp file
     const int subpkt_cap_;
-
-    // DataIt data_begin_; // Starting index of data used
-    // int data_count_;    // Total amount of buffer data used
 
     SubpktIt subpkt_begin_; // Starting index of used subpackets
     int subpkt_count_;      // number subpackets used
