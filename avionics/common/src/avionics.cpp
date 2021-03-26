@@ -76,6 +76,8 @@ PLEASE READ ME!
 #include "config.h"
 #include "env_config.h"
 
+#include "log.hpp"
+
 /**
  * @brief Helper function that makes things less verbose; basically saves the
  * static_cast call
@@ -89,6 +91,8 @@ void registerTask(TaskID id, Scheduler::Task task, bool repeat = true,
 int main(void) {
     // Before anything else there's some environment specific setup to be done
     env_initialize();
+    LOG_INFO("Everything is starting now");
+
     initPins();
 
 /* Setup all UART comms */
@@ -143,6 +147,8 @@ int main(void) {
         Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
         break;
     }
+
+    LOG_INFO("Initialization done; starting scheduler");
 
     Scheduler::run();
 }

@@ -167,6 +167,11 @@ target_sources(testexe_Estimators PUBLIC
 ROCKET_CREATE_TEST(Roar)
 target_Sources(testexe_Roar PUBLIC
     common/src/roar/buffer.cpp
+)
+
+ROCKET_CREATE_TEST(Log)
+target_sources(testexe_Log PUBLIC
+    common/src/log.cpp
     )
 
 
