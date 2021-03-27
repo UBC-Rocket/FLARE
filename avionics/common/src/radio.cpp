@@ -21,13 +21,12 @@
 #include <cstring>
 #include <utility> //for std::move
 
-#include "radio.h"
-
 #include "HAL/port_impl.h"
 
 #include "XBee.h"
 #include "ignitor_collection.h"
-#include "radio_queue.h"
+#include "radio.h"
+#include "roar/buffer.hpp"
 #include "sensor_collection.h"
 #include "state_id_enum.hpp"
 
@@ -48,13 +47,23 @@
 #endif
 
 namespace {
-constexpr uint64_t GND_STN_ADDR_MSB = 0x0013A200;
-constexpr uint64_t GND_STN_ADDR_LSB = 0x41678FC0;
+constexpr uint64_t kFlaregunAddrMsb = 0x0013A200;
+constexpr uint64_t kFlaregunAddrLsb = 0x41678FC0;
 constexpr uint32_t RADIO_BAUD_RATE = 921600;
 constexpr uint8_t MAX_PACKETS_PER_RX_LOOP = 8;
-constexpr int MAX_QUEUED_BYTES = 800;
+constexpr int kMaxQueuedBytes = 800;
+// 20 bytes per subpkt on average
+constexpr int kMaxQueuedSubpkts = kMaxQueuedBytes / 20;
 
 } // namespace
+
+/*  Many parts of the XBee library use uint8 for length (e.g. getFrameData).
+    Even though the HW likely supports more, this is the theoretical max for
+    this XBee library implementation.
+
+    TODO: If we deem this was an implementation error, we could PR a fix to the
+    library and then increase this */
+constexpr unsigned short kPacketPayloadSpace = 255 - ZB_TX_API_LENGTH;
 
 /**
  * The purpose of RadioMembers is to have a set of static member variables for
@@ -81,10 +90,9 @@ class Radio::RadioMembers {
     friend class Radio;
 
   public:
-    RadioMembers() : 
-        gnd_addr_(GND_STN_ADDR_MSB, GND_STN_ADDR_LSB),
-        tx_q_(MAX_QUEUED_BYTES)
-        {}
+    RadioMembers()
+        : gnd_addr_(kFlaregunAddrMsb, kFlaregunAddrLsb),
+          tx_q_(kPacketPayloadSpace, kMaxQueuedBytes, kMaxQueuedSubpkts) {}
 
   private:
     XBee xbee_;
@@ -92,8 +100,8 @@ class Radio::RadioMembers {
     ZBTxRequest tx_packet_;
     ZBRxResponse rx;
 
-    RadioQueue tx_q_; // the [ueue] is silent :)
-    uint8_t payload_[RADIO_MAX_SUBPACKET_SIZE];
+    roar::Buffer tx_q_; // the [ueue] is silent :)
+    uint8_t payload_[kPacketPayloadSpace];
 };
 static Radio::RadioMembers self;
 
@@ -221,7 +229,10 @@ void Radio::sendEvent(const uint32_t time, const EventId event) {
     Radio::addSubpacket(std::move(buf.packet));
 }
 
-void Radio::addSubpacket(SubPktPtr dat) { self.tx_q_.push(std::move(dat)); }
+void Radio::addSubpacket(SubPktPtr dat) {
+    self.tx_q_.allocSubpkt(dat->size());
+    self.tx_q_.write(dat->data(), dat->size());
+}
 
 int Radio::read_count_ = 0;
 

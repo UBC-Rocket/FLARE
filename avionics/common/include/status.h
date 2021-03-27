@@ -22,7 +22,6 @@
 
 /*Includes------------------------------------------------------------*/
 #include <stdint.h>
-#include <vector>
 
 #include "buzzer.h"
 #include "hw-interface.h"
@@ -33,13 +32,8 @@ void raiseToStatus(RocketStatus &currentStatus, RocketStatus incomingStatus);
 
 class SensorCollection;
 class IgnitorCollection;
-/* clang-format off */
 
 RocketStatus collectStatus(SensorCollection &sensors,
-              IgnitorCollection &ignitors);
-/* clang-format on */
-// void displayStatus(SensorCollection &sensors,
-//                    std::vector<std::reference_wrapper<IIgnitor>> &hardware,
-//                    IBuzzer &buzzer);
+                           IgnitorCollection &ignitors);
 
 void displayStatus(RocketStatus status, IBuzzer &buzzer);

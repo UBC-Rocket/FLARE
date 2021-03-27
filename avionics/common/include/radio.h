@@ -53,6 +53,7 @@ class PacketBuffWriter {
 
     SubPktPtr packet;
 };
+
 class Radio {
   private:
     typedef uint16_t fwd_cmd_t;
@@ -69,7 +70,7 @@ class Radio {
     constexpr static Hal::ms WATCHDOG_SEND_INTERVAL{3000};
     constexpr static fwd_cmd_t STOP_PARSE_FLAG = 1 << 0;
     constexpr static fwd_cmd_t CAN_SEND_FLAG = 1 << 1;
-    
+
     static bool can_send_; // Is XBee available to send
 
   public:
@@ -128,7 +129,7 @@ class Radio {
         if (Hal::now_ms() - watchdog_last_send > WATCHDOG_SEND_INTERVAL) {
             can_send_ = true;
         }
-        
+
         if (can_send_) {
             can_send_ = false;
             watchdog_last_send = Hal::now_ms();
