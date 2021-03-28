@@ -11,11 +11,10 @@ class AscentToApogee : public IState {
   public:
     AscentToApogee(StateId post_apogee_id, StateId mach_lock_id,
                    uint8_t const APOGEE_CHECKS, uint8_t const MACH_LOCK_CHECKS,
-                   float MACH_LOCK_VELOCITY, uint32_t MACH_LOCK_TIME, Ignitor &drogue_ignitor)
+                   float MACH_LOCK_VELOCITY, Ignitor &drogue_ignitor)
         : APOGEE_CHECKS_(APOGEE_CHECKS), MACH_LOCK_CHECKS_(MACH_LOCK_CHECKS),
-          MACH_LOCK_VELOCITY_(MACH_LOCK_VELOCITY), MACH_LOCK_TIME_(MACH_LOCK_TIME),
-          post_apogee_id_(post_apogee_id), mach_lock_id_(mach_lock_id),
-          drogue_ignitor_(drogue_ignitor) {}
+          MACH_LOCK_VELOCITY_(MACH_LOCK_VELOCITY), post_apogee_id_(post_apogee_id), 
+          mach_lock_id_(mach_lock_id), drogue_ignitor_(drogue_ignitor) {}
 
     /*
      * @brief Return the assigned enumeration code.
@@ -32,7 +31,7 @@ class AscentToApogee : public IState {
     StateId getNewState(Calculator const &input) {
         if (input.velocityGroundZ() > MACH_LOCK_VELOCITY_) {
             if (++mach_checks_ >= MACH_LOCK_CHECKS_) {
-                return machTimeout();
+                return mach_lock_id_;
             }
         } else {
             mach_checks_ = 0;
@@ -56,7 +55,6 @@ class AscentToApogee : public IState {
     void onEntry() override {
         apogee_checks_ = 0;
         mach_checks_ = 0;
-        initial_time_ = 0;
         // Awkward to pass in first value - 0-initialize works with checks.
         last_alt_ = 0;
     }
@@ -65,27 +63,13 @@ class AscentToApogee : public IState {
     const uint8_t APOGEE_CHECKS_;
     const uint8_t MACH_LOCK_CHECKS_;
     const float MACH_LOCK_VELOCITY_;
-    const uint32_t MACH_LOCK_TIME_;
     const StateId post_apogee_id_;
     const StateId mach_lock_id_;
     Ignitor &drogue_ignitor_;
 
     uint8_t apogee_checks_{0};
     uint8_t mach_checks_{0};
-    uint32_t initial_time_{0};
     float last_alt_{0};
-
-    StateId machTimeout() {
-        if (mach_checks_ == MACH_LOCK_CHECKS_) {
-            initial_time_ = Hal::millis();
-            return mach_lock_id_;
-        }
-        else if (Hal::millis() - initial_time_ > MACH_LOCK_TIME_) {
-            mach_checks_ = 0;
-            return StateId::ASCENT_TO_APOGEE;
-        }
-        return mach_lock_id_;
-    }
 };
 
 } // namespace State

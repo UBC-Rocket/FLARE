@@ -8,6 +8,7 @@ struct Ignitor {
 };
 
 #include "states/ascent_to_apogee.h"
+#include "states/mach_lock.h"
 #include "states/repeated_checks.hpp"
 
 // Mocking time.cpp
@@ -31,7 +32,7 @@ TEST(AscentToApogee, FireIgnitor) {
     vel = -2 * grav;
     Ignitor iggy;
     State::AscentToApogee state(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, 5,
-                                10, 200.0, 5000, iggy);
+                                10, 200.0, iggy);
     state.onEntry();
     float t;
     for (t = -2; t <= 2; t += period) {
@@ -56,7 +57,7 @@ TEST(AscentToApogee, MachLock) {
     vel = 201.0;
 
     State::AscentToApogee state(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, 5,
-                                10, 200.0, 5000, iggy);
+                                10, 200.0, iggy);
     state.onEntry();
 
     for (int i = 0; i < 10; i++) {
@@ -80,7 +81,7 @@ TEST(AscentToApogee, MachLockChecks) {
     vel = 201.0;
 
     State::AscentToApogee state(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, 5,
-                                10, 200.0, 5000, iggy);
+                                10, 200.0, iggy);
     state.onEntry();
 
     for (int i = 0; i < 9; i++) {
@@ -99,26 +100,47 @@ TEST(AscentToApogee, MachLockChecks) {
     EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
 }
 
-TEST(AscentToApogee, MachLockTimeout) {
-    Ignitor iggy;
+TEST(MachLock, MachLockChecks) {
     Calculator data;
     StateId result;
-    auto &alt = data.alt;
     auto &vel = data.vel_gnd_z;
-    alt = 1000;
+    vel = 199.0;
+
+    State::MachLock state(StateId::ASCENT_TO_APOGEE, 5,
+                                200.0, 999);
+    state.onEntry();
+
+    for (int i = 0; i < 4; i++) {
+        result = state.getNewState(data);
+        EXPECT_TRUE(result == StateId::MACH_LOCK);
+    }
+    
     vel = 201.0;
 
-    State::AscentToApogee state(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, 5,
-                                10, 200.0, 999, iggy);
+    for (int i = 0; i < 5; i++) {
+        result = state.getNewState(data);
+        EXPECT_TRUE(result == StateId::MACH_LOCK);
+    }
+
+    vel = 199.0;
+
+    for (int i = 0; i < 5; i++) {
+        result = state.getNewState(data);
+    }
+
+    EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
+
+}
+
+TEST(MachLock, MachLockTimeout) {
+    Calculator data;
+    StateId result;
+
+    State::MachLock state(StateId::ASCENT_TO_APOGEE, 15,
+                                200.0, 999);
     state.onEntry();
 
     result = state.getNewState(data);
-    EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
-
-    for (int i = 0; i < 10; i++) {
-        result = state.getNewState(data);
-    }
-    EXPECT_TRUE(result == StateId::MACH_LOCK);
 
     for (int i = 0; i < 10; i++) {
         Hal::sleep_ms(100);
