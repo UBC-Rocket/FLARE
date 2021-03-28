@@ -32,27 +32,6 @@
 #include "sensors/IMU.h"
 #include "sensors/accelerometer.h"
 #include "state_id_enum.hpp"
-#include "subpktptr.h"
-
-class PacketBuffWriter {
-  public:
-    PacketBuffWriter() : packet(new std::vector<uint8_t>) {
-        packet->reserve(255); // To avoid overhead of resizing multiple times
-    }
-
-    void write(void const *data, size_t size) {
-        if (!packet)
-            return;
-
-        size_t old_size = packet->size();
-        packet->resize(old_size + size);
-        std::memcpy(packet->data() + old_size, data, size);
-    }
-
-    void write(uint8_t byte) { write(&byte, 1); }
-
-    SubPktPtr packet;
-};
 
 class Radio {
   private:
@@ -137,15 +116,16 @@ class Radio {
         }
     }
 
-    /**
-     * @brief Add a subpacket to the queue to be sent. Note that this is a
-     * rather low-level utility; there should also be a helper method for any
-     * given subpacket that will build up the specific format this needs that
-     * you should use instead. Note that due to move semantics you will likely
-     * need to use std::move(dat).
-     * @param dat A SubPktPtr (refer to typedef) containing the data.
-     */
-    static void addSubpacket(SubPktPtr dat);
+    // /**
+    //  * @brief Add a subpacket to the queue to be sent. Note that this is a
+    //  * rather low-level utility; there should also be a helper method for any
+    //  * given subpacket that will build up the specific format this needs that
+    //  * you should use instead. Note that due to move semantics you will
+    //  likely
+    //  * need to use std::move(dat).
+    //  * @param dat A SubPktPtr (refer to typedef) containing the data.
+    //  */
+    // static void addSubpacket(SubPktPtr dat);
 
     /**
      * @brief Helper function to send status.
@@ -235,10 +215,7 @@ class Radio {
      * raw pointer rather than a unique pointer, so you'll need to call the
      * get() method of SubPktPtr.
      */
-    static void addIdTime(PacketBuffWriter &buf, Ids id, uint32_t time) {
-        buf.write(static_cast<uint8_t>(id));
-        buf.write(&time, sizeof(time));
-    }
+    static void addIdTime(Ids id, uint32_t time);
 
     /**
      * @brief Actually writes out data to the radio serial line; this is done

@@ -1,5 +1,4 @@
 #include <cassert>
-#include <cstring> // memcpy
 
 #include "roar/buffer.hpp"
 
@@ -89,23 +88,6 @@ void Buffer::write(uint8_t byte) {
 
     deref(pos_) = byte;
     pos_ = addIt(pos_, 1);
-}
-
-void Buffer::write(uint8_t *dat, int len) {
-    // make sure that we haven't overflowed the allocated space for a subpkt
-    assert(subIt(deref(addIt(subpkt_begin_, subpkt_count_)), pos_) >= len);
-
-    int space_remain = data_cap_ - pos_.index;
-    if (len <= space_remain) {
-        // fits within remaining space
-        std::memcpy(&data_[pos_.index], dat, len);
-    } else {
-        // data wraps to start
-        std::memcpy(&data_[pos_.index], dat, space_remain);
-        std::memcpy(data_.get(), dat + space_remain, len - space_remain);
-    }
-
-    pos_ = addIt(pos_, len);
 }
 
 /**

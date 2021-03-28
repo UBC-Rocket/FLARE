@@ -2,8 +2,8 @@
 #define ROAR_BUFFER_HPP_E3C08775FC654E1784215F53447EBFC0
 
 #include <cstdint>
-#include <memory>
-
+#include <cstring> // memcpy
+#include <memory> // unique_ptr, used for fixed internal buffers on the heap
 namespace roar {
 
 /**
@@ -50,7 +50,22 @@ class Buffer {
     /**
      * @brief Write data to the last allocated subpacket.
      */
-    void write(uint8_t *byte, int len);
+    template <class T> void write(const T *byte, int len) {
+        // TODO: figure out how to instantiate explicit versions in .cpp file
+        const uint8_t *dat = reinterpret_cast<const uint8_t *>(byte);
+
+        int space_remain = data_cap_ - pos_.index;
+        if (len <= space_remain) {
+            // fits within remaining space
+            std::memcpy(&data_[pos_.index], dat, len);
+        } else {
+            // data wraps to start
+            std::memcpy(&data_[pos_.index], dat, space_remain);
+            std::memcpy(data_.get(), dat + space_remain, len - space_remain);
+        }
+
+        pos_ = addIt(pos_, len);
+    }
 
     /**
      * @brief Fills payload pointer as full as possible (i.e. at most
