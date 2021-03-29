@@ -88,7 +88,6 @@ else()
   message(SEND_ERROR "Python not found; unable to set Radio Config data")
 endif()
 
-
 ###
 ### Google Test
 ###
