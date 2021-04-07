@@ -88,7 +88,6 @@ else()
   message(SEND_ERROR "Python not found; unable to set Radio Config data")
 endif()
 
-
 ###
 ### Google Test
 ###
@@ -163,6 +162,11 @@ ROCKET_CREATE_TEST(CalcHelpers)
 ROCKET_CREATE_TEST(Estimators)
 target_sources(testexe_Estimators PUBLIC
     common/lib/CalcHelpers/barometric.cpp
+    )
+
+ROCKET_CREATE_TEST(Roar)
+target_Sources(testexe_Roar PUBLIC
+    common/src/roar/buffer.cpp
     )
 
 

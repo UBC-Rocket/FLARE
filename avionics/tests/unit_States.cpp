@@ -8,7 +8,17 @@ struct Ignitor {
 };
 
 #include "states/ascent_to_apogee.h"
+#include "states/mach_lock.h"
 #include "states/repeated_checks.hpp"
+
+// Mocking time.cpp
+namespace Hal {
+    uint32_t current_time_;
+
+    uint32_t millis() { return current_time_; }
+    void sleep_ms(uint32_t t) {current_time_ += t;}
+
+} // namespace Hal
 
 TEST(AscentToApogee, FireIgnitor) {
     // Simulate free fall (uniform acceleration), with data every 50ms
@@ -35,6 +45,109 @@ TEST(AscentToApogee, FireIgnitor) {
     }
     EXPECT_TRUE(iggy.fired);
     EXPECT_TRUE(-1 < t && t < 1);
+}
+
+TEST(AscentToApogee, MachLock) {
+    Ignitor iggy;
+    Calculator data;
+    StateId result;
+    auto &alt = data.alt;
+    auto &vel = data.vel_gnd_z;
+    alt = 1000;
+    vel = 201.0;
+
+    State::AscentToApogee state(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, 5,
+                                10, 200.0, iggy);
+    state.onEntry();
+
+    for (int i = 0; i < 10; i++) {
+        result = state.getNewState(data);
+    }
+
+    EXPECT_TRUE(result == StateId::MACH_LOCK);
+
+    vel = 199.0;
+    result = state.getNewState(data);
+    EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
+}
+
+TEST(AscentToApogee, MachLockChecks) {
+    Ignitor iggy;
+    Calculator data;
+    StateId result;
+    auto &alt = data.alt;
+    auto &vel = data.vel_gnd_z;
+    alt = 1000;
+    vel = 201.0;
+
+    State::AscentToApogee state(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, 5,
+                                10, 200.0, iggy);
+    state.onEntry();
+
+    for (int i = 0; i < 9; i++) {
+        result = state.getNewState(data);
+    }
+    EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
+
+    vel = 199.0;
+    result = state.getNewState(data);
+    EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
+
+    vel = 201.0;
+    for (int i = 0; i < 9; i++) {
+        result = state.getNewState(data);
+    }
+    EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
+}
+
+TEST(MachLock, MachLockChecks) {
+    Calculator data;
+    StateId result;
+    auto &vel = data.vel_gnd_z;
+    vel = 199.0;
+
+    State::MachLock state(StateId::ASCENT_TO_APOGEE, 5,
+                                200.0, 999);
+    state.onEntry();
+
+    for (int i = 0; i < 4; i++) {
+        result = state.getNewState(data);
+        EXPECT_TRUE(result == StateId::MACH_LOCK);
+    }
+    
+    vel = 201.0;
+
+    for (int i = 0; i < 5; i++) {
+        result = state.getNewState(data);
+        EXPECT_TRUE(result == StateId::MACH_LOCK);
+    }
+
+    vel = 199.0;
+
+    for (int i = 0; i < 5; i++) {
+        result = state.getNewState(data);
+    }
+
+    EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
+
+}
+
+TEST(MachLock, MachLockTimeout) {
+    Calculator data;
+    StateId result;
+
+    State::MachLock state(StateId::ASCENT_TO_APOGEE, 15,
+                                200.0, 999);
+    state.onEntry();
+
+    result = state.getNewState(data);
+
+    for (int i = 0; i < 10; i++) {
+        Hal::sleep_ms(100);
+        EXPECT_TRUE(result == StateId::MACH_LOCK);
+        result = state.getNewState(data);
+    }
+    EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
 }
 
 TEST(DrogueDescent, FireIgnitor) {

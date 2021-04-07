@@ -3,6 +3,7 @@
 /*Includes------------------------------------------------------------*/
 #include "hardware/ignitor.h"
 #include "state_interface.h"
+#include "HAL/time.h"
 
 namespace State {
 
@@ -12,9 +13,8 @@ class AscentToApogee : public IState {
                    uint8_t const APOGEE_CHECKS, uint8_t const MACH_LOCK_CHECKS,
                    float MACH_LOCK_VELOCITY, Ignitor &drogue_ignitor)
         : APOGEE_CHECKS_(APOGEE_CHECKS), MACH_LOCK_CHECKS_(MACH_LOCK_CHECKS),
-          MACH_LOCK_VELOCITY_(MACH_LOCK_VELOCITY),
-          post_apogee_id_(post_apogee_id), mach_lock_id_(mach_lock_id),
-          drogue_ignitor_(drogue_ignitor) {}
+          MACH_LOCK_VELOCITY_(MACH_LOCK_VELOCITY), post_apogee_id_(post_apogee_id), 
+          mach_lock_id_(mach_lock_id), drogue_ignitor_(drogue_ignitor) {}
 
     /*
      * @brief Return the assigned enumeration code.
@@ -30,21 +30,21 @@ class AscentToApogee : public IState {
      */
     StateId getNewState(Calculator const &input) {
         if (input.velocityGroundZ() > MACH_LOCK_VELOCITY_) {
-            if (++mach_checks >= MACH_LOCK_CHECKS_) {
+            if (++mach_checks_ >= MACH_LOCK_CHECKS_) {
                 return mach_lock_id_;
             }
         } else {
-            mach_checks = 0;
+            mach_checks_ = 0;
         }
 
-        if (input.altitude() < last_alt) {
-            apogee_checks++;
-        } else if (apogee_checks > 0) {
-            apogee_checks--;
+        if (input.altitude() < last_alt_) {
+            apogee_checks_++;
+        } else if (apogee_checks_ > 0) {
+            apogee_checks_--;
         }
-        last_alt = input.altitude();
+        last_alt_ = input.altitude();
 
-        if (apogee_checks >= APOGEE_CHECKS_) {
+        if (apogee_checks_ >= APOGEE_CHECKS_) {
             drogue_ignitor_.fire();
             return post_apogee_id_;
         } else {
@@ -53,10 +53,10 @@ class AscentToApogee : public IState {
     }
 
     void onEntry() override {
-        apogee_checks = 0;
-        mach_checks = 0;
+        apogee_checks_ = 0;
+        mach_checks_ = 0;
         // Awkward to pass in first value - 0-initialize works with checks.
-        last_alt = 0;
+        last_alt_ = 0;
     }
 
   private:
@@ -67,9 +67,9 @@ class AscentToApogee : public IState {
     const StateId mach_lock_id_;
     Ignitor &drogue_ignitor_;
 
-    uint8_t apogee_checks{0};
-    uint8_t mach_checks{0};
-    float last_alt{0};
+    uint8_t apogee_checks_{0};
+    uint8_t mach_checks_{0};
+    float last_alt_{0};
 };
 
 } // namespace State
