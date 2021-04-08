@@ -43,22 +43,6 @@ class Armed : public RepeatedCheckBase<StateId::ARMED, next_id, num_checks,
 };
 
 template <StateId next_id, int num_checks>
-class MachLock
-    : public RepeatedCheckBase<StateId::MACH_LOCK, next_id, num_checks,
-                               MachLock<next_id, num_checks>> {
-  public:
-    MachLock(const float unlock_velocity) : unlock_velocity_(unlock_velocity) {}
-
-  private:
-    friend RepeatedCheckBase<StateId::MACH_LOCK, next_id, num_checks,
-                             MachLock<next_id, num_checks>>;
-    float unlock_velocity_;
-    bool accept(Calculator const &input) {
-        return input.velocityGroundZ() < unlock_velocity_;
-    }
-};
-
-template <StateId next_id, int num_checks>
 class DrogueDescent
     : public RepeatedCheckBase<StateId::DROGUE_DESCENT, next_id, num_checks,
                                DrogueDescent<next_id, num_checks>> {
