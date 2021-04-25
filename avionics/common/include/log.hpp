@@ -2,6 +2,7 @@
 #define LOG_HPP_E90DE04B2AC74C05BE2B65A022ED84AB
 
 #include <cstdint>
+#include <cstdio>
 #include <ostream>
 
 // TODO: provide more granularity (i.e. specify log level to keep) in
@@ -42,24 +43,6 @@ namespace rktlog {
 // Type used to take advantage of function overloading to flush the stream. Used
 // internally by logger; do not use externally.
 class Endl {};
-
-/**
- * @brief Converts an int32 into a C-style string. No dynamic memory
- * allocations are used.
- * @param buf Pointer to character buffer of at least 12 bytes, where the
- * output is written. At most 12 bytes are used. 12 is just sufficient to
- * contain the maximum int32 value, including sign character and terminating
- * zero.
- * @return Pointer to start of used buffer - this is not equal to buf; see
- * implementation notes
- *
- * Getting characters out of an integer (the easy way) involves a loop of
- * modulus & integer division, but this ends up getting the values from
- * right to left. So, for convenience we'll just write the output from right
- * to left, starting at the last position. This necessitates reporting what
- * final position we ended at, hence the return value does that.
- */
-char *itostr(char *buf, std::int32_t val);
 
 /**
  * @brief Serves as interface to an output stream. Subclass this class to
