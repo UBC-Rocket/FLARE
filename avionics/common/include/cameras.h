@@ -15,7 +15,8 @@
  * Distributed as-is; no warranty is given.
  */
 
-#pragma once
+#ifndef CAMERAS_H_2D865819C2084936A8B94C592E41FE26
+#define CAMERAS_H_2D865819C2084936A8B94C592E41FE26
 
 /*Includes------------------------------------------------------------*/
 #include <HAL/port.h>
@@ -53,3 +54,4 @@ class Camera {
     Hal::Serial &m_seri_cam;
     static constexpr auto M_CAMERA_BAUD = 115200;
 };
+#endif

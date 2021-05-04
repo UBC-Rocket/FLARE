@@ -1,9 +1,12 @@
 #pragma once
 
 /*Includes------------------------------------------------------------*/
-#include "calculations.h"
-#include "state_interface.h"
 #include <chrono>
+
+#include "calculations.h"
+#include "cameras.h"
+#include "state_interface.h"
+#include "tasks/restart_camera.hpp"
 
 namespace State {
 
@@ -36,7 +39,13 @@ class MainDescent : public IState {
      */
     StateId getNewState(Calculator const &);
 
-    void onEntry() override { prev_altitude = calc_.altitude(); }
+    void onEntry() override {
+        prev_altitude = calc_.altitude();
+
+        Scheduler::scheduleTask(Hal::now_ms() +
+                                    Hal::ms(CAMERA_FIRST_POWEROFF_DELAY_MS),
+                                static_cast<int>(TaskID::RestartCamera));
+    }
 
   private:
     const Hal::ms LANDED_TIME_INTERVAL_;

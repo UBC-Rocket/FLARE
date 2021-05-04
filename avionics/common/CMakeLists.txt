@@ -16,6 +16,7 @@ set(common_files
 
     ${CMAKE_CURRENT_LIST_DIR}/src/tasks/main_tasks.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/tasks/led_blinker.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/tasks/restart_camera.cpp
 
     ${CMAKE_CURRENT_LIST_DIR}/src/hardware/ignitor.cpp
 
