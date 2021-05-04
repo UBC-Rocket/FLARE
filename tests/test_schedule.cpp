@@ -304,4 +304,39 @@ TEST_F(ScheduleFixture, Unschedule) {
     Schedule::run();
 }
 
+/**
+ * Disrupt the existing task by adding a number of additional tasks
+ */
+TEST_F(ScheduleFixture, NewTasks) {
+    MockTaskLogger logger;
+    StoppingClock says_stop_at(50); // Should end before
+
+    constexpr int NUM_ADDNL_TASKS = 10;
+
+    std::vector<SimpleTask> addnl_tasks;
+
+    for (int i = 0; i < NUM_ADDNL_TASKS; ++i) {
+        addnl_tasks.emplace_back(i + 1, logger);
+    }
+
+    constexpr int period = 30;
+
+    SpawningTask main_task(addnl_tasks, logger);
+    Schedule::registerTask(
+        0, Schedule::Task(SpawningTask::externAct, &main_task, period));
+
+    EXPECT_CALL(logger, logImpl(0, 1, 0));
+    EXPECT_CALL(logger, logImpl(0, 2, period));
+
+    for (int i = 0; i < NUM_ADDNL_TASKS; ++i) {
+        EXPECT_CALL(logger, logImpl(i + 1, 1, 0));
+    }
+
+    try {
+        Schedule::run();
+    } catch (ClockFinishedExc &) {
+        // Expected
+    }
+}
+
 } // namespace RocketSchedule

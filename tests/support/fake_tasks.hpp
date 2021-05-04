@@ -50,6 +50,37 @@ class LongTask {
 };
 
 /**
+ * Given vector of additional tasks, spawns them immediately the first time the
+ * task is run.
+ */
+struct SpawningTask {
+    SpawningTask(std::vector<SimpleTask> &addnl_tasks, ITaskLogger &log)
+        : addnl_tasks_(addnl_tasks), task_(0, log) {}
+
+    void action() {
+        task_.action(); // log once
+        if (run_) {
+            return;
+        }
+
+        for (std::size_t i = 0; i < addnl_tasks_.size(); ++i) {
+            Schedule::Task addnl_task(SimpleTask::externAct,
+                                      (&(addnl_tasks_[i])), 0);
+            Schedule::registerTask(i + 1, addnl_task,
+                                   /*repeat*/ false, /*run_early*/ false);
+        }
+        run_ = true;
+    }
+    static void externAct(void *me) {
+        static_cast<SpawningTask *>(me)->action();
+    }
+
+    bool run_ = false;
+    std::vector<SimpleTask> &addnl_tasks_;
+    SimpleTask task_;
+};
+
+/**
  * In hindsight I should've just done this earlier, a single task type with
  * several features. But oh well.
  */

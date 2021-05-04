@@ -99,7 +99,7 @@ template <typename Clock, int MaxTasks> class ScheduleBase {
 
         TimePoint start_time = todo_[todo_count_].first;
         // aliases
-        const int &task_id = todo_[todo_count_].second;
+        const int task_id = todo_[todo_count_].second;
         const Task &task = tasks_[task_id];
 
         if (!run_early_.test(task_id)) {
