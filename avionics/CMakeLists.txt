@@ -154,6 +154,10 @@ ROCKET_CREATE_TEST(RepeatChecksState)
 
 ROCKET_CREATE_TEST(States)
 
+ROCKET_CREATE_TEST(RestartCamera)
+target_sources(testexe_RestartCamera PUBLIC common/src/tasks/restart_camera.cpp)
+target_sources(testexe_RestartCamera PUBLIC common/lib/RocketScheduler/include/RocketSchedule/fake_clocks.cpp)
+
 ROCKET_CREATE_TEST(Barometric)
 target_sources(testexe_Barometric PUBLIC common/lib/CalcHelpers/barometric.cpp)
 

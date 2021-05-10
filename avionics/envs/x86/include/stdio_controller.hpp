@@ -16,7 +16,6 @@
 #define OS_IS_WINDOWS
 #endif
 
-
 class StdIoController {
     // Everything is static but it's not a namespace b/c of the private member
     // variables
@@ -175,7 +174,6 @@ class StdIoController {
 
         return sensor_data;
     }
-
 
     /**
      * @brief Corresponds to Request Time Update package in confluence spec.

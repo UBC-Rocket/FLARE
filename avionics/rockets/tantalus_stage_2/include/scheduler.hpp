@@ -7,6 +7,7 @@ enum class TaskID {
     ReadEvalLog = 0,
     RadioTxBulk = 1,
     LEDBlinker = 2,
+    RestartCamera = 3,
     kNum,
 };
 

@@ -26,10 +26,14 @@ class Landed : public IState {
     StateId getNewState(Calculator const &) { return StateId::LANDED; }
 
     void onEntry() override {
-        // TODO: Turn off cameras and camera cycling task
         constexpr static unsigned int LANDED_POLLING_INTERVAL = 5000;
         Scheduler::get_task(static_cast<int>(TaskID::ReadEvalLog)).period =
             Hal::ms(LANDED_POLLING_INTERVAL);
+
+        Scheduler::unschedule(static_cast<int>(TaskID::RestartCamera));
+
+        // NOTE: Status of camera is unknown at this point. Ensure that it is
+        // turned off.
         cam_.stop_record();
     }
 

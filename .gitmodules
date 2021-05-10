@@ -1,3 +1,0 @@
-[submodule "avionics/common/lib/RocketScheduler"]
-	path = avionics/common/lib/RocketScheduler
-	url = https://github.com/UBC-Rocket/RocketScheduler.git

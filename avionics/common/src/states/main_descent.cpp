@@ -1,6 +1,5 @@
 #include "states/main_descent.h"
 #include "HAL/time.h"
-#include "scheduler.hpp"
 
 StateId State::MainDescent::getNewState(Calculator const &input) {
     typedef std::chrono::milliseconds ms;

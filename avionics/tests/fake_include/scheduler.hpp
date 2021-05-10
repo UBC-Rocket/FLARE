@@ -1,6 +1,7 @@
 #ifndef SCHEDULER_HPP_027EFDB5B9564B41A3DB637CF47A3960
 #define SCHEDULER_HPP_027EFDB5B9564B41A3DB637CF47A3960
-#include "scheduler_clock.hpp"
+#include "RocketSchedule/fake_clocks.hpp"
+#include "RocketSchedule/schedule.hpp"
 
 /* Task IDs =========================================================== */
 enum class TaskID {
@@ -11,5 +12,7 @@ enum class TaskID {
     kNum,
 };
 
-typedef ScheduleBase<SchedulerClock, static_cast<int>(TaskID::kNum)> Scheduler;
+typedef ScheduleBase<RocketSchedule::FakeClockWrapper,
+                     static_cast<int>(TaskID::kNum)>
+    Scheduler;
 #endif
