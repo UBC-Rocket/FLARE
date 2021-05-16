@@ -273,13 +273,15 @@ class StdIoController {
     }
 
     static void inputLoop() {
-        while (run_input_) {
-            extractPacket();
-        }
-        std::unique_lock<std::mutex> lock (blocking_request_mutex_);
-        blocking_request_cv_.notify_one();
-        while (!run_input_) {
-            blocking_request_cv_.wait(lock);
+        while (true) {
+            while (run_input_) {
+                extractPacket();
+            }
+            std::unique_lock<std::mutex> lock (blocking_request_mutex_);
+            blocking_request_cv_.notify_one();
+            while (!run_input_) {
+                blocking_request_cv_.wait(lock);
+            }
         }
     }
 };
