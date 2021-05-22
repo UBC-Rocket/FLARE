@@ -83,6 +83,7 @@ class StdIoController {
 
         ~BlockingRequest() {
             StdIoController::run_input_ = true;
+            std::unique_lock<std::mutex> lock(blocking_request_mutex_);
             StdIoController::blocking_request_cv_.notify_one();
         }
     };
@@ -279,9 +280,7 @@ class StdIoController {
             }
             std::unique_lock<std::mutex> lock (blocking_request_mutex_);
             blocking_request_cv_.notify_one();
-            while (!run_input_) {
-                blocking_request_cv_.wait(lock);
-            }
+            blocking_request_cv_.wait(lock);
         }
     }
 };
