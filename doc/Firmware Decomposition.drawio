@@ -1,1 +1,73 @@
-<mxfile host="app.diagrams.net" modified="2021-05-23T23:20:55.799Z" agent="5.0 (X11)" etag="eCQTyF3fq4kBrGrHoogf" version="14.7.0" type="github"><diagram id="o-eNBIKeLZyZqa3y3T_n" name="Firmware Decomposition">7Vrdc9o4EP9rmGsfwmAbA3kMkEsyl8x0Qjul96ZYwtZVljyyDLh//a1s+QsbjvYCodM+4V197Oq3H1qv6TmzcHsnURQ8CUxYzx7gbc+Z92zbsscT+NGcNOe47nXO8CXFZlLFWNBvxDAHhptQTOLGRCUEUzRqMj3BOfFUg4ekFJvmtJVgTakR8kmLsfAQa3M/U6yCnDtxBxX/nlA/KCRbAzMSomKyYcQBwmJTYzm3PWcmhVD5U7idEabBK3DJ1/25Z7RUTBKujlkQJtO/P3yNPy0/Pt0NBlerv7yruys332WNWGIOfH/zaPRVaQFCvKEhQxyoaayQVMZMINCZmg2IVGS7VzOrPC84ChEhUTKFKWaBOzYQGR8ZOobeVIiXMAY1tK8NDxkj++XWpbRncArEfThJKc7eEedYbXGjDmn2jjTEFJEcKTIVCcdxHXx4qB20YmUm+Q7zDFvmWfQf+k/9loWkVoHorbRNNgFVZBEhT49uIDCBF6gQRM+tY02231322tHaMWMb1nEHrMMDRmzg+b3gTVrg3UicUC40dEkUCakuFMfhZQFpj1s4EQxZ0pCAYyB8wRG7rbjTJpLVnEchIoPfP0Sp1OQSlCjRRBcQlOlSr++7BfnFbJcR822DSg2V66oVPJyO4DwikR45cPDCoSHn+eQH7CkJQ4qum4ocSFYfBAUVSz8YO253Xiy2yPUyq14/+xTHr0VQzx4xAGKK6Roeff24IDwWMi5GQFJt8AwBdvhuGdk7yb7jbrG67hb3ZNE0+lWjqajf/iuarEG3SY8Op/9ln0LNw14/Q8xLtDqCw9x3UZDGFKrGzK5QEmjMYkXDbML7Yv2LrOLip4gW++2jxf1Vo8U+Nlr2mPRM0WK3omVhAiBEXkDhpeHSnNp6c6d27Ddx6i1Vy9rzl8q/gao8WhNp3b2XdaK26kyB4BwbCPZJqrDRzmuNNTpvFeY4v53lBM7yplnTGf626Qls+rZ1o9O6Ce8f/AA4jKyzrqgnACLBWqavtdde4borO5BFvpq4revOcd32dWedrIFgtduMzwhT3Yh597x8f4YK4YDF9gPpThpAdrRhJh0wng7F0X4UP14sirbrXhaK4xaKj8L3Kfc1jkqjuZjrYEUSXyqmVhPS66569pyY2u2XgHnKUUg9YL6QAK0pJHkNaoC4T+KfA9YOTz0vrE47bXZ0Im7yr1ywF8fUy1+9MIkIAMq99MhGA0CpmijHcFV9JTPBhAQOF9n1tKKM7bAQoz4H0gPoCfCn2jC6FXJjBkKKcVa/dJm1afjXuP2cnduvy4qTI77uvJ4V22n7gWd1T0iyPBPrgJhVHCY2RBZlgzYsHD6vYijKXkyyltMmQOoPPRqgCIyd5y+kh5FmwsGqTfLtSd/v6zIq0LvFRdd2kKW8l1wCwvCzkiLUUmQ5GTFfSKoCzV5lfK9qf+k9QpQWmxSu11C0V7XFjPg0VkRvR3PP1Yp9gmW5zIwZU5WY/tosmwMrMv3EKiPBP3HimXPv+PysFKSB6CrBBnEgEqa3izfgibBrorLxMAK/5irD3fOExCCBpe0vbpcRMaFYo5dMJa2BJDH9VqcFgF6jMWGkThNM66T5hl7jnKAcdcbtgHSGHQFp/UBEAll9UM9fwKu/JTi3/wI=</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2021-05-30T20:42:22.694Z" agent="5.0 (X11)" etag="H3vVY4kPDvAe-Z3GOwdq" version="14.7.3" type="github">
+  <diagram id="o-eNBIKeLZyZqa3y3T_n" name="Firmware Decomposition">
+    <mxGraphModel dx="1278" dy="689" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="muBZPksUXTMG00-fKc-G-5" value="HAL" style="swimlane;startSize=20;" parent="1" vertex="1">
+          <mxGeometry x="570" y="430" width="220" height="90" as="geometry">
+            <mxRectangle x="270" y="310" width="60" height="20" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-4" value="S.I.M." style="rounded=0;whiteSpace=wrap;html=1;" parent="muBZPksUXTMG00-fKc-G-5" vertex="1">
+          <mxGeometry x="10" y="40" width="70" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-8" value="Arduino support" style="rounded=0;whiteSpace=wrap;html=1;" parent="muBZPksUXTMG00-fKc-G-5" vertex="1">
+          <mxGeometry x="140" y="40" width="70" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="muBZPksUXTMG00-fKc-G-10" target="muBZPksUXTMG00-fKc-G-5" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="735" y="430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-10" value="&lt;div&gt;Sensors&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="620" y="330" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="muBZPksUXTMG00-fKc-G-11" target="muBZPksUXTMG00-fKc-G-10" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-11" value="&lt;div&gt;Calculation (physical state estimation)&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="620" y="230" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="muBZPksUXTMG00-fKc-G-12" target="muBZPksUXTMG00-fKc-G-11" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-12" value="State machine" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="620" y="130" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="muBZPksUXTMG00-fKc-G-13" target="muBZPksUXTMG00-fKc-G-12" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="610" y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="muBZPksUXTMG00-fKc-G-13" target="muBZPksUXTMG00-fKc-G-11" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="muBZPksUXTMG00-fKc-G-13" target="muBZPksUXTMG00-fKc-G-10" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-13" value="High level control" style="swimlane;" parent="1" vertex="1">
+          <mxGeometry x="100" y="185" width="355" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-15" value="Radio (RX)" style="rounded=0;whiteSpace=wrap;html=1;" parent="muBZPksUXTMG00-fKc-G-13" vertex="1">
+          <mxGeometry x="158" y="40" width="85" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-16" value="Radio (TX)" style="rounded=0;whiteSpace=wrap;html=1;" parent="muBZPksUXTMG00-fKc-G-13" vertex="1">
+          <mxGeometry x="255" y="40" width="85" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-17" value="Logging (to SD card)" style="rounded=0;whiteSpace=wrap;html=1;" parent="muBZPksUXTMG00-fKc-G-13" vertex="1">
+          <mxGeometry x="15" y="90" width="125" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-22" value="Dynamic behaviour changes" style="rounded=0;whiteSpace=wrap;html=1;" parent="muBZPksUXTMG00-fKc-G-13" vertex="1">
+          <mxGeometry x="15" y="40" width="125" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-35" value="&lt;div&gt;Arrows indicate dependency, e.g things should depend on HAL (not other way around)&lt;br&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="130" y="100" width="210" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="muBZPksUXTMG00-fKc-G-36" value="In some cases, some lower levels are reliant on what&#39;s happening at a higher level, e.g. the sensors to be read from or the algorithm for calculations may be dependent on what state the system is in. Under this situation, instead of introducing a dependency, the high level control should swap out components accordingly." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;connectable=1;" parent="1" vertex="1">
+          <mxGeometry x="100" y="370" width="340" height="120" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
