@@ -9,7 +9,7 @@ namespace State {
 
 class Landed : public IState {
   public:
-    Landed(Camera &cam) : cam_(cam) {}
+    Landed() {}
 
     /*
      * @brief Return the assigned enumeration code.
@@ -24,21 +24,6 @@ class Landed : public IState {
      * codes and used states. Note that the returned code may be the same state.
      */
     StateId getNewState(Calculator const &) { return StateId::LANDED; }
-
-    void onEntry() override {
-        constexpr static unsigned int LANDED_POLLING_INTERVAL = 5000;
-        Scheduler::get_task(static_cast<int>(TaskID::ReadEvalLog)).period =
-            Hal::ms(LANDED_POLLING_INTERVAL);
-
-        Scheduler::unschedule(static_cast<int>(TaskID::RestartCamera));
-
-        // NOTE: Status of camera is unknown at this point. Ensure that it is
-        // turned off.
-        cam_.stop_record();
-    }
-
-  private:
-    Camera &cam_;
 };
 
 } // namespace State
