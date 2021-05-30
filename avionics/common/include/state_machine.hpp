@@ -2,11 +2,13 @@
 
 #include <cassert>
 #include <unordered_map> //for std::unordered_map (hash map)
+#include <utility>
 
 #include "HAL/time.h"
 #include "calculations.h"
 #include "log.hpp"
 #include "radio.h"
+#include "state_id_enum.hpp"
 #include "state_interface.h"
 
 class StateMachine {
@@ -20,12 +22,22 @@ class StateMachine {
         assert(map.count(StateId::WINTER_CONTINGENCY) != 0);
     }
 
-    void update(Calculator const &calc) {
-        IState *current_state = state_map_[current_id_];
-        StateId new_id = current_state->getNewState(calc);
-        if (new_id != current_id_) {
+    /**
+     * @brief Updates the state machine, using new physical state information
+     * provided by `Calculator`.
+     * @param calc Calculator object, which should be freshly updated with new
+     * sensor information
+     * @return std::pair of old and new StateId (which may be identical). To
+     * detect a state change, check whether the two returned values are
+     * different.
+     */
+    std::pair<StateId, StateId> update(Calculator const &calc) {
+        const StateId old_id = current_id_;
+        IState *current_state = state_map_[old_id];
+        const StateId new_id = current_state->getNewState(calc);
+        if (new_id != old_id) {
             LOG_INFO("State changed (previous state "
-                     << static_cast<std::int32_t>(current_id_) << ", new state "
+                     << static_cast<std::int32_t>(old_id) << ", new state "
                      << static_cast<std::int32_t>(new_id) << ", time is "
                      << static_cast<std::int32_t>(Hal::millis()) << "ms)");
             state_map_[new_id]->onEntry();
@@ -33,6 +45,7 @@ class StateMachine {
                              static_cast<uint16_t>(new_id));
             current_id_ = new_id;
         }
+        return std::make_pair(old_id, new_id);
     }
 
     /**
