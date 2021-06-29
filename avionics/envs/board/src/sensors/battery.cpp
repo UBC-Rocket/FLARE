@@ -18,7 +18,7 @@
  * Distributed as-is; no warranty is given.
  */
 
-#include "battery.h"
+#include "sensors/battery.h"
 #include "HAL/pin_util.h"
 
 
@@ -58,5 +58,5 @@ void Battery::readData() {
     // converts output value from mV to V and divides by voltage divider
     // value to calculate battery input voltage.
     float batteryVoltage = (teensyVoltage / m_divider) / 1000;
-    data_[0] = batteryVoltage;
+    data_[0] = batteryVoltage; 
 }

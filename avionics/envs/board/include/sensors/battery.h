@@ -20,7 +20,6 @@
 #pragma once
 
 #include "gpio.h"
-#include "status.h"
 #include "sensors_interface.h"
 
 class Battery : public SensorBase<BATTERY_DATA_LENGTH>{
