@@ -33,9 +33,9 @@ class Battery : public SensorBase<BATTERY_DATA_LENGTH>{
      *          is 11.0 volts; to adjust, change the resistors used
      *          in the voltage divider.
      * @param  None
-     * @return float batteryVoltage - voltage of the battery, in volts.
+     * @return float batteryVoltage - voltage of the battery, in volts - sets member variable with the value of battery voltage when called
      */
-    float readData();
+    void readData();
 
   private:
     float m_divider;

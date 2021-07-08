@@ -30,8 +30,7 @@
 #define R2 15150 // Nominal: 16000. Lower is larger range.
 // Maximum voltage = 3.3*(R1+R2)/R2
 
-
-Battery(float *const data, Pin batterySensorPin)
+Battery::Battery(Pin batterySensorPin, float *const data)
     : SensorBase(data) {
 
 /*init voltage sensor*/
@@ -42,7 +41,7 @@ Battery(float *const data, Pin batterySensorPin)
     m_batterySensorPin = batterySensorPin;
     status = SensorStatus::NOMINAL;
     // sets selected pin so it can be read from correctly
-    Hal::pinMode(m_batterySensorPin, Hal::PinMode.INPUT) 
+    Hal::pinMode(m_batterySensorPin, Hal::PinMode::INPUT);
 }
 
 float range_map(int x, int in_min, int in_max, int out_min, int out_max) {
