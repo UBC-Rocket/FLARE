@@ -41,6 +41,8 @@ Battery(float *const data, Pin batterySensorPin)
     m_divider = static_cast<float>(R2) / (R1 + R2);
     m_batterySensorPin = batterySensorPin;
     status = SensorStatus::NOMINAL;
+    // sets selected pin so it can be read from correctly
+    Hal::pinMode(m_batterySensorPin, Hal::PinMode.INPUT) 
 }
 
 float range_map(int x, int in_min, int in_max, int out_min, int out_max) {
