@@ -18,7 +18,7 @@
  * Distributed as-is; no warranty is given.
  */
 
-#include "sensors/battery.h"
+#include "sensors/battery_sensor.h"
 #include "HAL/pin_util.h"
 
 
@@ -44,7 +44,7 @@ Battery::Battery(Pin batterySensorPin, float *const data)
     Hal::pinMode(m_batterySensorPin, Hal::PinMode::INPUT);
 }
 
-float range_map(int x, int in_min, int in_max, int out_min, int out_max) {
+float sensor_range_map(int x, int in_min, int in_max, int out_min, int out_max) {
     return static_cast<float>((x - in_min) * (out_max - out_min)) / static_cast<float>((in_max - in_min) + out_min);
 }
 
@@ -55,7 +55,7 @@ void Battery::readData() {
     int inputValue = Hal::analogRead(m_batterySensorPin);
     // map it to the range the analog out:
     // 3300mV is the highest voltage Teensy can read.
-    float teensyVoltage = range_map(inputValue, 0, 1023, 0, 3300);
+    float teensyVoltage = sensor_range_map(inputValue, 0, 1023, 0, 3300);
     // converts output value from mV to V and divides by voltage divider
     // value to calculate battery input voltage.
     float batteryVoltage = (teensyVoltage / m_divider) / 1000;
