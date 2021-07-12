@@ -23,6 +23,7 @@ enum class SensorType {
 #define IMU_DATA_LENGTH             4
 #define TEMPERATURE_DATA_LENGTH     1
 #define THERMOCOUPLE_DATA_LENGTH    1
+#define BATTERY_DATA_LENGTH         1
 
 template <uint8_t size> class SensorBase {
   public:

@@ -5,6 +5,8 @@
  * @author  UBC Rocket Avionics 2018/2019
  * @description   A battery voltage read function to check
  *  battery charge status.
+ * 
+ * Modified to implement battery check as a sensor class
  *
  * @section LICENSE
  * This program is free software; you can redistribute it and/or
@@ -18,29 +20,22 @@
 #pragma once
 
 #include "gpio.h"
-#include "status.h"
+#include "sensors_interface.h"
 
-class Battery {
+class Battery : public SensorBase<BATTERY_DATA_LENGTH>{
   public: // public functions
     // Constructor. batterySensorPin is the pin for battery sensor
     // (i.e. output of the voltage divider)
-    Battery(Pin batterySensorPin);
+    Battery(Pin batterySensorPin, float *const data);
 
     /**
      * @brief  Gets the battery voltage level. Maximum voltage readable
      *          is 11.0 volts; to adjust, change the resistors used
      *          in the voltage divider.
      * @param  None
-     * @return float batteryVoltage - voltage of the battery, in volts.
+     * @return float batteryVoltage - voltage of the battery, in volts - sets member variable with the value of battery voltage when called
      */
-    float getVoltage();
-
-    /**
-     * @brief  Gets the error status that the battery should report
-     * @param  None
-     * @return Status - battery status
-     */
-    RocketStatus getStatus();
+    void readData();
 
   private:
     float m_divider;
