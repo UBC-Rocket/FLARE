@@ -27,13 +27,39 @@ class ReadEvalLog {
             state_machine.abort();
         }
 
-        StateId state = state_machine.getState();
+        {
+            const StateId state = state_machine.getState();
+            sensors.poll();
+            calc.update(state, sensors.last_poll_time());
+            datalog.logData(Hal::tpoint_to_uint(sensors.last_poll_time()),
+                            sensors, state, calc.altitude(),
+                            calc.altitudeBase());
+        }
 
-        sensors.poll();
-        calc.update(state, sensors.last_poll_time());
-        state_machine.update(calc);
-        datalog.logData(Hal::tpoint_to_uint(sensors.last_poll_time()), sensors,
-                        state, calc.altitude(), calc.altitudeBase());
+        StateId old_state, new_state;
+        std::tie(old_state, new_state) = state_machine.update(calc);
+        if (old_state != new_state) {
+            // state transition has occurred
+            if (new_state == StateId::MAIN_DESCENT) {
+                // restart the camera periodically once in main descent
+                Scheduler::scheduleTask(
+                    Hal::now_ms() + Hal::ms(CAMERA_FIRST_POWEROFF_DELAY_MS),
+                    static_cast<int>(TaskID::RestartCamera));
+
+            } else if (new_state == StateId::LANDED) {
+                // stop restarting the camera once in landed, and slow down
+                // polling interval
+                Scheduler::unschedule(static_cast<int>(TaskID::RestartCamera));
+
+                // NOTE: Status of camera is unknown at this point. Ensure that
+                // it is turned off.
+                rocket_.cam.stop_record();
+
+                constexpr static unsigned int LANDED_POLLING_INTERVAL = 5000;
+                Scheduler::get_task(static_cast<int>(TaskID::ReadEvalLog))
+                    .period = Hal::ms(LANDED_POLLING_INTERVAL);
+            }
+        }
 
         Radio::forwardCommand(command_receiver);
     }
@@ -46,7 +72,8 @@ class ReadEvalLog {
 };
 
 /**
- * @brief Responsible for periodically sending bulk sensor data through radio
+ * @brief Responsible for periodically sending bulk sensor data through
+ * radio
  */
 class RadioTxBulk {
   public:

@@ -39,13 +39,7 @@ class MainDescent : public IState {
      */
     StateId getNewState(Calculator const &);
 
-    void onEntry() override {
-        prev_altitude = calc_.altitude();
-
-        Scheduler::scheduleTask(Hal::now_ms() +
-                                    Hal::ms(CAMERA_FIRST_POWEROFF_DELAY_MS),
-                                static_cast<int>(TaskID::RestartCamera));
-    }
+    void onEntry() override { prev_altitude = calc_.altitude(); }
 
   private:
     const Hal::ms LANDED_TIME_INTERVAL_;
