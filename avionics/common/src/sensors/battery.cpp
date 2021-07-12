@@ -1,3 +1,4 @@
+/*Includes------------------------------------------------------------*/
 /*
  * Battery Check Source
  *
@@ -5,6 +6,8 @@
  * @author  UBC Rocket Avionics 2018/2019
  * @description   A battery voltage read function to check
  *  battery charge status.
+ * 
+ * Modified for use as sensor subclass
  *
  * @section LICENSE
  * This program is free software; you can redistribute it and/or
@@ -15,9 +18,9 @@
  * Distributed as-is; no warranty is given.
  */
 
-#include "battery.h"
+#include "sensors/battery_sensor.h"
 #include "HAL/pin_util.h"
-#include "status.h"
+
 
 /*Constants------------------------------------------------------------*/
 #define MINIMUM_BATTERY_VOLTAGE 10
@@ -27,36 +30,34 @@
 #define R2 15150 // Nominal: 16000. Lower is larger range.
 // Maximum voltage = 3.3*(R1+R2)/R2
 
-Battery::Battery(Pin batterySensorPin) {
+Battery::Battery(Pin batterySensorPin, float *const data)
+    : SensorBase(data) {
+
+/*init voltage sensor*/
+#ifdef TESTING
+    SerialUSB.println("Initializing battery voltage sensor");
+#endif
     m_divider = static_cast<float>(R2) / (R1 + R2);
     m_batterySensorPin = batterySensorPin;
+    status = SensorStatus::NOMINAL;
+    // sets selected pin so it can be read from correctly
+    Hal::pinMode(m_batterySensorPin, Hal::PinMode::INPUT);
 }
 
-// copied from Teensy source. Doesn't seemd to be used anywhere else, so
-// temporaryily put this here.
-// TODO - put in utility file? TODO this doesn't do float math properly - need
-// to cast first
-float range_map(int x, int in_min, int in_max, int out_min, int out_max) {
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+float sensor_range_map(int x, int in_min, int in_max, int out_min, int out_max) {
+    return static_cast<float>((x - in_min) * (out_max - out_min)) / static_cast<float>((in_max - in_min) + out_min);
 }
 
-float Battery::getVoltage() {
+void Battery::readData() {
+#ifdef TESTING
+    SerialUSB.println("Polling battery voltage sensor");
+#endif
     int inputValue = Hal::analogRead(m_batterySensorPin);
     // map it to the range the analog out:
     // 3300mV is the highest voltage Teensy can read.
-    float teensyVoltage = range_map(inputValue, 0, 1023, 0, 3300);
+    float teensyVoltage = sensor_range_map(inputValue, 0, 1023, 0, 3300);
     // converts output value from mV to V and divides by voltage divider
     // value to calculate battery input voltage.
     float batteryVoltage = (teensyVoltage / m_divider) / 1000;
-    return batteryVoltage;
-}
-
-RocketStatus Battery::getStatus() {
-    float voltage = getVoltage();
-    if (voltage < MINIMUM_BATTERY_VOLTAGE)
-        return RocketStatus::CRITICAL_FAILURE;
-    else if (voltage < LOW_BATTERY_VOLTAGE)
-        return RocketStatus::NONCRITICAL_FAILURE;
-    else
-        return RocketStatus::NOMINAL;
+    data_[0] = batteryVoltage; 
 }
