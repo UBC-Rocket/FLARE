@@ -7,8 +7,8 @@
 #include "states/repeated_checks.hpp"
 
 #include "states/ascent_to_apogee.h"
-#include "states/mach_lock.h"
 #include "states/landed.h"
+#include "states/mach_lock.h"
 #include "states/main_descent.h"
 #include "states/pressure_delay.h"
 #include "states/winter_contingency.h"
@@ -27,7 +27,7 @@ struct StateMachineConfig {
     constexpr static float LAUNCH_THRESHOLD = 25;                // m
     constexpr static float MACH_LOCK_VELOCITY_THRESHOLD = 155;   // m/s
     constexpr static float MACH_UNLOCK_VELOCITY_THRESHOLD = 150; // m/s
-    constexpr static float MACH_UNLOCK_TIME_THRESHOLD = 12000; // ms
+    constexpr static float MACH_UNLOCK_TIME_THRESHOLD = 12000;   // ms
     constexpr static float MAIN_DEPLOY_ALTITUDE = 488;           // m == 1500 ft
 
     constexpr static long LAND_CHECK_TIME_INTERVAL = 10000; // ms
@@ -64,13 +64,14 @@ struct StateMachineConfig {
                        Camera &camera)
         : standby(LAUNCH_THRESHOLD, camera),
           coast(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, APOGEE_CHECKS,
-                MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD, ignitors.drogue),
-          mach_lock(StateId::ASCENT_TO_APOGEE, MACH_UNLOCK_CHECKS, 
-                MACH_UNLOCK_VELOCITY_THRESHOLD, MACH_UNLOCK_TIME_THRESHOLD),
+                MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD,
+                ignitors.drogue),
+          mach_lock(StateId::ASCENT_TO_APOGEE, MACH_UNLOCK_CHECKS,
+                    MACH_UNLOCK_VELOCITY_THRESHOLD, MACH_UNLOCK_TIME_THRESHOLD),
           drogue(MAIN_DEPLOY_ALTITUDE, ignitors.main),
           main(StateId::LANDED, LAND_CHECK_TIME_INTERVAL, LAND_CHECKS,
                LAND_VELOCITY_THRESHOLD, calc),
-          landed(camera) {}
+          landed() {}
 
     std::unordered_map<StateId, IState *> state_map = {
         {StateId::STANDBY, &standby},
