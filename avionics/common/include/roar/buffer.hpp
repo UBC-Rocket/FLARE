@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <cstring> // memcpy
-#include <memory> // unique_ptr, used for fixed internal buffers on the heap
+#include <memory>  // unique_ptr, used for fixed internal buffers on the heap
 namespace roar {
 
 /**
@@ -25,6 +25,7 @@ namespace roar {
 class Buffer {
   public:
     /**
+     * @param pkt_size Size (in bytes) of one subpacket; used in fillPayload.
      * @param data_capacity Space (in bytes) for the underlying buffer.
      * @param subpkt_capacity Maximum number of subpackets to keep track
      * of. Should be less than data_capacity.
@@ -69,8 +70,8 @@ class Buffer {
 
     /**
      * @brief Fills payload pointer as full as possible (i.e. at most
-     * RADIO_MAX_PACKET_SIZE bytes)
-     * @param payload Pointer to payload array.
+     * pkt_size bytes, where pkt_size is what was passed into the constructor)
+     * @param payload Pointer to payload array. Must be at least pkt_size long.
      * @return Size of payload data filled in.
      */
     int fillPayload(uint8_t *payload);
