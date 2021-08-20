@@ -7,7 +7,8 @@ SensorCollection::SensorCollection()
     : barometer(BEGIN + BAROMETER_INDEX),
       gps(Hal::SerialInst::GPS, BEGIN + GPS_INDEX),
       accelerometer(BEGIN + ACCEL_INDEX), imuSensor(BEGIN + IMU_INDEX),
-      temperature(BEGIN + TEMP_INDEX) {
+      battery(Pin::VOLTAGE_SENSOR, BEGIN + BATTERY_INDEX), temperature(BEGIN + TEMP_INDEX) {
+    
     updateStatus();
 }
 
@@ -17,6 +18,7 @@ void SensorCollection::poll() {
     gps.readData();
     accelerometer.readData();
     imuSensor.readData();
+    battery.readData();
     temperature.readData();
 }
 
