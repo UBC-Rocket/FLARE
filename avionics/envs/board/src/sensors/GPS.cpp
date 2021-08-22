@@ -68,7 +68,7 @@ PLEASE READ ME!
 
 GPS::GPS(Hal::Serial &seri, float *const data)
     : SensorBase(data),
-      m_serial_gps(seri.getSerial()), GPS_reset_defaults{0xA0, 0xA1, 0x00,
+      serial_port_(seri), GPS_reset_defaults{0xA0, 0xA1, 0x00,
                                                          0x02, 0x04, 0x00,
                                                          0x04, 0x0D, 0x0A},
       GPS_set_baud_rate{0xA0, 0xA1, 0x00, 0x04, 0x05, 0x00,
@@ -82,8 +82,8 @@ GPS::GPS(Hal::Serial &seri, float *const data)
 #ifdef TESTING
     SerialUSB.println("Initializing GPS");
 #endif
-    m_serial_gps.begin(9600); // baud rate 9600 for the GP-20U7
-    while (!m_serial_gps) {
+    serial_port_.begin(9600); // baud rate 9600 for the GP-20U7
+    while (!serial_port_) {
     }
 
     status = SensorStatus::NOMINAL;
@@ -92,8 +92,8 @@ GPS::GPS(Hal::Serial &seri, float *const data)
 void GPS::readData() {
     bool gpsSuccess = false;
     elapsedMillis timeout;
-    while (m_serial_gps.available() && (timeout < GPS_TIMEOUT)) {
-        char c = m_serial_gps.read();
+    while (serial_port_.available() && (timeout < GPS_TIMEOUT)) {
+        char c = serial_port_.read();
         if (gps.encode(c)) {
             gpsSuccess = true;
             break;
