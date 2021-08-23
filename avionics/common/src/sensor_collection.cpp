@@ -58,4 +58,9 @@ void SensorCollection::updateStatus() {
         raiseToStatus(status_, RocketStatus::NONCRITICAL_FAILURE);
         *status_bitfield_ |= 0x08;
     }
+    if (battery.getStatus() == SensorStatus::FAILURE) {
+        LOG_WARN("Voltage sensor failed");
+        raiseToStatus(status_, RocketStatus::NONCRITICAL_FAILURE);
+        *status_bitfield_ |= 0x04;
+    }
 }
