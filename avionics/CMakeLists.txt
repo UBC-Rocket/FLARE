@@ -188,7 +188,8 @@ target_sources(testexe_Radio PUBLIC
     common/src/status.cpp
     common/src/hardware/ignitor.cpp
     common/src/log.cpp
-
+    
+    common/src/sensors/battery.cpp
     envs/x86/lib/HAL/port_impl.cpp
     envs/x86/lib/HAL/pin_util.cpp
 )
