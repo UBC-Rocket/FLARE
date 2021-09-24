@@ -34,8 +34,15 @@ struct Rocket {
     CSVWrite<CSVWriteImpl> datalog;
     RocketStatus init_status;
     Calculator calc;
+    Calculator calc_standby_armed;
+    Calculator calc_other;
     StateMachineConfig config;
     StateMachine state_machine;
+
+    void init_main_task_calcs() {
+        calc_standby_armed = CalculatorStandbyArmed(sensors, calc.getInitTime());
+        calc_other = CalculatorOther(sensors, calc.getInitTime());
+    }
 };
 class CommandReceiver {
   private:
