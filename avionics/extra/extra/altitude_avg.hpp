@@ -44,6 +44,12 @@ class AltitudeAvg {
      */
     float velocityGroundZ() const;
 
+    /**
+     * @brief Get time that calc object was initialized
+     * @return init_time [Hal::t_point]
+     */
+    Hal::t_point getInitTime() const;
+
   private:
     float rawAltitude() const;
 
@@ -55,6 +61,7 @@ class AltitudeAvg {
 
     float last_agl_alt_;
     Hal::t_point last_t_;
+    Hal::t_point init_time;
 };
 
 } // namespace estimator
