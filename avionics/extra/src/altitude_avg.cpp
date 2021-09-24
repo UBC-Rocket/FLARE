@@ -14,31 +14,7 @@ AltitudeAvg::AltitudeAvg(SensorCollection &sensors, Hal::t_point initial_time)
       base_alt_((baro_.readData(), rawAltitude()), MOVING_AVERAGE_VARIANCE,
                 BASE_MOVING_AVERAGE_ALPHA),
       agl_alt_(0), velocity_z_(0), last_agl_alt_(0), last_t_(initial_time) {}
-
-void AltitudeAvg::update(StateId const state, Hal::t_point t_ms) {
-    const float raw_alt = rawAltitude();
-
-    // Update base alt if appropriate
-    if (state == StateId::STANDBY || state == StateId::ARMED) {
-        const float diff = std::abs(base_alt_.getAverage() - raw_alt);
-        if (diff < base_alt_.getStandardDeviation() * 3) {
-            base_alt_.addValue(raw_alt);
-        }
-    }
-
-    // Update AGL altitude
-    const float raw_agl_alt = raw_alt - base_alt_.getAverage();
-    agl_alt_.addValue(raw_agl_alt);
-
-    // Update velocity
-    constexpr int MILLISECONDS_PER_SECOND = 1000;
-    velocity_z_ = (altitude() - last_agl_alt_) / (t_ms - last_t_).count() *
-                  MILLISECONDS_PER_SECOND;
-
-    // Update last iteration info
-    last_agl_alt_ = altitude();
-    last_t_ = t_ms;
-}
+virtual void AltitudeAvg::update(Hal::t_point t_ms) {}
 
 float AltitudeAvg::altitudeBase() const { return base_alt_.getAverage(); }
 
