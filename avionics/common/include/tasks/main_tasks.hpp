@@ -19,6 +19,7 @@ class ReadEvalLog {
         auto &init_status = rocket_.init_status;
         auto &sensors = rocket_.sensors;
         auto &datalog = rocket_.datalog;
+        auto &calc = rocket_.calc;
         rocket_.init_main_task_calcs();
 
         // ensures that if state somehow gets accidentally changed, state
@@ -32,10 +33,10 @@ class ReadEvalLog {
             sensors.poll();
 
             if(state == StateId::ARMED || state == StateId::STANDBY) {
-                auto &calc = rocket_.calc_standby_armed;
+                calc = rocket_.calc_standby_armed;
             }
             else {
-                auto &calc = rocket_.calc_other;
+                calc = rocket_.calc_other;
             }
 
             calc.update(sensors.last_poll_time());
