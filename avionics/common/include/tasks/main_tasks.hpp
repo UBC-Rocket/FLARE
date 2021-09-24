@@ -19,7 +19,7 @@ class ReadEvalLog {
         auto &init_status = rocket_.init_status;
         auto &sensors = rocket_.sensors;
         auto &datalog = rocket_.datalog;
-        auto &calc = rocket_.calc;
+        Calculator *calc = rocket_.calc;
         rocket_.init_main_task_calcs();
 
         // ensures that if state somehow gets accidentally changed, state
@@ -33,16 +33,16 @@ class ReadEvalLog {
             sensors.poll();
 
             if(state == StateId::ARMED || state == StateId::STANDBY) {
-                calc = rocket_.calc_standby_armed;
+                calc = &rocket_.calc_standby_armed;
             }
             else {
-                calc = rocket_.calc_other;
+                calc = &rocket_.calc_other;
             }
 
-            calc.update(sensors.last_poll_time());
+            calc->update(sensors.last_poll_time());
             datalog.logData(Hal::tpoint_to_uint(sensors.last_poll_time()),
-                            sensors, state, calc.altitude(),
-                            calc.altitudeBase());
+                            sensors, state, calc->altitude(),
+                            calc->altitudeBase());
         }
 
         StateId old_state, new_state;
@@ -98,7 +98,7 @@ class RadioTxBulk {
         StateId state = rocket.state_machine.getState();
         Radio::sendBulkSensor(
             Hal::tpoint_to_uint(rocket.sensors.last_poll_time()),
-            rocket.calc.altitude(), rocket.sensors.accelerometer,
+            rocket.calc->altitude(), rocket.sensors.accelerometer,
             rocket.sensors.imuSensor, rocket.sensors.gps,
             static_cast<uint16_t>(state));
     }
