@@ -18,8 +18,8 @@ class ReadEvalLog {
         auto &state_machine = rocket_.state_machine;
         auto &init_status = rocket_.init_status;
         auto &sensors = rocket_.sensors;
-        auto &calc = rocket_.calc;
         auto &datalog = rocket_.datalog;
+        rocket_.init_main_task_calcs();
 
         // ensures that if state somehow gets accidentally changed, state
         // reverts to aborted
@@ -30,7 +30,15 @@ class ReadEvalLog {
         {
             const StateId state = state_machine.getState();
             sensors.poll();
-            calc.update(state, sensors.last_poll_time());
+
+            if(state == StateId::ARMED || state == StateId::STANDBY) {
+                auto &calc = rocket_.calc_standby_armed;
+            }
+            else {
+                auto &calc = rocket_.calc_other;
+            }
+
+            calc.update(sensors.last_poll_time());
             datalog.logData(Hal::tpoint_to_uint(sensors.last_poll_time()),
                             sensors, state, calc.altitude(),
                             calc.altitudeBase());
