@@ -19,7 +19,7 @@ class ReadEvalLog {
         auto &init_status = rocket_.init_status;
         auto &sensors = rocket_.sensors;
         auto &datalog = rocket_.datalog;
-        Calculator *calc = rocket_.calc;
+        Calculator *calc = &rocket_.calc;
         rocket_.init_main_task_calcs();
 
         // ensures that if state somehow gets accidentally changed, state
@@ -46,7 +46,7 @@ class ReadEvalLog {
         }
 
         StateId old_state, new_state;
-        std::tie(old_state, new_state) = state_machine.update(calc);
+        std::tie(old_state, new_state) = state_machine.update(*calc);
         if (old_state != new_state) {
             // state transition has occurred
             if (new_state == StateId::MAIN_DESCENT) {
