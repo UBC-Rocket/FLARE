@@ -98,7 +98,7 @@ class RadioTxBulk {
         StateId state = rocket.state_machine.getState();
         Radio::sendBulkSensor(
             Hal::tpoint_to_uint(rocket.sensors.last_poll_time()),
-            rocket.calc->altitude(), rocket.sensors.accelerometer,
+            rocket.calc.altitude(), rocket.sensors.accelerometer,
             rocket.sensors.imuSensor, rocket.sensors.gps,
             static_cast<uint16_t>(state));
     }
