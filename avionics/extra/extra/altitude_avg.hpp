@@ -61,6 +61,8 @@ class AltitudeAvg {
 
     float last_agl_alt_;
     Hal::t_point last_t_;
+  
+  protected:
     Hal::t_point init_time;
 };
 
