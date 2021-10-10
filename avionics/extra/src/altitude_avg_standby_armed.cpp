@@ -26,8 +26,8 @@ public void update(Hal::t_point t_ms) override {
     // Update last iteration info
     last_agl_alt_ = altitude();
     last_t_ = t_ms;
-     
-}
+       
+};
 
 } // namespace estimator
 } // namespace extra

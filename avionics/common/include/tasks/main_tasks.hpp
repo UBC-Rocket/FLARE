@@ -20,7 +20,6 @@ class ReadEvalLog {
         auto &sensors = rocket_.sensors;
         auto &datalog = rocket_.datalog;
         Calculator *calc = &rocket_.calc;
-        rocket_.init_main_task_calcs();
 
         // ensures that if state somehow gets accidentally changed, state
         // reverts to aborted
