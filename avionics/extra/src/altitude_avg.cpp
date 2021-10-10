@@ -13,9 +13,7 @@ AltitudeAvg::AltitudeAvg(SensorCollection &sensors, Hal::t_point initial_time)
       // Using the comma operator to execute readData() before continuing
       base_alt_((baro_.readData(), rawAltitude()), MOVING_AVERAGE_VARIANCE,
                 BASE_MOVING_AVERAGE_ALPHA),
-      agl_alt_(0), velocity_z_(0), last_agl_alt_(0), last_t_(initial_time) {
-          init_time = initial_time;
-      }
+      agl_alt_(0), velocity_z_(0), last_agl_alt_(0), last_t_(initial_time) {}
 
 virtual void AltitudeAvg::update(Hal::t_point t_ms) {}
 
@@ -27,9 +25,7 @@ float AltitudeAvg::velocityGroundZ() const { return velocity_z_; }
 
 float AltitudeAvg::rawAltitude() const {
     return pressureToAltitude(*(baro_.getData()));
-}
-
-Hal::t_point getInitTime() const { return init_time }
+};
 
 } // namespace estimator
 } // namespace extra
