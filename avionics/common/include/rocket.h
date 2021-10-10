@@ -22,6 +22,7 @@ struct Rocket {
     Rocket()
         : cam(Hal::SerialInst::Camera), datalog(LOG_FILE_NAME),
           init_status(collectStatus(sensors, ignitors)), calc(sensors, Hal::now_ms()),
+          calc_standby_armed(sensors, Hal::now_ms()), calc_other(sensors, Hal::now_ms()),
           config(calc, ignitors, cam),
           state_machine(config.state_map, config.initial_state) {}
 
@@ -34,15 +35,10 @@ struct Rocket {
     CSVWrite<CSVWriteImpl> datalog;
     RocketStatus init_status;
     Calculator calc;
-    Calculator calc_standby_armed;
-    Calculator calc_other;
+    CalculatorStandbyArmed calc_standby_armed;
+    CalculatorOther calc_other;
     StateMachineConfig config;
     StateMachine state_machine;
-
-    void init_main_task_calcs() {
-        calc_standby_armed = CalculatorStandbyArmed(sensors, calc.getInitTime());
-        calc_other = CalculatorOther(sensors, calc.getInitTime());
-    }
 };
 class CommandReceiver {
   private:
