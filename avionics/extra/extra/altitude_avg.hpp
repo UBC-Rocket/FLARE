@@ -23,7 +23,7 @@ class AltitudeAvg {
     /**
      * @brief Update estimator with new information.
      */
-    virtual void update(Hal::t_point t_ms) = 0;
+    virtual void update(Hal::t_point t_ms);
 
     /**
      * @brief Get baseline altitude (i.e. altitude of launch site above sea
