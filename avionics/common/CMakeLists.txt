@@ -11,6 +11,8 @@ set(common_files
     ${CMAKE_CURRENT_LIST_DIR}/src/XBee.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/log.cpp
 
+    ${CMAKE_CURRENT_LIST_DIR}/src/sensors/battery.cpp
+
     ${CMAKE_CURRENT_LIST_DIR}/src/states/main_descent.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/states/pressure_delay.cpp
 

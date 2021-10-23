@@ -15,6 +15,7 @@ enum class SensorType {
     IMU             = 0x01,
     GPS             = 0x00,
     THERMOCOUPLE    = 0x05,
+    BATTERY         = 0x06
 };
 
 #define ACCELEROMETER_DATA_LENGTH   3

@@ -66,7 +66,6 @@ TEST(Radio, AllPacketTypes) {
         Radio::sendGPS(time, sensors.gps);
         Radio::sendSingleSensor(time, 0, 1.23);
         Radio::sendState(time, state_id);
-        Radio::sendConfig(time);
         Radio::sendEvent(time, EventId::IGNITOR_FIRED);
     }
 }
