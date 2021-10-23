@@ -21,10 +21,12 @@ struct Rocket {
 
     Rocket()
         : cam(Hal::SerialInst::Camera), datalog(LOG_FILE_NAME),
-          init_status(collectStatus(sensors, ignitors)), calc(sensors, Hal::now_ms()),
+          init_status(collectStatus(sensors, ignitors)),
           calc_standby_armed(sensors, Hal::now_ms()), calc_other(sensors, Hal::now_ms()),
-          config(calc, ignitors, cam),
-          state_machine(config.state_map, config.initial_state) {}
+          config(calc_standby_armed, ignitors, cam),
+          state_machine(config.state_map, config.initial_state) {
+              calc = &calc_standby_armed;
+          }
 
     // WARNING - MEMBER ORDER DEPENDENCY
     // https://isocpp.org/wiki/faq/ctors#order-dependency-in-members
@@ -34,9 +36,9 @@ struct Rocket {
     IgnitorCollection ignitors;
     CSVWrite<CSVWriteImpl> datalog;
     RocketStatus init_status;
-    Calculator calc;
     CalculatorStandbyArmed calc_standby_armed;
     CalculatorOther calc_other;
+    Calculator* calc;
     StateMachineConfig config;
     StateMachine state_machine;
 };
@@ -71,7 +73,7 @@ class CommandReceiver {
             break;
         case 0x30:
             Radio::sendBulkSensor(
-                sensor_poll_time, rocket_.calc.altitude(),
+                sensor_poll_time, rocket_.calc->altitude(),
                 rocket_.sensors.accelerometer, rocket_.sensors.imuSensor,
                 rocket_.sensors.gps, static_cast<uint16_t>(state));
             break;
@@ -126,7 +128,7 @@ class CommandReceiver {
             break;
         case 0x1C:
             Radio::sendSingleSensor(sensor_poll_time, 0x1C,
-                                    rocket_.calc.altitude());
+                                    rocket_.calc->altitude());
             break;
         case 0x1D:
             Radio::sendState(sensor_poll_time, static_cast<uint16_t>(state));
@@ -135,7 +137,7 @@ class CommandReceiver {
             break; // Voltage sensor not implemented
         case 0x1F:
             Radio::sendSingleSensor(sensor_poll_time, 0x1F,
-                                    rocket_.calc.altitudeBase());
+                                    rocket_.calc->altitudeBase());
             break;
         default:
             break;
