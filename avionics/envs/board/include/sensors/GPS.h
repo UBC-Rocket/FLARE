@@ -64,9 +64,6 @@ PLEASE READ ME!
 */
 
 #pragma once
-/**
- * Thermocouple Sensor Class
- */
 
 /*Includes------------------------------------------------------------*/
 #include <array>
@@ -89,7 +86,7 @@ class GPS : public SensorBase<GPS_DATA_LENGTH> {
     constexpr static int GPS_FIELD_LENGTH = 20;
     constexpr static int GPS_TIMEOUT = 100;
 
-    HardwareSerial &m_serial_gps;
+    Hal::Serial &serial_port_;
     TinyGPS gps;
 
     /*GPS initialization commands*/

@@ -115,7 +115,8 @@ void Radio::initialize() {
     serial.begin(kRadioBaudRate);
     while (!serial)
         ;
-    self.xbee_.setSerial(serial.getSerial());
+
+    self.xbee_.setSerial(serial);
 
     Radio::sendMessage(Hal::millis(), "Radio initialized");
     Radio::send();

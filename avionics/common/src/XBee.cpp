@@ -719,13 +719,15 @@ XBee::XBee() : _response(XBeeResponse()) {
 
     _response.init();
     _response.setFrameData(_responseFrameData);
-    // Contributed by Paul Stoffregen for Teensy support
-#if defined(__AVR_ATmega32U4__) ||                                             \
-    (defined(TEENSYDUINO) && (defined(KINETISK) || defined(KINETISL)))
-    _serial = &Serial1;
-#else
-    _serial = &Serial;
-#endif
+
+    _serial = &Hal::SerialInst::Radio;
+//     // Contributed by Paul Stoffregen for Teensy support
+// #if defined(__AVR_ATmega32U4__) ||                                             \
+//     (defined(TEENSYDUINO) && (defined(KINETISK) || defined(KINETISL)))
+//     _serial = &Serial1;
+// #else
+//     _serial = &Serial;
+// #endif
 }
 
 uint8_t XBee::getNextFrameId() {
@@ -741,9 +743,9 @@ uint8_t XBee::getNextFrameId() {
 }
 
 // Support for SoftwareSerial. Contributed by Paul Stoffregen
-void XBee::begin(Stream &serial) { _serial = &serial; }
+void XBee::begin(Hal::Serial &serial) { _serial = &serial; }
 
-void XBee::setSerial(Stream &serial) { _serial = &serial; }
+void XBee::setSerial(Hal::Serial &serial) { _serial = &serial; }
 
 bool XBee::available() { return _serial->available(); }
 
