@@ -7,7 +7,8 @@ SensorCollection::SensorCollection()
     : barometer(BEGIN + BAROMETER_INDEX),
       gps(Hal::SerialInst::GPS, BEGIN + GPS_INDEX),
       accelerometer(BEGIN + ACCEL_INDEX), imuSensor(BEGIN + IMU_INDEX),
-      temperature(BEGIN + TEMP_INDEX) {
+      battery(Pin::VOLTAGE_SENSOR, BEGIN + BATTERY_INDEX), temperature(BEGIN + TEMP_INDEX) {
+    
     updateStatus();
 }
 
@@ -17,6 +18,7 @@ void SensorCollection::poll() {
     gps.readData();
     accelerometer.readData();
     imuSensor.readData();
+    battery.readData();
     temperature.readData();
 }
 
@@ -55,5 +57,11 @@ void SensorCollection::updateStatus() {
         LOG_WARN("Temperature sensor failed");
         raiseToStatus(status_, RocketStatus::NONCRITICAL_FAILURE);
         *status_bitfield_ |= 0x08;
+    }
+    if (battery.getStatus() == SensorStatus::FAILURE) {
+        LOG_WARN("Voltage sensor failed");
+        raiseToStatus(status_, RocketStatus::NONCRITICAL_FAILURE);
+        *status_bitfield_ |= 0x04;
+        // TODO: Measure voltage level before launch and if it's too low raise a critical or non-critical error
     }
 }

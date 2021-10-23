@@ -29,6 +29,7 @@
 #include "sensors/accelerometer.h"
 #include "sensors/barometer.h"
 #include "sensors/temperature.h"
+#include "sensors/battery_sensor.h"
 #include "status.h"
 
 /*Classes------------------------------------------------------------*/
@@ -41,30 +42,34 @@ class SensorCollection {
     constexpr static std::size_t ACCEL_INDEX = GPS_INDEX + GPS::dataLength();
     constexpr static std::size_t IMU_INDEX =
         ACCEL_INDEX + Accelerometer::dataLength();
-    constexpr static std::size_t TEMP_INDEX = IMU_INDEX + IMU::dataLength();
+    constexpr static std::size_t BATTERY_INDEX = IMU_INDEX + IMU::dataLength();
+    constexpr static std::size_t TEMP_INDEX 
+        = BATTERY_INDEX + Battery::dataLength();
     constexpr static std::size_t DATA_LENGTH =
         TEMP_INDEX + Temperature::dataLength();
+    
 
     std::array<float, DATA_LENGTH> sensor_data;
     float *const BEGIN = sensor_data.begin();
-
+ 
     RocketStatus status_;
     uint8_t status_bitfield_[2];
     Hal::t_point last_poll_time_;
 
   public:
-    constexpr static std::size_t NUM_SENSORS = 5;
+    constexpr static std::size_t NUM_SENSORS = 6;
     constexpr static char LOG_FILE_HEADER[] =
         "Pressure (mbar), Barom. Temp (C), GPS (lat), GPS (long), GPS (alt), "
         "Accel (x)(g), Accel (y)(g), Accel (z)(g), IMU (w), IMU(x), IMU(y), "
-        "IMU(z), Temperature (C),";
+        "IMU(z), Voltage (V), Temperature (C)";
 
     Barometer barometer;
     GPS gps;
     Accelerometer accelerometer;
     IMU imuSensor;
+    Battery battery;
     Temperature temperature;
-
+    
     SensorCollection();
 
     /**

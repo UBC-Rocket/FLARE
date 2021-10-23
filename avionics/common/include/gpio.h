@@ -34,7 +34,8 @@ enum class Pin {
     MAIN_CONTINUITY_READ = 14,
     DROGUE_IGNITOR = 35,
     DROGUE_CONTINUITY_TEST = 17,
-    DROGUE_CONTINUITY_READ = 34
+    DROGUE_CONTINUITY_READ = 34,
+    VOLTAGE_SENSOR = 36 // TODO: Check in Eagle for the pin the battery voltage divider is connected to
 };
 
 /*Functions------------------------------------------------------------*/
