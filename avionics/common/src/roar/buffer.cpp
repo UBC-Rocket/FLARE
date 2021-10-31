@@ -94,31 +94,28 @@ void Buffer::write(uint8_t byte) {
  * @brief Fills payload pointer as full as possible (i.e. at most
  * RADIO_MAX_SUBPACKET_SIZE bytes)
  * @param payload Pointer to payload array.
- * @return Size of payload data filled in.
+ * @return Number of bytes output to payload.
  */
 int Buffer::fillPayload(uint8_t *payload) {
     assert(payload != nullptr);
 
-    int used = usage();
-    if (used <= pkt_size_) {
-        dumpContiguous(payload, deref(subpkt_begin_), used);
-        subpkt_count_ = 0;
-        // Return subpkt_begin_ and pos_ to 0 to delay wrapping
-        subpkt_begin_ = 0;
-        pos_.index = 0;
-        return used;
-    } else {
-        return dispenseIntoPayload(payload);
+    int used = 0;
+    DataIt start = deref(subpkt_begin_);
+
+    while (subpkt_count_ != 0 && used + firstSubpktSize() <= pkt_size_) {
+        used += firstSubpktSize();
+        popSubpkt(); // Popping subpacket doesn't overwrite the data
     }
+    dumpContiguous(payload, start, used);
+    return used;
 }
 
 /**
- * @brief Dump entire queue into payload. Must check that payload is
- * large enough and queue is small enough that this works (i.e.
- * m_byte_count < payload array size); otherwise this is undefined
- * behaviour
- * @return Size of payload data filled in (= m_byte_count before this
- * starts).
+ * @brief Copies a continuous sequence of bytes from the buffer into the
+ * destination.
+ * @param dest Pointer to output buffer, must be at least `len` long
+ * @param src Iterator to start of data to copy from circular buffer
+ * @param len How many bytes to copy
  */
 void Buffer::dumpContiguous(uint8_t *dest, DataIt src, int len) const {
     const int first_half = data_cap_ - src.index;
@@ -130,23 +127,6 @@ void Buffer::dumpContiguous(uint8_t *dest, DataIt src, int len) const {
         std::memcpy(dest, &data_[src.index], first_half);
         std::memcpy(dest + first_half, data_.get(), len - first_half);
     }
-}
-
-/**
- * @brief Dispenses at most pkt_size_ bytes worth of
- * subpackets into payload.
- * @return Size of payload data filled in.
- */
-int Buffer::dispenseIntoPayload(uint8_t *payload) {
-    int used = 0;
-    DataIt start = deref(subpkt_begin_);
-
-    while (used + firstSubpktSize() <= pkt_size_) {
-        used += firstSubpktSize();
-        popSubpkt(); // Popping subpacket doesn't overwrite the data
-    }
-    dumpContiguous(payload, start, used);
-    return used;
 }
 
 /**

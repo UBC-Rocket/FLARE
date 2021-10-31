@@ -68,6 +68,7 @@ PLEASE READ ME!
 #include "scheduler.hpp"
 #include "tasks/led_blinker.hpp"
 #include "tasks/main_tasks.hpp"
+#include "tasks/restart_camera.hpp"
 
 #include "radio.h"
 #include "rocket.h"
@@ -75,6 +76,8 @@ PLEASE READ ME!
 
 #include "config.h"
 #include "env_config.h"
+
+#include "log.hpp"
 
 /**
  * @brief Helper function that makes things less verbose; basically saves the
@@ -89,6 +92,8 @@ void registerTask(TaskID id, Scheduler::Task task, bool repeat = true,
 int main(void) {
     // Before anything else there's some environment specific setup to be done
     env_initialize();
+    LOG_INFO("Everything is starting now");
+
     initPins();
 
 /* Setup all UART comms */
@@ -101,6 +106,7 @@ int main(void) {
 #endif
 
     Radio::initialize();
+    LOG_INFO("Initialized radio");
     Rocket rocket;
     // Logically, these are all unrelated variables - but to allow the command
     // receiver to function, they need to be coalesced into one POD struct.
@@ -110,10 +116,12 @@ int main(void) {
     auto &ignitors = rocket.ignitors;
 
     if (init_status == RocketStatus::CRITICAL_FAILURE) {
+        LOG_ERROR("Critical failure; aborting in state machine");
         state_machine.abort();
     }
 
     Radio::sendStatus(Hal::millis(), init_status, sensors, ignitors);
+    LOG_INFO("Sent startup status");
 
     /* Register all tasks */
     typedef Scheduler::Task Task;
@@ -144,5 +152,17 @@ int main(void) {
         break;
     }
 
+    RestartCamera restart_camera_(rocket.cam);
+    // This tasks sets its own reschedule interval (since the same task is run
+    // both to start and stop the recording)
+    Task restart_camera_task_(RestartCamera::togglePower, &restart_camera_,
+                              Hal::ms{0});
+    Scheduler::preregisterTask(static_cast<int>(TaskID::RestartCamera),
+                               restart_camera_task_, true, false);
+
+    LOG_INFO("Initialization done; starting scheduler");
+
     Scheduler::run();
+
+    LOG_ERROR("Somehow finished all tasks; main executable exiting");
 }

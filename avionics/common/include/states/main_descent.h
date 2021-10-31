@@ -1,9 +1,12 @@
 #pragma once
 
 /*Includes------------------------------------------------------------*/
-#include "calculations.h"
-#include "state_interface.h"
 #include <chrono>
+
+#include "calculations.h"
+#include "cameras.h"
+#include "state_interface.h"
+#include "tasks/restart_camera.hpp"
 
 namespace State {
 

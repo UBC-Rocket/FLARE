@@ -154,6 +154,10 @@ ROCKET_CREATE_TEST(RepeatChecksState)
 
 ROCKET_CREATE_TEST(States)
 
+ROCKET_CREATE_TEST(RestartCamera)
+target_sources(testexe_RestartCamera PUBLIC common/src/tasks/restart_camera.cpp)
+target_sources(testexe_RestartCamera PUBLIC common/lib/RocketScheduler/include/RocketSchedule/fake_clocks.cpp)
+
 ROCKET_CREATE_TEST(Barometric)
 target_sources(testexe_Barometric PUBLIC common/lib/CalcHelpers/barometric.cpp)
 
@@ -167,7 +171,28 @@ target_sources(testexe_Estimators PUBLIC
 ROCKET_CREATE_TEST(Roar)
 target_Sources(testexe_Roar PUBLIC
     common/src/roar/buffer.cpp
+)
+
+ROCKET_CREATE_TEST(Log)
+target_sources(testexe_Log PUBLIC
+    common/src/log.cpp
     )
+
+ROCKET_CREATE_TEST(Radio)
+target_sources(testexe_Radio PUBLIC
+    common/src/radio.cpp
+    common/src/roar/buffer.cpp
+    common/src/XBee.cpp
+    common/src/sensor_collection.cpp
+    common/src/ignitor_collection.cpp
+    common/src/status.cpp
+    common/src/hardware/ignitor.cpp
+    common/src/log.cpp
+    
+    common/src/sensors/battery.cpp
+    envs/x86/lib/HAL/port_impl.cpp
+    envs/x86/lib/HAL/pin_util.cpp
+)
 
 
 # We can now call make test to run all the tests

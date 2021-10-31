@@ -1,7 +1,8 @@
 /*Includes------------------------------------------------------------*/
+#include "log.hpp"
+#include "radio.h"
 #include <HAL/pin_util.h>
 #include <HAL/time.h>
-#include "radio.h"
 
 #include "hardware/ignitor.h"
 
@@ -35,5 +36,9 @@ void Ignitor::fire() {
 
     // TODO(akoen) This could be expanded to support different events for
     // different ignitions.
-    Radio::sendEvent(Hal::tpoint_to_uint(Hal::now_ms()), EventId::IGNITOR_FIRED);
+    Radio::sendEvent(Hal::tpoint_to_uint(Hal::now_ms()),
+                     EventId::IGNITOR_FIRED);
+    LOG_INFO("Firing ignitor at pin "
+             << static_cast<int>(ignitePin_) << " at time "
+             << static_cast<std::int32_t>(Hal::millis()) << "ms");
 }

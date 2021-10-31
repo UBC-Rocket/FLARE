@@ -7,7 +7,7 @@
  *  drogue and main parachute releases, status LEDs, buzzer.
  *
  *  The drogue servo control function and main parachute release functions are
- *  also contained here. There is a function that implements continuity testing
+ *  also contained here. There is a function that im plements continuity testing
  *  of the ematch - required as per IREC regulations.
  *
  * @section LICENSE

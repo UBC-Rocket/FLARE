@@ -333,3 +333,36 @@ TEST(RoarBuffer, WrapWrite3) {
         EXPECT_EQ(payload[i], i);
     }
 }
+
+/**
+ * Test position reseting behaviour of internal dumpContiguous strategy
+ */
+TEST(RoarBuffer, DumpContiguousResetting) {
+    roar::Buffer buff(8, 32, 8);
+
+    // Write 16 subpackets of size 1
+    for (int i = 0; i < 16; ++i) {
+        buff.allocSubpkt(1);
+        buff.write(i + 1);
+    }
+
+    // Since only 8 subpackets allowed to be stored at a time, only 8 bytes of
+    // data used
+    EXPECT_EQ(buff.usage(), 8);
+
+    std::vector<uint8_t> payload(10, 255);
+    // should use the dumpContiguous approach
+    buff.fillPayload(payload.data());
+
+    // buffer is now empty
+    EXPECT_EQ(buff.usage(), 0);
+
+    buff.allocSubpkt(3);
+    buff.write(100);
+    buff.write(101);
+    buff.write(102);
+    buff.allocSubpkt(3);
+    buff.write(103);
+    buff.write(104);
+    buff.write(105);
+}
