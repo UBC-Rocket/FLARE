@@ -4,6 +4,8 @@
 
 #include "stdio_controller.hpp"
 
+std::condition_variable StdIoController::blocking_request_cv_{};
+
 // typedef for clarity
 typedef uint8_t Id;
 
@@ -19,28 +21,22 @@ static std::ofstream out_log_{"FW_SIM_log",
                               std::ios_base::out | std::ios_base::binary};
 
 static std::thread input_{};              // run infinite inputLoop()
-static std::atomic_bool run_input_{true}; // controls if input_ is running
 
-StdIoController::BlockingRequest::BlockingRequest(
-    const uint8_t stream_id, const uint8_t *const packet,
-    const std::size_t packet_len) {
-    // input_ will now run at most once more
-    run_input_ = false;
-    // ensures that at least one more SIM packet exists
+void StdIoController::blockingRequest(const uint8_t stream_id, const uint8_t *const packet,
+    const std::size_t packet_len){
+
+    // Initiate the request -- ensures that at least one more SIM packet exists
     StdIoController::putPacket(stream_id, packet, packet_len);
-    input_.join(); // so this won't block
 
-    // Keep polling for new packet until response is received.
-    while (istreams_[stream_id].size() == 0) {
-        extractPacket();
-    }
+    // Wait for response to be received.
+    { // LOCK
+        std::unique_lock<std::mutex> lock(istream_mutex_);
+        while (istreams_[stream_id].size() == 0) { // Assumes extractPacket pushes all required bytes to queue before notifying / unlocking
+            blocking_request_cv_.wait(lock);
+        }
+    } // UNLOCK
 }
 
-StdIoController::BlockingRequest::~BlockingRequest() {
-    run_input_ = true;
-    std::thread input{&StdIoController::inputLoop};
-    input_ = std::move(input);
-}
 void StdIoController::initialize() {
     static bool done = false;
     if (done) { // idempotency
@@ -92,6 +88,7 @@ void StdIoController::putPacket(uint8_t const id, uint8_t const *c,
     std::cout << std::flush;
     out_log_.flush();
 }
+
 void StdIoController::putPacket(uint8_t const id, char const *c,
                                 uint16_t const length) {
     putPacket(id, reinterpret_cast<const uint8_t *>(c), length);
@@ -107,7 +104,9 @@ void StdIoController::putPacket(uint8_t const id, char const *c,
 
 int StdIoController::requestAnalogRead(uint8_t const pin_id) {
     uint8_t const PACKET_ID = static_cast<uint8_t>(PacketIds::analog_read);
-    BlockingRequest restart(PACKET_ID, &pin_id, 1);
+    blockingRequest(PACKET_ID, &pin_id, 1);
+
+    const std::lock_guard<std::mutex> lock(istream_mutex_);
 
     int val = istreams_[PACKET_ID].front();
     istreams_[PACKET_ID].pop();
@@ -121,7 +120,9 @@ int StdIoController::requestAnalogRead(uint8_t const pin_id) {
 std::vector<float> StdIoController::requestSensorRead(uint8_t sensor_id,
                                                       std::size_t num_floats) {
     uint8_t const PACKET_ID = static_cast<uint8_t>(PacketIds::sensor_read);
-    BlockingRequest restart(PACKET_ID, &sensor_id, 1);
+    blockingRequest(PACKET_ID, &sensor_id, 1);
+
+    const std::lock_guard<std::mutex> lock(istream_mutex_);
 
     std::vector<float> sensor_data;
     for (std::size_t f = 0; f < num_floats; f++) {
@@ -141,8 +142,10 @@ uint32_t StdIoController::requestTimeUpdate(uint32_t delta_us) {
     auto const PACKET_ID = static_cast<uint8_t>(PacketIds::time_update);
     uint8_t chars[sizeof(uint32_t)];
     std::memcpy(chars, &delta_us, sizeof(delta_us));
-    BlockingRequest restart(PACKET_ID, chars, sizeof(delta_us));
+    blockingRequest(PACKET_ID, chars, sizeof(delta_us));
 
+    const std::lock_guard<std::mutex> lock(istream_mutex_);
+    
     uint8_t packetData[sizeof(uint32_t)];
     for (std::size_t i = 0; i < sizeof(uint32_t); i++) {
         packetData[i] = istreams_[PACKET_ID].front();
@@ -226,12 +229,13 @@ void StdIoController::extractPacket() {
         const std::lock_guard<std::mutex> lock(istream_mutex_);
         for (auto j : buf) {
             istreams_[id].push(j);
-        } // unlock mutex
-    }
+        }
+    } // unlock mutex
+    blocking_request_cv_.notify_all();
 }
 
 void StdIoController::inputLoop() {
-    while (run_input_) {
+    while (true) {
         extractPacket();
     }
 }
