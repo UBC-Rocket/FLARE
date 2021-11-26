@@ -1,6 +1,5 @@
 #pragma once
 
-#include <atomic>
 #include <cstdint>
 #include <cstring> //for memmove
 #include <fstream>
@@ -30,14 +29,12 @@ class StdIoController {
     // static std::mutex cout_mutex_;
 
     // static std::thread input_;          // run infinite inputLoop()
-    // static std::atomic_bool run_input_; // controls if input_ is running
 
     // static std::ofstream out_log_;
 
     static void outputFiltered(uint8_t const c);
     static void output(uint8_t const c);
 
-    static std::mutex blocking_request_mutex_;
     static std::condition_variable blocking_request_cv_;
 
     enum class PacketIds : uint8_t {
@@ -50,23 +47,13 @@ class StdIoController {
     static_assert(FLOAT_SIZE == 4,
                   "Code assumes floating point numbers are 4 bytes");
 
-    class BlockingRequest {
-        /**
-         * @brief Helper class - constructor sends a packet request on
-         *stream_id, and blocks until a response is heard. Destructor restarts
-         *the input, so as long as your instance of this object is in scope, you
-         *have clean, single-threaded access to the incoming data.
-         **/
-      public:
-        BlockingRequest(const uint8_t stream_id, const uint8_t *const packet,
-                        const std::size_t packet_len);
+    /**
+     * @brief Sends a packet request on stream_id, and blocks until a response 
+     * is heard.
+     **/
+    static void blockingRequest(const uint8_t stream_id, const uint8_t *const packet,
+                    const std::size_t packet_len);
 
-        // Can't copy.
-        BlockingRequest(const BlockingRequest &) = delete;
-        BlockingRequest &operator=(const BlockingRequest &other) = delete;
-
-        ~BlockingRequest();
-    };
 
   public:
     /**
