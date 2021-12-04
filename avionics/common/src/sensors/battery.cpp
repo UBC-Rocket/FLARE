@@ -39,16 +39,21 @@ Battery::Battery(Pin batterySensorPin, float *const data)
 #endif
     m_divider = static_cast<float>(R2) / (R1 + R2);
     m_batterySensorPin = batterySensorPin;
-    status = SensorStatus::NOMINAL;
     // sets selected pin so it can be read from correctly
     Hal::pinMode(m_batterySensorPin, Hal::PinMode::INPUT);
+
+    if (getBatteryVoltage() < LOW_BATTERY_VOLTAGE) {
+        status = SensorStatus::FAILURE;
+    } else {
+        status = SensorStatus::NOMINAL;
+    }
 }
 
 float sensor_range_map(int x, int in_min, int in_max, int out_min, int out_max) {
     return static_cast<float>((x - in_min) * (out_max - out_min)) / static_cast<float>((in_max - in_min) + out_min);
 }
 
-void Battery::readData() {
+float Battery::getBatteryVoltage() {
 #ifdef TESTING
     SerialUSB.println("Polling battery voltage sensor");
 #endif
@@ -59,5 +64,10 @@ void Battery::readData() {
     // converts output value from mV to V and divides by voltage divider
     // value to calculate battery input voltage.
     float batteryVoltage = (teensyVoltage / m_divider) / 1000;
+    return batteryVoltage;
+}
+
+void Battery::readData() {
+    float batteryVoltage = getBatteryVoltage();
     data_[0] = batteryVoltage; 
 }
