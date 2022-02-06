@@ -36,15 +36,6 @@
 class Radio {
   private:
     typedef uint16_t fwd_cmd_t;
-    enum class Ids {
-        status_ping = 0x00,
-        message = 0x01,
-        event = 0x02,
-        config = 0x03,
-        gps = 0x04,
-        state = 0x05,
-        bulk_sensor = 0x30,
-    };
 
     constexpr static Hal::ms WATCHDOG_SEND_INTERVAL{3000};
     constexpr static fwd_cmd_t STOP_PARSE_FLAG = 1 << 0;
@@ -61,6 +52,29 @@ class Radio {
 
     // Loose type to more explicitly indicate what variables are commands.
     typedef uint8_t command_t;
+
+    enum Ids : command_t {
+        status_ping = 0x00,
+        message = 0x01,
+        event = 0x02,
+        config = 0x03,
+        gps = 0x04,
+        state = 0x05,
+        bulk_sensor = 0x30,
+        acceleration_x = 0x10,
+        acceleration_y = 0x11,
+        acceleration_z = 0x12,
+        pressure = 0x13,
+        barometer_temperature = 0x14,
+        temperature = 0x15,
+        latitude = 0x19,
+        longitude = 0x1A,
+        gps_altitude = 0x1B,
+        calculated_altitude = 0x1C,
+        send_state = 0x1D,
+        voltage = 0x1E,
+        ground_altitude = 0x1F
+    };
 
     /**
      * @brief Initializes the class.
