@@ -127,7 +127,9 @@ class CommandReceiver {
             Radio::sendState(sensor_poll_time, static_cast<uint16_t>(state));
             break;
         case 0x1E:
-            break; // Voltage sensor not implemented
+            Radio::sendSingleSensor(sensor_poll_time, 0x1E,
+                                    rocket_.sensors.battery.getData()[0]);
+            break;
         case 0x1F:
             Radio::sendSingleSensor(sensor_poll_time, 0x1F,
                                     rocket_.calc.altitudeBase());
