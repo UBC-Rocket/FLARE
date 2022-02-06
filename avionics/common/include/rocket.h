@@ -51,16 +51,16 @@ class CommandReceiver {
 
         auto state = rocket_.state_machine.getState();
         switch (command) {
-        case 'P':
+        case Radio::poll:
             Radio::sendStatus(Hal::millis(), rocket_.init_status,
                               rocket_.sensors, rocket_.ignitors);
             break;
-        case 'A':
+        case Radio::arm:
             rocket_.state_machine.arm();
             rocket_.cam.start_record();
             break;
 
-        case 'D':
+        case Radio::disarm:
             rocket_.state_machine.disarm();
             rocket_.cam.stop_record();
             break;
@@ -98,13 +98,13 @@ class CommandReceiver {
             Radio::sendSingleSensor(sensor_poll_time, Radio::temperature,
                                     rocket_.sensors.temperature.getData()[0]);
             break;
-        case 0x16:
+        case Radio::unused1:
             break;
             // Not implemented - still uncertain about IMU storage
-        case 0x17:
+        case Radio::unused2:
             break;
             // Not implemented - still uncertain about IMU storage
-        case 0x18:
+        case Radio::unused3:
             break;
             // Not implemented - still uncertain about IMU storage
         case Radio::latitude:
