@@ -41,6 +41,24 @@ class CommandReceiver {
   private:
     Rocket &rocket_;
 
+    enum PacketTypeId {
+        BULK_SENSOR = 0x30,
+        GPS = 0x04,
+        ACCELERATION_X = 0x10,
+        ACCELERATION_Y = 0x11,
+        ACCELERATION_Z = 0x12,
+        PRESSURE = 0x13,
+        BAROMETER_TEMPERATURE = 0x14,
+        TEMPERATURE = 0x15,
+        LATITUDE = 0x19,
+        LONGITUDE = 0x1A,
+        GPS_ALTITUDE = 0x1B,
+        CALCULATED_ALTITUDE = 0x1C,
+        STATE = 0x1D,
+        VOLTAGE = 0x1E,
+        GROUND_ALTITUDE = 0x1F
+    };
+
   public:
     CommandReceiver(Rocket &rocket) : rocket_(rocket) {}
 
@@ -64,37 +82,37 @@ class CommandReceiver {
             rocket_.state_machine.disarm();
             rocket_.cam.stop_record();
             break;
-        case 0x30:
+        case BULK_SENSOR:
             Radio::sendBulkSensor(
                 sensor_poll_time, rocket_.calc.altitude(),
                 rocket_.sensors.accelerometer, rocket_.sensors.imuSensor,
                 rocket_.sensors.gps, static_cast<uint16_t>(state));
             break;
-        case 0x04:
+        case GPS:
             Radio::sendGPS(sensor_poll_time, rocket_.sensors.gps);
             break;
-        case 0x10:
+        case ACCELERATION_X:
             Radio::sendSingleSensor(sensor_poll_time, 0x10,
                                     rocket_.sensors.accelerometer.getData()[0]);
             break;
 
-        case 0x11:
+        case ACCELERATION_Y:
             Radio::sendSingleSensor(sensor_poll_time, 0x11,
                                     rocket_.sensors.accelerometer.getData()[1]);
             break;
-        case 0x12:
+        case ACCELERATION_Z:
             Radio::sendSingleSensor(sensor_poll_time, 0x12,
                                     rocket_.sensors.accelerometer.getData()[2]);
             break;
-        case 0x13:
+        case PRESSURE:
             Radio::sendSingleSensor(sensor_poll_time, 0x13,
                                     rocket_.sensors.barometer.getData()[0]);
             break;
-        case 0x14:
+        case BAROMETER_TEMPERATURE:
             Radio::sendSingleSensor(sensor_poll_time, 0x14,
                                     rocket_.sensors.barometer.getData()[1]);
             break;
-        case 0x15:
+        case TEMPERATURE:
             Radio::sendSingleSensor(sensor_poll_time, 0x15,
                                     rocket_.sensors.temperature.getData()[0]);
             break;
@@ -107,30 +125,30 @@ class CommandReceiver {
         case 0x18:
             break;
             // Not implemented - still uncertain about IMU storage
-        case 0x19:
+        case LATITUDE:
             Radio::sendSingleSensor(sensor_poll_time, 0x19,
                                     rocket_.sensors.gps.getData()[0]);
             break;
-        case 0x1A:
+        case LONGITUDE:
             Radio::sendSingleSensor(sensor_poll_time, 0x1A,
                                     rocket_.sensors.gps.getData()[1]);
             break;
-        case 0x1B:
+        case GPS_ALTITUDE:
             Radio::sendSingleSensor(sensor_poll_time, 0x1B,
                                     rocket_.sensors.gps.getData()[2]);
             break;
-        case 0x1C:
+        case CALCULATED_ALTITUDE:
             Radio::sendSingleSensor(sensor_poll_time, 0x1C,
                                     rocket_.calc.altitude());
             break;
-        case 0x1D:
+        case STATE:
             Radio::sendState(sensor_poll_time, static_cast<uint16_t>(state));
             break;
-        case 0x1E:
+        case VOLTAGE:
             Radio::sendSingleSensor(sensor_poll_time, 0x1E,
                                     rocket_.sensors.battery.getData()[0]);
             break;
-        case 0x1F:
+        case GROUND_ALTITUDE:
             Radio::sendSingleSensor(sensor_poll_time, 0x1F,
                                     rocket_.calc.altitudeBase());
             break;
