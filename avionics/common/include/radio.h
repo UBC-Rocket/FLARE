@@ -36,15 +36,6 @@
 class Radio {
   private:
     typedef uint16_t fwd_cmd_t;
-    enum class Ids {
-        status_ping = 0x00,
-        message = 0x01,
-        event = 0x02,
-        config = 0x03,
-        gps = 0x04,
-        state = 0x05,
-        bulk_sensor = 0x30,
-    };
 
     constexpr static Hal::ms WATCHDOG_SEND_INTERVAL{3000};
     constexpr static fwd_cmd_t STOP_PARSE_FLAG = 1 << 0;
@@ -59,8 +50,34 @@ class Radio {
     // (especially since no definition is given)
     class RadioMembers;
 
-    // Loose type to more explicitly indicate what variables are commands.
-    typedef uint8_t command_t;
+    enum command_t : uint8_t {
+        status_ping = 0x00,
+        message = 0x01,
+        event = 0x02,
+        config = 0x03,
+        gps = 0x04,
+        state = 0x05,
+        bulk_sensor = 0x30,
+        acceleration_x = 0x10,
+        acceleration_y = 0x11,
+        acceleration_z = 0x12,
+        pressure = 0x13,
+        barometer_temperature = 0x14,
+        temperature = 0x15,
+        unused1 = 0x16,
+        unused2 = 0x17,
+        unused3 = 0x18,
+        latitude = 0x19,
+        longitude = 0x1A,
+        gps_altitude = 0x1B,
+        calculated_altitude = 0x1C,
+        send_state = 0x1D,
+        voltage = 0x1E,
+        ground_altitude = 0x1F,
+        poll = 80,    // "P"
+        arm = 65,     // "A"
+        disarm = 68,  // "D"
+    };
 
     /**
      * @brief Initializes the class.
@@ -229,7 +246,7 @@ class Radio {
      * raw pointer rather than a unique pointer, so you'll need to call the
      * get() method of SubPktPtr.
      */
-    static void addIdTime(Ids id, uint32_t time);
+    static void addIdTime(command_t id, uint32_t time);
 
     /**
      * @brief Actually writes out data to the radio serial line; this is done
@@ -257,7 +274,7 @@ class Radio {
       private:
         template <typename C>
         static constexpr auto check(C *) -> typename std::is_same<
-            decltype(std::declval<C>().run_command(std::declval<uint8_t>())),
+            decltype(std::declval<C>().run_command(std::declval<command_t>())),
             void>::type;
 
         template <typename> static constexpr std::false_type check(...);

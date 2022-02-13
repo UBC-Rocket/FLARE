@@ -122,7 +122,7 @@ void Radio::initialize() {
     Radio::send();
 }
 
-void Radio::addIdTime(Ids id, uint32_t time) {
+void Radio::addIdTime(command_t id, uint32_t time) {
     self.tx_q_.write(static_cast<uint8_t>(id));
     self.tx_q_.write((&time), sizeof(time));
 }
@@ -137,7 +137,7 @@ void Radio::send() {
 void Radio::sendStatus(uint32_t time, RocketStatus status,
                        SensorCollection &sensors, IgnitorCollection &ignitors) {
     self.tx_q_.allocSubpkt(10);
-    addIdTime(Ids::status_ping, time);
+    addIdTime(command_t::status_ping, time);
 
     self.tx_q_.write(static_cast<uint8_t>(status));
     self.tx_q_.write(sensors.getStatusBitfield(), 2);
@@ -147,7 +147,7 @@ void Radio::sendStatus(uint32_t time, RocketStatus status,
 void Radio::sendBulkSensor(uint32_t time, float alt, Accelerometer &xl,
                            IMU &imu, GPS &gps, uint16_t state_id) {
     self.tx_q_.allocSubpkt(43);
-    addIdTime(Ids::bulk_sensor, time);
+    addIdTime(command_t::bulk_sensor, time);
 
     // Altitude
     self.tx_q_.write(&alt, 4);
@@ -171,7 +171,7 @@ void Radio::sendMessage(const uint32_t time, const char *str) {
     assert(strlen + 5 <= kPacketPayloadSpace);
 
     self.tx_q_.allocSubpkt(6 + strlen);
-    addIdTime(Ids::message, time);
+    addIdTime(command_t::message, time);
 
     self.tx_q_.write(strlen);
     self.tx_q_.write(str, strlen);
@@ -180,7 +180,7 @@ void Radio::sendMessage(const uint32_t time, const char *str) {
 void Radio::sendGPS(const uint32_t time, GPS &gps) {
     self.tx_q_.allocSubpkt(17);
 
-    addIdTime(Ids::gps, time);
+    addIdTime(command_t::gps, time);
     self.tx_q_.write(gps.getData(), 12);
 }
 
@@ -195,13 +195,13 @@ void Radio::sendSingleSensor(const uint32_t time, uint8_t id, float data) {
 void Radio::sendState(const uint32_t time, uint16_t state_id) {
     self.tx_q_.allocSubpkt(7);
 
-    addIdTime(Ids::state, time);
+    addIdTime(command_t::state, time);
     self.tx_q_.write(&state_id, sizeof(state_id));
 }
 
 void Radio::sendConfig(const uint32_t time) {
     self.tx_q_.allocSubpkt(47);
-    addIdTime(Ids::config, time);
+    addIdTime(command_t::config, time);
 
     // Defined in CMakeLists/platformio.ini
     self.tx_q_.write(RADIO_CONFIG_PACKET_SIM_ACTIVE);
@@ -217,7 +217,7 @@ void Radio::sendConfig(const uint32_t time) {
 void Radio::sendEvent(const uint32_t time, const EventId event) {
     self.tx_q_.allocSubpkt(7);
 
-    addIdTime(Ids::event, time);
+    addIdTime(command_t::event, time);
     self.tx_q_.write(&event, sizeof(uint16_t));
 }
 
@@ -247,7 +247,7 @@ Radio::fwd_cmd_t Radio::readPacket(command_t *&command_dat_out,
         } else if (self.xbee_.getResponse().getApiId() == ZB_RX_RESPONSE) {
             // received command from xbee_
             self.xbee_.getResponse().getZBRxResponse(self.rx);
-            command_dat_out = self.rx.getData();
+            command_dat_out = (command_t *) self.rx.getData();
             command_len_out = self.rx.getDataLength();
             return result;
         } else {
