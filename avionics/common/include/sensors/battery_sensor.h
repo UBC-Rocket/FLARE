@@ -46,4 +46,5 @@ class Battery : public SensorBase<BATTERY_DATA_LENGTH>{
   private:
     float m_divider;
     Pin m_batterySensorPin;
+    bool lowVoltageWarningSent;
 };

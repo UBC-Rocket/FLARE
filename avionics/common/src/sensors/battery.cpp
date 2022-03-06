@@ -19,8 +19,9 @@
  */
 
 #include "sensors/battery_sensor.h"
+#include "radio.h"
 #include "HAL/pin_util.h"
-
+#include "HAL/time.h"
 
 /*Constants------------------------------------------------------------*/
 #define MINIMUM_BATTERY_VOLTAGE 10
@@ -42,7 +43,7 @@ Battery::Battery(Pin batterySensorPin, float *const data)
     // sets selected pin so it can be read from correctly
     Hal::pinMode(m_batterySensorPin, Hal::PinMode::INPUT);
 
-    if (getBatteryVoltage() < LOW_BATTERY_VOLTAGE) {
+    if (getBatteryVoltage() < MINIMUM_BATTERY_VOLTAGE) {
         status = SensorStatus::FAILURE;
     } else {
         status = SensorStatus::NOMINAL;
@@ -64,6 +65,13 @@ float Battery::getBatteryVoltage() {
     // converts output value from mV to V and divides by voltage divider
     // value to calculate battery input voltage.
     float batteryVoltage = (teensyVoltage / m_divider) / 1000;
+
+    if (batteryVoltage < LOW_BATTERY_VOLTAGE && !lowVoltageWarningSent) {
+        // only send low voltage event once to prevent spamming
+        Radio::sendEvent(Hal::tpoint_to_uint(Hal::now_ms()), EventId::LOW_VOLTAGE);
+        lowVoltageWarningSent = true;
+    }
+    
     return batteryVoltage;
 }
 
