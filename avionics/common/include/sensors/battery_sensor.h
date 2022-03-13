@@ -23,10 +23,12 @@
 #include "sensors_interface.h"
 
 class Battery : public SensorBase<BATTERY_DATA_LENGTH>{
-  public: // public functions
+  public:
     // Constructor. batterySensorPin is the pin for battery sensor
     // (i.e. output of the voltage divider)
     Battery(Pin batterySensorPin, float *const data);
+
+    bool lowVoltageWarningSent;
 
     /**
      * @brief  Gets the battery voltage level. Maximum voltage readable
@@ -46,5 +48,4 @@ class Battery : public SensorBase<BATTERY_DATA_LENGTH>{
   private:
     float m_divider;
     Pin m_batterySensorPin;
-    bool lowVoltageWarningSent;
 };

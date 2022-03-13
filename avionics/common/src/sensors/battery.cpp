@@ -38,6 +38,7 @@ Battery::Battery(Pin batterySensorPin, float *const data)
 #ifdef TESTING
     SerialUSB.println("Initializing battery voltage sensor");
 #endif
+    lowVoltageWarningSent = false;
     m_divider = static_cast<float>(R2) / (R1 + R2);
     m_batterySensorPin = batterySensorPin;
     // sets selected pin so it can be read from correctly
