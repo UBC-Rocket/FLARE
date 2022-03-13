@@ -60,8 +60,11 @@ void SensorCollection::updateStatus() {
     }
     if (battery.getStatus() == SensorStatus::FAILURE) {
         LOG_WARN("Voltage sensor failed");
+        raiseToStatus(status_, RocketStatus::CRITICAL_FAILURE);
+        *status_bitfield_ |= 0x04;
+    } else if (battery.lowVoltageWarningSent) {
+        LOG_WARN("Low battery voltage");
         raiseToStatus(status_, RocketStatus::NONCRITICAL_FAILURE);
         *status_bitfield_ |= 0x04;
-        // TODO: Measure voltage level before launch and if it's too low raise a critical or non-critical error
     }
 }
