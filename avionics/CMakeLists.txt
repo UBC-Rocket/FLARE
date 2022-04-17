@@ -14,12 +14,14 @@ endif()
 add_executable(TantalusStage1 common/src/avionics.cpp)
 add_executable(TantalusStage2 common/src/avionics.cpp)
 add_executable(Hollyburn common/src/avionics.cpp)
+add_executable(Silvertip common/src/avionics.cpp)
 
 add_subdirectory(common)
 add_subdirectory(envs/x86)
 add_subdirectory(rockets/tantalus_stage_1)
 add_subdirectory(rockets/tantalus_stage_2)
 add_subdirectory(rockets/hollyburn)
+add_subdirectory(rockets/silvertip)
 
 include_directories(
     common/include
@@ -48,6 +50,11 @@ rockets/hollyburn/include
 
 target_sources(Hollyburn PUBLIC extra/src/altitude_avg.cpp)
 
+target_include_directories(Silvertip PUBLIC
+  rockets/silvertip/include
+)
+target_sources(Silvertip PUBLIC extra/src/altitude_avg.cpp)
+
 ###
 ### Setup Radio defines
 ###
@@ -62,6 +69,10 @@ target_compile_definitions(TantalusStage2 PUBLIC
 
 target_compile_definitions(Hollyburn PUBLIC
     RADIO_CONFIG_PACKET_ROCKET_ID=3
+)
+
+target_compile_definitions(Silvertip PUBLIC
+    RADIO_CONFIG_PACKET_ROCKET_ID=5
 )
 
 ###

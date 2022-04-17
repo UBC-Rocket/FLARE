@@ -25,3 +25,10 @@ target_sources(
     PRIVATE
         ${x86_specific_files}
 )
+
+target_sources(
+    Silvertip
+    PRIVATE
+        ${x86_specific_files}
+)
+
