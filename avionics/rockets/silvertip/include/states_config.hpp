@@ -16,7 +16,7 @@
 struct StateMachineConfig {
   private:
     /* Configuration constants */
-    constexpr static int STANDBY_LAUNCH_CHECKS = 4;
+    constexpr static int STANDBY_LAUNCH_CHECKS = 4;              // # of successful checks required before moving to next state
     constexpr static int ARMED_LAUNCH_CHECKS = 4;
     constexpr static int MOTOR_BURNOUT_CHECKS = 4;
     constexpr static int MACH_LOCK_CHECKS = 10;
@@ -25,16 +25,16 @@ struct StateMachineConfig {
     constexpr static int MAIN_DEPLOY_CHECKS = 5;
 
     constexpr static float LAUNCH_THRESHOLD = 25;                // m
-    constexpr static float MACH_LOCK_VELOCITY_THRESHOLD = 155;   // m/s
-    constexpr static float MACH_UNLOCK_VELOCITY_THRESHOLD = 150; // m/s
-    constexpr static float MACH_UNLOCK_TIME_THRESHOLD = 12000;   // ms
-    constexpr static float MAIN_DEPLOY_ALTITUDE = 488;           // m == 1500 ft
+    constexpr static float MACH_LOCK_VELOCITY_THRESHOLD = 688;   // m/s, ~ 1.25x max speed
+    constexpr static float MACH_UNLOCK_VELOCITY_THRESHOLD = 661; // m/s, ~ 1.2x max speed
+    constexpr static float MACH_UNLOCK_TIME_THRESHOLD = 35000;   // ms, time between max velocity and slightly after apogee
+    constexpr static float MAIN_DEPLOY_ALTITUDE = 500;           // m == 1640 ft, directly from simulation
 
-    constexpr static long LAND_CHECK_TIME_INTERVAL = 10000; // ms
+    constexpr static long LAND_CHECK_TIME_INTERVAL = 10000;      // ms
     constexpr static int LAND_CHECKS = 6;
-    constexpr static float LAND_VELOCITY_THRESHOLD = 4;
+    constexpr static float LAND_VELOCITY_THRESHOLD = 4;          // m/s
 
-    constexpr static long APOGEE_PRESSURE_DELAY = 3000;
+    constexpr static long APOGEE_PRESSURE_DELAY = 3000;          // ms
     constexpr static long LANDING_TIME_INTERVAL = 10000;
     constexpr static long TOGGLE_CAMERA_INTERVAL = 200;
 
