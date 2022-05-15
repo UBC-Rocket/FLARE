@@ -42,3 +42,8 @@ target_sources(
     PRIVATE
     ${common_files}
 )
+target_sources(
+    Silvertip
+    PRIVATE
+    ${common_files}
+)
