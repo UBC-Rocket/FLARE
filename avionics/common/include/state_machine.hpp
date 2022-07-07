@@ -41,8 +41,9 @@ class StateMachine {
                      << static_cast<std::int32_t>(new_id) << ", time is "
                      << static_cast<std::int32_t>(Hal::millis()) << "ms)");
             state_map_[new_id]->onEntry();
-            Radio::sendState(Hal::tpoint_to_uint(Hal::now_ms()),
-                             static_cast<uint16_t>(new_id));
+            // removed for lite version
+            // Radio::sendState(Hal::tpoint_to_uint(Hal::now_ms()),
+            //                  static_cast<uint16_t>(new_id));
             current_id_ = new_id;
         }
         return std::make_pair(old_id, new_id);

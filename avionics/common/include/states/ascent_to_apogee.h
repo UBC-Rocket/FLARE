@@ -9,12 +9,22 @@ namespace State {
 
 class AscentToApogee : public IState {
   public:
-    AscentToApogee(StateId post_apogee_id, StateId mach_lock_id,
-                   uint8_t const APOGEE_CHECKS, uint8_t const MACH_LOCK_CHECKS,
-                   float MACH_LOCK_VELOCITY, Ignitor &drogue_ignitor)
-        : APOGEE_CHECKS_(APOGEE_CHECKS), MACH_LOCK_CHECKS_(MACH_LOCK_CHECKS),
-          MACH_LOCK_VELOCITY_(MACH_LOCK_VELOCITY), post_apogee_id_(post_apogee_id), 
-          mach_lock_id_(mach_lock_id), drogue_ignitor_(drogue_ignitor) {}
+    AscentToApogee(
+        StateId post_apogee_id, 
+        StateId mach_lock_id,
+        uint8_t const APOGEE_CHECKS, 
+        uint8_t const MACH_LOCK_CHECKS,
+        float MACH_LOCK_VELOCITY, 
+        Ignitor &drogue_ignitor, 
+        Ignitor &redundant_drogue_ignitor
+    )
+    :   APOGEE_CHECKS_(APOGEE_CHECKS), 
+        MACH_LOCK_CHECKS_(MACH_LOCK_CHECKS),
+        MACH_LOCK_VELOCITY_(MACH_LOCK_VELOCITY), 
+        post_apogee_id_(post_apogee_id), 
+        mach_lock_id_(mach_lock_id), 
+        drogue_ignitor_(drogue_ignitor), 
+        redundant_drogue_ignitor_(redundant_drogue_ignitor) {}
 
     /*
      * @brief Return the assigned enumeration code.
@@ -46,6 +56,7 @@ class AscentToApogee : public IState {
 
         if (apogee_checks_ >= APOGEE_CHECKS_) {
             drogue_ignitor_.fire();
+            redundant_drogue_ignitor_.fire();
             return post_apogee_id_;
         } else {
             return StateId::ASCENT_TO_APOGEE;
@@ -66,6 +77,7 @@ class AscentToApogee : public IState {
     const StateId post_apogee_id_;
     const StateId mach_lock_id_;
     Ignitor &drogue_ignitor_;
+    Ignitor &redundant_drogue_ignitor_;
 
     uint8_t apogee_checks_{0};
     uint8_t mach_checks_{0};

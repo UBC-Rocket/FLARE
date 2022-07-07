@@ -37,16 +37,19 @@
 class SensorCollection {
   private:
     constexpr static std::size_t BAROMETER_INDEX = 0;
-    constexpr static std::size_t GPS_INDEX =
-        BAROMETER_INDEX + Barometer::dataLength();
-    constexpr static std::size_t ACCEL_INDEX = GPS_INDEX + GPS::dataLength();
-    constexpr static std::size_t IMU_INDEX =
-        ACCEL_INDEX + Accelerometer::dataLength();
-    constexpr static std::size_t BATTERY_INDEX = IMU_INDEX + IMU::dataLength();
-    constexpr static std::size_t TEMP_INDEX 
-        = BATTERY_INDEX + Battery::dataLength();
-    constexpr static std::size_t DATA_LENGTH =
-        TEMP_INDEX + Temperature::dataLength();
+    // Modified for lite version
+    // constexpr static std::size_t GPS_INDEX =
+    //     BAROMETER_INDEX + Barometer::dataLength();
+    // constexpr static std::size_t ACCEL_INDEX = GPS_INDEX + GPS::dataLength();
+    // constexpr static std::size_t IMU_INDEX =
+    //     ACCEL_INDEX + Accelerometer::dataLength();
+    // constexpr static std::size_t BATTERY_INDEX = IMU_INDEX + IMU::dataLength();
+    // constexpr static std::size_t TEMP_INDEX 
+    //     = BATTERY_INDEX + Battery::dataLength();
+    // constexpr static std::size_t DATA_LENGTH =
+    //     TEMP_INDEX + Temperature::dataLength();
+    constexpr static std::size_t ACCEL_INDEX = BAROMETER_INDEX + Barometer::dataLength();
+    constexpr static std::size_t DATA_LENGTH = ACCEL_INDEX + Accelerometer::dataLength();
     
 
     std::array<float, DATA_LENGTH> sensor_data;
@@ -57,18 +60,23 @@ class SensorCollection {
     Hal::t_point last_poll_time_;
 
   public:
-    constexpr static std::size_t NUM_SENSORS = 6;
+    // Modified for lite version
+    // constexpr static std::size_t NUM_SENSORS = 6;
+    constexpr static std::size_t NUM_SENSORS = 2;
+    // Modified for lite version
+    // constexpr static char LOG_FILE_HEADER[] =
+    //     "Pressure (mbar), Barom. Temp (C), GPS (lat), GPS (long), GPS (alt), "
+    //     "Accel (x)(g), Accel (y)(g), Accel (z)(g), IMU (w), IMU(x), IMU(y), "
+    //     "IMU(z), Voltage (V), Temperature (C)";
     constexpr static char LOG_FILE_HEADER[] =
-        "Pressure (mbar), Barom. Temp (C), GPS (lat), GPS (long), GPS (alt), "
-        "Accel (x)(g), Accel (y)(g), Accel (z)(g), IMU (w), IMU(x), IMU(y), "
-        "IMU(z), Voltage (V), Temperature (C)";
+        "Pressure (mbar), Barom. Temp (C), Accel (x)(g), Accel (y)(g), Accel (z)(g)";
 
     Barometer barometer;
-    GPS gps;
+    // GPS gps; // removed for lite version
     Accelerometer accelerometer;
-    IMU imuSensor;
-    Battery battery;
-    Temperature temperature;
+    // IMU imuSensor; // removed for lite version
+    // Battery battery;
+    // Temperature temperature;
     
     SensorCollection();
 

@@ -47,19 +47,23 @@ class DrogueDescent
     : public RepeatedCheckBase<StateId::DROGUE_DESCENT, next_id, num_checks,
                                DrogueDescent<next_id, num_checks>> {
   public:
-    DrogueDescent(const float main_altitude, Ignitor &main_ignitor)
-        : main_altitude_(main_altitude), ignitor_(main_ignitor) {}
+    DrogueDescent(const float main_altitude, Ignitor &main_ignitor, Ignitor &redundant_main_ignitor)
+        : main_altitude_(main_altitude), ignitor_(main_ignitor), redundant_ignitor_(redundant_main_ignitor) {}
 
   private:
     friend RepeatedCheckBase<StateId::DROGUE_DESCENT, next_id, num_checks,
                              DrogueDescent<next_id, num_checks>>;
     float main_altitude_;
     Ignitor &ignitor_;
+    Ignitor &redundant_ignitor_;
     bool accept(Calculator const &input) {
         return input.altitude() < main_altitude_;
     }
 
-    void extraOnExit() { ignitor_.fire(); }
+    void extraOnExit() { 
+      ignitor_.fire();
+      redundant_ignitor_.fire();
+    }
 };
 
 } // namespace State

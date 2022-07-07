@@ -105,23 +105,26 @@ int main(void) {
     SerialUSB.println("Initializing...");
 #endif
 
-    Radio::initialize();
-    LOG_INFO("Initialized radio");
+    // Disabled for lite version
+    // Radio::initialize();
+    // LOG_INFO("Initialized radio");
+
     Rocket rocket;
     // Logically, these are all unrelated variables - but to allow the command
     // receiver to function, they need to be coalesced into one POD struct.
     auto &state_machine = rocket.state_machine;
     auto &init_status = rocket.init_status;
-    auto &sensors = rocket.sensors;
-    auto &ignitors = rocket.ignitors;
+    // auto &sensors = rocket.sensors; unnecessary for lite version
+    // auto &ignitors = rocket.ignitors;
 
     if (init_status == RocketStatus::CRITICAL_FAILURE) {
         LOG_ERROR("Critical failure; aborting in state machine");
         state_machine.abort();
     }
 
-    Radio::sendStatus(Hal::millis(), init_status, sensors, ignitors);
-    LOG_INFO("Sent startup status");
+    // Disabled for lite version
+    // Radio::sendStatus(Hal::millis(), init_status, sensors, ignitors);
+    // LOG_INFO("Sent startup status");
 
     /* Register all tasks */
     typedef Scheduler::Task Task;
@@ -130,13 +133,14 @@ int main(void) {
     Task read_eval_log(ReadEvalLog::run, &read_eval_logger, Hal::ms(50));
     registerTask(TaskID::ReadEvalLog, read_eval_log);
 
+    // Disabled for lite version
     // Radio needs to be scheduled later; sensors need to be read first
-    RadioTxBulk radio_txer(rocket);
-    Task radio_tx(RadioTxBulk::run, &radio_txer, RadioTxBulk::freq);
-    Scheduler::preregisterTask(static_cast<int>(TaskID::RadioTxBulk), radio_tx,
-                               true, false);
-    Scheduler::scheduleTask(Hal::now_ms() + Hal::ms(1),
-                            static_cast<int>(TaskID::RadioTxBulk));
+    // RadioTxBulk radio_txer(rocket);
+    // Task radio_tx(RadioTxBulk::run, &radio_txer, RadioTxBulk::freq);
+    // Scheduler::preregisterTask(static_cast<int>(TaskID::RadioTxBulk), radio_tx,
+    //                            true, false);
+    // Scheduler::scheduleTask(Hal::now_ms() + Hal::ms(1),
+    //                         static_cast<int>(TaskID::RadioTxBulk));
 
     Task led_blink(LEDBlinker::toggle, nullptr, LEDBlinker::freq);
 

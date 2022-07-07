@@ -13,6 +13,7 @@
 /*Constants------------------------------------------------------------*/
 constexpr short IGNITOR_DELAY = 25;          // in milliseconds
 constexpr short CONTINUITY_CHECK_DELAY = 50; // in microseconds
+constexpr short REDUNDANCY_DELAY = 1000;     // in milliseconds
 // tested at 11.1V with a 2.2k/470 divider (606) or 1.3k/330 (642)
 //  or 1.33k/330 (629)
 // threshold for a discontinuous ematch -> read voltage / 3.3 * 1023
@@ -35,8 +36,9 @@ class Ignitor : public IIgnitor {
      * continuity, this pin is brought high briefly
      * @param continuityADCPin the pin for the ADC for checking continuity -
      * when testing continuity, the value at this pin is read
+     * @param hasRedundancyDelay whether or not the firing should be delayed by REDUNDANCY_DELAY
      */
-    Ignitor(Pin ignitePin, Pin continuityPin, Pin continuityADCPin);
+    Ignitor(Pin ignitePin, Pin continuityPin, Pin continuityADCPin, bool hasRedundancyDelay);
 
     void fire() override;
 
@@ -44,6 +46,7 @@ class Ignitor : public IIgnitor {
     Pin ignitePin_;
     Pin continuityPin_;
     Pin continuityADCPin_;
+    bool hasRedundancyDelay_;
 };
 
 #endif

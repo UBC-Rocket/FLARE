@@ -61,7 +61,8 @@ class ReadEvalLog {
             }
         }
 
-        Radio::forwardCommand(command_receiver);
+        // removed for lite version
+        // Radio::forwardCommand(command_receiver);
     }
 
   public:
@@ -87,11 +88,12 @@ class RadioTxBulk {
   private:
     void run() {
         StateId state = rocket.state_machine.getState();
-        Radio::sendBulkSensor(
-            Hal::tpoint_to_uint(rocket.sensors.last_poll_time()),
-            rocket.calc.altitude(), rocket.sensors.accelerometer,
-            rocket.sensors.imuSensor, rocket.sensors.gps,
-            static_cast<uint16_t>(state));
+        // removed for lite version
+        // Radio::sendBulkSensor(
+        //     Hal::tpoint_to_uint(rocket.sensors.last_poll_time()),
+        //     rocket.calc.altitude(), rocket.sensors.accelerometer,
+        //     rocket.sensors.imuSensor, rocket.sensors.gps,
+        //     static_cast<uint16_t>(state));
     }
 
     Rocket &rocket;

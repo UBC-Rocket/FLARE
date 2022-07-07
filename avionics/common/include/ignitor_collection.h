@@ -9,7 +9,9 @@ class IgnitorCollection {
     IgnitorCollection();
 
     Ignitor drogue;
+    Ignitor redundantDrogue;
     Ignitor main;
+    Ignitor redundantMain;
     const uint8_t *getStatusBitfield() const { return status_bitfield_; }
     RocketStatus getStatus() const { return status_; }
 

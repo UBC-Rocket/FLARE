@@ -65,13 +65,15 @@ class CommandReceiver {
             rocket_.cam.stop_record();
             break;
         case Radio::bulk_sensor:
-            Radio::sendBulkSensor(
-                sensor_poll_time, rocket_.calc.altitude(),
-                rocket_.sensors.accelerometer, rocket_.sensors.imuSensor,
-                rocket_.sensors.gps, static_cast<uint16_t>(state));
+            // removed for lite version
+            // Radio::sendBulkSensor(
+            //     sensor_poll_time, rocket_.calc.altitude(),
+            //     rocket_.sensors.accelerometer, rocket_.sensors.imuSensor,
+            //     rocket_.sensors.gps, static_cast<uint16_t>(state));
             break;
         case Radio::gps:
-            Radio::sendGPS(sensor_poll_time, rocket_.sensors.gps);
+            // removed for lite version
+            // Radio::sendGPS(sensor_poll_time, rocket_.sensors.gps);
             break;
         case Radio::acceleration_x:
             Radio::sendSingleSensor(sensor_poll_time, Radio::acceleration_x,
@@ -95,8 +97,9 @@ class CommandReceiver {
                                     rocket_.sensors.barometer.getData()[1]);
             break;
         case Radio::temperature:
-            Radio::sendSingleSensor(sensor_poll_time, Radio::temperature,
-                                    rocket_.sensors.temperature.getData()[0]);
+            // removed for lite version
+            // Radio::sendSingleSensor(sensor_poll_time, Radio::temperature,
+            //                         rocket_.sensors.temperature.getData()[0]);
             break;
         case Radio::unused1:
             break;
@@ -108,16 +111,19 @@ class CommandReceiver {
             break;
             // Not implemented - still uncertain about IMU storage
         case Radio::latitude:
-            Radio::sendSingleSensor(sensor_poll_time, Radio::latitude,
-                                    rocket_.sensors.gps.getData()[0]);
+            // removed for lite version
+            // Radio::sendSingleSensor(sensor_poll_time, Radio::latitude,
+            //                         rocket_.sensors.gps.getData()[0]);
             break;
         case Radio::longitude:
-            Radio::sendSingleSensor(sensor_poll_time, Radio::longitude,
-                                    rocket_.sensors.gps.getData()[1]);
+            // removed for lite version
+            // Radio::sendSingleSensor(sensor_poll_time, Radio::longitude,
+            //                         rocket_.sensors.gps.getData()[1]);
             break;
         case Radio::gps_altitude:
-            Radio::sendSingleSensor(sensor_poll_time, Radio::gps_altitude,
-                                    rocket_.sensors.gps.getData()[2]);
+            // removed for lite version
+            // Radio::sendSingleSensor(sensor_poll_time, Radio::gps_altitude,
+            //                         rocket_.sensors.gps.getData()[2]);
             break;
         case Radio::calculated_altitude:
             Radio::sendSingleSensor(sensor_poll_time, Radio::calculated_altitude,
@@ -127,8 +133,9 @@ class CommandReceiver {
             Radio::sendState(sensor_poll_time, static_cast<uint16_t>(state));
             break;
         case Radio::voltage:
-            Radio::sendSingleSensor(sensor_poll_time, Radio::voltage,
-                                    rocket_.sensors.battery.getData()[0]);
+            // removed for lite version
+            // Radio::sendSingleSensor(sensor_poll_time, Radio::voltage,
+            //                         rocket_.sensors.battery.getData()[0]);
             break;
         case Radio::ground_altitude:
             Radio::sendSingleSensor(sensor_poll_time, Radio::ground_altitude,

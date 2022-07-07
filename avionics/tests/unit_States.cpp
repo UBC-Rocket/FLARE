@@ -31,8 +31,9 @@ TEST(AscentToApogee, FireIgnitor) {
     alt = 1000;
     vel = -2 * grav;
     Ignitor iggy;
+    Ignitor redundantIggy;
     State::AscentToApogee state(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, 5,
-                                10, 200.0, iggy);
+                                10, 200.0, iggy, redundantIggy);
     state.onEntry();
     float t;
     for (t = -2; t <= 2; t += period) {
@@ -49,6 +50,7 @@ TEST(AscentToApogee, FireIgnitor) {
 
 TEST(AscentToApogee, MachLock) {
     Ignitor iggy;
+    Ignitor redundantIggy;
     Calculator data;
     StateId result;
     auto &alt = data.alt;
@@ -57,7 +59,7 @@ TEST(AscentToApogee, MachLock) {
     vel = 201.0;
 
     State::AscentToApogee state(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, 5,
-                                10, 200.0, iggy);
+                                10, 200.0, iggy, redundantIggy);
     state.onEntry();
 
     for (int i = 0; i < 10; i++) {
@@ -73,6 +75,7 @@ TEST(AscentToApogee, MachLock) {
 
 TEST(AscentToApogee, MachLockChecks) {
     Ignitor iggy;
+    Ignitor redundantIggy;
     Calculator data;
     StateId result;
     auto &alt = data.alt;
@@ -81,7 +84,7 @@ TEST(AscentToApogee, MachLockChecks) {
     vel = 201.0;
 
     State::AscentToApogee state(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, 5,
-                                10, 200.0, iggy);
+                                10, 200.0, iggy, redundantIggy);
     state.onEntry();
 
     for (int i = 0; i < 9; i++) {
@@ -160,9 +163,10 @@ TEST(DrogueDescent, FireIgnitor) {
     auto &vel = data.vel_gnd_z;
     vel = TERM_VEL;
     Ignitor iggy;
+    Ignitor redundantIggy;
 
     constexpr float main_alt = 500;
-    State::DrogueDescent<StateId::MAIN_DESCENT, 5> state(main_alt, iggy);
+    State::DrogueDescent<StateId::MAIN_DESCENT, 5> state(main_alt, iggy, redundantIggy);
 
     alt = main_alt + 50;
     bool ok = false;

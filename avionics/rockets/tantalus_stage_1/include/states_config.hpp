@@ -65,10 +65,10 @@ struct StateMachineConfig {
         : standby(LAUNCH_THRESHOLD, camera),
           coast(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, APOGEE_CHECKS,
                 MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD,
-                ignitors.drogue),
+                ignitors.drogue, ignitors.redundantDrogue),
           mach_lock(StateId::ASCENT_TO_APOGEE, MACH_UNLOCK_CHECKS,
                     MACH_UNLOCK_VELOCITY_THRESHOLD, MACH_UNLOCK_TIME_THRESHOLD),
-          drogue(MAIN_DEPLOY_ALTITUDE, ignitors.main),
+          drogue(MAIN_DEPLOY_ALTITUDE, ignitors.main, ignitors.redundantMain),
           main(StateId::LANDED, LAND_CHECK_TIME_INTERVAL, LAND_CHECKS,
                LAND_VELOCITY_THRESHOLD, calc),
           landed() {}

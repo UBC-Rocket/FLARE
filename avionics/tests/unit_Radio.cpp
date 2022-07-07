@@ -60,10 +60,10 @@ TEST(Radio, AllPacketTypes) {
         Radio::sendStatus(time, RocketStatus::NOMINAL, sensors, ignitors);
         float alt = 100;
         uint16_t state_id = 0;
-        Radio::sendBulkSensor(time, alt, sensors.accelerometer,
-                              sensors.imuSensor, sensors.gps, state_id);
+        // Radio::sendBulkSensor(time, alt, sensors.accelerometer, // removed for lite version
+        //                       sensors.imuSensor, sensors.gps, state_id);
         Radio::sendMessage(time, "hello");
-        Radio::sendGPS(time, sensors.gps);
+        // Radio::sendGPS(time, sensors.gps); // removed for lite version
         Radio::sendSingleSensor(time, 0, 1.23);
         Radio::sendState(time, state_id);
         Radio::sendEvent(time, EventId::IGNITOR_FIRED);
