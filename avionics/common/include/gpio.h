@@ -28,19 +28,19 @@ enum class Pin {
     FLIGHT_LED = 21, // required by state machine
     BUILTIN_LED = 13,
     STATUS_LED = 13, // uses BUILTIN_LED
-    BUZZER = 3,      // required by buzzer
-    MAIN_IGNITOR = 16,
-    MAIN_CONTINUITY_TEST = 4,
-    MAIN_CONTINUITY_READ = 14,
-    MAIN_REDUNDANT_IGNITOR = 0,
-    MAIN_REDUNDANT_CONTINUITY_TEST = 0, //TODO
-    MAIN_REDUNDANT_CONTINUITY_READ = 0,
-    DROGUE_IGNITOR = 35,
-    DROGUE_CONTINUITY_TEST = 17,
-    DROGUE_CONTINUITY_READ = 34,
-    DROGUE_REDUNDANT_IGNITOR = 0, //TODO
-    DROGUE_REDUNDANT_CONTINUITY_TEST = 0,
-    DROGUE_REDUNDANT_CONTINUITY_READ = 0,
+    BUZZER = 23,      // required by buzzer
+    MAIN_IGNITOR = 4,
+    MAIN_CONTINUITY_TEST = 0, //replaced for tantalus lite
+    MAIN_CONTINUITY_READ = 0, //replaced for tantalus lite
+    MAIN_REDUNDANT_IGNITOR = 5,
+    MAIN_REDUNDANT_CONTINUITY_TEST = 0, //TODO after tantalus
+    MAIN_REDUNDANT_CONTINUITY_READ = 0, //TODO after tantalus
+    DROGUE_IGNITOR = 2,
+    DROGUE_CONTINUITY_TEST = 0, //replaced for tantalus lite
+    DROGUE_CONTINUITY_READ = 0, //replaced for tantalus lite
+    DROGUE_REDUNDANT_IGNITOR = 3,
+    DROGUE_REDUNDANT_CONTINUITY_TEST = 0, //TODO after tantalus
+    DROGUE_REDUNDANT_CONTINUITY_READ = 0, //TODO after tantalus
     VOLTAGE_SENSOR = 23
 };
 
