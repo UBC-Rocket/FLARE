@@ -15,20 +15,20 @@ Ignitor::Ignitor(Pin ignitePin, Pin continuityPin, Pin continuityADCPin, bool ha
     Hal::pinMode(ignitePin_, Hal::PinMode::OUTPUT);
     Hal::digitalWrite(ignitePin_, Hal::PinDigital::LO);
 
-    /*continuity check */
-    Hal::pinMode(continuityPin_, Hal::PinMode::OUTPUT);
+    /*continuity check (removed for tantalus lite version)*/
+    // Hal::pinMode(continuityPin_, Hal::PinMode::OUTPUT);
 
-    Hal::digitalWrite(continuityPin_, Hal::PinDigital::HI);
-    Hal::sleep_us(CONTINUITY_CHECK_DELAY);
+    // Hal::digitalWrite(continuityPin_, Hal::PinDigital::HI);
+    // Hal::sleep_us(CONTINUITY_CHECK_DELAY);
 
-    int continuity = Hal::analogRead(continuityADCPin);
-    Hal::digitalWrite(continuityPin_, Hal::PinDigital::LO);
+    // int continuity = Hal::analogRead(continuityADCPin);
+    // Hal::digitalWrite(continuityPin_, Hal::PinDigital::LO);
 
-    if (continuity <= DISCONTINUOUS_THRESHOLD) {
-        status = HardwareStatus::FAILURE;
-    } else {
+    // if (continuity <= DISCONTINUOUS_THRESHOLD) {
+    //     status = HardwareStatus::FAILURE;
+    // } else {
         status = HardwareStatus::NOMINAL;
-    }
+    // }
 }
 
 void Ignitor::fire() {
