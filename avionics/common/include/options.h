@@ -28,4 +28,6 @@
 
 // #define THERMOCOUPLE    // if thermocouple is utilized or not
 
+#define STAGE2
+
 // Refer to README or the wiki for more information.

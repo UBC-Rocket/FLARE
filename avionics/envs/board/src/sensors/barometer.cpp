@@ -47,6 +47,11 @@ void Barometer::readData() {
     // data_[1] = barometer.temperature();
 
     // TODO: DETERMINE UNITS
+#ifdef STAGE2
+    data_[0] = bmp.getPressure();
+    data_[1] = bmp.getTemperature(); 
+#else
     data_[0] = bmp.readPressure();
     data_[1] = bmp.readTemperature(); 
+#endif
 }
