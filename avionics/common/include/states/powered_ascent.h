@@ -22,7 +22,7 @@ class PoweredAscent : public IState {
      * @return State enumeration code, to be passed into the std::map between
      * codes and used states. Note that the returned code may be the same state.
      */
-    StateId getNewState(Calculator const &input) {
+    StateId getNewState(Calculator const &input, Hal::t_point const) {
         static uint8_t burnout_checks = 0;
 
         if (input.accel_rocket(0) < 0) {

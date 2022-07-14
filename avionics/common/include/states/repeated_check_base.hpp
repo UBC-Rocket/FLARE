@@ -38,7 +38,7 @@ namespace State {
 template <StateId my_id, StateId next_id, int num_checks, class Derived>
 class RepeatedCheckBase : public IState {
   public:
-    StateId getNewState(Calculator const &input) final override {
+    StateId getNewState(Calculator const &input, Hal::t_point const) final override {
         if (accept(input)) {
             ++checks_;
             if (checks_ >= num_checks) {

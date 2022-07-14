@@ -36,7 +36,7 @@ class PreAirStartCoastTimed : public IState {
      * @return State enumeration code, to be passed into the std::map between
      * codes and used states. Note that the returned code may be the same state.
      */
-    StateId getNewState(Calculator const &) {
+    StateId getNewState(Calculator const &, Hal::t_point const) {
         typedef std::chrono::milliseconds ms;
         static auto start_time = Hal::now_ms();
 

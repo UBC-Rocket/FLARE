@@ -23,7 +23,7 @@ class Landed : public IState {
      * @return State enumeration code, to be passed into the std::map between
      * codes and used states. Note that the returned code may be the same state.
      */
-    StateId getNewState(Calculator const &) { return StateId::LANDED; }
+    StateId getNewState(Calculator const &, Hal::t_point const) { return StateId::LANDED; }
 };
 
 } // namespace State

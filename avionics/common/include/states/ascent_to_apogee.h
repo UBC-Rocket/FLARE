@@ -15,12 +15,14 @@ class AscentToApogee : public IState {
         uint8_t const APOGEE_CHECKS, 
         uint8_t const MACH_LOCK_CHECKS,
         float MACH_LOCK_VELOCITY, 
+        long APOGEE_LOCKOUT,
         Ignitor &drogue_ignitor, 
         Ignitor &redundant_drogue_ignitor
     )
     :   APOGEE_CHECKS_(APOGEE_CHECKS), 
         MACH_LOCK_CHECKS_(MACH_LOCK_CHECKS),
         MACH_LOCK_VELOCITY_(MACH_LOCK_VELOCITY), 
+        APOGEE_LOCKOUT_(APOGEE_LOCKOUT),
         post_apogee_id_(post_apogee_id), 
         mach_lock_id_(mach_lock_id), 
         drogue_ignitor_(drogue_ignitor), 
@@ -38,7 +40,7 @@ class AscentToApogee : public IState {
      * @return State enumeration code, to be passed into the std::map between
      * codes and used states. Note that the returned code may be the same state.
      */
-    StateId getNewState(Calculator const &input) {
+    StateId getNewState(Calculator const &input, Hal::t_point const launch_time) {
         if (input.velocityGroundZ() > MACH_LOCK_VELOCITY_) {
             if (++mach_checks_ >= MACH_LOCK_CHECKS_) {
                 return mach_lock_id_;
@@ -54,7 +56,7 @@ class AscentToApogee : public IState {
         }
         last_alt_ = input.altitude();
 
-        if (apogee_checks_ >= APOGEE_CHECKS_) {
+        if (((Hal::now_ms() - launch_time) >= Hal::ms(APOGEE_LOCKOUT_)) && (apogee_checks_ >= APOGEE_CHECKS_)) {
             drogue_ignitor_.fire();
             redundant_drogue_ignitor_.fire();
             return post_apogee_id_;
@@ -74,6 +76,7 @@ class AscentToApogee : public IState {
     const uint8_t APOGEE_CHECKS_;
     const uint8_t MACH_LOCK_CHECKS_;
     const float MACH_LOCK_VELOCITY_;
+    const uint32_t APOGEE_LOCKOUT_;
     const StateId post_apogee_id_;
     const StateId mach_lock_id_;
     Ignitor &drogue_ignitor_;

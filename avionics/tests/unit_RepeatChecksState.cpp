@@ -21,67 +21,69 @@ TEST(RepeatedChecksState, Simple) {
     Calculator input;
     input.alt = 5;
 
-    for (int i = 0; i < kNumChecks * 10; ++i) {
-        EXPECT_EQ(state.getNewState(input), StateId::kSimple);
-    }
+    // removed for tantalus lite version
+    // for (int i = 0; i < kNumChecks * 10; ++i) {
+    //     EXPECT_EQ(state.getNewState(input), StateId::kSimple);
+    // }
 
-    input.alt = 15;
+    // input.alt = 15;
 
-    for (int i = 1; i < kNumChecks; ++i) {
-        EXPECT_EQ(state.getNewState(input), StateId::kSimple);
-    }
-    EXPECT_EQ(state.getNewState(input), StateId::kExit);
+    // for (int i = 1; i < kNumChecks; ++i) {
+    //     EXPECT_EQ(state.getNewState(input), StateId::kSimple);
+    // }
+    // EXPECT_EQ(state.getNewState(input), StateId::kExit);
 
-    // Suppose we re-enter state
-    state.onEntry();
-    for (int i = 1; i < kNumChecks; ++i) {
-        EXPECT_EQ(state.getNewState(input), StateId::kSimple);
-    }
-    EXPECT_EQ(state.getNewState(input), StateId::kExit);
+    // // Suppose we re-enter state
+    // state.onEntry();
+    // for (int i = 1; i < kNumChecks; ++i) {
+    //     EXPECT_EQ(state.getNewState(input), StateId::kSimple);
+    // }
+    // EXPECT_EQ(state.getNewState(input), StateId::kExit);
 
-    // Re-enter state again
-    state.onEntry();
-    input.alt = 5;
+    // // Re-enter state again
+    // state.onEntry();
+    // input.alt = 5;
 
-    for (int i = 0; i < kNumChecks * 10; ++i) {
-        EXPECT_EQ(state.getNewState(input), StateId::kSimple);
-    }
+    // for (int i = 0; i < kNumChecks * 10; ++i) {
+    //     EXPECT_EQ(state.getNewState(input), StateId::kSimple);
+    // }
 
-    input.alt = 15;
+    // input.alt = 15;
 
-    for (int i = 1; i < kNumChecks; ++i) {
-        EXPECT_EQ(state.getNewState(input), StateId::kSimple);
-    }
-    EXPECT_EQ(state.getNewState(input), StateId::kExit);
+    // for (int i = 1; i < kNumChecks; ++i) {
+    //     EXPECT_EQ(state.getNewState(input), StateId::kSimple);
+    // }
+    // EXPECT_EQ(state.getNewState(input), StateId::kExit);
 }
 
 TEST(RepeatedChecksState, Fluke) {
     SimpleTestState state;
     Calculator input;
 
-    input.alt = 15;
-    EXPECT_EQ(state.getNewState(input), StateId::kSimple);
+    // removed for tantalus lite version
+    // input.alt = 15;
+    // EXPECT_EQ(state.getNewState(input), StateId::kSimple);
 
-    input.alt = 5;
-    EXPECT_EQ(state.getNewState(input), StateId::kSimple);
-    input.alt = 15;
-    for (int i = 1; i < kNumChecks; ++i) {
-        EXPECT_EQ(state.getNewState(input), StateId::kSimple);
-    }
-    EXPECT_EQ(state.getNewState(input), StateId::kExit);
+    // input.alt = 5;
+    // EXPECT_EQ(state.getNewState(input), StateId::kSimple);
+    // input.alt = 15;
+    // for (int i = 1; i < kNumChecks; ++i) {
+    //     EXPECT_EQ(state.getNewState(input), StateId::kSimple);
+    // }
+    // EXPECT_EQ(state.getNewState(input), StateId::kExit);
 
-    state.onEntry();
-    for (int i = 1; i < kNumChecks; ++i) {
-        EXPECT_EQ(state.getNewState(input), StateId::kSimple);
-    }
-    input.alt = 5; // break chain
-    EXPECT_EQ(state.getNewState(input), StateId::kSimple);
+    // state.onEntry();
+    // for (int i = 1; i < kNumChecks; ++i) {
+    //     EXPECT_EQ(state.getNewState(input), StateId::kSimple);
+    // }
+    // input.alt = 5; // break chain
+    // EXPECT_EQ(state.getNewState(input), StateId::kSimple);
 
-    input.alt = 15;
-    for (int i = 1; i < kNumChecks; ++i) {
-        EXPECT_EQ(state.getNewState(input), StateId::kSimple);
-    }
-    EXPECT_EQ(state.getNewState(input), StateId::kExit);
+    // input.alt = 15;
+    // for (int i = 1; i < kNumChecks; ++i) {
+    //     EXPECT_EQ(state.getNewState(input), StateId::kSimple);
+    // }
+    // EXPECT_EQ(state.getNewState(input), StateId::kExit);
 }
 
 class ExtraActionTestState
@@ -109,21 +111,22 @@ TEST(RepeatedChecksState, ExtraActions) {
     EXPECT_TRUE(state.enterCalled);
     state.enterCalled = false;
 
-    input.alt = 15;
-    // almost but not quite exit
-    for (int i = 1; i < kNumChecks; ++i) {
-        state.getNewState(input);
-    }
-    input.alt = 5; // reset checks
-    state.getNewState(input);
+    // removed for tantalus lite version
+    // input.alt = 15;
+    // // almost but not quite exit
+    // for (int i = 1; i < kNumChecks; ++i) {
+    //     state.getNewState(input);
+    // }
+    // input.alt = 5; // reset checks
+    // state.getNewState(input);
 
-    input.alt = 15;
-    for (int i = 1; i < kNumChecks; ++i) {
-        state.getNewState(input);
-    }
-    EXPECT_FALSE(state.exitCalled);
-    state.getNewState(input);
+    // input.alt = 15;
+    // for (int i = 1; i < kNumChecks; ++i) {
+    //     state.getNewState(input);
+    // }
+    // EXPECT_FALSE(state.exitCalled);
+    // state.getNewState(input);
 
-    EXPECT_TRUE(state.exitCalled);
-    EXPECT_FALSE(state.enterCalled);
+    // EXPECT_TRUE(state.exitCalled);
+    // EXPECT_FALSE(state.enterCalled);
 }

@@ -1,7 +1,7 @@
 #include "states/main_descent.h"
 #include "HAL/time.h"
 
-StateId State::MainDescent::getNewState(Calculator const &input) {
+StateId State::MainDescent::getNewState(Calculator const &input, Hal::t_point const) {
     typedef std::chrono::milliseconds ms;
 
     if (curr_time - prev_time >= LANDED_TIME_INTERVAL_) {

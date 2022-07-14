@@ -26,7 +26,7 @@ class MachLock : public IState {
      * @return State enumeration code, to be passed into the std::map between
      * codes and used states. Note that the returned code may be the same state.
      */
-    StateId getNewState(Calculator const &input) {
+    StateId getNewState(Calculator const &input, Hal::t_point const) {
         if (input.velocityGroundZ() < MACH_UNLOCK_VELOCITY_) {
             ++mach_checks_;
             if (mach_checks_ >= MACH_UNLOCK_CHECKS_) {

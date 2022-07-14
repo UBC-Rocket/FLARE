@@ -34,6 +34,7 @@ struct StateMachineConfig {
     constexpr static int LAND_CHECKS = 6;
     constexpr static float LAND_VELOCITY_THRESHOLD = 4;
 
+    constexpr static long APOGEE_LOCKOUT = 24000;
     constexpr static long APOGEE_PRESSURE_DELAY = 3000;
     constexpr static long LANDING_TIME_INTERVAL = 10000;
     constexpr static long TOGGLE_CAMERA_INTERVAL = 200;
@@ -64,7 +65,7 @@ struct StateMachineConfig {
                        Camera &camera)
         : standby(LAUNCH_THRESHOLD, camera),
           coast(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, APOGEE_CHECKS,
-                MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD,
+                MACH_LOCK_CHECKS, MACH_LOCK_VELOCITY_THRESHOLD, APOGEE_LOCKOUT,
                 ignitors.drogue, ignitors.redundantDrogue),
           mach_lock(StateId::ASCENT_TO_APOGEE, MACH_UNLOCK_CHECKS,
                     MACH_UNLOCK_VELOCITY_THRESHOLD, MACH_UNLOCK_TIME_THRESHOLD),

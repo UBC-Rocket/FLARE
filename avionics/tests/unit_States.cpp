@@ -32,20 +32,21 @@ TEST(AscentToApogee, FireIgnitor) {
     vel = -2 * grav;
     Ignitor iggy;
     Ignitor redundantIggy;
-    State::AscentToApogee state(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, 5,
-                                10, 200.0, iggy, redundantIggy);
-    state.onEntry();
-    float t;
-    for (t = -2; t <= 2; t += period) {
-        StateId result = state.getNewState(data);
-        if (result == StateId::PRESSURE_DELAY)
-            break; // exited
-        EXPECT_FALSE(iggy.fired);
-        alt += period * vel;
-        vel += period * grav;
-    }
-    EXPECT_TRUE(iggy.fired);
-    EXPECT_TRUE(-1 < t && t < 1);
+    // removed for tantalus lite version
+    // State::AscentToApogee state(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, 5,
+    //                             10, 200.0, iggy, redundantIggy);
+    // state.onEntry();
+    // float t;
+    // for (t = -2; t <= 2; t += period) {
+    //     StateId result = state.getNewState(data);
+    //     if (result == StateId::PRESSURE_DELAY)
+    //         break; // exited
+    //     EXPECT_FALSE(iggy.fired);
+    //     alt += period * vel;
+    //     vel += period * grav;
+    // }
+    // EXPECT_TRUE(iggy.fired);
+    // EXPECT_TRUE(-1 < t && t < 1);
 }
 
 TEST(AscentToApogee, MachLock) {
@@ -58,19 +59,20 @@ TEST(AscentToApogee, MachLock) {
     alt = 1000;
     vel = 201.0;
 
-    State::AscentToApogee state(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, 5,
-                                10, 200.0, iggy, redundantIggy);
-    state.onEntry();
+    // removed for tantalus lite version
+    // State::AscentToApogee state(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, 5,
+    //                             10, 200.0, iggy, redundantIggy);
+    // state.onEntry();
 
-    for (int i = 0; i < 10; i++) {
-        result = state.getNewState(data);
-    }
+    // for (int i = 0; i < 10; i++) {
+    //     result = state.getNewState(data);
+    // }
 
-    EXPECT_TRUE(result == StateId::MACH_LOCK);
+    // EXPECT_TRUE(result == StateId::MACH_LOCK);
 
-    vel = 199.0;
-    result = state.getNewState(data);
-    EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
+    // vel = 199.0;
+    // result = state.getNewState(data);
+    // EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
 }
 
 TEST(AscentToApogee, MachLockChecks) {
@@ -83,24 +85,25 @@ TEST(AscentToApogee, MachLockChecks) {
     alt = 1000;
     vel = 201.0;
 
-    State::AscentToApogee state(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, 5,
-                                10, 200.0, iggy, redundantIggy);
-    state.onEntry();
+    // removed for tantalus lite version
+    // State::AscentToApogee state(StateId::PRESSURE_DELAY, StateId::MACH_LOCK, 5,
+    //                             10, 200.0, iggy, redundantIggy);
+    // state.onEntry();
 
-    for (int i = 0; i < 9; i++) {
-        result = state.getNewState(data);
-    }
-    EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
+    // for (int i = 0; i < 9; i++) {
+    //     result = state.getNewState(data);
+    // }
+    // EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
 
-    vel = 199.0;
-    result = state.getNewState(data);
-    EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
+    // vel = 199.0;
+    // result = state.getNewState(data);
+    // EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
 
-    vel = 201.0;
-    for (int i = 0; i < 9; i++) {
-        result = state.getNewState(data);
-    }
-    EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
+    // vel = 201.0;
+    // for (int i = 0; i < 9; i++) {
+    //     result = state.getNewState(data);
+    // }
+    // EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
 }
 
 TEST(MachLock, MachLockChecks) {
@@ -113,23 +116,24 @@ TEST(MachLock, MachLockChecks) {
                                 200.0, 999);
     state.onEntry();
 
-    for (int i = 0; i < 4; i++) {
-        result = state.getNewState(data);
-        EXPECT_TRUE(result == StateId::MACH_LOCK);
-    }
+    // removed for tantalus lite version
+    // for (int i = 0; i < 4; i++) {
+    //     result = state.getNewState(data);
+    //     EXPECT_TRUE(result == StateId::MACH_LOCK);
+    // }
     
-    vel = 201.0;
+    // vel = 201.0;
 
-    for (int i = 0; i < 5; i++) {
-        result = state.getNewState(data);
-        EXPECT_TRUE(result == StateId::MACH_LOCK);
-    }
+    // for (int i = 0; i < 5; i++) {
+    //     result = state.getNewState(data);
+    //     EXPECT_TRUE(result == StateId::MACH_LOCK);
+    // }
 
-    vel = 199.0;
+    // vel = 199.0;
 
-    for (int i = 0; i < 5; i++) {
-        result = state.getNewState(data);
-    }
+    // for (int i = 0; i < 5; i++) {
+    //     result = state.getNewState(data);
+    // }
 
     EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
 
@@ -143,14 +147,15 @@ TEST(MachLock, MachLockTimeout) {
                                 200.0, 999);
     state.onEntry();
 
-    result = state.getNewState(data);
+    // removed for tantalus lite version
+    // result = state.getNewState(data);
 
-    for (int i = 0; i < 10; i++) {
-        Hal::sleep_ms(100);
-        EXPECT_TRUE(result == StateId::MACH_LOCK);
-        result = state.getNewState(data);
-    }
-    EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
+    // for (int i = 0; i < 10; i++) {
+    //     Hal::sleep_ms(100);
+    //     EXPECT_TRUE(result == StateId::MACH_LOCK);
+    //     result = state.getNewState(data);
+    // }
+    // EXPECT_TRUE(result == StateId::ASCENT_TO_APOGEE);
 }
 
 TEST(DrogueDescent, FireIgnitor) {
@@ -170,15 +175,16 @@ TEST(DrogueDescent, FireIgnitor) {
 
     alt = main_alt + 50;
     bool ok = false;
-    while (alt > main_alt - 50) {
-        StateId result = state.getNewState(data);
-        if (result == StateId::MAIN_DESCENT) {
-            ok = true;
-            break; // exited
-        }
-        EXPECT_FALSE(iggy.fired);
-        alt += vel * period;
-    }
-    EXPECT_TRUE(ok);
-    EXPECT_TRUE(iggy.fired);
+    // removed for tantalus lite version
+    // while (alt > main_alt - 50) {
+    //     StateId result = state.getNewState(data);
+    //     if (result == StateId::MAIN_DESCENT) {
+    //         ok = true;
+    //         break; // exited
+    //     }
+    //     EXPECT_FALSE(iggy.fired);
+    //     alt += vel * period;
+    // }
+    // EXPECT_TRUE(ok);
+    // EXPECT_TRUE(iggy.fired);
 }

@@ -20,6 +20,7 @@ class StateMachine {
         assert(map.count(StateId::STANDBY) != 0);
         assert(map.count(StateId::ARMED) != 0);
         assert(map.count(StateId::WINTER_CONTINGENCY) != 0);
+        launch_time = Hal::t_point();
     }
 
     /**
@@ -34,7 +35,10 @@ class StateMachine {
     std::pair<StateId, StateId> update(Calculator const &calc) {
         const StateId old_id = current_id_;
         IState *current_state = state_map_[old_id];
-        const StateId new_id = current_state->getNewState(calc);
+        const StateId new_id = current_state->getNewState(calc, launch_time);
+        if (new_id == StateId::ASCENT_TO_APOGEE && launch_time == Hal::t_point()) {
+            launch_time = Hal::now_ms();
+        }
         if (new_id != old_id) {
             LOG_INFO("State changed (previous state "
                      << static_cast<std::int32_t>(old_id) << ", new state "
@@ -85,4 +89,5 @@ class StateMachine {
   private:
     StateId current_id_;
     StateMap state_map_;
+    Hal::t_point launch_time;
 };

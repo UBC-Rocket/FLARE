@@ -4,6 +4,7 @@
 
 #include "calculations.h"
 #include "state_id_enum.hpp"
+#include "HAL/time.h"
 
 // Need to specify hash for StateId, since scoped enums aren't allowed as hash
 // keys until C++14
@@ -29,7 +30,7 @@ class IState {
      * @return State enumeration code, to be passed into the std::map between
      * codes and used states. Note that the returned code may be the same state.
      */
-    virtual StateId getNewState(Calculator const &input) = 0;
+    virtual StateId getNewState(Calculator const &input, Hal::t_point const launch_time) = 0;
 
     /**
      * @brief Optional method that runs when entering a state from a different
