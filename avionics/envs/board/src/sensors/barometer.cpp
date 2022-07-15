@@ -6,6 +6,9 @@ Barometer::Barometer(float *const buf) : SensorBase(buf) {
     /*init barometer*/
 #ifdef TESTING
     SerialUSB.println("Initializing barometer");
+    #ifdef STAGE2
+        SerialUSB.println("for stage 2");
+    #endif
     // replaced for tantalus lite version
     // if (!barometer.initializeMS_5803(true)) { // because one is verbose
     //     return CRITICAL_FAILURE;
@@ -46,12 +49,11 @@ void Barometer::readData() {
     // data_[0] = barometer.pressure() * 100;
     // data_[1] = barometer.temperature();
 
-    // TODO: DETERMINE UNITS
 #ifdef STAGE2
-    data_[0] = bmp.getPressure();
+    data_[0] = bmp.getPressure() * 100; // MS5611 gives mbar, we want Pa
     data_[1] = bmp.getTemperature(); 
 #else
-    data_[0] = bmp.readPressure();
+    data_[0] = bmp.readPressure(); // BMP085 gives Pa
     data_[1] = bmp.readTemperature(); 
 #endif
 }
