@@ -25,5 +25,5 @@ class Accelerometer : public SensorBase<ACCELEROMETER_DATA_LENGTH> {
     // LIS331 accelerometer;
     int16_t x, y, z;
     void getRawAccel(int16_t* ax, int16_t* ay, int16_t* az);
-    int Accelerometer::twosComplementToInt(int16_t input);
+    int twosComplementToInt(int16_t input);
 };

@@ -62,7 +62,7 @@ public:
    * @param wire The I2C interface to use, defaults to Wire
    * @return Returns true if successful
    */
-  bool begin(uint8_t mode = BMP085_ULTRAHIGHRES, TwoWire *wire = &Wire);
+  bool begin(uint8_t mode = BMP085_ULTRAHIGHRES, TwoWire *wire = &WireKinetis);
   /*!
    * @brief Gets the temperature over I2C from the BMP085
    * @return Returns the temperature

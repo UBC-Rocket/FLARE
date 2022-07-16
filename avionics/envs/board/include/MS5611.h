@@ -57,9 +57,9 @@ public:
   explicit MS5611(uint8_t deviceAddress = MS5611_DEFAULT_ADDRESS);
 
 #if defined (ESP8266) || defined(ESP32)
-  bool     begin(uint8_t sda, uint8_t scl, TwoWire *wire = &Wire);
+  bool     begin(uint8_t sda, uint8_t scl, TwoWire *wire = &WireKinetis);
 #endif
-  bool     begin(TwoWire *wire = &Wire);
+  bool     begin(TwoWire *wire = &WireKinetis);
   bool     isConnected();
 
   // reset command + get constants
