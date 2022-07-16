@@ -20,7 +20,36 @@ Accelerometer::Accelerometer(float *const buf) : SensorBase(buf) {
     WireKinetis.endTransmission();
     delay(10);
 
+    byte _s = B00000011; // stole more code from SEEED, this sets the range to +/-16g
+    byte _b;
+
+    readFromReg(0x53, 1, &_b);
+    _s |= (_b & B11101100);
+    writeToReg(0x53, _s);
+
     status = SensorStatus::NOMINAL;
+}
+
+void Accelerometer::readFromReg(byte address, int num, byte _buff[]) { // stolen from the SEEED ADXL345 library
+  WireKinetis.beginTransmission(0x53); // start transmission to device
+  WireKinetis.write(address);             // sends address to read from
+  WireKinetis.endTransmission();         // end transmission
+
+  WireKinetis.beginTransmission(0x53); // start transmission to device
+  WireKinetis.requestFrom(0x53, num);    // request 6 bytes from device
+
+  int i = 0;
+  while (WireKinetis.available()) {      // device may send less than requested (abnormal)
+    _buff[i] = WireKinetis.read();    // receive a byte
+    i++;
+  }
+  WireKinetis.endTransmission();         // end transmission
+}
+void Accelerometer::writeToReg(byte address, byte val) {
+  WireKinetis.beginTransmission(0x53); // start transmission to device
+  WireKinetis.write(address);             // send register address
+  WireKinetis.write(val);                 // send value to write
+  WireKinetis.endTransmission();         // end transmission
 }
 
 void Accelerometer::getRawAccel(int16_t* ax, int16_t* ay, int16_t* az) {
