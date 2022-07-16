@@ -26,4 +26,6 @@ class Accelerometer : public SensorBase<ACCELEROMETER_DATA_LENGTH> {
     int16_t x, y, z;
     void getRawAccel(int16_t* ax, int16_t* ay, int16_t* az);
     int twosComplementToInt(int16_t input);
+    void writeToReg(byte address, byte val);
+    void readFromReg(byte address, int num, byte _buff[]);
 };
