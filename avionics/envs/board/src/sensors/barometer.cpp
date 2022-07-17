@@ -49,11 +49,27 @@ void Barometer::readData() {
     // data_[0] = barometer.pressure() * 100;
     // data_[1] = barometer.temperature();
 
+    // TODO: Create abstract barometer so we can use any barometer library here
 #ifdef STAGE2
+    bmp.read();
     data_[0] = bmp.getPressure() * 100; // MS5611 gives mbar, we want Pa
     data_[1] = bmp.getTemperature(); 
+    #ifdef TESTING
+        SerialUSB.print("pressure: ");
+        SerialUSB.print(bmp.getPressure() * 100);
+        SerialUSB.print("Pa, temp: ");
+        SerialUSB.print(bmp.getTemperature());
+        SerialUSB.println("degC");
+    #endif
 #else
     data_[0] = bmp.readPressure(); // BMP085 gives Pa
     data_[1] = bmp.readTemperature(); 
+    #ifdef TESTING
+        SerialUSB.print("pressure: ");
+        SerialUSB.print(bmp.readPressure());
+        SerialUSB.print("Pa, temp: ");
+        SerialUSB.print(bmp.readTemperature());
+        SerialUSB.println("degC");
+    #endif
 #endif
 }

@@ -69,7 +69,7 @@ class SensorCollection {
     //     "Accel (x)(g), Accel (y)(g), Accel (z)(g), IMU (w), IMU(x), IMU(y), "
     //     "IMU(z), Voltage (V), Temperature (C)";
     constexpr static char LOG_FILE_HEADER[] =
-        "Pressure (mbar), Barom. Temp (C), Accel (x)(g), Accel (y)(g), Accel (z)(g)";
+        "Pressure (Pa), Barom. Temp (C), Accel (x)(g), Accel (y)(g), Accel (z)(g)";
 
     Barometer barometer;
     // GPS gps; // removed for lite version

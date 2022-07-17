@@ -28,7 +28,7 @@ class CSVWriteImpl {
      */
     template <typename T> void print(T t) {
         m_datalog.print(t);
-        m_datalog.print(",");
+        // m_datalog.print(","); // this creates extra commas in the datalog.csv file
     }
 
     /**
