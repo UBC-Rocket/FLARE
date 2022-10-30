@@ -76,16 +76,16 @@ void Accelerometer::readData(void) {
     // data_[1] = accelerometer.convertToG(ACCELEROMETER_SCALE, y);
     // data_[2] = accelerometer.convertToG(ACCELEROMETER_SCALE, z);
     getRawAccel(&x, &y, &z);
-    data_[0] = twosComplementToInt(x) / 256.0;
+    data_[0] = twosComplementToInt(z) / 256.0; // accel directions are swapped due to sensor orientation
     data_[1] = twosComplementToInt(y) / 256.0;
-    data_[2] = twosComplementToInt(z) / 256.0;
+    data_[2] = -twosComplementToInt(x) / 256.0;
 #ifdef TESTING
     SerialUSB.print("ax: ");
-    SerialUSB.print(twosComplementToInt(x) / 256.0);
+    SerialUSB.print(twosComplementToInt(z) / 256.0); // accel directions are swapped due to sensor orientation
     SerialUSB.print(", ay: ");
     SerialUSB.print(twosComplementToInt(y) / 256.0);
     SerialUSB.print(", az: ");
-    SerialUSB.print(twosComplementToInt(z) / 256.0);
+    SerialUSB.print(-twosComplementToInt(x) / 256.0);
     SerialUSB.println();
 #endif
 }
