@@ -78,6 +78,7 @@ PLEASE READ ME!
 #include "env_config.h"
 
 #include "log.hpp"
+#include "options.h"
 
 /**
  * @brief Helper function that makes things less verbose; basically saves the
@@ -86,6 +87,60 @@ PLEASE READ ME!
 void registerTask(TaskID id, Scheduler::Task task, bool repeat = true,
                   bool early = false) {
     Scheduler::registerTask(static_cast<int>(id), task, repeat, early);
+}
+
+// added for tantalus lite version
+// this really shouldnt be here but importing buzzer is very finnicky so this has been copied over
+void buzz(long frequency, long length) {
+    const Pin M_MELODY_PIN = Pin::BUZZER;
+    long delayValue = 1000000 / frequency / 2; // delay between transitions
+    // 1 000 000 microseconds, divided by the frequency, divided by 2 b/c
+    // there are two phases to each cycle
+    long numCycles = frequency * length / 1000; // #of cycles for proper timing
+    // multiply frequency = cycles per second, by the number of seconds to
+    // get the total number of cycles to produce
+    for (long i = 0; i < numCycles; i++) { // for the calculated length of time
+        Hal::digitalWrite(
+            M_MELODY_PIN,
+            Hal::PinDigital::HI); // write high to push out the diaphram
+        Hal::sleep_us(delayValue);  // wait for the calculated delay value
+        Hal::digitalWrite(
+            M_MELODY_PIN,
+            Hal::PinDigital::LO); // write low to pull back the diaphram
+        Hal::sleep_us(delayValue); // wait for the calculated delay value
+    }
+    Hal::sleep_ms(100);
+}
+
+void singStartup() {
+    const int NOTE_A4 = 440;
+    const int NOTE_F4 = 349;
+    const int NOTE_C5 = 523;
+    const int NOTE_E5 = 659;
+    const int NOTE_F5 = 698;
+    const int NOTE_GS4 = 415;
+
+#ifdef STAGE2
+    buzz(NOTE_A4, 400);
+    buzz(NOTE_A4, 400);    
+    buzz(NOTE_A4, 400);
+    buzz(NOTE_F4, 250);
+    buzz(NOTE_C5, 100);  
+    buzz(NOTE_A4, 400);
+    buzz(NOTE_F4, 250);
+    buzz(NOTE_C5, 100);
+    buzz(NOTE_A4, 400);
+#else
+    buzz(NOTE_E5, 400);
+    buzz(NOTE_E5, 400);
+    buzz(NOTE_E5, 400);  
+    buzz(NOTE_F5, 250);
+    buzz(NOTE_C5, 100);
+    buzz(NOTE_GS4, 400);
+    buzz(NOTE_F4, 250);
+    buzz(NOTE_C5, 100);
+    buzz(NOTE_A4, 400);
+#endif
 }
 
 /* Main function ====================================================== */
@@ -147,6 +202,7 @@ int main(void) {
     switch (init_status) {
     case RocketStatus::NOMINAL:
         Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
+        singStartup();
         break;
     case RocketStatus::NONCRITICAL_FAILURE:
         registerTask(TaskID::LEDBlinker, led_blink);
