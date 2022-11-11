@@ -9,20 +9,29 @@ namespace State {
 
 class MachLock : public IState {
   public:
+
+    /**
+     * @brief Construct a new Mach Lock object
+     * @param next_id 
+     * @param MACH_UNLOCK_CHECKS 
+     * @param MACH_UNLOCK_VELOCITY 
+     * @param MACH_UNLOCK_TIME 
+     */
     MachLock(StateId next_id, uint8_t const MACH_UNLOCK_CHECKS, 
             float MACH_UNLOCK_VELOCITY, uint32_t MACH_UNLOCK_TIME)
         : next_id_(next_id), MACH_UNLOCK_CHECKS_(MACH_UNLOCK_CHECKS),
           MACH_UNLOCK_VELOCITY_(MACH_UNLOCK_VELOCITY), MACH_UNLOCK_TIME_(MACH_UNLOCK_TIME) {}
 
-    /*
+    /**
      * @brief Return the assigned enumeration code.
      * @return Enumeration code.
      */
     StateId getStateEnum(void) { return StateId::ASCENT_TO_APOGEE; }
 
-    /*
+    /**
      * @brief Return the next state, based on input data (mostly from filtered
      * sensor data)
+     * @param input reference to input
      * @return State enumeration code, to be passed into the std::map between
      * codes and used states. Note that the returned code may be the same state.
      */
@@ -43,6 +52,10 @@ class MachLock : public IState {
         }
     }
 
+    /**
+     * @brief todo add description
+     * 
+     */
     void onEntry() override {
         mach_checks_ = 0;
         initial_time_ = Hal::millis();

@@ -7,6 +7,10 @@ namespace State {
 
 class WinterContingency : public IState {
   public:
+
+  /**
+   * @brief Construct a new Winter Contingency object
+   */
     WinterContingency() {}
 
     /**

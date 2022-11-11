@@ -38,6 +38,9 @@ class Ignitor : public IIgnitor {
      */
     Ignitor(Pin ignitePin, Pin continuityPin, Pin continuityADCPin);
 
+    /**
+     * @brief fires ignitor at pin ignitePin_
+     */
     void fire() override;
 
   private:

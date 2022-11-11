@@ -28,11 +28,24 @@
 #include "status_enums.h"
 
 /*Functions------------------------------------------------------------*/
+
+/**
+ * @brief updates currentStatus to incomingStatus if incomingStatus > currentStatus
+ * @param currentStatus 
+ * @param incomingStatus 
+ */
 void raiseToStatus(RocketStatus &currentStatus, RocketStatus incomingStatus);
 
 class SensorCollection;
 class IgnitorCollection;
 
+/**
+ * @brief get current status of sensors and calls raiseToStatus to check if ignitors.getStatus() > sensors.get_status()
+ * 
+ * @param sensors used to get current status of sensors
+ * @param ignitors can be used to update status of sensors
+ * @return status of sensors
+ */
 RocketStatus collectStatus(SensorCollection &sensors,
                            IgnitorCollection &ignitors);
 

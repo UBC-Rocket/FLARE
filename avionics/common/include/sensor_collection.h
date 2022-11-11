@@ -70,6 +70,9 @@ class SensorCollection {
     Battery battery;
     Temperature temperature;
     
+    /**
+     * @brief Construct a new Sensor Collection object
+     */
     SensorCollection();
 
     /**
@@ -90,8 +93,16 @@ class SensorCollection {
      */
     RocketStatus getStatus(bool refresh = false);
     const uint8_t *getStatusBitfield() const { return status_bitfield_; }
+
+    /**
+     * @brief update status of sensors to CRITICAL_FAILURE/NONCRITICAL_FAILURE if sensor experiences FAILURE
+     */
     void updateStatus();
 
+    /**
+     * @brief Get the sensor_data array from SensorCollection
+     * @return sensor_data array from SensorCollection
+     */
     const std::array<float, DATA_LENGTH> &getData() const {
         return sensor_data;
     }

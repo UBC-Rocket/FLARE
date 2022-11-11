@@ -9,6 +9,16 @@ namespace State {
 
 class AscentToApogee : public IState {
   public:
+
+    /**
+     * @brief Construct a new Ascent To Apogee object
+     * @param post_apogee_id 
+     * @param mach_lock_id 
+     * @param APOGEE_CHECKS 
+     * @param MACH_LOCK_CHECKS 
+     * @param MACH_LOCK_VELOCITY 
+     * @param drogue_ignitor 
+     */
     AscentToApogee(StateId post_apogee_id, StateId mach_lock_id,
                    uint8_t const APOGEE_CHECKS, uint8_t const MACH_LOCK_CHECKS,
                    float MACH_LOCK_VELOCITY, Ignitor &drogue_ignitor)
@@ -16,13 +26,13 @@ class AscentToApogee : public IState {
           MACH_LOCK_VELOCITY_(MACH_LOCK_VELOCITY), post_apogee_id_(post_apogee_id), 
           mach_lock_id_(mach_lock_id), drogue_ignitor_(drogue_ignitor) {}
 
-    /*
+    /**
      * @brief Return the assigned enumeration code.
      * @return Enumeration code.
      */
     StateId getStateEnum(void) { return StateId::ASCENT_TO_APOGEE; }
 
-    /*
+    /**
      * @brief Return the next state, based on input data (mostly from filtered
      * sensor data)
      * @return State enumeration code, to be passed into the std::map between
@@ -52,6 +62,9 @@ class AscentToApogee : public IState {
         }
     }
 
+    /**
+     * @brief todo add description
+     */
     void onEntry() override {
         apogee_checks_ = 0;
         mach_checks_ = 0;
