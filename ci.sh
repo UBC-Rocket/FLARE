@@ -36,7 +36,9 @@ cd ..
 
 # PlatformIO
 pip install -U platformio
-pio update
+cd FLARE
+pio pkg update
+cd ..
 
 
   #####################################
