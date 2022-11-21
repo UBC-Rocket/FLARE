@@ -49,17 +49,7 @@ class MainDescent : public IState {
     const Calculator &calc_;
 
     float prev_altitude;
-
-    /**
-     * @brief todo
-     * 
-     */
     Hal::t_point prev_time{Hal::now_ms()}; // time_point
-
-    /**
-     * @brief todo
-     * 
-     */
     Hal::t_point curr_time{Hal::now_ms()};
     uint8_t num_checks = 0;
 };

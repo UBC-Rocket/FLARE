@@ -48,7 +48,7 @@ class CommandReceiver {
     CommandReceiver(Rocket &rocket) : rocket_(rocket) {}
 
     /**
-     * @brief sends various information from sensors based on command 
+     * @brief performs some action depedning on the information from sensors based on command 
      * @param command selects which information is sent
      */
     void run_command(Radio::command_t command) {

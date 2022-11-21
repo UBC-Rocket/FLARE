@@ -11,7 +11,7 @@ class AscentToApogee : public IState {
   public:
 
     /**
-     * @brief Construct a new Ascent To Apogee object
+     * @brief Construct a new state object
      * @param post_apogee_id 
      * @param mach_lock_id 
      * @param APOGEE_CHECKS 
@@ -63,7 +63,7 @@ class AscentToApogee : public IState {
     }
 
     /**
-     * @brief todo add description
+     * @brief Initialize AscentToApogee state
      */
     void onEntry() override {
         apogee_checks_ = 0;

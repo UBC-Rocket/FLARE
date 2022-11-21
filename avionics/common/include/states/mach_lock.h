@@ -53,7 +53,7 @@ class MachLock : public IState {
     }
 
     /**
-     * @brief todo add description
+     * @brief Initialize MachLock state
      * 
      */
     void onEntry() override {

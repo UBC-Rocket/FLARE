@@ -46,7 +46,7 @@ class Buffer {
 
     /**
      * @brief Write data to the last allocated subpacket.
-     * @param byte todo
+     * @param byte byte of data to be written
      */
     void write(uint8_t byte);
 
@@ -82,7 +82,6 @@ class Buffer {
 
     /**
      * @brief Returns how many bytes are in use in the data buffer.
-     * @return todo
      */
     int usage();
 

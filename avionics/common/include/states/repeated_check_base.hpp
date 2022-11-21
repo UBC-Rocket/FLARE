@@ -64,8 +64,8 @@ class RepeatedCheckBase : public IState {
     StateId getStateEnum(void) final override { return my_id; }
 
     /**
-     * @brief todo
-     * 
+     * @brief Initialize generic states
+     *
      */
     void onEntry() final override {
         checks_ = 0;
@@ -87,7 +87,7 @@ class RepeatedCheckBase : public IState {
 
     /**
      * @brief Alias for underlying `accept` function.
-     * @return todo
+     * @return boolean if condition is accepted
      */
     bool accept(Calculator const &input) {
         return static_cast<Derived *>(this)->accept(input);

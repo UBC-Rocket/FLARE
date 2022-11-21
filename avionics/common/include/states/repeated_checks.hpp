@@ -38,7 +38,7 @@ class Standby : public RepeatedCheckBase<StateId::STANDBY, next_id, num_checks,
     // rocket command parser addresses camera on/off
 
     /**
-     * @brief todo
+     * @brief additional logic ran when exiting a state
      */
     void extraOnExit() { camera_.start_record(); }
 };
@@ -99,7 +99,7 @@ class DrogueDescent
     }
 
     /**
-     * @brief todo
+     * @brief additional logic ran when exiting a state
      * 
      */
     void extraOnExit() { ignitor_.fire(); }

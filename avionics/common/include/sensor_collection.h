@@ -100,8 +100,8 @@ class SensorCollection {
     void updateStatus();
 
     /**
-     * @brief Get the sensor_data array from SensorCollection
-     * @return sensor_data array from SensorCollection
+     * @brief Get the current array of sensor data
+     * @return current array of sensor data
      */
     const std::array<float, DATA_LENGTH> &getData() const {
         return sensor_data;

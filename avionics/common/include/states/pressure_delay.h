@@ -33,7 +33,7 @@ class PressureDelay : public IState {
     StateId getNewState(Calculator const &);
 
     /**
-     * @brief todo
+     * @brief Initialize PressureDelay state
      */
     void onEntry() { start_time_ = Hal::now_ms(); }
 
