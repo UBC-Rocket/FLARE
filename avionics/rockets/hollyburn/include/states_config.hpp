@@ -4,8 +4,10 @@
 
 #include "calculations.h"
 #include "ignitor_collection.h"
-#include "states/repeated_checks.hpp"
 
+#include "states/standby.h"
+#include "states/armed.h"
+#include "states/drogue_descent.h"
 #include "states/ascent_to_apogee.h"
 #include "states/landed.h"
 #include "states/mach_lock.h"

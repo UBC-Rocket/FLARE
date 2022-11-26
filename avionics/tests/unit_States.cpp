@@ -9,8 +9,10 @@ struct Ignitor {
 
 #include "states/ascent_to_apogee.h"
 #include "states/mach_lock.h"
-#include "states/repeated_checks.hpp"
 
+#include "states/armed.h"
+#include "states/drogue_descent.h"
+#include "states/standby.h"
 // Mocking time.cpp
 namespace Hal {
     uint32_t current_time_;

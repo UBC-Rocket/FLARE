@@ -1,8 +1,0 @@
-#ifndef STATES_REPEATED_CHECKS_HPP_5A521F841076442ABBD5520A3B85FC2B
-#define STATES_REPEATED_CHECKS_HPP_5A521F841076442ABBD5520A3B85FC2B
-
-#include "standby.h"
-#include "armed.h"
-#include "drogue_descent.h"
-
-#endif
