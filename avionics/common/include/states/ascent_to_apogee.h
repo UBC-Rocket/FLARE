@@ -9,15 +9,14 @@ namespace State {
 
 class AscentToApogee : public IState {
   public:
-
     /**
      * @brief Construct a new state object
-     * @param post_apogee_id 
-     * @param mach_lock_id 
-     * @param APOGEE_CHECKS 
-     * @param MACH_LOCK_CHECKS 
-     * @param MACH_LOCK_VELOCITY 
-     * @param drogue_ignitor 
+     * @param post_apogee_id
+     * @param mach_lock_id
+     * @param APOGEE_CHECKS number of apogee checks required before drogue_ignitor_.fire()
+     * @param MACH_LOCK_CHECKS number of mach lock checks required before next state
+     * @param MACH_LOCK_VELOCITY minimum velocity required before next state
+     * @param drogue_ignitor
      */
     AscentToApogee(StateId post_apogee_id, StateId mach_lock_id,
                    uint8_t const APOGEE_CHECKS, uint8_t const MACH_LOCK_CHECKS,

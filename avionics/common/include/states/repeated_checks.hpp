@@ -12,7 +12,7 @@ class Standby : public RepeatedCheckBase<StateId::STANDBY, next_id, num_checks,
   public:
 
     /**
-     * @brief Construct a new Standby object
+     * @brief Construct a new state object
      * @param launch_threshold 
      * @param camera 
      */
@@ -26,9 +26,9 @@ class Standby : public RepeatedCheckBase<StateId::STANDBY, next_id, num_checks,
     Camera &camera_;
 
     /**
-     * @brief compares altitude of parameter vs launch_threshold_
-     * @param input altitude 
-     * @return true if input.altitude() > launch_threshold_
+     * @brief compares current altitude vs launch_threshold_ altitude
+     * @param input current altitude 
+     * @return true if current altitude > launch_threshold_ altitude
      */
     bool accept(Calculator const &input) {
         return input.altitude() > launch_threshold_;
@@ -49,7 +49,7 @@ class Armed : public RepeatedCheckBase<StateId::ARMED, next_id, num_checks,
   public:
 
     /**
-     * @brief Construct a new Armed object
+     * @brief Construct a new state object
      * @param launch_threshold 
      */
     Armed(const float launch_threshold) : launch_threshold_(launch_threshold) {}
@@ -76,7 +76,7 @@ class DrogueDescent
   public:
 
     /**
-     * @brief Construct a new Drogue Descent object
+     * @brief Construct a new state object
      * @param main_altitude 
      * @param main_ignitor 
      */
@@ -90,9 +90,9 @@ class DrogueDescent
     Ignitor &ignitor_;
 
     /**
-     * @brief compares altitude of parameter vs main_altitude_
-     * @param input altitude
-     * @return true if input.altitude() > main_altitude_
+     * @brief compares current altitude vs main_altitude_
+     * @param input current altitude
+     * @return true if current altitude < main_altitude_
      */
     bool accept(Calculator const &input) {
         return input.altitude() < main_altitude_;

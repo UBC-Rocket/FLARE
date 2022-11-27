@@ -40,7 +40,7 @@ class SensorCollection;
 class IgnitorCollection;
 
 /**
- * @brief get current status of sensors and calls raiseToStatus to check if ignitors.getStatus() > sensors.get_status()
+ * @brief get current status of sensors and calls raiseToStatus
  * 
  * @param sensors used to get current status of sensors
  * @param ignitors can be used to update status of sensors

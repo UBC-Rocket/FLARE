@@ -87,7 +87,6 @@ class Buffer {
 
     /**
      * @brief Returns true if no data is in the buffer.
-     * @return Returns true if no data is in the buffer.
      */
     bool empty();
 

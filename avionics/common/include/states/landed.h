@@ -11,7 +11,7 @@ class Landed : public IState {
   public:
 
     /**
-     * @brief Construct a new Landed object
+     * @brief Construct a new state object
      */
     Landed() {}
 

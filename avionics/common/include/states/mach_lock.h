@@ -9,13 +9,12 @@ namespace State {
 
 class MachLock : public IState {
   public:
-
     /**
      * @brief Construct a new Mach Lock object
-     * @param next_id 
-     * @param MACH_UNLOCK_CHECKS 
-     * @param MACH_UNLOCK_VELOCITY 
-     * @param MACH_UNLOCK_TIME 
+     * @param next_id
+     * @param MACH_UNLOCK_CHECKS number of mach_checks_ required before next state
+     * @param MACH_UNLOCK_VELOCITY maximum velocity at which mach_checks_ can be done
+     * @param MACH_UNLOCK_TIME maximum amount of time before switching to next state
      */
     MachLock(StateId next_id, uint8_t const MACH_UNLOCK_CHECKS, 
             float MACH_UNLOCK_VELOCITY, uint32_t MACH_UNLOCK_TIME)

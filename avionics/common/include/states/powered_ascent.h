@@ -9,9 +9,9 @@ class PoweredAscent : public IState {
   public:
 
     /**
-     * @brief Construct a new Powered Ascent object
+     * @brief Construct a new state object
      * @param post_ascent_id 
-     * @param BURNOUT_CHECKS 
+     * @param BURNOUT_CHECKS number of burnout_checks required befroe next state
      */
     PoweredAscent(StateId const post_ascent_id, int const BURNOUT_CHECKS)
         : post_ascent_id_(post_ascent_id), M_BURNOUT_CHECKS(BURNOUT_CHECKS) {}

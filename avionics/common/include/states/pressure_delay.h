@@ -11,7 +11,7 @@ class PressureDelay : public IState {
   public:
 
     /**
-     * @brief Construct a new Pressure Delay object
+     * @brief Construct a new state object
      * @param post_delay 
      * @param DELAY_TIME_MS 
      */

@@ -9,7 +9,7 @@ class WinterContingency : public IState {
   public:
 
   /**
-   * @brief Construct a new Winter Contingency object
+   * @brief Construct a new state object
    */
     WinterContingency() {}
 

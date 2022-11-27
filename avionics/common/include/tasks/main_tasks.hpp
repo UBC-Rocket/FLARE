@@ -15,7 +15,7 @@ class ReadEvalLog {
     // MainDescent state updates this to 5000 ms - see main_descent.cpp
 
     /**
-     * @brief runs state machine for ReadEvalLog
+     * @brief polss sensors, logs data, and updates state machine
      */
     void run() {
         auto &state_machine = rocket_.state_machine;
