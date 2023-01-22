@@ -58,9 +58,14 @@ class ReadEvalLog {
                 constexpr static unsigned int LANDED_POLLING_INTERVAL = 5000;
                 Scheduler::get_task(static_cast<int>(TaskID::ReadEvalLog))
                     .period = Hal::ms(LANDED_POLLING_INTERVAL);
+
+                //change polling interval for radio
+                constexpr static unsigned int LANDED_RADIO_TX_INTERVAL = 10000;
+                Scheduler::get_task(static_cast<int>(TaskID::RadioTxBulk))
+                    .period = Hal::ms(LANDED_RADIO_TX_INTERVAL);
             }
         }
-
+        
         Radio::forwardCommand(command_receiver);
     }
 
@@ -87,6 +92,7 @@ class RadioTxBulk {
   private:
     void run() {
         StateId state = rocket.state_machine.getState();
+
         Radio::sendBulkSensor(
             Hal::tpoint_to_uint(rocket.sensors.last_poll_time()),
             rocket.calc.altitude(), rocket.sensors.accelerometer,
