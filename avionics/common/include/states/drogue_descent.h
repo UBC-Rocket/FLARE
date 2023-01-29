@@ -26,5 +26,5 @@ class DrogueDescent
     void extraOnExit() { ignitor_.fire(); }
 };
 
-} // namespace State
+} 
 #endif

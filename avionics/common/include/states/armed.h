@@ -21,5 +21,5 @@ class Armed : public RepeatedCheckBase<StateId::ARMED, next_id, num_checks,
     }
 };
 
-} // namespace State
+} 
 #endif
