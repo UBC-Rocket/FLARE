@@ -16,7 +16,7 @@ class MachLock : public IState {
      * state
      * @param MACH_UNLOCK_VELOCITY maximum velocity before leaving MACH_LOCK
      * state
-     * @param MACH_UNLOCK_TIME maximum amount of time before leaving MACH_LOCK
+     * @param MACH_UNLOCK_TIME minimum amount of time before leaving MACH_LOCK
      * state' state
      */
     MachLock(StateId next_id, uint8_t const MACH_UNLOCK_CHECKS, 
