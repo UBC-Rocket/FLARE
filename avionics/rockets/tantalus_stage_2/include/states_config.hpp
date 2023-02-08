@@ -4,13 +4,15 @@
 
 #include "calculations.h"
 #include "ignitor_collection.h"
-#include "states/repeated_checks.hpp"
 
+#include "states/armed.h"
 #include "states/ascent_to_apogee.h"
+#include "states/drogue_descent.h"
 #include "states/landed.h"
 #include "states/mach_lock.h"
 #include "states/main_descent.h"
 #include "states/pressure_delay.h"
+#include "states/standby.h"
 #include "states/winter_contingency.h"
 
 struct StateMachineConfig {
