@@ -21,7 +21,7 @@ enum class SensorType {
 #define ACCELEROMETER_DATA_LENGTH   3
 #define BAROMETER_DATA_LENGTH       2
 #define GPS_DATA_LENGTH             3
-#define IMU_DATA_LENGTH             4
+#define IMU_DATA_LENGTH             7
 #define TEMPERATURE_DATA_LENGTH     1
 #define THERMOCOUPLE_DATA_LENGTH    1
 #define BATTERY_DATA_LENGTH         1
