@@ -20,6 +20,7 @@
  */
 
 #pragma once
+#include "variant_NUCLEO_L476RG.h"
 
 /*Constants------------------------------------------------------------*/
 // Double, triple check pin assignments
@@ -35,7 +36,8 @@ enum class Pin {
     DROGUE_IGNITOR = 35,
     DROGUE_CONTINUITY_TEST = 17,
     DROGUE_CONTINUITY_READ = 34,
-    VOLTAGE_SENSOR = 23
+    VOLTAGE_SENSOR = 23,
+    SD_CHIP_SELECT = PA9,
 };
 
 /*Functions------------------------------------------------------------*/

@@ -66,7 +66,7 @@ PLEASE READ ME!
 /*Includes------------------------------------------------------------*/
 #include "sensors/GPS.h"
 
-GPS::GPS(Hal::Serial &seri, float *const data)
+GPS::GPS(Hal::CustomSerial &seri, float *const data)
     : SensorBase(data),
       serial_port_(seri), GPS_reset_defaults{0xA0, 0xA1, 0x00,
                                                          0x02, 0x04, 0x00,

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SD.h>
+#include "gpio.h"
 
 /**
  * Another layer of wrapping between commands to write to file and actual file
@@ -10,7 +11,7 @@
 class CSVWriteImpl {
   public:
     bool init(char const *filename) {
-        bool success = SD.begin(BUILTIN_SDCARD);
+        bool success = SD.begin(static_cast<int>(Pin::SD_CHIP_SELECT));
         if (success) {
             m_datalog = SD.open(filename, FILE_WRITE);
         }

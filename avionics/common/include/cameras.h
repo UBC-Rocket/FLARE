@@ -32,7 +32,7 @@
 
 class Camera {
   public:
-    Camera(Hal::Serial &SerialCam) : m_seri_cam(SerialCam) {
+    Camera(Hal::CustomSerial &SerialCam) : m_seri_cam(SerialCam) {
         m_seri_cam.begin(M_CAMERA_BAUD);
         while (!m_seri_cam)
             ;
@@ -51,7 +51,7 @@ class Camera {
     uint8_t crc_calculator(uint8_t *command, uint8_t len);
     uint8_t crc8_dvb_s2(uint8_t crc, unsigned char a);
 
-    Hal::Serial &m_seri_cam;
+    Hal::CustomSerial &m_seri_cam;
     static constexpr auto M_CAMERA_BAUD = 115200;
 };
 #endif

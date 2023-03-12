@@ -2,7 +2,7 @@
 
 namespace Hal {
 
-Serial SerialInst::GPS{Serial1};
-Serial SerialInst::Radio{Serial2};
-Serial SerialInst::Camera{Serial3};
+CustomSerial SerialInst::GPS{Serial1};
+CustomSerial SerialInst::Radio{Serial2};
+CustomSerial SerialInst::Camera{Serial3};
 } // namespace Hal

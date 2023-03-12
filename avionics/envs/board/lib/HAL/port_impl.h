@@ -6,9 +6,9 @@
 
 namespace Hal {
 
-class Serial {
+class CustomSerial {
   public:
-    constexpr Serial(HardwareSerial &seri) : m_seri(seri) {}
+    constexpr CustomSerial(HardwareSerial &seri) : m_seri(seri) {}
 
     void begin(long baud) { m_seri.begin(baud); }
     bool available() { return m_seri.available(); }
@@ -35,9 +35,9 @@ class SerialInst {
      */
   public:
     // auto static SerialUSB//?
-    static Hal::Serial GPS;
-    static Hal::Serial Radio;
-    static Hal::Serial Camera;
+    static Hal::CustomSerial GPS;
+    static Hal::CustomSerial Radio;
+    static Hal::CustomSerial Camera;
     // Annoyingly trying to make some of these SerialX const directly doesn't
     // easily work because the underlying HardwareSerial isn't const, which I
     // think means everything that uses HardwareSerial (i.e. everything useful)

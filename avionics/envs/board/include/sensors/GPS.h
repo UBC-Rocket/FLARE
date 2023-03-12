@@ -79,14 +79,14 @@ PLEASE READ ME!
 
 class GPS : public SensorBase<GPS_DATA_LENGTH> {
   public:
-    GPS(Hal::Serial &seri, float *const data);
+    GPS(Hal::CustomSerial &seri, float *const data);
     void readData();
 
   private:
     constexpr static int GPS_FIELD_LENGTH = 20;
     constexpr static int GPS_TIMEOUT = 100;
 
-    Hal::Serial &serial_port_;
+    Hal::CustomSerial &serial_port_;
     TinyGPS gps;
 
     /*GPS initialization commands*/
