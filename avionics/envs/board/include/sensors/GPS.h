@@ -68,10 +68,10 @@ PLEASE READ ME!
 /*Includes------------------------------------------------------------*/
 #include <array>
 
+#include "sensors_interface.h"
 #include <HAL/port_impl.h>
 #include <TinyGPS.h>
-
-#include "sensors_interface.h"
+#include <elapsedMillis.h>
 
 /*Constants------------------------------------------------------------*/
 
