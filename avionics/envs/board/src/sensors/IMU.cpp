@@ -6,17 +6,17 @@
 
 IMU::IMU(float *const data) : SensorBase(data), bmi088{BMI088_ACC_ALT_ADDRESS, BMI088_GYRO_ALT_ADDRESS} {
 #ifdef TESTING
-    SerialUSB.println("Initializing IMU");
+    Serial.println("Initializing IMU");
 #endif
     if (bmi088.isConnection()) {
         bmi088.initialize();
         status = SensorStatus::NOMINAL;
 #ifdef TESTING
-        SerialUSB.println("BMI088 is connected");
+        Serial.println("BMI088 is connected");
 #endif
     } else {
 #ifdef TESTING
-        SerialUSB.println("BMI088 is not connected");
+        Serial.println("BMI088 is not connected");
 #endif
         status = SensorStatus::FAILURE;
     }
@@ -24,7 +24,7 @@ IMU::IMU(float *const data) : SensorBase(data), bmi088{BMI088_ACC_ALT_ADDRESS, B
 
 void IMU::readData() {
 #ifdef TESTING
-    SerialUSB.println("Polling IMU");
+    Serial.println("Polling IMU");
 #endif
 
     // #if defined NOSECONE
@@ -69,21 +69,21 @@ void IMU::readData() {
     data_[5] = gz;
     data_[6] = imuTemp;
 #ifdef TESTING
-    SerialUSB.println("Polling IMU");
-    SerialUSB.print("ax:  ");
-    SerialUSB.println(data_[0]);
-    SerialUSB.print("ay: ");
-    SerialUSB.println(data_[1]);
-    SerialUSB.print("az: ");
-    SerialUSB.println(data_[2]);
-    SerialUSB.print("gx:  ");
-    SerialUSB.println(data_[3]);
-    SerialUSB.print("gy: ");
-    SerialUSB.println(data_[4]);
-    SerialUSB.print("gz: ");
-    SerialUSB.println(data_[5]);
-    SerialUSB.print("imuTemp: ");
-    SerialUSB.println(data_[6]);
+    Serial.println("Polling IMU");
+    Serial.print("ax:  ");
+    Serial.println(data_[0]);
+    Serial.print("ay: ");
+    Serial.println(data_[1]);
+    Serial.print("az: ");
+    Serial.println(data_[2]);
+    Serial.print("gx:  ");
+    Serial.println(data_[3]);
+    Serial.print("gy: ");
+    Serial.println(data_[4]);
+    Serial.print("gz: ");
+    Serial.println(data_[5]);
+    Serial.print("imuTemp: ");
+    Serial.println(data_[6]);
 #endif
 
 }

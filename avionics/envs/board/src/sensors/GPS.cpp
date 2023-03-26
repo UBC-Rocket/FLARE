@@ -80,7 +80,7 @@ GPS::GPS(Hal::CustomSerial &seri, float *const data)
 
 {
 #ifdef TESTING
-    SerialUSB.println("Initializing GPS");
+    Serial.println("Initializing GPS");
 #endif
     serial_port_.begin(9600); // baud rate 9600 for the GP-20U7
     while (!serial_port_) {

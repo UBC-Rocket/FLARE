@@ -1,15 +1,16 @@
 /*Includes------------------------------------------------------------*/
 #include "sensors/barometer.h"
+#include "options.h"
 
 Barometer::Barometer(float *const buf) : SensorBase(buf) , barometer(&Wire) {
     /*init barometer*/
     barometer.setI2Caddr(0b1110111);
 
 #ifdef TESTING
-    SerialUSB.println("Initializing barometer");
+    Serial.println("Initializing barometer");
     if (barometer.connect() > 0) {
-        SerialUSB.println("Error connecting to barometer");
-        return CRITICAL_FAILURE;
+        Serial.println("Error connecting to barometer");
+        // return CRITICAL_FAILURE;
     }
 #else
     if (barometer.connect() > 0) {
@@ -30,10 +31,10 @@ void Barometer::readData() {
     data_[1] = barometer.GetTemp();
 
 #ifdef TESTING
-    SerialUSB.println("Polling barometer");
-    SerialUSB.print("Temperature [0.01 C]: ");
-    SerialUSB.println(data_[0]);
-    SerialUSB.print("Pressure [Pa]: ");
-    SerialUSB.println(data_[1]);
+    Serial.println("Polling barometer");
+    Serial.print("Temperature [0.01 C]: ");
+    Serial.println(data_[0]);
+    Serial.print("Pressure [Pa]: ");
+    Serial.println(data_[1]);
 #endif
 }

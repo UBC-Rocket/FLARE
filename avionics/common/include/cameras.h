@@ -33,7 +33,7 @@
 class Camera {
   public:
     Camera(Hal::CustomSerial &SerialCam) : m_seri_cam(SerialCam) {
-        m_seri_cam.begin(M_CAMERA_BAUD);
+        // m_seri_cam.begin(M_CAMERA_BAUD);
         while (!m_seri_cam)
             ;
         Hal::sleep_ms(2000);

@@ -1,12 +1,13 @@
 /*Includes------------------------------------------------------------*/
 #include "sensors/temperature.h"
+#include "options.h"
 
 Temperature::Temperature(float *const data)
     : SensorBase(data) {
 
 /*init temp sensor*/
 #ifdef TESTING
-    SerialUSB.println("Initializing temperature sensor");
+    Serial.println("Initializing temperature sensor");
 #endif
     // Start I2C Transmission
     Wire.beginTransmission(0x48);
@@ -49,8 +50,8 @@ void Temperature::readData() {
     data_[0] = cTemp;
 
 #ifdef TESTING
-    SerialUSB.println("Polling temperature sensor");
-    SerialUSB.print("cTemp:  ");
-    SerialUSB.println(data_[0]);
+    Serial.println("Polling temperature sensor");
+    Serial.print("cTemp:  ");
+    Serial.println(data_[0]);
 #endif
 }

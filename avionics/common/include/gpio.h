@@ -38,6 +38,7 @@ enum class Pin {
     DROGUE_CONTINUITY_READ = 34,
     VOLTAGE_SENSOR = 23,
     SD_CHIP_SELECT = PA9,
+    TEMP = 205,
 };
 
 /*Functions------------------------------------------------------------*/

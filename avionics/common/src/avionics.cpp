@@ -78,6 +78,8 @@ PLEASE READ ME!
 #include "env_config.h"
 
 #include "log.hpp"
+#include "HAL/pin_util.h"
+#include "variant_NUCLEO_L476RG.h"
 
 /**
  * @brief Helper function that makes things less verbose; basically saves the
@@ -90,6 +92,9 @@ void registerTask(TaskID id, Scheduler::Task task, bool repeat = true,
 
 /* Main function ====================================================== */
 int main(void) {
+    // Initialize Arduino
+    init();
+    
     // Before anything else there's some environment specific setup to be done
     env_initialize();
     LOG_INFO("Everything is starting now");
@@ -99,10 +104,12 @@ int main(void) {
 /* Setup all UART comms */
 // Serial comms to computer
 #ifdef TESTING
-    SerialUSB.begin(9600);
-    while (!SerialUSB) {
+    Serial.begin(9600);
+    while (!Serial) {
     }
-    SerialUSB.println("Initializing...");
+    Serial.println("Initializing...");
+    Serial.println(PA5);
+    Serial.println(PA5 == 205);
 #endif
 
     Radio::initialize();
@@ -116,6 +123,7 @@ int main(void) {
     auto &ignitors = rocket.ignitors;
 
     if (init_status == RocketStatus::CRITICAL_FAILURE) {
+        Serial.println("abort");
         LOG_ERROR("Critical failure; aborting in state machine");
         state_machine.abort();
     }
@@ -142,27 +150,28 @@ int main(void) {
 
     switch (init_status) {
     case RocketStatus::NOMINAL:
-        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
+        Hal::digitalWrite(Pin::TEMP, Hal::PinDigital::LO);
         break;
     case RocketStatus::NONCRITICAL_FAILURE:
         registerTask(TaskID::LEDBlinker, led_blink);
         break;
     case RocketStatus::CRITICAL_FAILURE:
-        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
+        Hal::digitalWrite(Pin::TEMP, Hal::PinDigital::HI);
         break;
     }
 
-    RestartCamera restart_camera_(rocket.cam);
-    // This tasks sets its own reschedule interval (since the same task is run
-    // both to start and stop the recording)
-    Task restart_camera_task_(RestartCamera::togglePower, &restart_camera_,
-                              Hal::ms{0});
-    Scheduler::preregisterTask(static_cast<int>(TaskID::RestartCamera),
-                               restart_camera_task_, true, false);
+    // RestartCamera restart_camera_(rocket.cam);
+    // // This tasks sets its own reschedule interval (since the same task is run
+    // // both to start and stop the recording)
+    // Task restart_camera_task_(RestartCamera::togglePower, &restart_camera_,
+    //                           Hal::ms{0});
+    // Scheduler::preregisterTask(static_cast<int>(TaskID::RestartCamera),
+    //                            restart_camera_task_, true, false);
 
-    LOG_INFO("Initialization done; starting scheduler");
+    // LOG_INFO("Initialization done; starting scheduler");
 
-    Scheduler::run();
+    // Scheduler::run();
 
-    LOG_ERROR("Somehow finished all tasks; main executable exiting");
+    // LOG_ERROR("Somehow finished all tasks; main executable exiting");
+    Serial.println("bottom");
 }

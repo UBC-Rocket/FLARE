@@ -36,7 +36,7 @@ Battery::Battery(Pin batterySensorPin, float *const data)
 
 /*init voltage sensor*/
 #ifdef TESTING
-    SerialUSB.println("Initializing battery voltage sensor");
+    Serial.println("Initializing battery voltage sensor");
 #endif
     lowVoltageWarningSent = false;
     m_divider = static_cast<float>(R2) / (R1 + R2);
@@ -57,7 +57,7 @@ float sensor_range_map(int x, int in_min, int in_max, int out_min, int out_max) 
 
 float Battery::getBatteryVoltage() {
 #ifdef TESTING
-    SerialUSB.println("Polling battery voltage sensor");
+    Serial.println("Polling battery voltage sensor");
 #endif
     int inputValue = Hal::analogRead(m_batterySensorPin);
     // map it to the range the analog out:
