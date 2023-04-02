@@ -19,7 +19,7 @@ class Accelerometer : public SensorBase<ACCELEROMETER_DATA_LENGTH> {
 
   private:
     constexpr static uint8_t ACCELEROMETER_ADDRESS = 0x19;
-    constexpr static uint8_t ACCELEROMETER_SCALE = 6;
+    constexpr static uint8_t ACCELEROMETER_SCALE = 2;
     LIS331 accelerometer;
     int16_t x, y, z;
 };
