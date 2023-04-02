@@ -42,9 +42,9 @@ class SensorCollection {
     constexpr static std::size_t ACCEL_INDEX = GPS_INDEX + GPS::dataLength();
     constexpr static std::size_t IMU_INDEX =
         ACCEL_INDEX + Accelerometer::dataLength();
-    constexpr static std::size_t BATTERY_INDEX = IMU_INDEX + IMU::dataLength();
+    // constexpr static std::size_t BATTERY_INDEX = IMU_INDEX + IMU::dataLength(); // No voltage sensor for 2022/23
     constexpr static std::size_t TEMP_INDEX 
-        = BATTERY_INDEX + Battery::dataLength();
+        = IMU_INDEX + IMU::dataLength();
     constexpr static std::size_t DATA_LENGTH =
         TEMP_INDEX + Temperature::dataLength();
     
@@ -61,13 +61,16 @@ class SensorCollection {
     constexpr static char LOG_FILE_HEADER[] =
         "Pressure (mbar), Barom. Temp (C), GPS (lat), GPS (long), GPS (alt), "
         "Accel (x)(g), Accel (y)(g), Accel (z)(g), IMU (w), IMU(x), IMU(y), "
-        "IMU(z), Voltage (V), Temperature (C)";
+        "IMU(z), Temperature (C)";
+        // "Pressure (mbar), Barom. Temp (C), GPS (lat), GPS (long), GPS (alt), "
+        // "Accel (x)(g), Accel (y)(g), Accel (z)(g), IMU (w), IMU(x), IMU(y), "
+        // "IMU(z), Voltage (V), Temperature (C)"; // No voltage sensor for 2022/23
 
     Barometer barometer;
     GPS gps;
     Accelerometer accelerometer;
     IMU imuSensor;
-    Battery battery;
+    // Battery battery; // No voltage sensor for 2022/23
     Temperature temperature;
     
     SensorCollection();

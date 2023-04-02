@@ -8,8 +8,10 @@ constexpr char SensorCollection::LOG_FILE_HEADER[];
 SensorCollection::SensorCollection()
     : barometer(BEGIN + BAROMETER_INDEX),
       gps(Hal::SerialInst::GPS, BEGIN + GPS_INDEX),
-      accelerometer(BEGIN + ACCEL_INDEX), imuSensor(BEGIN + IMU_INDEX),
-      battery(Pin::VOLTAGE_SENSOR, BEGIN + BATTERY_INDEX), temperature(BEGIN + TEMP_INDEX) {
+      accelerometer(BEGIN + ACCEL_INDEX), 
+      imuSensor(BEGIN + IMU_INDEX),
+    //   battery(Pin::VOLTAGE_SENSOR, BEGIN + BATTERY_INDEX), // No voltage sensor for 2022/23
+      temperature(BEGIN + TEMP_INDEX) {
     
     updateStatus();
 }
@@ -20,7 +22,7 @@ void SensorCollection::poll() {
     gps.readData();
     accelerometer.readData();
     imuSensor.readData();
-    battery.readData();
+    // battery.readData(); // No voltage sensor for 2022/23
     temperature.readData();
 }
 
@@ -80,17 +82,17 @@ void SensorCollection::updateStatus() {
         raiseToStatus(status_, RocketStatus::NONCRITICAL_FAILURE);
         *status_bitfield_ |= 0x08;
     }
-    if (battery.getStatus() == SensorStatus::FAILURE) {
-        #ifdef TESTING
-        Serial.println("Voltage sensor failed");
-        #endif
+    // if (battery.getStatus() == SensorStatus::FAILURE) {
+    //     #ifdef TESTING
+    //     Serial.println("Voltage sensor failed");
+    //     #endif
 
-        LOG_WARN("Voltage sensor failed");
-        raiseToStatus(status_, RocketStatus::CRITICAL_FAILURE);
-        *status_bitfield_ |= 0x04;
-    } else if (battery.lowVoltageWarningSent) {
-        LOG_WARN("Low battery voltage");
-        raiseToStatus(status_, RocketStatus::NONCRITICAL_FAILURE);
-        *status_bitfield_ |= 0x04;
-    }
+    //     LOG_WARN("Voltage sensor failed");
+    //     raiseToStatus(status_, RocketStatus::CRITICAL_FAILURE);
+    //     *status_bitfield_ |= 0x04;
+    // } else if (battery.lowVoltageWarningSent) {
+    //     LOG_WARN("Low battery voltage");
+    //     raiseToStatus(status_, RocketStatus::NONCRITICAL_FAILURE);
+    //     *status_bitfield_ |= 0x04;
+    // }
 }

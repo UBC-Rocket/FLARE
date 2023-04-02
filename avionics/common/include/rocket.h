@@ -127,8 +127,9 @@ class CommandReceiver {
             Radio::sendState(sensor_poll_time, static_cast<uint16_t>(state));
             break;
         case Radio::voltage:
-            Radio::sendSingleSensor(sensor_poll_time, Radio::voltage,
-                                    rocket_.sensors.battery.getData()[0]);
+            // No voltage sensor for 2022/23
+            // Radio::sendSingleSensor(sensor_poll_time, Radio::voltage,
+            //                         rocket_.sensors.battery.getData()[0]);
             break;
         case Radio::ground_altitude:
             Radio::sendSingleSensor(sensor_poll_time, Radio::ground_altitude,
