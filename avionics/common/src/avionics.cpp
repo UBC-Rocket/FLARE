@@ -150,13 +150,22 @@ int main(void) {
 
     switch (init_status) {
     case RocketStatus::NOMINAL:
-        Hal::digitalWrite(Pin::TEMP, Hal::PinDigital::LO);
+    #ifdef TESTING
+        Serial.println("Nominal");
+    #endif
+        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
         break;
     case RocketStatus::NONCRITICAL_FAILURE:
+    #ifdef TESTING
+        Serial.println("Non-critical failure");
+    #endif
         registerTask(TaskID::LEDBlinker, led_blink);
         break;
     case RocketStatus::CRITICAL_FAILURE:
-        Hal::digitalWrite(Pin::TEMP, Hal::PinDigital::HI);
+    #ifdef TESTING
+        Serial.println("Critical failure");
+    #endif
+        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HI);
         break;
     }
 
@@ -168,10 +177,10 @@ int main(void) {
     // Scheduler::preregisterTask(static_cast<int>(TaskID::RestartCamera),
     //                            restart_camera_task_, true, false);
 
-    // LOG_INFO("Initialization done; starting scheduler");
+    LOG_INFO("Initialization done; starting scheduler");
 
-    // Scheduler::run();
+    Scheduler::run();
 
-    // LOG_ERROR("Somehow finished all tasks; main executable exiting");
-    Serial.println("bottom");
+    LOG_ERROR("Somehow finished all tasks; main executable exiting");
+    Serial.println("bottom???");
 }

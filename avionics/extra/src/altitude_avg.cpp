@@ -3,6 +3,8 @@
 
 #include "CalcHelpers/barometric.hpp"
 #include "extra/altitude_avg.hpp"
+#include "Arduino.h"
+#include "options.h"
 #undef abs
 
 namespace extra {
@@ -13,7 +15,14 @@ AltitudeAvg::AltitudeAvg(SensorCollection &sensors, Hal::t_point initial_time)
       // Using the comma operator to execute readData() before continuing
       base_alt_((baro_.readData(), rawAltitude()), MOVING_AVERAGE_VARIANCE,
                 BASE_MOVING_AVERAGE_ALPHA),
-      agl_alt_(0), velocity_z_(0), last_agl_alt_(0), last_t_(initial_time) {}
+      agl_alt_(0), velocity_z_(0), last_agl_alt_(0), last_t_(initial_time) {
+        #ifdef TESTING
+        Serial.print("base alt (avg): ");
+        Serial.println(base_alt_.getAverage());
+        Serial.print("agl alt (avg): ");
+        Serial.println(agl_alt_.getAverage());
+        #endif
+      }
 
 void AltitudeAvg::update(StateId const state, Hal::t_point t_ms) {
     const float raw_alt = rawAltitude();

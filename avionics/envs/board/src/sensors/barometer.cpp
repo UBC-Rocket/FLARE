@@ -10,7 +10,7 @@ Barometer::Barometer(float *const buf) : SensorBase(buf) , barometer(&Wire) {
     Serial.println("Initializing barometer");
     if (barometer.connect() > 0) {
         Serial.println("Error connecting to barometer");
-        // return CRITICAL_FAILURE;
+        status = SensorStatus::FAILURE;
     }
 #else
     if (barometer.connect() > 0) {

@@ -23,10 +23,6 @@ IMU::IMU(float *const data) : SensorBase(data), bmi088{BMI088_ACC_ALT_ADDRESS, B
 }
 
 void IMU::readData() {
-#ifdef TESTING
-    Serial.println("Polling IMU");
-#endif
-
     // #if defined NOSECONE
     //     sensors_event_t event;
     //     IMU_Sensor.getEvent(&event);
