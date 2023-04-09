@@ -32,9 +32,9 @@ void Barometer::readData() {
 
 #ifdef TESTING
     Serial.println("Polling barometer");
-    Serial.print("Temperature [0.01 C]: ");
-    Serial.println(data_[0]);
     Serial.print("Pressure [Pa]: ");
+    Serial.println(data_[0]);
+    Serial.print("Temperature [0.01 C]: ");
     Serial.println(data_[1]);
 #endif
 }
