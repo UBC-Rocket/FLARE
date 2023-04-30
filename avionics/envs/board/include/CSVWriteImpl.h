@@ -29,7 +29,6 @@ class CSVWriteImpl {
      */
     template <typename T> void print(T t) {
         m_datalog.print(t);
-        m_datalog.print(",");
     }
 
     /**
