@@ -11,7 +11,8 @@ class CustomSerial {
     constexpr CustomSerial(HardwareSerial &seri) : m_seri(seri) {}
 
     void begin(long baud) { m_seri.begin(baud); }
-    bool available() { return m_seri.available(); }
+    void end() { m_seri.end(); }
+    int available() { return m_seri.available(); }
     int read() { return m_seri.read(); }
     std::size_t write(uint8_t val) { return m_seri.write(val); }
     std::size_t write(const uint8_t *buffer, size_t size) {

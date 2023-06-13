@@ -65,6 +65,7 @@ PLEASE READ ME!
 
 /*Includes------------------------------------------------------------*/
 #include "sensors/GPS.h"
+// #include "HardwareSerial.h"
 
 GPS::GPS(Hal::CustomSerial &seri, float *const data)
     : SensorBase(data),
@@ -82,17 +83,50 @@ GPS::GPS(Hal::CustomSerial &seri, float *const data)
 #ifdef TESTING
     Serial.println("Initializing GPS");
 #endif
-    serial_port_.begin(9600); // baud rate 9600 for the GP-20U7
-    while (!serial_port_) {
-    }
+    // serial_port_.begin(4800); // baud rate Copernicus II DIP module
+    // while (!serial_port_) {
+    // }
 
     status = SensorStatus::NOMINAL;
 }
 
+// #ifdef __arm__
+// // should use uinstd.h to define sbrk but Due causes a conflict
+// extern "C" char* sbrk(int incr);
+// #else  // __ARM__
+// extern char *__brkval;
+// #endif  // __arm__
+
+// int freeMemory() {
+//   char top;
+// #ifdef __arm__
+//   return &top - reinterpret_cast<char*>(sbrk(0));
+// #elif defined(CORE_TEENSY) || (ARDUINO > 103 && ARDUINO != 151)
+//   return &top - __brkval;
+// #else  // __arm__
+//   return __brkval ? &top - __brkval : &top - __malloc_heap_start;
+// #endif  // __arm__
+// }
+
 void GPS::readData() {
+    serial_port_.begin(4800);
+    // elapsedMillis timeout;
+    while (!serial_port_.available()) {
+        // if (timeout > 500) {
+        //     serial_port_.end();
+        //     return;
+        // }
+    }
+    // while (!serial_port_) {}
+    // Serial.print("rx buf size: "); Serial.println(SERIAL_RX_BUFFER_SIZE);
+    // Serial.println("read gps data");
+    // Serial.print("free memory: "); Serial.println(freeMemory());
     bool gpsSuccess = false;
     elapsedMillis timeout;
-    while (serial_port_.available() && (timeout < GPS_TIMEOUT)) {
+    // timeout = millis(); // Reset timeout
+    // Serial.print("2nd timeout: "); Serial.println(timeout);
+    // Serial.print("gps serial available: "); Serial.println(serial_port_.available());
+    while (serial_port_.available() && (timeout < 100)) { // try shorter timeout here then use separate timeout in above while loop. NEED SEPARATE TIMEOUT VARS?
         char c = serial_port_.read();
         if (gps.encode(c)) {
             gpsSuccess = true;
@@ -107,6 +141,37 @@ void GPS::readData() {
     unsigned long fix_age;
     gps.f_get_position(data_, data_ + 1, &fix_age);
     data_[2] = gps.f_altitude();
+
+    // Serial.print("gps data 0: "); Serial.println(data_[0], 10);
+    // Serial.print("gps data 1: "); Serial.println(data_[1], 10);
+    // Serial.print("gps data 2: "); Serial.println(data_[2], 10);
+    // serial_port_.end();
+
+    // serial_port_.begin(4800);
+
+    // int startChar = 36;
+    // int newLineChar = 10;
+    // while (true) {
+    //     String sentenceBuf;
+
+    //     while (true) {
+    //         if (serial_port_.available() > 0) {
+    //             int byte = serial_port_.read();
+    //             char c = byte;
+    //             sentenceBuf += c;
+    //             if (byte == newLineChar) {
+    //                 Serial.println(byte);
+    //                 // Serial.println("break");
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     Serial.println(sentenceBuf);
+    // }
+
+    // data_[0] = 0.0;
+    // data_[1] = 1.0;
+    // data_[2] = 2.0;
 
     status = SensorStatus::NOMINAL;
 }
