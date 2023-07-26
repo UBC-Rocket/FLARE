@@ -23,7 +23,12 @@ class DrogueDescent
         return input.altitude() < main_altitude_;
     }
 
-    void extraOnExit() { ignitor_.fire(); }
+    void extraOnExit() { 
+        #ifdef TESTING
+            Serial.println("firing main"); 
+        #endif
+        ignitor_.fire(); 
+    }
 };
 
 } 
