@@ -79,7 +79,6 @@ PLEASE READ ME!
 
 #include "log.hpp"
 #include "HAL/pin_util.h"
-#include "variant_BLACKPILL_F411CE.h"
 
 /**
  * @brief Helper function that makes things less verbose; basically saves the
@@ -118,53 +117,25 @@ int main(void) {
         Hal::sleep_ms(100);
     }
     Serial.println("Initializing...");
-    
-    // Serial.print("PA9 "); Serial.println(PA9); Serial.println(PA9 == PA_9);
-    // Serial.print("PA10 "); Serial.println(PA10); Serial.println(PA10 == PA_10);
-    // Serial.print("PA2 "); Serial.println(PA2); Serial.print("PA_2: "); Serial.println(PA_2); Serial.println(PA2 == PA_2);
-    // Serial.print("PA3 "); Serial.println(PA3); Serial.print("PA_3: "); Serial.println(PA_3); Serial.println(PA3 == PA_3);
-    // Serial.print("PA5"); Serial.println(PA5);
-    // Serial.println(PA5 == 205);
-    // Serial.print("PA6: "); Serial.println(static_cast<uint8_t>(Pin::DROGUE_CONTINUITY_READ_));
-    // Serial.print("PA7: "); Serial.println(static_cast<uint8_t>(Pin::IGNITOR_3_READ_));
-    // Serial.print("PC0: "); Serial.println(PC0);
-    // Serial.print("PC1: "); Serial.println(PC1);
-    // Serial.print("PA15: "); Serial.println(PA15);
-    // Serial.print("PA_15: "); Serial.println(PA_15);
-    // Serial.print("PB4: "); Serial.println(PB4);
-    // Serial.print("PB_4: "); Serial.println(PB_4);
-    // Serial.print("PA0: "); Serial.println(PA0);
-    // Serial.print("PA_0: "); Serial.println(PA_0);
-    // Serial.print("PA1: "); Serial.println(PA1);
-    // Serial.print("PA_1: "); Serial.println(PA_1);
-    // Serial.print("PB0: "); Serial.println(PB0);
-    // Serial.print("PB_0: "); Serial.println(PB_0);
-
 #endif
 
     Radio::initialize();
-    // Serial.println("initialized radio");
     LOG_INFO("Initialized radio");
     Rocket rocket;
-    // Serial.println("initialized rocket");
     // Logically, these are all unrelated variables - but to allow the command
     // receiver to function, they need to be coalesced into one POD struct.
     auto &state_machine = rocket.state_machine;
     auto &init_status = rocket.init_status;
     auto &sensors = rocket.sensors;
     auto &ignitors = rocket.ignitors;
-    // Serial.println("destructure rocket stuff");
 
     if (init_status == RocketStatus::CRITICAL_FAILURE) {
-        // Serial.println("abort");
         LOG_ERROR("Critical failure; aborting in state machine");
         state_machine.abort();
     }
 
-// Serial.println("send startup status");
     Radio::sendStatus(Hal::millis(), init_status, sensors, ignitors);
     LOG_INFO("Sent startup status");
-    // Serial.println("finish send startup status");
 
     /* Register all tasks */
     typedef Scheduler::Task Task;
@@ -254,5 +225,4 @@ int main(void) {
     Scheduler::run();
 
     LOG_ERROR("Somehow finished all tasks; main executable exiting");
-    Serial.println("bottom???");
 }

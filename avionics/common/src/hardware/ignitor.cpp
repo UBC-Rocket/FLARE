@@ -14,26 +14,15 @@ Ignitor::Ignitor(Pin ignitePin, Pin continuityPin, Pin continuityADCPin)
     Hal::digitalWrite(ignitePin_, Hal::PinDigital::LO);
 
     /*continuity check */
-    // Hal::pinMode(continuityPin_, Hal::PinMode::OUTPUT);
-
-    // Hal::digitalWrite(continuityPin_, Hal::PinDigital::HI);
-    // Hal::sleep_us(CONTINUITY_CHECK_DELAY);
-    // pinMode(0, 0);
-    // int test = analogRead(0);
-    // Serial.print("test: "); Serial.println(test);
-
     Hal::pinMode(continuityADCPin_, Hal::PinMode::INPUT);
-    // int continuity = 0;
-    // for (int i = 0; i < 100; i++) {
     int continuity = Hal::analogRead(continuityADCPin_);
+
     #ifdef TESTING
         Serial.print("Continuity read for ignitor on pin "); 
         Serial.print(static_cast<uint8_t>(ignitePin_));
         Serial.print(": "); 
         Serial.println(continuity);
     #endif
-    // }
-    // Hal::digitalWrite(continuityPin_, Hal::PinDigital::LO);
     
 
     if (continuity <= DISCONTINUOUS_THRESHOLD) {
