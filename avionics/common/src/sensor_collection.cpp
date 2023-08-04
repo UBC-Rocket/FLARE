@@ -1,7 +1,10 @@
 #include "sensor_collection.h"
 #include "log.hpp"
 #include "options.h"
+
+#if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
+#endif
 
 constexpr char SensorCollection::LOG_FILE_HEADER[];
 

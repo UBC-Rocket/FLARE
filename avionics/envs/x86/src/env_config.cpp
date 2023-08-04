@@ -36,4 +36,4 @@ void env_initialize() {
     StdIoController::initialize();
 }
 
-void env_callbacks() { Hal::Serial::watchdog_callback(); }
+void env_callbacks() { Hal::CustomSerial::watchdog_callback(); }

@@ -2,7 +2,11 @@
 #include "gpio.h"
 #include "log.hpp"
 #include "options.h"
+
+#if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
+#endif
+
 
 IgnitorCollection::IgnitorCollection()
     : drogue(Pin::DROGUE_IGNITOR, Pin::DROGUE_CONTINUITY_TEST,

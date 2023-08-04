@@ -3,8 +3,10 @@
 
 #include "CalcHelpers/barometric.hpp"
 #include "extra/altitude_avg.hpp"
-#include "Arduino.h"
 #include "options.h"
+#if defined(ARDUINO) && ARDUINO >= 100
+#include "Arduino.h"
+#endif
 #undef abs
 
 namespace extra {

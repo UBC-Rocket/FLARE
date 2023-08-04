@@ -80,6 +80,12 @@ PLEASE READ ME!
 #include "log.hpp"
 #include "HAL/pin_util.h"
 
+#if defined(ARDUINO) && ARDUINO >= 100
+#include "Arduino.h"
+#else
+#include "WProgram.h"
+#endif
+
 /**
  * @brief Helper function that makes things less verbose; basically saves the
  * static_cast call
@@ -162,40 +168,40 @@ int main(void) {
     #endif
         Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
 
-        int A = 440;
-        int Bf = 466;
-        int B = 494;
-        int C = 523;
-        int Cs = 554;
-        int D = 587;
-        int Ds = 622;
-        int E = 659;
-        int F = 698;
-        int Fs = 740;
-        int G = 784;
+    //     int A = 440;
+    //     int Bf = 466;
+    //     int B = 494;
+    //     int C = 523;
+    //     int Cs = 554;
+    //     int D = 587;
+    //     int Ds = 622;
+    //     int E = 659;
+    //     int F = 698;
+    //     int Fs = 740;
+    //     int G = 784;
 
-    #ifdef STAGE_2
-        buzzNote(C, 500);
-        buzzNote(G, 500);
-        buzzNote(G, 500);
-        buzzNote(F, 250);
-        buzzNote(E, 250);
-        buzzNote(F, 250);
-        buzzNote(E, 250);
-        buzzNote(D, 500);
-        buzzNote(D, 500);
-    #else
-        buzzNote(C, 250);
-        buzzNote(D, 250);
-        buzzNote(E, 500);
-        buzzNote(D, 250);
-        buzzNote(E, 250);
-        buzzNote(F, 500);
-        buzzNote(E, 250);
-        buzzNote(C, 250);
-        buzzNote(E, 500);
-        buzzNote(D, 1000);
-    #endif
+    // #ifdef STAGE_2
+    //     buzzNote(C, 500);
+    //     buzzNote(G, 500);
+    //     buzzNote(G, 500);
+    //     buzzNote(F, 250);
+    //     buzzNote(E, 250);
+    //     buzzNote(F, 250);
+    //     buzzNote(E, 250);
+    //     buzzNote(D, 500);
+    //     buzzNote(D, 500);
+    // #else
+    //     buzzNote(C, 250);
+    //     buzzNote(D, 250);
+    //     buzzNote(E, 500);
+    //     buzzNote(D, 250);
+    //     buzzNote(E, 250);
+    //     buzzNote(F, 500);
+    //     buzzNote(E, 250);
+    //     buzzNote(C, 250);
+    //     buzzNote(E, 500);
+    //     buzzNote(D, 1000);
+    // #endif
         break;
     }
     case RocketStatus::NONCRITICAL_FAILURE:
