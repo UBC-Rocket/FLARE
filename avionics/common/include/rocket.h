@@ -57,12 +57,12 @@ class CommandReceiver {
             break;
         case Radio::arm:
             rocket_.state_machine.arm();
-            rocket_.cam.start_record();
+            // rocket_.cam.start_record();
             break;
 
         case Radio::disarm:
             rocket_.state_machine.disarm();
-            rocket_.cam.stop_record();
+            // rocket_.cam.stop_record();
             break;
         case Radio::bulk_sensor:
             Radio::sendBulkSensor(
