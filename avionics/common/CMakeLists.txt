@@ -28,12 +28,12 @@ set(common_files
     ${CMAKE_CURRENT_LIST_DIR}/lib/CalcHelpers/barometric.cpp
 )
 target_sources(
-    TantalusStage1
+    BNBStage1
     PRIVATE
     ${common_files}
 )
 target_sources(
-    TantalusStage2
+    BNBStage2
     PRIVATE
     ${common_files}
 )

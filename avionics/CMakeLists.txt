@@ -11,15 +11,15 @@ else()
     set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -static-libgcc -Wall -Wextra -g")
 endif()
 
-add_executable(TantalusStage1 common/src/avionics.cpp)
-add_executable(TantalusStage2 common/src/avionics.cpp)
+add_executable(BNBStage1 common/src/avionics.cpp)
+add_executable(BNBStage2 common/src/avionics.cpp)
 add_executable(Hollyburn common/src/avionics.cpp)
 add_executable(Silvertip common/src/avionics.cpp)
 
 add_subdirectory(common)
 add_subdirectory(envs/x86)
-add_subdirectory(rockets/tantalus_stage_1)
-add_subdirectory(rockets/tantalus_stage_2)
+add_subdirectory(rockets/bnb_stage_1)
+add_subdirectory(rockets/bnb_stage_2)
 add_subdirectory(rockets/hollyburn)
 add_subdirectory(rockets/silvertip)
 
@@ -33,15 +33,15 @@ include_directories(
 )
 
 # Rocket-specific directories
-target_include_directories(TantalusStage1 PUBLIC
-  rockets/tantalus_stage_1/include
+target_include_directories(BNBStage1 PUBLIC
+  rockets/bnb_stage_1/include
 )
-target_sources(TantalusStage1 PUBLIC extra/src/altitude_avg.cpp)
+target_sources(BNBStage1 PUBLIC extra/src/altitude_avg.cpp)
 
-target_include_directories(TantalusStage2 PUBLIC
-rockets/tantalus_stage_2/include
+target_include_directories(BNBStage2 PUBLIC
+rockets/bnb_stage_2/include
 )
-target_sources(TantalusStage2 PUBLIC extra/src/altitude_avg.cpp)
+target_sources(BNBStage2 PUBLIC extra/src/altitude_avg.cpp)
 
 
 target_include_directories(Hollyburn PUBLIC
@@ -60,10 +60,10 @@ target_sources(Silvertip PUBLIC extra/src/altitude_avg.cpp)
 ###
 
 add_compile_definitions(RADIO_CONFIG_PACKET_SIM_ACTIVE=1)
-target_compile_definitions(TantalusStage1 PUBLIC
+target_compile_definitions(BNBStage1 PUBLIC
     RADIO_CONFIG_PACKET_ROCKET_ID=0
 )
-target_compile_definitions(TantalusStage2 PUBLIC
+target_compile_definitions(BNBStage2 PUBLIC
     RADIO_CONFIG_PACKET_ROCKET_ID=1
 )
 
