@@ -114,62 +114,9 @@ int main(void) {
 
     Task led_blink(LEDBlinker::toggle, nullptr, LEDBlinker::freq);
 
-    switch (init_status) {
-    case RocketStatus::NOMINAL:
-    {
-    #ifdef TESTING
-        Serial.println("Nominal");
-    #endif
-        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
-
-    //     int A = 440;
-    //     int Bf = 466;
-    //     int B = 494;
-    //     int C = 523;
-    //     int Cs = 554;
-    //     int D = 587;
-    //     int Ds = 622;
-    //     int E = 659;
-    //     int F = 698;
-    //     int Fs = 740;
-    //     int G = 784;
-
-    // #ifdef STAGE_2
-    //     buzzNote(C, 500);
-    //     buzzNote(G, 500);
-    //     buzzNote(G, 500);
-    //     buzzNote(F, 250);
-    //     buzzNote(E, 250);
-    //     buzzNote(F, 250);
-    //     buzzNote(E, 250);
-    //     buzzNote(D, 500);
-    //     buzzNote(D, 500);
-    // #else
-    //     buzzNote(C, 250);
-    //     buzzNote(D, 250);
-    //     buzzNote(E, 500);
-    //     buzzNote(D, 250);
-    //     buzzNote(E, 250);
-    //     buzzNote(F, 500);
-    //     buzzNote(E, 250);
-    //     buzzNote(C, 250);
-    //     buzzNote(E, 500);
-    //     buzzNote(D, 1000);
-    // #endif
-        break;
-    }
-    case RocketStatus::NONCRITICAL_FAILURE:
-    #ifdef TESTING
-        Serial.println("Non-critical failure");
-    #endif
-        // registerTask(TaskID::LEDBlinker, led_blink);
-        break;
-    case RocketStatus::CRITICAL_FAILURE:
-    #ifdef TESTING
-        Serial.println("Critical failure");
-    #endif
-        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HI);
-        break;
+    displayStatus(init_status, rocket.buzzer);
+    if (init_status == RocketStatus::NONCRITICAL_FAILURE) {
+        registerTask(TaskID::LEDBlinker, led_blink);
     }
 
     // RestartCamera restart_camera_(rocket.cam);

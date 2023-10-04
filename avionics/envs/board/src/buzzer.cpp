@@ -21,6 +21,7 @@
 #include <chrono>
 
 #include "buzzer.h"
+#include "options.h"
 
 /*Constants------------------------------------------------------------*/
 #define NOTE_B0 31
@@ -123,10 +124,28 @@
 void Buzzer::sing(SongTypes song) const {
     switch (song) {
     case SongTypes_SUCCESS: {
-        buzz(NOTE_C1, 500);
-        buzz(NOTE_C7, 1000);
-        buzz(NOTE_G7, 1000);
-        buzz(NOTE_C8, 1000);
+        #ifdef STAGE_2
+            buzzWithPause(NOTE_C5, 500);
+            buzzWithPause(NOTE_G5, 500);
+            buzzWithPause(NOTE_G5, 500);
+            buzzWithPause(NOTE_F5, 250);
+            buzzWithPause(NOTE_E5, 250);
+            buzzWithPause(NOTE_F5, 250);
+            buzzWithPause(NOTE_E5, 250);
+            buzzWithPause(NOTE_D5, 500);
+            buzzWithPause(NOTE_D5, 500);
+        #else
+            buzzWithPause(NOTE_C5, 250);
+            buzzWithPause(NOTE_D5, 250);
+            buzzWithPause(NOTE_E5, 500);
+            buzzWithPause(NOTE_D5, 250);
+            buzzWithPause(NOTE_E5, 250);
+            buzzWithPause(NOTE_F5, 500);
+            buzzWithPause(NOTE_E5, 250);
+            buzzWithPause(NOTE_C5, 250);
+            buzzWithPause(NOTE_E5, 500);
+            buzzWithPause(NOTE_D5, 1000);
+        #endif
         break;
     }
     case SongTypes_NONCRITFAIL: {
@@ -179,4 +198,9 @@ void Buzzer::buzz(long frequency, long length) const {
             Hal::PinDigital::LO); // write low to pull back the diaphram
         Hal::sleep_us(delayValue); // wait for the calculated delay value
     }
+}
+
+void Buzzer::buzzWithPause(long frequency, long length, int pause) const {
+    buzz(frequency, length);
+    Hal::sleep_ms(pause);
 }

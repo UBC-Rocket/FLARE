@@ -56,6 +56,18 @@ class Buzzer : public IBuzzer {
      */
     void buzz(long frequency, long length) const;
 
+    /**
+     * @brief  Creates a buzzer note at a specified frequency and duration with a pause afterwards -
+     * note that this is a blocking function.
+     * @param  long frequency - frequency of the note to be played
+     * @param  long length - length of note to be played. To calculate the note
+     *          duration, take one second divided by the note type.
+     *          e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+     * @param  int pause - milliseconds to pause after playing the note
+     * @return void.
+     */
+    void buzzWithPause(long frequency, long length, int pause = 50) const;
+
   private:
     const Pin M_MELODY_PIN;
 };

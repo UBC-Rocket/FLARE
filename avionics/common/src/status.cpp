@@ -73,14 +73,8 @@ void displayStatus(RocketStatus status, IBuzzer &buzzer) {
         song = SongTypes_CRITICALFAIL;
     }
 
-#ifdef TESTING // Only plays song once if testing, because it's annoying
-    for (int i = 1; i <= 1; i++) {
-#else
-    for (int i = 1; i <= 5; i++) {
-#endif
-        buzzer.sing(song);
-        Hal::sleep_ms(400);
-    }
+    buzzer.sing(song);
+
     return;
 }
 
