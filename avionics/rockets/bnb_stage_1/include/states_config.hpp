@@ -18,8 +18,8 @@
 struct StateMachineConfig {
   private:
     /* Configuration constants */
-    constexpr static int STANDBY_LAUNCH_CHECKS = 4;
-    constexpr static int ARMED_LAUNCH_CHECKS = 4;
+    constexpr static int STANDBY_LAUNCH_CHECKS = 10;
+    constexpr static int ARMED_LAUNCH_CHECKS = 10;
     constexpr static int MOTOR_BURNOUT_CHECKS = 4;
     constexpr static int MACH_LOCK_CHECKS = 10;
     constexpr static int MACH_UNLOCK_CHECKS = 10;
