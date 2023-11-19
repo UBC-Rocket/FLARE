@@ -158,6 +158,48 @@ void Buzzer::sing(SongTypes song) const {
         buzz(NOTE_A6, 2500);
         break;
     }
+    case SongTypes_LANDED: {
+        // Play the 2001: A Space Odyssey theme
+        buzz(NOTE_C5, 500);
+        buzz(NOTE_G5, 500);
+        buzz(NOTE_C6, 500);
+
+        buzz(NOTE_E5, 100);
+        buzz(NOTE_DS5, 400);
+        Hal::sleep_ms(1000);
+
+        buzz(NOTE_C5, 500);
+        buzz(NOTE_G5, 500);
+        buzz(NOTE_C6, 500);
+        Hal::sleep_ms(500);
+
+        buzz(NOTE_E5, 100);
+        buzz(NOTE_A6, 400); // not correct
+        Hal::sleep_ms(500);
+
+        buzz(NOTE_A6, 100);
+        buzz(NOTE_B6, 100);
+        buzz(NOTE_C6, 300);
+        Hal::sleep_ms(500)
+
+        buzz(NOTE_D6, 250);
+        Hal::sleep_ms(250);
+        buzz(NOTE_E6, 100);
+        buzz(NOTE_F6, 100);
+        buzz(NOTE_G6, 300);
+        Hal::sleep_ms(500)
+
+        buzz(NOTE_E6, 100);
+        buzz(NOTE_F6, 100);
+        buzz(NOTE_G6, 300);
+        Hal::sleep_ms(500)
+
+        buzz(NOTE_A6, 500);
+        buzz(NOTE_B6, 250);
+        Hal::sleep_ms(250);
+        buzz(NOTE_C6, 750);
+        Hal::sleep_ms(1000);
+    break;
     }
 }
 

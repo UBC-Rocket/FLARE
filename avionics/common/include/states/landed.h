@@ -24,6 +24,18 @@ class Landed : public IState {
      * codes and used states. Note that the returned code may be the same state.
      */
     StateId getNewState(Calculator const &) { return StateId::LANDED; }
+
+
+    void onEntry() override {
+      // create instance of buzzer
+      Buzzer landedBuzzer = Buzzer();
+
+      // create buzzer task
+      Scheduler::Task buzzer(Buzzer::landBuzzer, &landedBuzzer, Hal::ms(15000));
+
+      // register the task
+      Scheduler::registerTask(static_cast<int>(TaskID::BuzzerBeacon) , buzzer);
+    }
 };
 
 } // namespace State

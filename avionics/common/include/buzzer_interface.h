@@ -3,7 +3,8 @@
 enum SongTypes {
     SongTypes_SUCCESS,
     SongTypes_NONCRITFAIL,
-    SongTypes_CRITICALFAIL
+    SongTypes_CRITICALFAIL,
+    SongTypes_LANDED,
 };
 
 /*Classes--------------------------------------------------------------*/

@@ -8,6 +8,7 @@ enum class TaskID {
     RadioTxBulk = 1,
     LEDBlinker = 2,
     RestartCamera = 3,
+    BuzzerBeacon = 4, 
     kNum,
 };
 
