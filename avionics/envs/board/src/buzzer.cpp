@@ -174,7 +174,7 @@ void Buzzer::sing(SongTypes song) const {
         Hal::sleep_ms(500);
 
         buzz(NOTE_E5, 100);
-        buzz(NOTE_A6, 400); // not correct
+        buzz(NOTE_F6, 400); 
         Hal::sleep_ms(500);
 
         buzz(NOTE_A6, 100);
