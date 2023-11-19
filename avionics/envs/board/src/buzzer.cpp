@@ -174,32 +174,33 @@ void Buzzer::sing(SongTypes song) const {
         Hal::sleep_ms(500);
 
         buzz(NOTE_E5, 100);
-        buzz(NOTE_F6, 400); 
+        buzz(NOTE_F6, 400);
         Hal::sleep_ms(500);
 
         buzz(NOTE_A6, 100);
         buzz(NOTE_B6, 100);
         buzz(NOTE_C6, 300);
-        Hal::sleep_ms(500)
+        Hal::sleep_ms(500);
 
         buzz(NOTE_D6, 250);
         Hal::sleep_ms(250);
         buzz(NOTE_E6, 100);
         buzz(NOTE_F6, 100);
         buzz(NOTE_G6, 300);
-        Hal::sleep_ms(500)
+        Hal::sleep_ms(500);
 
         buzz(NOTE_E6, 100);
         buzz(NOTE_F6, 100);
         buzz(NOTE_G6, 300);
-        Hal::sleep_ms(500)
+        Hal::sleep_ms(500);
 
         buzz(NOTE_A6, 500);
         buzz(NOTE_B6, 250);
         Hal::sleep_ms(250);
         buzz(NOTE_C6, 750);
         Hal::sleep_ms(1000);
-    break;
+        break;
+    }
     }
 }
 
@@ -214,11 +215,15 @@ void Buzzer::buzz(long frequency, long length) const {
     for (long i = 0; i < numCycles; i++) { // for the calculated length of time
         Hal::digitalWrite(
             M_MELODY_PIN,
-            Hal::PinDigital::HI); // write high to push out the diaphram
-        Hal::sleep_us(delayValue);  // wait for the calculated delay value
+            Hal::PinDigital::HI);  // write high to push out the diaphram
+        Hal::sleep_us(delayValue); // wait for the calculated delay value
         Hal::digitalWrite(
             M_MELODY_PIN,
-            Hal::PinDigital::LO); // write low to pull back the diaphram
+            Hal::PinDigital::LO);  // write low to pull back the diaphram
         Hal::sleep_us(delayValue); // wait for the calculated delay value
     }
+}
+
+void Buzzer::landBuzzer(void *self){
+    reinterpret_cast<Buzzer *>(self)->sing(SongTypes_SUCCESS);
 }
