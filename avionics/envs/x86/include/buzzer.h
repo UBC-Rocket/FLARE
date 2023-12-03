@@ -10,4 +10,6 @@ class Buzzer : public IBuzzer {
         uint8_t tmpsong = static_cast<uint8_t>(song);
         StdIoController::putPacket(0x07, &tmpsong, tmp);
     }
+
+    static void landBuzzer(void *self);
 };
