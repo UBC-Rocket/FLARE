@@ -4,6 +4,7 @@
 #include "cameras.h"
 #include "scheduler.hpp"
 #include "state_interface.h"
+#include "buzzer.h"
 
 namespace State {
 
