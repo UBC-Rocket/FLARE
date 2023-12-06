@@ -28,14 +28,6 @@ void Barometer::readData() {
     barometer.Readout();
 
     data_[0] = barometer.GetPres();
-    
-    // Re-read in case of overflow
-    while (data_[0] < 0 || data_[0] > 102000) {
-        barometer.ReadProm();
-        barometer.Readout();
-        data_[0] = barometer.GetPres();
-    }
-    
     data_[1] = barometer.GetTemp();
 
 #ifdef TESTING
