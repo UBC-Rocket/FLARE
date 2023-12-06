@@ -10,4 +10,8 @@ class Buzzer : public IBuzzer {
         uint8_t tmpsong = static_cast<uint8_t>(song);
         StdIoController::putPacket(0x07, &tmpsong, tmp);
     }
+
+  void landBuzzer(void *self){
+    reinterpret_cast<Buzzer *>(self)->sing(SongTypes_SUCCESS);
+  }
 };

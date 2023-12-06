@@ -32,10 +32,10 @@ class Landed : public IState {
       Buzzer landedBuzzer = Buzzer();
 
       // create buzzer task
-      Scheduler::Task buzzer(Buzzer::landBuzzer, &landedBuzzer, Hal::ms(15000));
+      Scheduler::Task buzzer = Scheduler::Task(Buzzer::landBuzzer , &landedBuzzer, Hal::ms(15000));
 
       // register the task
-      Scheduler::registerTask(static_cast<int>(TaskID::BuzzerBeacon) , buzzer);
+      Scheduler::registerTask(static_cast<int>(TaskID::BuzzerBeacon), buzzer);
     }
 };
 
