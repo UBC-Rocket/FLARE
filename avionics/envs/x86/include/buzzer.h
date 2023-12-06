@@ -11,7 +11,7 @@ class Buzzer : public IBuzzer {
         StdIoController::putPacket(0x07, &tmpsong, tmp);
     }
 
-  void landBuzzer(void *self){
+  static void landBuzzer(void *self){
     reinterpret_cast<Buzzer *>(self)->sing(SongTypes_SUCCESS);
   }
 };
