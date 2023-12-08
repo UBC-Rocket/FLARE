@@ -1,4 +1,4 @@
 target_sources(
-    TantalusStage1
+    BNBStage1
     PRIVATE
 )

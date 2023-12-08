@@ -58,7 +58,7 @@ void displayStatus(RocketStatus status, IBuzzer &buzzer) {
     switch (status) {
     case RocketStatus::NOMINAL:
         song = SongTypes_SUCCESS;
-        Hal::digitalWrite(Pin::STATUS_LED, Hal::PinDigital::HI);
+        Hal::digitalWrite(Pin::STATUS_LED, Hal::PinDigital::LO);
         break;
     case RocketStatus::NONCRITICAL_FAILURE:
         song = SongTypes_NONCRITFAIL;
@@ -66,21 +66,15 @@ void displayStatus(RocketStatus status, IBuzzer &buzzer) {
         break;
     case RocketStatus::CRITICAL_FAILURE:
         song = SongTypes_CRITICALFAIL;
-        Hal::digitalWrite(Pin::STATUS_LED, Hal::PinDigital::LO);
+        Hal::digitalWrite(Pin::STATUS_LED, Hal::PinDigital::HI);
         break;
     default:
         // Not known - assume the worst
         song = SongTypes_CRITICALFAIL;
     }
 
-#ifdef TESTING // Only plays song once if testing, because it's annoying
-    for (int i = 1; i <= 1; i++) {
-#else
-    for (int i = 1; i <= 5; i++) {
-#endif
-        buzzer.sing(song);
-        Hal::sleep_ms(400);
-    }
+    buzzer.sing(song);
+
     return;
 }
 

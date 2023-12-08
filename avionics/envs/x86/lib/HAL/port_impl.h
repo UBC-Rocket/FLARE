@@ -12,7 +12,7 @@ namespace Hal {
 
 class SerialInst;
 
-class Serial {
+class CustomSerial {
   private:
     friend SerialInst;
 
@@ -29,7 +29,7 @@ class Serial {
     std::size_t buf_used_;
     Clock::time_point last_sent_;
 
-    static std::vector<Serial *> serials_;
+    static std::vector<CustomSerial *> serials_;
 
   public:
     void begin(long) {} // no-op for native
@@ -45,7 +45,7 @@ class Serial {
     constexpr operator bool() { return true; }
 
     // Useful for mocking
-    Serial &getSerial() { return *this; }
+    CustomSerial &getSerial() { return *this; }
 
     /**
      * \brief Goes over all Serial instances and sens if they haven't been sent
@@ -60,14 +60,14 @@ class Serial {
     }
 
   private:
-    Serial(uint8_t const id) : IO_ID_(id) {
+    CustomSerial(uint8_t const id) : IO_ID_(id) {
         if (id != StdIoController::DEV_NULL) {
             serials_.push_back(this);
         }
     }
 
-    Serial(const Serial &other) = delete;
-    Serial &operator=(const Serial &other) = delete;
+    CustomSerial(const CustomSerial &other) = delete;
+    CustomSerial &operator=(const CustomSerial &other) = delete;
 
     /**
      * \brief Sends all data in the buffer. NOT THREAD SAFE
@@ -90,10 +90,10 @@ class SerialInst {
      * file gets #included
      */
   public:
-    static Serial USB;
-    static Serial GPS;
-    static Serial Radio;
-    static Serial Camera;
+    static CustomSerial USB;
+    static CustomSerial GPS;
+    static CustomSerial Radio;
+    static CustomSerial Camera;
     // static Serial Serial;
 };
 } // namespace Hal

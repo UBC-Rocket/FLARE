@@ -6,12 +6,13 @@
 
 namespace Hal {
 
-class Serial {
+class CustomSerial {
   public:
-    constexpr Serial(HardwareSerial &seri) : m_seri(seri) {}
+    constexpr CustomSerial(HardwareSerial &seri) : m_seri(seri) {}
 
     void begin(long baud) { m_seri.begin(baud); }
-    bool available() { return m_seri.available(); }
+    void end() { m_seri.end(); }
+    int available() { return m_seri.available(); }
     int read() { return m_seri.read(); }
     std::size_t write(uint8_t val) { return m_seri.write(val); }
     std::size_t write(const uint8_t *buffer, size_t size) {
@@ -35,9 +36,9 @@ class SerialInst {
      */
   public:
     // auto static SerialUSB//?
-    static Hal::Serial GPS;
-    static Hal::Serial Radio;
-    static Hal::Serial Camera;
+    static Hal::CustomSerial GPS;
+    static Hal::CustomSerial Radio;
+    static Hal::CustomSerial Camera;
     // Annoyingly trying to make some of these SerialX const directly doesn't
     // easily work because the underlying HardwareSerial isn't const, which I
     // think means everything that uses HardwareSerial (i.e. everything useful)

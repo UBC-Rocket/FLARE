@@ -16,8 +16,17 @@ class Armed : public RepeatedCheckBase<StateId::ARMED, next_id, num_checks,
     friend RepeatedCheckBase<StateId::ARMED, next_id, num_checks,
                              Armed<next_id, num_checks>>;
     float launch_threshold_;
+    float last_alt_;
+
     bool accept(Calculator const &input) {
-        return input.altitude() > launch_threshold_;
+      float altitude = input.altitude();
+      bool isAccepted = altitude > launch_threshold_ && altitude > last_alt_;
+      last_alt_ = altitude;
+      return isAccepted;
+    }
+
+    void extraOnEntry() {
+      last_alt_ = 0;
     }
 };
 

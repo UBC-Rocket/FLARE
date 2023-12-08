@@ -1,5 +1,5 @@
 /*
- * GPS GP-20U7 Driver Header
+ * GPS Copernicus II DIP Driver Header
  *
  * @file    GPS.cpp
  * @author  UBC Rocket Avionics 2018/2019
@@ -15,58 +15,11 @@
  * Distributed as-is; no warranty is given.
  */
 
-/*
-VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT
-PLEASE READ ME!
-
-                 uuuuuuu
-             uu$$$$$$$$$$$uu
-          uu$$$$$$$$$$$$$$$$$uu
-         u$$$$$$$$$$$$$$$$$$$$$u
-        u$$$$$$$$$$$$$$$$$$$$$$$u
-       u$$$$$$$$$$$$$$$$$$$$$$$$$u
-       u$$$$$$$$$$$$$$$$$$$$$$$$$u
-       u$$$$$$"   "$$$"   "$$$$$$u
-       "$$$$"      u$u       $$$$"
-        $$$u       u$u       u$$$
-        $$$u      u$$$u      u$$$
-         "$$$$uu$$$   $$$uu$$$$"
-          "$$$$$$$"   "$$$$$$$"
-            u$$$$$$$u$$$$$$$u
-             u$"$"$"$"$"$"$u
-  uuu        $$u$ $ $ $ $u$$       uuu
- u$$$$        $$$$$u$u$u$$$       u$$$$
-  $$$$$uu      "$$$$$$$$$"     uu$$$$$$
-u$$$$$$$$$$$uu    """""    uuuu$$$$$$$$$$
-$$$$"""$$$$$$$$$$uuu   uu$$$$$$$$$"""$$$"
- """      ""$$$$$$$$$$$uu ""$"""
-           uuuu ""$$$$$$$$$$uuu
-  u$$$uuu$$$$$$$$$uu ""$$$$$$$$$$$uuu$$$
-  $$$$$$$$$$""""           ""$$$$$$$$$$$"
-   "$$$$$"                      ""$$$$""
-     $$$"                         $$$$"
-
-In order to successfully poll the GPS, the serial RX buffer size must be
-increased. This needs to be done on the computer used for compilation. This can
-be done by navigating to the following path in the Arduino contents folder: On
-Mac: Got to the Applications folder, right click on the Arduino app, select Show
-Package Contents, then navigate to
-‎⁨Contents⁩/⁨Java⁩/⁨hardware⁩/⁨teensy⁩/⁨avr⁩/⁨cores⁩/⁨teensy3⁩/serial1.c
-On Windows: [user_drive]\Program Files
-(x86)\Arduino\hardware\teensy\avr\cores\teensy3\serial1.c
-
-On line 43 increase SERIAL1_RX_BUFFER_SIZE from 64 to 1024
-
-THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
-
-VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT
-PLEASE READ ME!
-*/
-
 /*Includes------------------------------------------------------------*/
 #include "sensors/GPS.h"
+#include "options.h"
 
-GPS::GPS(Hal::Serial &seri, float *const data)
+GPS::GPS(Hal::CustomSerial &seri, float *const data)
     : SensorBase(data),
       serial_port_(seri), GPS_reset_defaults{0xA0, 0xA1, 0x00,
                                                          0x02, 0x04, 0x00,
@@ -80,9 +33,9 @@ GPS::GPS(Hal::Serial &seri, float *const data)
 
 {
 #ifdef TESTING
-    SerialUSB.println("Initializing GPS");
+    Serial.println("Initializing GPS");
 #endif
-    serial_port_.begin(9600); // baud rate 9600 for the GP-20U7
+    serial_port_.begin(4800); // baud rate of Copernicus II DIP module
     while (!serial_port_) {
     }
 
@@ -107,6 +60,13 @@ void GPS::readData() {
     unsigned long fix_age;
     gps.f_get_position(data_, data_ + 1, &fix_age);
     data_[2] = gps.f_altitude();
+
+    #ifdef TESTING
+        Serial.println("Polling GPS");
+        Serial.print("gps lat: "); Serial.println(data_[0], 10);
+        Serial.print("gps lon: "); Serial.println(data_[1], 10);
+        Serial.print("gps alt: "); Serial.println(data_[2], 10);
+    #endif
 
     status = SensorStatus::NOMINAL;
 }

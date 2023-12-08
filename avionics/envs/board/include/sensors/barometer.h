@@ -6,7 +6,7 @@
  */
 
 /*Includes------------------------------------------------------------*/
-#include "MS5803_01.h" // Barometer
+#include "MS5xxx.h" // Barometer
 #include "sensors_interface.h"
 
 /*Constants------------------------------------------------------------*/
@@ -19,7 +19,7 @@ class Barometer : public SensorBase<BAROMETER_DATA_LENGTH> {
     void readData();
 
   private:
-    MS_5803 barometer;
+    MS5xxx barometer;
 };
 
 #endif

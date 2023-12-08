@@ -2,10 +2,10 @@
 #include <algorithm>
 
 namespace Hal {
-std::vector<Serial *> Serial::serials_{};
-constexpr std::chrono::milliseconds Serial::MAX_SEND_PERIOD_;
+std::vector<CustomSerial *> CustomSerial::serials_{};
+constexpr std::chrono::milliseconds CustomSerial::MAX_SEND_PERIOD_;
 
-int Serial::read() {
+int CustomSerial::read() {
     if (IO_ID_ == StdIoController::DEV_NULL) {
         // TODO log error
         return -1;
@@ -17,7 +17,7 @@ int Serial::read() {
     return -1;
 }
 
-std::size_t Serial::write(const uint8_t *const inbuf, std::size_t const size) {
+std::size_t CustomSerial::write(const uint8_t *const inbuf, std::size_t const size) {
     if (IO_ID_ == StdIoController::DEV_NULL) {
         return size;
     }
@@ -29,8 +29,8 @@ std::size_t Serial::write(const uint8_t *const inbuf, std::size_t const size) {
     return size;
 }
 
-Serial SerialInst::USB{StdIoController::DEV_NULL};
-Serial SerialInst::GPS{StdIoController::DEV_NULL};
-Serial SerialInst::Radio{'R'};
-Serial SerialInst::Camera{StdIoController::DEV_NULL};
+CustomSerial SerialInst::USB{StdIoController::DEV_NULL};
+CustomSerial SerialInst::GPS{StdIoController::DEV_NULL};
+CustomSerial SerialInst::Radio{'R'};
+CustomSerial SerialInst::Camera{StdIoController::DEV_NULL};
 } // namespace Hal

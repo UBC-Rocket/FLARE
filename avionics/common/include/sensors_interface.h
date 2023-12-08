@@ -14,16 +14,16 @@ enum class SensorType {
     TEMPERATURE     = 0x04,
     IMU             = 0x01,
     GPS             = 0x00,
-    THERMOCOUPLE    = 0x05,
+    //THERMOCOUPLE    = 0x05,
     BATTERY         = 0x06
 };
 
 #define ACCELEROMETER_DATA_LENGTH   3
 #define BAROMETER_DATA_LENGTH       2
 #define GPS_DATA_LENGTH             3
-#define IMU_DATA_LENGTH             4
+#define IMU_DATA_LENGTH             7
 #define TEMPERATURE_DATA_LENGTH     1
-#define THERMOCOUPLE_DATA_LENGTH    1
+//#define THERMOCOUPLE_DATA_LENGTH    1
 #define BATTERY_DATA_LENGTH         1
 
 template <uint8_t size> class SensorBase {
