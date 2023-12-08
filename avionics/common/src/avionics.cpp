@@ -49,12 +49,6 @@ void registerTask(TaskID id, Scheduler::Task task, bool repeat = true,
     Scheduler::registerTask(static_cast<int>(id), task, repeat, early);
 }
 
-// TODO: Move to buzzer.cpp
-void buzzNote(int frequency, int length = 750, int pause = 50) {
-    tone(static_cast<uint8_t>(Pin::BUZZER), frequency, length);
-    Hal::sleep_ms(length + pause);
-}
-
 /* Main function ====================================================== */
 int main(void) {
     // Initialize Arduino
