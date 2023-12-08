@@ -17,6 +17,10 @@ class LEDBlinker {
     static bool led_on;
 
   public:
+
+    /**
+     * @brief toggles led
+     */
     static void toggle(void *) {
         if (led_on)
             Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HI);

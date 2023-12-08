@@ -26,6 +26,12 @@ class Battery : public SensorBase<BATTERY_DATA_LENGTH>{
   public:
     // Constructor. batterySensorPin is the pin for battery sensor
     // (i.e. output of the voltage divider)
+
+    /**
+     * @brief Construct a new Battery object
+     * @param batterySensorPin pin for battery sensor
+     * @param data 
+     */
     Battery(Pin batterySensorPin, float *const data);
 
     bool lowVoltageWarningSent;

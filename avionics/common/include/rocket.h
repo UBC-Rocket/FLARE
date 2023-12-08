@@ -19,6 +19,9 @@ struct Rocket {
   public:
     static constexpr char LOG_FILE_NAME[] = "datalog.csv";
 
+    /**
+     * @brief Construct a new Rocket object
+     */
     Rocket()
         : cam(Hal::SerialInst::Camera), datalog(LOG_FILE_NAME),
           init_status(collectStatus(sensors, ignitors)),
@@ -44,6 +47,10 @@ class CommandReceiver {
   public:
     CommandReceiver(Rocket &rocket) : rocket_(rocket) {}
 
+    /**
+     * @brief performs some action depedning on the information from sensors based on command 
+     * @param command selects which information is sent
+     */
     void run_command(Radio::command_t command) {
         // Sensor-related data should inform based on the last sensor poll time
         uint32_t sensor_poll_time =

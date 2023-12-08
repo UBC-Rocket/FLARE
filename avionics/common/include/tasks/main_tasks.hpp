@@ -14,6 +14,9 @@ class ReadEvalLog {
     constexpr static unsigned int NOMINAL_POLLING_TIME_INTERVAL = 50; // ms
     // MainDescent state updates this to 5000 ms - see main_descent.cpp
 
+    /**
+     * @brief polss sensors, logs data, and updates state machine
+     */
     void run() {
         auto &state_machine = rocket_.state_machine;
         auto &init_status = rocket_.init_status;
@@ -83,10 +86,18 @@ class RadioTxBulk {
         reinterpret_cast<RadioTxBulk *>(self)->run();
     }
 
+    /**
+     * @brief Construct a new Radio Tx Bulk object
+     * @param rkt 
+     */
     RadioTxBulk(Rocket &rkt) : rocket(rkt) {}
     static constexpr Hal::ms freq{500};
 
   private:
+
+    /**
+     * @brief sends bulk sensor data
+     */
     void run() {
         StateId state = rocket.state_machine.getState();
         Radio::sendBulkSensor(

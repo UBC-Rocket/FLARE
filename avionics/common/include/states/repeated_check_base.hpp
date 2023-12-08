@@ -38,6 +38,12 @@ namespace State {
 template <StateId my_id, StateId next_id, int num_checks, class Derived>
 class RepeatedCheckBase : public IState {
   public:
+    /**
+     * @brief Return the next state, based on input data (mostly from filtered
+     * sensor data)
+     * @return State enumeration code, to be passed into the std::map between
+     * codes and used states. Note that the returned code may be the same state.
+     */
     StateId getNewState(Calculator const &input) final override {
         if (accept(input)) {
             ++checks_;
@@ -51,8 +57,16 @@ class RepeatedCheckBase : public IState {
         return my_id;
     }
 
+    /**
+     * @brief Return the assigned enumeration code.
+     * @return Enumeration code.
+     */
     StateId getStateEnum(void) final override { return my_id; }
 
+    /**
+     * @brief Initialize generic states
+     *
+     */
     void onEntry() final override {
         checks_ = 0;
         static_cast<Derived *>(this)->extraOnEntry();
@@ -73,6 +87,7 @@ class RepeatedCheckBase : public IState {
 
     /**
      * @brief Alias for underlying `accept` function.
+     * @return boolean if condition is accepted
      */
     bool accept(Calculator const &input) {
         return static_cast<Derived *>(this)->accept(input);

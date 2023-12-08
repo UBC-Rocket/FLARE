@@ -28,6 +28,11 @@ enum class SensorType {
 
 template <uint8_t size> class SensorBase {
   public:
+
+    /**
+     * @brief Construct a new SensorBase object
+     * @param data 
+     */
     SensorBase(float *const data) : data_(data) {}
 
     /**

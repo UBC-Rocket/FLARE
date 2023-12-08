@@ -10,6 +10,11 @@ template <StateId next_id, int num_checks>
 class Armed : public RepeatedCheckBase<StateId::ARMED, next_id, num_checks,
                                        Armed<next_id, num_checks>> {
   public:
+    
+    /**
+     * @brief Construct a new state object
+     * @param launch_threshold
+     */
     Armed(const float launch_threshold) : launch_threshold_(launch_threshold) {}
 
   private:
@@ -18,6 +23,11 @@ class Armed : public RepeatedCheckBase<StateId::ARMED, next_id, num_checks,
     float launch_threshold_;
     float last_alt_;
 
+    /**
+     * @brief compares altitude of parameter vs launch_threshold_
+     * @param input altitude
+     * @return true if current altitude > launch_threshold_
+     */
     bool accept(Calculator const &input) {
       float altitude = input.altitude();
       bool isAccepted = altitude > launch_threshold_ && altitude > last_alt_;

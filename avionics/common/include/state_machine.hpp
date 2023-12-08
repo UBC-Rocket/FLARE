@@ -15,6 +15,11 @@ class StateMachine {
   public:
     typedef std::unordered_map<StateId, IState *> StateMap;
 
+    /**
+     * @brief Construct a new State Machine object
+     * @param map 
+     * @param initial_state_ 
+     */
     StateMachine(StateMap map, StateId initial_state_)
         : current_id_(initial_state_), state_map_(map) {
         assert(map.count(StateId::STANDBY) != 0);
