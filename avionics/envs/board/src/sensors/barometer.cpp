@@ -1,35 +1,40 @@
 /*Includes------------------------------------------------------------*/
 #include "sensors/barometer.h"
+#include "options.h"
 
-Barometer::Barometer(float *const buf) : SensorBase(buf) {
+Barometer::Barometer(float *const buf) : SensorBase(buf) , barometer(&Wire) {
     /*init barometer*/
+    barometer.setI2Caddr(0b1110111);
+
 #ifdef TESTING
-    SerialUSB.println("Initializing barometer");
-    if (!barometer.initializeMS_5803(true)) { // because one is verbose
-        return CRITICAL_FAILURE;
-    }
-#else
-    if (!barometer.initializeMS_5803(false)) {
+    Serial.println("Initializing barometer");
+    if (barometer.connect() > 0) {
+        Serial.println("Error connecting to barometer");
         status = SensorStatus::FAILURE;
     }
+#else
+    if (barometer.connect() > 0) {
+        status = SensorStatus::FAILURE;
+    }
+    
 #endif
 
     status = SensorStatus::NOMINAL;
 }
 
 void Barometer::readData() {
-#ifdef TESTING
-    SerialUSB.println("Polling barometer");
-    bool bar_flag = barometer.readSensor();
-    if (!bar_flag) {
-        SerialUSB.println("BAROMETER FAILED READING");
-        return NOMINAL;
-    }
-#else
-    barometer.readSensor();
-#endif
 
-    // barometer.pressure() returns mbar; we want Pa
-    data_[0] = barometer.pressure() * 100;
-    data_[1] = barometer.temperature();
+    barometer.ReadProm();
+    barometer.Readout();
+
+    data_[0] = barometer.GetPres();
+    data_[1] = barometer.GetTemp();
+
+#ifdef TESTING
+    Serial.println("Polling barometer");
+    Serial.print("Pressure [Pa]: ");
+    Serial.println(data_[0]);
+    Serial.print("Temperature [0.01 C]: ");
+    Serial.println(data_[1]);
+#endif
 }

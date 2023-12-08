@@ -1,51 +1,5 @@
 /* Main Arduino Sketch */
 /*
-VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT
-PLEASE READ ME!
-
-                 uuuuuuu
-             uu$$$$$$$$$$$uu
-          uu$$$$$$$$$$$$$$$$$uu
-         u$$$$$$$$$$$$$$$$$$$$$u
-        u$$$$$$$$$$$$$$$$$$$$$$$u
-       u$$$$$$$$$$$$$$$$$$$$$$$$$u
-       u$$$$$$$$$$$$$$$$$$$$$$$$$u
-       u$$$$$$"   "$$$"   "$$$$$$u
-       "$$$$"      u$u       $$$$"
-        $$$u       u$u       u$$$
-        $$$u      u$$$u      u$$$
-         "$$$$uu$$$   $$$uu$$$$"
-          "$$$$$$$"   "$$$$$$$"
-            u$$$$$$$u$$$$$$$u
-             u$"$"$"$"$"$"$u
-  uuu        $$u$ $ $ $ $u$$       uuu
- u$$$$        $$$$$u$u$u$$$       u$$$$
-  $$$$$uu      "$$$$$$$$$"     uu$$$$$$
-u$$$$$$$$$$$uu    """""    uuuu$$$$$$$$$$
-$$$$"""$$$$$$$$$$uuu   uu$$$$$$$$$"""$$$"
- """      ""$$$$$$$$$$$uu ""$"""
-           uuuu ""$$$$$$$$$$uuu
-  u$$$uuu$$$$$$$$$uu ""$$$$$$$$$$$uuu$$$
-  $$$$$$$$$$""""           ""$$$$$$$$$$$"
-   "$$$$$"                      ""$$$$""
-     $$$"                         $$$$"
-
-In order to successfully poll the GPS, the serial RX buffer size must be
-increased. This needs to be done on the computer used for compilation. This can
-be done by navigating to the following path in the Arduino contents folder: On
-Mac: Got to the Applications folder, right click on the Arduino app, select Show
-Package Contents, then navigate to
-‎⁨Contents⁩/⁨Java⁩/⁨hardware⁩/⁨teensy⁩/⁨avr⁩/⁨cores⁩/⁨teensy3⁩/serial1.c
-On Windows: [user_drive]\Program Files
-(x86)\Arduino\hardware\teensy\avr\cores\teensy3\serial1.c
-
-On line 43 increase SERIAL1_RX_BUFFER_SIZE from 64 to 1024
-
-THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
-
-VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT
-PLEASE READ ME!
-*/
 
 /* @file    avionics.ino
  * @author  UBC Rocket Avionics 2018/2019
@@ -78,6 +32,13 @@ PLEASE READ ME!
 #include "env_config.h"
 
 #include "log.hpp"
+#include "HAL/pin_util.h"
+
+#if defined(ARDUINO) && ARDUINO >= 100
+#include "Arduino.h"
+#else
+#include "WProgram.h"
+#endif
 
 /**
  * @brief Helper function that makes things less verbose; basically saves the
@@ -88,8 +49,17 @@ void registerTask(TaskID id, Scheduler::Task task, bool repeat = true,
     Scheduler::registerTask(static_cast<int>(id), task, repeat, early);
 }
 
+// TODO: Move to buzzer.cpp
+void buzzNote(int frequency, int length = 750, int pause = 50) {
+    tone(static_cast<uint8_t>(Pin::BUZZER), frequency, length);
+    Hal::sleep_ms(length + pause);
+}
+
 /* Main function ====================================================== */
 int main(void) {
+    // Initialize Arduino
+    init();
+    
     // Before anything else there's some environment specific setup to be done
     env_initialize();
     LOG_INFO("Everything is starting now");
@@ -99,10 +69,14 @@ int main(void) {
 /* Setup all UART comms */
 // Serial comms to computer
 #ifdef TESTING
-    SerialUSB.begin(9600);
-    while (!SerialUSB) {
+    Serial.begin(9600);
+    while (!Serial) {
+        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HI);
+        Hal::sleep_ms(100);
+        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
+        Hal::sleep_ms(100);
     }
-    SerialUSB.println("Initializing...");
+    Serial.println("Initializing...");
 #endif
 
     Radio::initialize();
@@ -140,25 +114,18 @@ int main(void) {
 
     Task led_blink(LEDBlinker::toggle, nullptr, LEDBlinker::freq);
 
-    switch (init_status) {
-    case RocketStatus::NOMINAL:
-        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
-        break;
-    case RocketStatus::NONCRITICAL_FAILURE:
+    displayStatus(init_status, rocket.buzzer);
+    if (init_status == RocketStatus::NONCRITICAL_FAILURE) {
         registerTask(TaskID::LEDBlinker, led_blink);
-        break;
-    case RocketStatus::CRITICAL_FAILURE:
-        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
-        break;
     }
 
-    RestartCamera restart_camera_(rocket.cam);
-    // This tasks sets its own reschedule interval (since the same task is run
-    // both to start and stop the recording)
-    Task restart_camera_task_(RestartCamera::togglePower, &restart_camera_,
-                              Hal::ms{0});
-    Scheduler::preregisterTask(static_cast<int>(TaskID::RestartCamera),
-                               restart_camera_task_, true, false);
+    // RestartCamera restart_camera_(rocket.cam);
+    // // This tasks sets its own reschedule interval (since the same task is run
+    // // both to start and stop the recording)
+    // Task restart_camera_task_(RestartCamera::togglePower, &restart_camera_,
+    //                           Hal::ms{0});
+    // Scheduler::preregisterTask(static_cast<int>(TaskID::RestartCamera),
+    //                            restart_camera_task_, true, false);
 
     LOG_INFO("Initialization done; starting scheduler");
 

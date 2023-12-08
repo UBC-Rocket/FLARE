@@ -4,7 +4,7 @@
  */
 
 /*Includes------------------------------------------------------------*/
-#include "SparkFunTMP102.h" // Temperature
+#include "MCP9803.h" // Temperature
 #include "sensors_interface.h"
 
 /*Constants------------------------------------------------------------*/
@@ -17,5 +17,4 @@ class Temperature : public SensorBase<TEMPERATURE_DATA_LENGTH> {
 
   private:
     constexpr static uint8_t TEMP_SENSOR_ADDRESS = 0x48;
-    TMP102 temp_sensor;
 };

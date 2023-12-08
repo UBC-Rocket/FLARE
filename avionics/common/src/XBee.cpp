@@ -743,9 +743,9 @@ uint8_t XBee::getNextFrameId() {
 }
 
 // Support for SoftwareSerial. Contributed by Paul Stoffregen
-void XBee::begin(Hal::Serial &serial) { _serial = &serial; }
+void XBee::begin(Hal::CustomSerial &serial) { _serial = &serial; }
 
-void XBee::setSerial(Hal::Serial &serial) { _serial = &serial; }
+void XBee::setSerial(Hal::CustomSerial &serial) { _serial = &serial; }
 
 bool XBee::available() { return _serial->available(); }
 

@@ -4,6 +4,7 @@
 StateId State::MainDescent::getNewState(Calculator const &input) {
     typedef std::chrono::milliseconds ms;
 
+    curr_time = Hal::now_ms();
     if (curr_time - prev_time >= LANDED_TIME_INTERVAL_) {
         auto dt_ms =
             std::chrono::duration_cast<ms>(curr_time - prev_time).count();
@@ -19,6 +20,7 @@ StateId State::MainDescent::getNewState(Calculator const &input) {
         }
 
         prev_time = curr_time;
+        prev_altitude = input.altitude();
     }
 
     return StateId::MAIN_DESCENT;

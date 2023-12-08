@@ -23,6 +23,7 @@ class Standby : public RepeatedCheckBase<StateId::STANDBY, next_id, num_checks,
     friend RepeatedCheckBase<StateId::STANDBY, next_id, num_checks,
                              Standby<next_id, num_checks>>;
     float launch_threshold_;
+    float last_alt_;
     Camera &camera_;
 
     /**
@@ -31,16 +32,24 @@ class Standby : public RepeatedCheckBase<StateId::STANDBY, next_id, num_checks,
      * @return true if current altitude > launch_threshold_ altitude
      */
     bool accept(Calculator const &input) {
-        return input.altitude() > launch_threshold_;
+      float altitude = input.altitude();
+      bool isAccepted = altitude > launch_threshold_ && altitude > last_alt_;
+      last_alt_ = altitude;
+      return isAccepted;
+    }
+
+    void extraOnEntry() {
+      last_alt_ = 0;
     }
 
     // Exiting directly is abnormal - means we didn't get arm signal.  Normally
     // rocket command parser addresses camera on/off
 
     /**
-     * @brief additional logic ran when exiting a state
+     * @brief additional logic ran when exiting state
      */
-    void extraOnExit() { camera_.start_record(); }
+    void extraOnExit() { //camera_.start_record(); 
+    }
 };
 
 } // namespace State

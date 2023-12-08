@@ -833,7 +833,7 @@ class XBee {
     /**
      * Starts the serial connection on the specified serial port
      */
-    void begin(Hal::Serial &serial);
+    void begin(Hal::CustomSerial &serial);
     void getResponse(XBeeResponse &response);
     /**
      * Returns a reference to the current response
@@ -853,7 +853,7 @@ class XBee {
      * Specify the serial port.  Only relevant for Arduinos that support
      * multiple serial ports (e.g. Mega)
      */
-    void setSerial(Hal::Serial &serial);
+    void setSerial(Hal::CustomSerial &serial);
 
   private:
     bool available();
@@ -874,7 +874,7 @@ class XBee {
     // buffer for incoming RX packets.  holds only the api specific frame data,
     // starting after the api id byte and prior to checksum
     uint8_t _responseFrameData[MAX_FRAME_DATA_SIZE];
-    Hal::Serial *_serial;
+    Hal::CustomSerial *_serial;
 };
 
 /**

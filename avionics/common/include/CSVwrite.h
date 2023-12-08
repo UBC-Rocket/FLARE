@@ -71,8 +71,14 @@ template <typename Impl> class CSVWrite {
         print(baseline_alt);
 
         // Print Sensor Data
-        for (auto dat : sensors.getData()) {
-            print(dat);
+        // Separate GPS coordinate printing because they require more precision
+        std::array<float, SensorCollection::SENSOR_DATA_LENGTH> sensorData = sensors.getData();
+        for (int idx = 0; idx < SensorCollection::SENSOR_DATA_LENGTH; idx++) {
+            if (idx == SensorCollection::GPS_LAT_INDEX || idx == SensorCollection::GPS_LON_INDEX) {
+                print(sensorData[idx], 5);
+            } else {
+                print(sensorData[idx]);
+            }
         }
         m_datalog.print('\n');
         flush();
@@ -85,6 +91,16 @@ template <typename Impl> class CSVWrite {
      */
     template <typename T> void print(T s) {
         m_datalog.print(s);
+        m_datalog.print(",");
+    }
+
+    /**
+     * @brief prints float data with specified number of decimal places to next csv column in order
+     * @param data the float data to print
+     * @param decimalPlaces the number of decimal places
+     */
+    void print(float data, int decimalPlaces) {
+        m_datalog.print(data, decimalPlaces);
         m_datalog.print(",");
     }
 

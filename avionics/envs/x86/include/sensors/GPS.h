@@ -7,7 +7,7 @@
 
 class GPS : public SensorBase<GPS_DATA_LENGTH> {
   public:
-    GPS(Hal::Serial &, float *const buf) : SensorBase(buf) {
+    GPS(Hal::CustomSerial &, float *const buf) : SensorBase(buf) {
     }
     void initSensor() {}
     void readData() {

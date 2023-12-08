@@ -43,20 +43,22 @@ class ReadEvalLog {
         std::tie(old_state, new_state) = state_machine.update(calc);
         if (old_state != new_state) {
             // state transition has occurred
-            if (new_state == StateId::MAIN_DESCENT) {
-                // restart the camera periodically once in main descent
-                Scheduler::scheduleTask(
-                    Hal::now_ms() + Hal::ms(CAMERA_FIRST_POWEROFF_DELAY_MS),
-                    static_cast<int>(TaskID::RestartCamera));
+            
+            // if (new_state == StateId::MAIN_DESCENT) {
+            //     // restart the camera periodically once in main descent
+            //     Scheduler::scheduleTask(
+            //         Hal::now_ms() + Hal::ms(CAMERA_FIRST_POWEROFF_DELAY_MS),
+            //         static_cast<int>(TaskID::RestartCamera));
 
-            } else if (new_state == StateId::LANDED) {
+            // } else if (new_state == StateId::LANDED) {
+            if (new_state == StateId::LANDED) {
                 // stop restarting the camera once in landed, and slow down
                 // polling interval
-                Scheduler::unschedule(static_cast<int>(TaskID::RestartCamera));
+                // Scheduler::unschedule(static_cast<int>(TaskID::RestartCamera));
 
                 // NOTE: Status of camera is unknown at this point. Ensure that
                 // it is turned off.
-                rocket_.cam.stop_record();
+                // rocket_.cam.stop_record();
 
                 constexpr static unsigned int LANDED_POLLING_INTERVAL = 5000;
                 Scheduler::get_task(static_cast<int>(TaskID::ReadEvalLog))

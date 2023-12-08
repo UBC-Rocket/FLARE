@@ -24,18 +24,19 @@
 /*Constants------------------------------------------------------------*/
 // Double, triple check pin assignments
 enum class Pin {
-    POWER_LED = 20,  // kept in one place w/ FLIGHT_LED
-    FLIGHT_LED = 21, // required by state machine
-    BUILTIN_LED = 13,
-    STATUS_LED = 13, // uses BUILTIN_LED
-    BUZZER = 3,      // required by buzzer
-    MAIN_IGNITOR = 16,
-    MAIN_CONTINUITY_TEST = 4,
-    MAIN_CONTINUITY_READ = 14,
-    DROGUE_IGNITOR = 35,
-    DROGUE_CONTINUITY_TEST = 17,
-    DROGUE_CONTINUITY_READ = 34,
-    VOLTAGE_SENSOR = 23
+    POWER_LED = 33,  // kept in one place w/ FLIGHT_LED
+    FLIGHT_LED = 33, // required by state machine
+    BUILTIN_LED = 31, // PC13
+    STATUS_LED = 31, // uses BUILTIN_LED
+    BUZZER = 25, // PB9
+    MAIN_IGNITOR = 20, // PB4
+    MAIN_CONTINUITY_TEST = 33,
+    MAIN_CONTINUITY_READ = 200, // PB_0
+    DROGUE_IGNITOR = 15, // PA15
+    DROGUE_CONTINUITY_TEST = 33,
+    DROGUE_CONTINUITY_READ = 193, // PA_1
+    VOLTAGE_SENSOR = 33, // PC15 (unused)
+    SD_CHIP_SELECT = 196, // PA_4
 };
 
 /*Functions------------------------------------------------------------*/

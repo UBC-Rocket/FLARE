@@ -57,6 +57,9 @@ class AscentToApogee : public IState {
         last_alt_ = input.altitude();
 
         if (apogee_checks_ >= APOGEE_CHECKS_) {
+            #ifdef TESTING
+                Serial.println("firing drogue");
+            #endif
             drogue_ignitor_.fire();
             return post_apogee_id_;
         } else {

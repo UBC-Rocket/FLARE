@@ -36,10 +36,15 @@ class DrogueDescent
     }
 
     /**
-     * @brief additional logic ran when exiting a state
+     * @brief additional logic ran when exiting state
      *
      */
-    void extraOnExit() { ignitor_.fire(); }
+    void extraOnExit() { 
+        #ifdef TESTING
+            Serial.println("firing main"); 
+        #endif
+        ignitor_.fire(); 
+    }
 };
 
 } 

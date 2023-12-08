@@ -24,6 +24,13 @@ class CSVWriteImpl {
     template <typename T> void print(T t) { file_ << t; }
 
     /**
+     * @brief prints float data with specified number of decimal places to next csv column in order
+     * @param data the float data to print
+     * @param decimalPlaces the number of decimal places
+     */
+    void print(float data, int decimalPlaces) { print(data); }
+
+    /**
      * @brief writes t and ends the line
      * @param t the data to write
      */
