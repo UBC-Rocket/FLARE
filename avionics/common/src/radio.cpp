@@ -130,7 +130,7 @@ void Radio::addIdTime(command_t id, uint32_t time) {
 void Radio::send() {
     if (!self.tx_q_.empty()) {
         self.tx_packet_.setPayloadLength(self.tx_q_.fillPayload(self.payload_));
-        self.xbee_.send(self.tx_packet_);
+        //self.xbee_.send(self.tx_packet_);
     }
 }
 

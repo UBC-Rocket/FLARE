@@ -69,6 +69,7 @@ PLEASE READ ME!
 #include "tasks/led_blinker.hpp"
 #include "tasks/main_tasks.hpp"
 #include "tasks/restart_camera.hpp"
+#include "tasks/landed_buzzer.hpp"
 
 #include "radio.h"
 #include "rocket.h"
@@ -134,6 +135,8 @@ int main(void) {
     auto &init_status = rocket.init_status;
     auto &sensors = rocket.sensors;
     auto &ignitors = rocket.ignitors;
+
+    LandedBuzzer landedBuzzer(rocket.buzzer);
 
     if (init_status == RocketStatus::CRITICAL_FAILURE) {
         LOG_ERROR("Critical failure; aborting in state machine");
@@ -217,6 +220,15 @@ int main(void) {
         Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HI);
         break;
     }
+    
+    Task buzzer(LandedBuzzer::run, nullptr, Hal::ms(1500));
+    Scheduler::preregisterTask(static_cast<int>(TaskID::BuzzerBeacon), buzzer, true, false);
+    //Scheduler::preregisterTask(static_cast<int>(TaskID::BuzzerBeacon), led_blink, true, false);
+    rocket.buzzer.buzz(1760, 2500);
+    Scheduler::scheduleTask(Hal::now_ms() + Hal::ms(1), static_cast<int>(TaskID::BuzzerBeacon));
+    rocket.buzzer.buzz(1000, 5000);
+
+
 
     // RestartCamera restart_camera_(rocket.cam);
     // // This tasks sets its own reschedule interval (since the same task is run

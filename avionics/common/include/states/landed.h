@@ -26,16 +26,8 @@ class Landed : public IState {
      */
     StateId getNewState(Calculator const &) { return StateId::LANDED; }
 
-
     void onEntry() override {
-      // create instance of buzzer
-      Buzzer landedBuzzer = Buzzer();
-
-      // create buzzer task
-      Scheduler::Task buzzer = Scheduler::Task(Buzzer::landBuzzer , &landedBuzzer, Hal::ms(15000));
-
-      // register the task
-      Scheduler::registerTask(static_cast<int>(TaskID::BuzzerBeacon), buzzer);
+      Scheduler::scheduleTask(Hal::now_ms() + Hal::ms(1), static_cast<int>(TaskID::BuzzerBeacon));
     }
 };
 

@@ -20,6 +20,8 @@ class Barometer : public SensorBase<BAROMETER_DATA_LENGTH> {
 
   private:
     MS5xxx barometer;
+    int fakePressure;
+    int negative;
 };
 
 #endif
