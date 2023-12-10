@@ -221,14 +221,8 @@ int main(void) {
         break;
     }
     
-    Task buzzer(LandedBuzzer::run, nullptr, Hal::ms(1500));
+    Task buzzer(LandedBuzzer::run, &landedBuzzer, Hal::ms(15000));
     Scheduler::preregisterTask(static_cast<int>(TaskID::BuzzerBeacon), buzzer, true, false);
-    //Scheduler::preregisterTask(static_cast<int>(TaskID::BuzzerBeacon), led_blink, true, false);
-    rocket.buzzer.buzz(1760, 2500);
-    Scheduler::scheduleTask(Hal::now_ms() + Hal::ms(1), static_cast<int>(TaskID::BuzzerBeacon));
-    rocket.buzzer.buzz(1000, 5000);
-
-
 
     // RestartCamera restart_camera_(rocket.cam);
     // // This tasks sets its own reschedule interval (since the same task is run

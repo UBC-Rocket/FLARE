@@ -166,7 +166,6 @@ void Buzzer::sing(SongTypes song) const {
     case SongTypes_LANDED: {
         // Play the 2001: A Space Odyssey theme
         buzz(NOTE_C5, 500);
-        /*
         buzz(NOTE_G5, 500);
         buzz(NOTE_C6, 500);
 
@@ -205,17 +204,12 @@ void Buzzer::sing(SongTypes song) const {
         Hal::sleep_ms(250);
         buzz(NOTE_C6, 750);
         Hal::sleep_ms(1000);
-        */
         break;
     }
     }
 }
 
 void Buzzer::buzz(long frequency, long length) const {
-    Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HI);
-    Hal::sleep_ms(1000);
-    Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
-
     long delayValue = 1000000 / frequency / 2; // delay between transitions
     // 1 000 000 microseconds, divided by the frequency, divided by 2 b/c
     // there are two phases to each cycle

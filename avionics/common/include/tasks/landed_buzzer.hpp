@@ -16,8 +16,8 @@ class  LandedBuzzer{
 		
 	}
     static void run(void * self) {
-		  reinterpret_cast<LandedBuzzer *>(self)->buzzer_.sing(SongTypes_CRITICALFAIL);
-
+		  //reinterpret_cast<LandedBuzzer *>(self)->buzzer_.sing(SongTypes_CRITICALFAIL);
+		  reinterpret_cast<LandedBuzzer *>(self)->buzzer_.sing(SongTypes_LANDED);
     }
     static constexpr Hal::ms freq{500};
 };
