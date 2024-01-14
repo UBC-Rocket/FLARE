@@ -222,7 +222,7 @@ int main(void) {
         break;
     }
     
-    Task buzzer(LandedBuzzer::run, &landedBuzzer, Hal::ms(64000));
+    Task buzzer(LandedBuzzer::run, &landedBuzzer, Hal::ms(45000));
     Scheduler::preregisterTask(static_cast<int>(TaskID::BuzzerBeacon), buzzer, true, false);
 
     // RestartCamera restart_camera_(rocket.cam);

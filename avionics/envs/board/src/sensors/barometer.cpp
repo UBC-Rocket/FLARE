@@ -35,7 +35,7 @@ void Barometer::readData() {
     //     barometer.Readout();
     //     data_[0] = barometer.GetPres();
     // }
-    fakePressure += 500 * negative;
+    fakePressure += 2000 * negative;
     data_[0] = fakePressure;
     if(fakePressure < 60000){
         negative = 1;

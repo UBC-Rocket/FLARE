@@ -160,57 +160,58 @@ void Buzzer::sing(SongTypes song) const {
     }
     case SongTypes_LANDED: {
         // Play the 2001: A Space Odyssey theme
-        buzz(NOTE_C5, 2000);
-        buzz(NOTE_G5, 2000);
-        buzz(NOTE_C6, 3500);
-        buzz(NOTE_E6, 250);
-        buzz(NOTE_DS6, 4000);
+        int tempo = 2;
+        buzz(NOTE_C5, 2000 / tempo);
+        buzz(NOTE_G5, 2000 / tempo);
+        buzz(NOTE_C6, 3500 / tempo);
+        buzz(NOTE_E6, 250 / tempo);
+        buzz(NOTE_DS6, 4000 / tempo);
 
-        buzz(NOTE_C4, 500);
-        buzz(NOTE_G3, 500);
-        buzz(NOTE_C4, 500);
-        buzz(NOTE_G3, 500);
-        buzz(NOTE_C4, 500);
-        buzz(NOTE_G3, 500);
-        buzz(NOTE_C4, 500);
-        buzz(NOTE_G3, 500);
+        buzz(NOTE_C4, 500 / tempo);
+        buzz(NOTE_G3, 500 / tempo);
+        buzz(NOTE_C4, 500 / tempo);
+        buzz(NOTE_G3, 500 / tempo);
+        buzz(NOTE_C4, 500 / tempo);
+        buzz(NOTE_G3, 500 / tempo);
+        buzz(NOTE_C4, 500 / tempo);
+        buzz(NOTE_G3, 500 / tempo);
 
-        buzz(NOTE_C5, 2000);
-        buzz(NOTE_G5, 2000);
-        buzz(NOTE_C6, 3500);
-        buzz(NOTE_DS6, 250);
-        buzz(NOTE_E6, 4000);
+        buzz(NOTE_C5, 2000 / tempo);
+        buzz(NOTE_G5, 2000 / tempo);
+        buzz(NOTE_C6, 3500 / tempo);
+        buzz(NOTE_DS6, 250 / tempo);
+        buzz(NOTE_E6, 4000 / tempo);
 
-        buzz(NOTE_C4, 500);
-        buzz(NOTE_G3, 500);
-        buzz(NOTE_C4, 500);
-        buzz(NOTE_G3, 500);
-        buzz(NOTE_C4, 500);
-        buzz(NOTE_G3, 500);
-        buzz(NOTE_C4, 500);
-        buzz(NOTE_G3, 500);
+        buzz(NOTE_C4, 500 / tempo);
+        buzz(NOTE_G3, 500 / tempo);
+        buzz(NOTE_C4, 500 / tempo);
+        buzz(NOTE_G3, 500 / tempo);
+        buzz(NOTE_C4, 500 / tempo);
+        buzz(NOTE_G3, 500 / tempo);
+        buzz(NOTE_C4, 500 / tempo);
+        buzz(NOTE_G3, 500 / tempo);
 
-        buzz(NOTE_C5, 2000);
-        buzz(NOTE_G5, 2000);
-        buzz(NOTE_C6, 3500);
-        buzz(NOTE_E6, 250);
-        buzz(NOTE_A6, 4000);
+        buzz(NOTE_C5, 2000 / tempo);
+        buzz(NOTE_G5, 2000 / tempo);
+        buzz(NOTE_C6, 3500 / tempo);
+        buzz(NOTE_E6, 250 / tempo);
+        buzz(NOTE_A6, 4000 / tempo);
 
-        buzz(NOTE_A5, 250);
-        buzz(NOTE_B5, 250);
-        buzz(NOTE_C6, 2500);
-        buzz(NOTE_D6, 1000);
+        buzz(NOTE_A5, 250 / tempo);
+        buzz(NOTE_B5, 250 / tempo);
+        buzz(NOTE_C6, 2500 / tempo);
+        buzz(NOTE_D6, 1000 / tempo);
 
-        buzz(NOTE_E6, 500);
-        buzz(NOTE_F6, 500);
-        buzz(NOTE_G6, 2500);
-        buzz(NOTE_E6, 250);
-        buzz(NOTE_F6, 250);
+        buzz(NOTE_E6, 500 / tempo);
+        buzz(NOTE_F6, 500 / tempo);
+        buzz(NOTE_G6, 2500 / tempo);
+        buzz(NOTE_E6, 250 / tempo);
+        buzz(NOTE_F6, 250 / tempo);
 
-        buzz(NOTE_G6, 2000);
-        buzz(NOTE_A6, 1000);
-        buzz(NOTE_B6, 1000);
-        buzz(NOTE_C7, 8000);
+        buzz(NOTE_G6, 2000 / tempo);
+        buzz(NOTE_A6, 1000 / tempo);
+        buzz(NOTE_B6, 1000 / tempo);
+        buzz(NOTE_C7, 8000 / tempo);
         break;
     }
     }
