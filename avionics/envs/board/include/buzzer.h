@@ -56,11 +56,6 @@ class Buzzer : public IBuzzer {
      */
     void buzz(long frequency, long length) const;
 
-    // /**
-    //  * \brief function that can be called in a task for buzzer when landed
-    //  */
-    // static void landBuzzer(void *self);
-
   private:
     const Pin M_MELODY_PIN;
 };

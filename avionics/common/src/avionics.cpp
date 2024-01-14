@@ -136,6 +136,7 @@ int main(void) {
     auto &sensors = rocket.sensors;
     auto &ignitors = rocket.ignitors;
 
+    // Create instance of landed buzzer
     LandedBuzzer landedBuzzer(rocket.buzzer);
 
     if (init_status == RocketStatus::CRITICAL_FAILURE) {
@@ -221,7 +222,7 @@ int main(void) {
         break;
     }
     
-    Task buzzer(LandedBuzzer::run, &landedBuzzer, Hal::ms(15000));
+    Task buzzer(LandedBuzzer::run, &landedBuzzer, Hal::ms(64000));
     Scheduler::preregisterTask(static_cast<int>(TaskID::BuzzerBeacon), buzzer, true, false);
 
     // RestartCamera restart_camera_(rocket.cam);

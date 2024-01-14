@@ -121,11 +121,6 @@
  * @return void.
  */
 void Buzzer::sing(SongTypes song) const {
-    //         Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HI);
-    //         Hal::sleep_ms(1000);
-    //         Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
-    // return;
-
     switch (song) {
     case SongTypes_SUCCESS: {
         buzz(NOTE_C1, 500);
@@ -165,45 +160,57 @@ void Buzzer::sing(SongTypes song) const {
     }
     case SongTypes_LANDED: {
         // Play the 2001: A Space Odyssey theme
-        buzz(NOTE_C5, 500);
-        buzz(NOTE_G5, 500);
-        buzz(NOTE_C6, 500);
+        buzz(NOTE_C5, 2000);
+        buzz(NOTE_G5, 2000);
+        buzz(NOTE_C6, 3500);
+        buzz(NOTE_E6, 250);
+        buzz(NOTE_DS6, 4000);
 
-        buzz(NOTE_E5, 100);
-        buzz(NOTE_DS5, 400);
-        Hal::sleep_ms(1000);
+        buzz(NOTE_C4, 500);
+        buzz(NOTE_G3, 500);
+        buzz(NOTE_C4, 500);
+        buzz(NOTE_G3, 500);
+        buzz(NOTE_C4, 500);
+        buzz(NOTE_G3, 500);
+        buzz(NOTE_C4, 500);
+        buzz(NOTE_G3, 500);
 
-        buzz(NOTE_C5, 500);
-        buzz(NOTE_G5, 500);
-        buzz(NOTE_C6, 500);
-        Hal::sleep_ms(500);
+        buzz(NOTE_C5, 2000);
+        buzz(NOTE_G5, 2000);
+        buzz(NOTE_C6, 3500);
+        buzz(NOTE_DS6, 250);
+        buzz(NOTE_E6, 4000);
 
-        buzz(NOTE_E5, 100);
-        buzz(NOTE_F6, 400);
-        Hal::sleep_ms(500);
+        buzz(NOTE_C4, 500);
+        buzz(NOTE_G3, 500);
+        buzz(NOTE_C4, 500);
+        buzz(NOTE_G3, 500);
+        buzz(NOTE_C4, 500);
+        buzz(NOTE_G3, 500);
+        buzz(NOTE_C4, 500);
+        buzz(NOTE_G3, 500);
 
-        buzz(NOTE_A6, 100);
-        buzz(NOTE_B6, 100);
-        buzz(NOTE_C6, 300);
-        Hal::sleep_ms(500);
+        buzz(NOTE_C5, 2000);
+        buzz(NOTE_G5, 2000);
+        buzz(NOTE_C6, 3500);
+        buzz(NOTE_E6, 250);
+        buzz(NOTE_A6, 4000);
 
-        buzz(NOTE_D6, 250);
-        Hal::sleep_ms(250);
-        buzz(NOTE_E6, 100);
-        buzz(NOTE_F6, 100);
-        buzz(NOTE_G6, 300);
-        Hal::sleep_ms(500);
+        buzz(NOTE_A5, 250);
+        buzz(NOTE_B5, 250);
+        buzz(NOTE_C6, 2500);
+        buzz(NOTE_D6, 1000);
 
-        buzz(NOTE_E6, 100);
-        buzz(NOTE_F6, 100);
-        buzz(NOTE_G6, 300);
-        Hal::sleep_ms(500);
+        buzz(NOTE_E6, 500);
+        buzz(NOTE_F6, 500);
+        buzz(NOTE_G6, 2500);
+        buzz(NOTE_E6, 250);
+        buzz(NOTE_F6, 250);
 
-        buzz(NOTE_A6, 500);
-        buzz(NOTE_B6, 250);
-        Hal::sleep_ms(250);
-        buzz(NOTE_C6, 750);
-        Hal::sleep_ms(1000);
+        buzz(NOTE_G6, 2000);
+        buzz(NOTE_A6, 1000);
+        buzz(NOTE_B6, 1000);
+        buzz(NOTE_C7, 8000);
         break;
     }
     }
@@ -227,7 +234,3 @@ void Buzzer::buzz(long frequency, long length) const {
         Hal::sleep_us(delayValue); // wait for the calculated delay value
     }
 }
-
-// void Buzzer::landBuzzer(void *self){
-//     reinterpret_cast<Buzzer *>(self)->sing(SongTypes_SUCCESS);
-// }
