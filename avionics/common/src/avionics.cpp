@@ -1,51 +1,5 @@
 /* Main Arduino Sketch */
 /*
-VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT
-PLEASE READ ME!
-
-                 uuuuuuu
-             uu$$$$$$$$$$$uu
-          uu$$$$$$$$$$$$$$$$$uu
-         u$$$$$$$$$$$$$$$$$$$$$u
-        u$$$$$$$$$$$$$$$$$$$$$$$u
-       u$$$$$$$$$$$$$$$$$$$$$$$$$u
-       u$$$$$$$$$$$$$$$$$$$$$$$$$u
-       u$$$$$$"   "$$$"   "$$$$$$u
-       "$$$$"      u$u       $$$$"
-        $$$u       u$u       u$$$
-        $$$u      u$$$u      u$$$
-         "$$$$uu$$$   $$$uu$$$$"
-          "$$$$$$$"   "$$$$$$$"
-            u$$$$$$$u$$$$$$$u
-             u$"$"$"$"$"$"$u
-  uuu        $$u$ $ $ $ $u$$       uuu
- u$$$$        $$$$$u$u$u$$$       u$$$$
-  $$$$$uu      "$$$$$$$$$"     uu$$$$$$
-u$$$$$$$$$$$uu    """""    uuuu$$$$$$$$$$
-$$$$"""$$$$$$$$$$uuu   uu$$$$$$$$$"""$$$"
- """      ""$$$$$$$$$$$uu ""$"""
-           uuuu ""$$$$$$$$$$uuu
-  u$$$uuu$$$$$$$$$uu ""$$$$$$$$$$$uuu$$$
-  $$$$$$$$$$""""           ""$$$$$$$$$$$"
-   "$$$$$"                      ""$$$$""
-     $$$"                         $$$$"
-
-In order to successfully poll the GPS, the serial RX buffer size must be
-increased. This needs to be done on the computer used for compilation. This can
-be done by navigating to the following path in the Arduino contents folder: On
-Mac: Got to the Applications folder, right click on the Arduino app, select Show
-Package Contents, then navigate to
-‎⁨Contents⁩/⁨Java⁩/⁨hardware⁩/⁨teensy⁩/⁨avr⁩/⁨cores⁩/⁨teensy3⁩/serial1.c
-On Windows: [user_drive]\Program Files
-(x86)\Arduino\hardware\teensy\avr\cores\teensy3\serial1.c
-
-On line 43 increase SERIAL1_RX_BUFFER_SIZE from 64 to 1024
-
-THIS MUST BE DONE ON THE COMPUTER USED TO COMPILE THE CODE!!!
-
-VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT PLEASE READ ME! VERY IMPORTANT
-PLEASE READ ME!
-*/
 
 /* @file    avionics.ino
  * @author  UBC Rocket Avionics 2018/2019
@@ -94,12 +48,6 @@ PLEASE READ ME!
 void registerTask(TaskID id, Scheduler::Task task, bool repeat = true,
                   bool early = false) {
     Scheduler::registerTask(static_cast<int>(id), task, repeat, early);
-}
-
-// TODO: Move to buzzer.cpp
-void buzzNote(int frequency, int length = 750, int pause = 50) {
-    tone(static_cast<uint8_t>(Pin::BUZZER), frequency, length);
-    Hal::sleep_ms(length + pause);
 }
 
 /* Main function ====================================================== */
@@ -164,62 +112,9 @@ int main(void) {
 
     Task led_blink(LEDBlinker::toggle, nullptr, LEDBlinker::freq);
 
-    switch (init_status) {
-    case RocketStatus::NOMINAL:
-    {
-    #ifdef TESTING
-        Serial.println("Nominal");
-    #endif
-        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
-
-    //     int A = 440;
-    //     int Bf = 466;
-    //     int B = 494;
-    //     int C = 523;
-    //     int Cs = 554;
-    //     int D = 587;
-    //     int Ds = 622;
-    //     int E = 659;
-    //     int F = 698;
-    //     int Fs = 740;
-    //     int G = 784;
-
-    // #ifdef STAGE_2
-    //     buzzNote(C, 500);
-    //     buzzNote(G, 500);
-    //     buzzNote(G, 500);
-    //     buzzNote(F, 250);
-    //     buzzNote(E, 250);
-    //     buzzNote(F, 250);
-    //     buzzNote(E, 250);
-    //     buzzNote(D, 500);
-    //     buzzNote(D, 500);
-    // #else
-    //     buzzNote(C, 250);
-    //     buzzNote(D, 250);
-    //     buzzNote(E, 500);
-    //     buzzNote(D, 250);
-    //     buzzNote(E, 250);
-    //     buzzNote(F, 500);
-    //     buzzNote(E, 250);
-    //     buzzNote(C, 250);
-    //     buzzNote(E, 500);
-    //     buzzNote(D, 1000);
-    // #endif
-        break;
-    }
-    case RocketStatus::NONCRITICAL_FAILURE:
-    #ifdef TESTING
-        Serial.println("Non-critical failure");
-    #endif
-        // registerTask(TaskID::LEDBlinker, led_blink);
-        break;
-    case RocketStatus::CRITICAL_FAILURE:
-    #ifdef TESTING
-        Serial.println("Critical failure");
-    #endif
-        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HI);
-        break;
+    displayStatus(init_status, rocket.buzzer);
+    if (init_status == RocketStatus::NONCRITICAL_FAILURE) {
+        registerTask(TaskID::LEDBlinker, led_blink);
     }
     
     Task buzzer(LandedBuzzer::run, &landedBuzzer, Hal::ms(45000));

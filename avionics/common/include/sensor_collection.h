@@ -77,6 +77,9 @@ class SensorCollection {
     // Battery battery; // No voltage sensor for 2022/23
     Temperature temperature;
     
+    /**
+     * @brief Construct a new Sensor Collection object
+     */
     SensorCollection();
 
     /**
@@ -97,8 +100,16 @@ class SensorCollection {
      */
     RocketStatus getStatus(bool refresh = false);
     const uint8_t *getStatusBitfield() const { return status_bitfield_; }
+
+    /**
+     * @brief update status of sensors to CRITICAL_FAILURE/NONCRITICAL_FAILURE if sensor experiences FAILURE
+     */
     void updateStatus();
 
+    /**
+     * @brief Get the current array of sensor data
+     * @return current array of sensor data
+     */
     const std::array<float, DATA_LENGTH> &getData() const {
         return sensor_data;
     }

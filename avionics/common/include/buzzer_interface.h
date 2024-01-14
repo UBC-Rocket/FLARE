@@ -10,5 +10,9 @@ enum SongTypes {
 /*Classes--------------------------------------------------------------*/
 class IBuzzer {
   public:
+    /**
+     * @brief play tune
+     * @param song tune to play
+     */
     virtual void sing(SongTypes song) const = 0;
 };

@@ -10,12 +10,12 @@ set(x86_specific_files
 )
 
 target_sources(
-    TantalusStage1
+    BNBStage1
     PRIVATE
         ${x86_specific_files}
 )
 target_sources(
-    TantalusStage2
+    BNBStage2
     PRIVATE
         ${x86_specific_files}
 )

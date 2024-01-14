@@ -14,13 +14,20 @@ private:
     bool camera_on_{true};
 
 public:
+
+    /**
+     * @brief Construct a new Restart Camera object
+     * @param cam 
+     */
     RestartCamera(Camera &cam) : cam_(cam) {};
 
     static void togglePower(void *self) {
         reinterpret_cast<RestartCamera *>(self)->togglePower();
     }
 private:
-
+    /**
+     * @brief toggles camera on/off
+     */
     void togglePower();
 };
 #endif

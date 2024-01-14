@@ -32,6 +32,11 @@
 
 class Camera {
   public:
+
+    /**
+     * @brief Construct a new Camera object
+     * @param SerialCam 
+     */
     Camera(Hal::CustomSerial &SerialCam) : m_seri_cam(SerialCam) {
         // m_seri_cam.begin(M_CAMERA_BAUD);
         while (!m_seri_cam)

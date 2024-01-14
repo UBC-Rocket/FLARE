@@ -10,15 +10,19 @@ namespace State {
 
 class Landed : public IState {
   public:
+
+    /**
+     * @brief Construct a new state object
+     */
     Landed() {}
 
-    /*
+    /**
      * @brief Return the assigned enumeration code.
      * @return Enumeration code.
      */
     StateId getStateEnum(void) { return StateId::LANDED; }
 
-    /*
+    /**
      * @brief Return the next state, based on input data (mostly from filtered
      * sensor data)
      * @return State enumeration code, to be passed into the std::map between

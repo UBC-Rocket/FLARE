@@ -10,6 +10,12 @@ class PreAirStartCoastTimed : public IState {
     /**
      * @brief Constructor. Altitudes are in metres above ground level (AGL),
      * accelerations in m/s^2. Angle is in radians.
+     * @param DELAY_TIME_MS
+     * @param MAX_ACCEPT_ALTITUDE
+     * @param MIN_ACCEPT_ALTITUDE
+     * @param MAX_ACCEPT_VERTICAL_ACCEL
+     * @param MIN_ACCEPT_VERTICAL_ACCEL
+     * @param MAX_ACCEPT_ANGLE_FROM_VERTICAL
      */
     PreAirStartCoastTimed(uint32_t const DELAY_TIME_MS,
                           float MAX_ACCEPT_ALTITUDE, float MIN_ACCEPT_ALTITUDE,
@@ -62,7 +68,7 @@ class PreAirStartCoastTimed : public IState {
     part is 1
     */
     const Eigen::Quaternionf IDENTITY_QUATERNION;
-    /*
+    /**
      * @brief Does the heavy lifting of checking whether flight is nominal
      * @param &input Reference to the input data structure
      * @return boolean true if everything is fine; false if something is not

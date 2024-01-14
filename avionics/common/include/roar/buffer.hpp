@@ -39,17 +39,21 @@ class Buffer {
      * It is expected that the subpacket gets filled out immediately, before
      * space for the next subpacket is allocated.
      *
-     * Returns how many subpackets were dropped to make space.
+     * @param size size of subpacket to be allocated
+     * @return how many subpackets were dropped to make space.
      */
     int allocSubpkt(int size);
 
     /**
      * @brief Write data to the last allocated subpacket.
+     * @param byte byte of data to be written
      */
     void write(uint8_t byte);
 
     /**
      * @brief Write data to the last allocated subpacket.
+     * @param byte pointer to source 
+     * @param len length of data we want to write in bytes
      */
     template <class T> void write(const T *byte, int len) {
         // TODO: figure out how to instantiate explicit versions in .cpp file
@@ -103,6 +107,7 @@ class Buffer {
     /**
      * @brief Dispenses at most pkt_size_ bytes worth of
      * subpackets into payload.
+     * @param payload pointer to payload
      * @return Size of payload data filled in.
      */
     int dispenseIntoPayload(uint8_t *payload);
@@ -118,31 +123,47 @@ class Buffer {
     // pointer to the Buffer inside the iterator structs
     /**
      * @brief Increments data iterator; takes care of wrapping
+     * @param it data iterator which we want to increment
+     * @param add amount we want to increment data iterator by
+     * @return the data iterator after incrementation 
      */
     DataIt addIt(DataIt it, int add);
 
     /**
      * @brief Increments data iterator; takes care of wrapping
+     * @param it SubpktIt iterator which we want to increment
+     * @param add amount we want to increment SubpktIt iterator by
+     * @return the SubpktIt iterator after incrementation
      */
     SubpktIt addIt(SubpktIt it, int add);
 
     /**
-     * @brief Difference between subpacket iterator
+     * @brief Difference between data iterator
+     * @param a operand 1 
+     * @param b operand 2
+     * @return Difference between data iterators a and b
      */
     int subIt(DataIt a, DataIt b);
 
     /**
      * @brief Difference between subpacket iterator
+     * @param a operand 1
+     * @param b operand 2
+     * @return Difference between subpacket iterators a and b
      */
     int subIt(SubpktIt a, SubpktIt b);
 
     /**
      * @brief Dereferences iterator
+     * @param it data iterator we want to dereference
+     * @return value of data iterator in data_ buffer
      */
     uint8_t &deref(DataIt it);
 
     /**
      * @brief Dereferences iterator
+     * @param it SubpktIt iterator we want to derefence
+     * @return value of SubpktIt iterator in subpkts_
      */
     DataIt &deref(SubpktIt it);
 
@@ -151,7 +172,16 @@ class Buffer {
     // addIt(), subIt(), and deref() (which makes sure that the index wraps
     // properly)
     struct DataIt {
+
+        /**
+         * @brief Construct a new Data It object
+         * @param i 
+         */
         DataIt(int i) : index(i) {}
+
+        /**
+         * @brief Construct a new Data It object
+         */
         DataIt() : DataIt(0) {}
 
         bool operator==(const DataIt &other) const {
@@ -182,6 +212,7 @@ class Buffer {
 
     /**
      * @brief Returns the size of the first subpacket, in bytes.
+     * @return size of first subpacket, in bytes
      */
     int firstSubpktSize();
 
