@@ -41,9 +41,6 @@
 #include "WProgram.h"
 #endif
 
-// Set Serial to use UART5
-#define Serial Serial5
-
 /**
  * @brief Helper function that makes things less verbose; basically saves the
  * static_cast call
@@ -100,9 +97,9 @@ int main(void) {
     /* Register all tasks */
     typedef Scheduler::Task Task;
 
-    // ReadEvalLog read_eval_logger(rocket);
-    // Task read_eval_log(ReadEvalLog::run, &read_eval_logger, Hal::ms(50));
-    // registerTask(TaskID::ReadEvalLog, read_eval_log);
+    ReadEvalLog read_eval_logger(rocket);
+    Task read_eval_log(ReadEvalLog::run, &read_eval_logger, Hal::ms(50));
+    registerTask(TaskID::ReadEvalLog, read_eval_log);
 
     // // Radio needs to be scheduled later; sensors need to be read first
     // RadioTxBulk radio_txer(rocket);

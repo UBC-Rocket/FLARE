@@ -13,6 +13,9 @@
 // x86 configurations.
 #include "log_control.hpp"
 
+// Set the serial port to use UART5
+#define Serial Serial5
+
 /*
 Defined logging levels. Usage:
 LOG_WARN("Warning message; warning code: " << 123 << " addnl string")

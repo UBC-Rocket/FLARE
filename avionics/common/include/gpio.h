@@ -28,15 +28,15 @@ enum class Pin {
     // FLIGHT_LED = 0, // N/A on Rev 2 board
     BUILTIN_LED = 33, // PC6
     STATUS_LED = 33, // PC6, uses BUILTIN_LED
-    BUZZER = 41, // PB14
-    MAIN_IGNITOR = 0, // PB4
-    MAIN_CONTINUITY_TEST = 0,
-    MAIN_CONTINUITY_READ = 0, // PB_0
-    DROGUE_IGNITOR = 0, // PA15
-    DROGUE_CONTINUITY_TEST = 0,
-    DROGUE_CONTINUITY_READ = 0, // PA_1
-    VOLTAGE_SENSOR = 0, // PC15 (unused)
-    SD_CHIP_SELECT = 0, // PA_4
+    BUZZER = 41, // PB15
+    MAIN_IGNITOR = 14, // PB9, TODO!
+    MAIN_CONTINUITY_TEST = 2, // PA10, TODO!
+    MAIN_CONTINUITY_READ = 2, // PA10, TODO!
+    DROGUE_IGNITOR = 15, // PB8, TODO!
+    DROGUE_CONTINUITY_TEST = 8, // PA9, TODO!
+    DROGUE_CONTINUITY_READ = 8, // PA9, TODO!
+    VOLTAGE_SENSOR = 42, // PB14, unused
+    SD_CHIP_SELECT = 31, // PC9
 };
 
 /*Functions------------------------------------------------------------*/
