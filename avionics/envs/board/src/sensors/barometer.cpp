@@ -16,7 +16,7 @@ Barometer::Barometer(float *const buf) : SensorBase(buf) , barometer(&Wire) {
     if (barometer.connect() > 0) {
         status = SensorStatus::FAILURE;
     }
-    
+
 #endif
 
     status = SensorStatus::NOMINAL;

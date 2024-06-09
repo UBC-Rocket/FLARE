@@ -16,7 +16,6 @@
  */
 
 /* Includes------------------------------------------------------------*/
-#define TESTING
 #include "HAL/pin_util.h"
 #include "HAL/time.h"
 
@@ -73,8 +72,8 @@ int main(void) {
     }
     Hal::sleep_ms(500);
     Serial.println("[ TESTING MODE ]");
-    Serial.println("Initializing...");
 #endif
+    Serial.println("Initializing...");
 
     Radio::initialize();
     LOG_INFO("Initialized radio");
