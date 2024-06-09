@@ -21,7 +21,7 @@ IgnitorCollection::IgnitorCollection()
         Serial.println("Main parachute ignitor failed");
         #endif
 
-        LOG_ERROR("Broken ignitor for main parachute");
+        // LOG_ERROR("Broken ignitor for main parachute");
         status_bitfield_[0] |= 0x80;
         // status_ = RocketStatus::CRITICAL_FAILURE;
     }
@@ -30,7 +30,7 @@ IgnitorCollection::IgnitorCollection()
         Serial.println("Drogue parachute ignitor failed");
         #endif
 
-        LOG_ERROR("Broken ignitor for drogue parachute");
+        // LOG_ERROR("Broken ignitor for drogue parachute");
         status_bitfield_[0] |= 0x40;
         // status_ = RocketStatus::CRITICAL_FAILURE;
     }

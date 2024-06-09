@@ -17,21 +17,33 @@
 Defined logging levels. Usage:
 LOG_WARN("Warning message; warning code: " << 123 << " addnl string")
 */
-#ifndef LOG_CONTROL_DISABLE_LOGGING
-
-#define LOG_DEBUG(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kDebug, expr)
-#define LOG_INFO(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kInfo, expr)
-#define LOG_WARN(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kWarn, expr)
-#define LOG_ERROR(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kErr, expr)
-
-#else // LOG_CONTROL_DISABLE_LOGGING
+#ifdef LOG_CONTROL_DISABLE_LOGGING  // LOG_CONTROL_DISABLE_LOGGING
 
 #define LOG_DEBUG(expr)
 #define LOG_INFO(expr)
 #define LOG_WARN(expr)
 #define LOG_ERROR(expr)
 
-#endif // LOG_CONTROL_DISABLE_LOGGING
+#else  // LOG_CONTROL_DISABLE_LOGGING
+
+// This is kinda a hack to get logging through serial
+#ifdef LOG_CONTROL_SERIAL_LOGGING  // LOG_CONTROL_SERIAL_LOGGING
+
+#define LOG_DEBUG(expr) Serial.print("DEBUG: "); Serial.println(expr)
+#define LOG_INFO(expr) Serial.print("INFO: "); Serial.println(expr)
+#define LOG_WARN(expr) Serial.print("WARN: "); Serial.println(expr)
+#define LOG_ERROR(expr) Serial.print("ERROR: "); Serial.println(expr)
+
+#else  // LOG_CONTROL_SERIAL_LOGGING
+
+#define LOG_DEBUG(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kDebug, expr)
+#define LOG_INFO(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kInfo, expr)
+#define LOG_WARN(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kWarn, expr)
+#define LOG_ERROR(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kErr, expr)
+
+#endif  // LOG_CONTROL_SERIAL_LOGGING
+
+#endif  // LOG_CONTROL_DISABLE_LOGGING
 
 // Log at a specified level. Strongly recommended to instead use the defined log
 // level macros instead of this.

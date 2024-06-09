@@ -16,6 +16,7 @@
  */
 
 /* Includes------------------------------------------------------------*/
+#define TESTING
 #include "HAL/pin_util.h"
 #include "HAL/time.h"
 
@@ -74,6 +75,7 @@ int main(void) {
         Hal::sleep_ms(100);
     }
     Hal::sleep_ms(500);
+    Serial.println("[ TESTING MODE ]");
     Serial.println("Initializing...");
 #endif
 
@@ -98,24 +100,25 @@ int main(void) {
     /* Register all tasks */
     typedef Scheduler::Task Task;
 
-    ReadEvalLog read_eval_logger(rocket);
-    Task read_eval_log(ReadEvalLog::run, &read_eval_logger, Hal::ms(50));
-    registerTask(TaskID::ReadEvalLog, read_eval_log);
+    // ReadEvalLog read_eval_logger(rocket);
+    // Task read_eval_log(ReadEvalLog::run, &read_eval_logger, Hal::ms(50));
+    // registerTask(TaskID::ReadEvalLog, read_eval_log);
 
-    // Radio needs to be scheduled later; sensors need to be read first
-    RadioTxBulk radio_txer(rocket);
-    Task radio_tx(RadioTxBulk::run, &radio_txer, RadioTxBulk::freq);
-    Scheduler::preregisterTask(static_cast<int>(TaskID::RadioTxBulk), radio_tx,
-                               true, false);
-    Scheduler::scheduleTask(Hal::now_ms() + Hal::ms(1),
-                            static_cast<int>(TaskID::RadioTxBulk));
+    // // Radio needs to be scheduled later; sensors need to be read first
+    // RadioTxBulk radio_txer(rocket);
+    // Task radio_tx(RadioTxBulk::run, &radio_txer, RadioTxBulk::freq);
+    // Scheduler::preregisterTask(static_cast<int>(TaskID::RadioTxBulk), radio_tx,
+    //                            true, false);
+    // Scheduler::scheduleTask(Hal::now_ms() + Hal::ms(1),
+    //                         static_cast<int>(TaskID::RadioTxBulk));
 
     Task led_blink(LEDBlinker::toggle, nullptr, LEDBlinker::freq);
+    registerTask(TaskID::LEDBlinker, led_blink);
 
-    displayStatus(init_status, rocket.buzzer);
-    if (init_status == RocketStatus::NONCRITICAL_FAILURE) {
-        registerTask(TaskID::LEDBlinker, led_blink);
-    }
+    // displayStatus(init_status, rocket.buzzer);
+    // if (init_status == RocketStatus::NONCRITICAL_FAILURE) {
+    //     registerTask(TaskID::LEDBlinker, led_blink);
+    // }
 
     // RestartCamera restart_camera_(rocket.cam);
     // // This tasks sets its own reschedule interval (since the same task is run

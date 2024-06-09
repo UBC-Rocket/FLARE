@@ -17,8 +17,8 @@ class StateMachine {
 
     /**
      * @brief Construct a new State Machine object
-     * @param map 
-     * @param initial_state_ 
+     * @param map
+     * @param initial_state_
      */
     StateMachine(StateMap map, StateId initial_state_)
         : current_id_(initial_state_), state_map_(map) {
@@ -41,10 +41,10 @@ class StateMachine {
         IState *current_state = state_map_[old_id];
         const StateId new_id = current_state->getNewState(calc);
         if (new_id != old_id) {
-            LOG_INFO("State changed (previous state "
-                     << static_cast<std::int32_t>(old_id) << ", new state "
-                     << static_cast<std::int32_t>(new_id) << ", time is "
-                     << static_cast<std::int32_t>(Hal::millis()) << "ms)");
+            LOG_INFO(("State changed (previous state "
+                     + std::to_string(static_cast<std::int32_t>(old_id)) + ", new state "
+                     + std::to_string(static_cast<std::int32_t>(new_id)) + ", time is "
+                     + std::to_string(static_cast<std::int32_t>(Hal::millis())) + "ms)").c_str());
             state_map_[new_id]->onEntry();
             Radio::sendState(Hal::tpoint_to_uint(Hal::now_ms()),
                              static_cast<uint16_t>(new_id));

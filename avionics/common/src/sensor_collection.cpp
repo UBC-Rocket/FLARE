@@ -11,11 +11,11 @@ constexpr char SensorCollection::LOG_FILE_HEADER[];
 SensorCollection::SensorCollection()
     : barometer(BEGIN + BAROMETER_INDEX),
       gps(Hal::SerialInst::GPS, BEGIN + GPS_INDEX),
-      accelerometer(BEGIN + ACCEL_INDEX), 
+      accelerometer(BEGIN + ACCEL_INDEX),
       imuSensor(BEGIN + IMU_INDEX),
     //   battery(Pin::VOLTAGE_SENSOR, BEGIN + BATTERY_INDEX), // No voltage sensor for 2022/23
       temperature(BEGIN + TEMP_INDEX) {
-    
+
     updateStatus();
 }
 
