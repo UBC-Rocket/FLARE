@@ -40,6 +40,9 @@
 #include "WProgram.h"
 #endif
 
+// Set Serial to use UART5
+#define Serial Serial5
+
 /**
  * @brief Helper function that makes things less verbose; basically saves the
  * static_cast call
@@ -53,7 +56,7 @@ void registerTask(TaskID id, Scheduler::Task task, bool repeat = true,
 int main(void) {
     // Initialize Arduino
     init();
-    
+
     // Before anything else there's some environment specific setup to be done
     env_initialize();
     LOG_INFO("Everything is starting now");
@@ -70,6 +73,7 @@ int main(void) {
         Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
         Hal::sleep_ms(100);
     }
+    Hal::sleep_ms(500);
     Serial.println("Initializing...");
 #endif
 
