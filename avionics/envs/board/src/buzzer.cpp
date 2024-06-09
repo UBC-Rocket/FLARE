@@ -177,11 +177,66 @@ void Buzzer::sing(SongTypes song) const {
         buzz(NOTE_A6, 2500);
         break;
     }
+    case SongTypes_LANDED: {
+        // Play the 2001: A Space Odyssey theme
+        int tempo = 2;
+        buzz(NOTE_C5, 2000 / tempo);
+        buzz(NOTE_G5, 2000 / tempo);
+        buzz(NOTE_C6, 3500 / tempo);
+        buzz(NOTE_E6, 250 / tempo);
+        buzz(NOTE_DS6, 4000 / tempo);
+
+        buzz(NOTE_C4, 500 / tempo);
+        buzz(NOTE_G3, 500 / tempo);
+        buzz(NOTE_C4, 500 / tempo);
+        buzz(NOTE_G3, 500 / tempo);
+        buzz(NOTE_C4, 500 / tempo);
+        buzz(NOTE_G3, 500 / tempo);
+        buzz(NOTE_C4, 500 / tempo);
+        buzz(NOTE_G3, 500 / tempo);
+
+        buzz(NOTE_C5, 2000 / tempo);
+        buzz(NOTE_G5, 2000 / tempo);
+        buzz(NOTE_C6, 3500 / tempo);
+        buzz(NOTE_DS6, 250 / tempo);
+        buzz(NOTE_E6, 4000 / tempo);
+
+        buzz(NOTE_C4, 500 / tempo);
+        buzz(NOTE_G3, 500 / tempo);
+        buzz(NOTE_C4, 500 / tempo);
+        buzz(NOTE_G3, 500 / tempo);
+        buzz(NOTE_C4, 500 / tempo);
+        buzz(NOTE_G3, 500 / tempo);
+        buzz(NOTE_C4, 500 / tempo);
+        buzz(NOTE_G3, 500 / tempo);
+
+        buzz(NOTE_C5, 2000 / tempo);
+        buzz(NOTE_G5, 2000 / tempo);
+        buzz(NOTE_C6, 3500 / tempo);
+        buzz(NOTE_E6, 250 / tempo);
+        buzz(NOTE_A6, 4000 / tempo);
+
+        buzz(NOTE_A5, 250 / tempo);
+        buzz(NOTE_B5, 250 / tempo);
+        buzz(NOTE_C6, 2500 / tempo);
+        buzz(NOTE_D6, 1000 / tempo);
+
+        buzz(NOTE_E6, 500 / tempo);
+        buzz(NOTE_F6, 500 / tempo);
+        buzz(NOTE_G6, 2500 / tempo);
+        buzz(NOTE_E6, 250 / tempo);
+        buzz(NOTE_F6, 250 / tempo);
+
+        buzz(NOTE_G6, 2000 / tempo);
+        buzz(NOTE_A6, 1000 / tempo);
+        buzz(NOTE_B6, 1000 / tempo);
+        buzz(NOTE_C7, 8000 / tempo);
+        break;
+    }
     }
 }
 
 void Buzzer::buzz(long frequency, long length) const {
-
     long delayValue = 1000000 / frequency / 2; // delay between transitions
     // 1 000 000 microseconds, divided by the frequency, divided by 2 b/c
     // there are two phases to each cycle
@@ -191,11 +246,11 @@ void Buzzer::buzz(long frequency, long length) const {
     for (long i = 0; i < numCycles; i++) { // for the calculated length of time
         Hal::digitalWrite(
             M_MELODY_PIN,
-            Hal::PinDigital::HI); // write high to push out the diaphram
-        Hal::sleep_us(delayValue);  // wait for the calculated delay value
+            Hal::PinDigital::HI);  // write high to push out the diaphram
+        Hal::sleep_us(delayValue); // wait for the calculated delay value
         Hal::digitalWrite(
             M_MELODY_PIN,
-            Hal::PinDigital::LO); // write low to pull back the diaphram
+            Hal::PinDigital::LO);  // write low to pull back the diaphram
         Hal::sleep_us(delayValue); // wait for the calculated delay value
     }
 }

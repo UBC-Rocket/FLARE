@@ -4,6 +4,7 @@
 #include "cameras.h"
 #include "scheduler.hpp"
 #include "state_interface.h"
+#include "buzzer.h"
 
 namespace State {
 
@@ -28,6 +29,10 @@ class Landed : public IState {
      * codes and used states. Note that the returned code may be the same state.
      */
     StateId getNewState(Calculator const &) { return StateId::LANDED; }
+
+    void onEntry() override {
+      Scheduler::scheduleTask(Hal::now_ms() + Hal::ms(1), static_cast<int>(TaskID::BuzzerBeacon));
+    }
 };
 
 } // namespace State

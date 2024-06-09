@@ -23,6 +23,7 @@
 #include "tasks/led_blinker.hpp"
 #include "tasks/main_tasks.hpp"
 #include "tasks/restart_camera.hpp"
+#include "tasks/landed_buzzer.hpp"
 
 #include "radio.h"
 #include "rocket.h"
@@ -84,6 +85,9 @@ int main(void) {
     auto &init_status = rocket.init_status;
     auto &sensors = rocket.sensors;
     auto &ignitors = rocket.ignitors;
+
+    // Create instance of landed buzzer
+    LandedBuzzer landedBuzzer(rocket.buzzer);
 
     if (init_status == RocketStatus::CRITICAL_FAILURE) {
         LOG_ERROR("Critical failure; aborting in state machine");
