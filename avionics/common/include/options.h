@@ -29,6 +29,7 @@
 // #define THERMOCOUPLE    // if thermocouple is utilized or not
 
 // Set the serial port to use UART5
+#undef Serial
 #define Serial Serial5
 
 // Refer to README or the wiki for more information.
