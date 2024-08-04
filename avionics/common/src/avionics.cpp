@@ -68,16 +68,18 @@ int main(void) {
     while (!Serial) {
         Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HI);
         Hal::sleep_ms(100);
-        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
+    Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
         Hal::sleep_ms(100);
-    }
-    Hal::sleep_ms(500);
+}
+    Hal::sleep_ms(1000);
     Serial.println("[ TESTING MODE ]");
 #endif
     Serial.println("Initializing...");
 
-    Radio::initialize();
-    LOG_INFO("Initialized radio");
+    PB10;
+
+    // Radio::initialize();
+    // LOG_INFO("Initialized radio");
     Rocket rocket;
     // Logically, these are all unrelated variables - but to allow the command
     // receiver to function, they need to be coalesced into one POD struct.
@@ -85,6 +87,12 @@ int main(void) {
     auto &init_status = rocket.init_status;
     auto &sensors = rocket.sensors;
     auto &ignitors = rocket.ignitors;
+
+    if (rocket.datalog.ok()) {
+        Serial.println("Datalogging initialized");
+    } else {
+        Serial.println("Datalogging failed to initialize");
+    }
 
     // Create instance of landed buzzer
     LandedBuzzer landedBuzzer(rocket.buzzer);
