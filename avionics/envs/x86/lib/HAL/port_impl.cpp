@@ -31,6 +31,6 @@ std::size_t CustomSerial::write(const uint8_t *const inbuf, std::size_t const si
 
 CustomSerial SerialInst::USB{StdIoController::DEV_NULL};
 CustomSerial SerialInst::GPS{StdIoController::DEV_NULL};
-CustomSerial SerialInst::Radio{'R'};
+// CustomSerial SerialInst::Radio{'R'};
 CustomSerial SerialInst::Camera{StdIoController::DEV_NULL};
 } // namespace Hal

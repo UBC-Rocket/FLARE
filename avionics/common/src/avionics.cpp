@@ -76,10 +76,8 @@ int main(void) {
 #endif
     Serial.println("Initializing...");
 
-    PA1;
-
-    // Radio::initialize();
-    // LOG_INFO("Initialized radio");
+    Radio::initialize();
+    LOG_INFO("Initialized radio");
     Rocket rocket;
     // Logically, these are all unrelated variables - but to allow the command
     // receiver to function, they need to be coalesced into one POD struct.
@@ -108,17 +106,18 @@ int main(void) {
     /* Register all tasks */
     typedef Scheduler::Task Task;
 
+    // Read sensors, evaluate state, log data, and send status
     ReadEvalLog read_eval_logger(rocket);
-    Task read_eval_log(ReadEvalLog::run, &read_eval_logger, Hal::ms(5000));
+    Task read_eval_log(ReadEvalLog::run, &read_eval_logger, Hal::ms(50));
     registerTask(TaskID::ReadEvalLog, read_eval_log);
 
     // // Radio needs to be scheduled later; sensors need to be read first
-    // RadioTxBulk radio_txer(rocket);
-    // Task radio_tx(RadioTxBulk::run, &radio_txer, RadioTxBulk::freq);
-    // Scheduler::preregisterTask(static_cast<int>(TaskID::RadioTxBulk), radio_tx,
-    //                            true, false);
-    // Scheduler::scheduleTask(Hal::now_ms() + Hal::ms(1),
-    //                         static_cast<int>(TaskID::RadioTxBulk));
+    RadioTxBulk radio_txer(rocket);
+    Task radio_tx(RadioTxBulk::run, &radio_txer, RadioTxBulk::freq);
+    Scheduler::preregisterTask(static_cast<int>(TaskID::RadioTxBulk), radio_tx,
+                               true, false);
+    Scheduler::scheduleTask(Hal::now_ms() + Hal::ms(1),
+                            static_cast<int>(TaskID::RadioTxBulk));
 
     Task led_blink(LEDBlinker::toggle, nullptr, LEDBlinker::freq);
     registerTask(TaskID::LEDBlinker, led_blink);

@@ -100,6 +100,7 @@ class RadioTxBulk {
      * @brief sends bulk sensor data
      */
     void run() {
+        LOG_DEBUG("RadioTxBulk task started");
         StateId state = rocket.state_machine.getState();
         Radio::sendBulkSensor(
             Hal::tpoint_to_uint(rocket.sensors.last_poll_time()),
