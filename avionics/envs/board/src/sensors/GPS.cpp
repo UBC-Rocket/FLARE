@@ -43,11 +43,17 @@ GPS::GPS(Hal::CustomSerial &seri, float *const data)
 }
 
 void GPS::readData() {
+    Serial.println("1");
     bool gpsSuccess = false;
+    Serial.println("2");
     elapsedMillis timeout;
+    Serial.println("3");
     while (serial_port_.available() && (timeout < GPS_TIMEOUT)) {
+    Serial.println("4");
         char c = serial_port_.read();
+    Serial.println("5");
         if (gps.encode(c)) {
+    Serial.println("6");
             gpsSuccess = true;
             break;
         }
@@ -56,6 +62,14 @@ void GPS::readData() {
     if (!gpsSuccess) {
         status = SensorStatus::FAILURE;
     }
+
+#ifdef TESTING
+    if (gpsSuccess) {
+        Serial.println("GPS SUCCESS");
+    } else {
+        Serial.println("GPS FAIL");
+    }
+#endif
 
     unsigned long fix_age;
     gps.f_get_position(data_, data_ + 1, &fix_age);

@@ -76,6 +76,8 @@ int main(void) {
 #endif
     Serial.println("Initializing...");
 
+    PA1;
+
     // Radio::initialize();
     // LOG_INFO("Initialized radio");
     Rocket rocket;
@@ -107,7 +109,7 @@ int main(void) {
     typedef Scheduler::Task Task;
 
     ReadEvalLog read_eval_logger(rocket);
-    Task read_eval_log(ReadEvalLog::run, &read_eval_logger, Hal::ms(50));
+    Task read_eval_log(ReadEvalLog::run, &read_eval_logger, Hal::ms(5000));
     registerTask(TaskID::ReadEvalLog, read_eval_log);
 
     // // Radio needs to be scheduled later; sensors need to be read first
