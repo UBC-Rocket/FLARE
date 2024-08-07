@@ -47,8 +47,8 @@ uint8_t MS5xxx::connect() {
 void MS5xxx::ReadProm() {
 	send_cmd(MS5xxx_CMD_RESET);
 	delay(3);
-	  
-	for(uint8_t i=0;i<8;i++) 
+
+	for(uint8_t i=0;i<8;i++)
 	{
 	    C[i]=0x0000;
 	    send_cmd(MS5xxx_CMD_PROM_RD+2*i);
@@ -60,7 +60,7 @@ void MS5xxx::ReadProm() {
 	    C[i] += c;
 	    _Wire->endTransmission(true);
 	}
-	
+
 }
 
 unsigned int MS5xxx::Calc_CRC4(unsigned char poly)
@@ -117,7 +117,7 @@ unsigned long MS5xxx::read_adc(unsigned char aCMD)
 {
   unsigned long value=0;
   unsigned long c=0;
-  
+
   send_cmd(MS5xxx_CMD_ADC_CONV+aCMD); // start DAQ and conversion of ADC data
   switch (aCMD & 0x0f)
   {
@@ -141,13 +141,13 @@ unsigned long MS5xxx::read_adc(unsigned char aCMD)
   c = _Wire->read();
   value += c;
   _Wire->endTransmission(true);
- 
+
   return value;
 }
 
 void MS5xxx::Readout() {
 	unsigned long D1=0, D2=0;
-	
+
 	double dT;
 	double OFF;
 	double SENS;
@@ -161,7 +161,7 @@ void MS5xxx::Readout() {
 	SENS=C[1]*pow(2,16)+dT*C[3]/pow(2,7);
 	TEMP=(2000+(dT*C[6])/pow(2,23));
 	P=(((D1*SENS)/pow(2,21)-OFF)/pow(2,15));
-	 
+
 	// perform higher order corrections
 	double T2=0., OFF2=0., SENS2=0.;
 	if(TEMP<2000) {
@@ -173,11 +173,11 @@ void MS5xxx::Readout() {
 	    SENS2+=8*(TEMP+1500)*(TEMP+1500);
 	  }
 	}
-	  
+
 	TEMP-=T2;
 	OFF-=OFF2;
 	SENS-=SENS2;
-	P=(((D1*SENS)/pow(2,21)-OFF)/pow(2,15));	
+	P=(((D1*SENS)/pow(2,21)-OFF)/pow(2,15));
 }
 
 double MS5xxx::GetTemp() {

@@ -76,8 +76,6 @@ int main(void) {
 #endif
     Serial.println("Initializing...");
 
-    PB10;
-
     // Radio::initialize();
     // LOG_INFO("Initialized radio");
     Rocket rocket;
