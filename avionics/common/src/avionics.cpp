@@ -23,6 +23,7 @@
 #include "tasks/led_blinker.hpp"
 #include "tasks/main_tasks.hpp"
 #include "tasks/restart_camera.hpp"
+#include "tasks/landed_buzzer.hpp"
 
 #include "radio.h"
 #include "rocket.h"
@@ -83,6 +84,9 @@ int main(void) {
     auto &sensors = rocket.sensors;
     auto &ignitors = rocket.ignitors;
 
+    // Create instance of landed buzzer
+    LandedBuzzer landedBuzzer(rocket.buzzer);
+
     if (init_status == RocketStatus::CRITICAL_FAILURE) {
         LOG_ERROR("Critical failure; aborting in state machine");
         state_machine.abort();
@@ -112,6 +116,9 @@ int main(void) {
     if (init_status == RocketStatus::NONCRITICAL_FAILURE) {
         registerTask(TaskID::LEDBlinker, led_blink);
     }
+    
+    Task buzzer(LandedBuzzer::run, &landedBuzzer, Hal::ms(45000));
+    Scheduler::preregisterTask(static_cast<int>(TaskID::BuzzerBeacon), buzzer, true, false);
 
     // RestartCamera restart_camera_(rocket.cam);
     // // This tasks sets its own reschedule interval (since the same task is run
