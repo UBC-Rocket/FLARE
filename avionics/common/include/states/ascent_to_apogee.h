@@ -4,6 +4,8 @@
 #include "hardware/ignitor.h"
 #include "state_interface.h"
 #include "HAL/time.h"
+#include "options.h"
+#include "log.hpp"
 
 namespace State {
 
@@ -58,7 +60,7 @@ class AscentToApogee : public IState {
 
         if (apogee_checks_ >= APOGEE_CHECKS_) {
             #ifdef TESTING
-                Serial.println("firing drogue");
+                LOG_DEBUG("Firing drogue");
             #endif
             drogue_ignitor_.fire();
             return post_apogee_id_;

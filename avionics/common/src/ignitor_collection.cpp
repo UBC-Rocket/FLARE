@@ -18,7 +18,7 @@ IgnitorCollection::IgnitorCollection()
     // TODO: Check continuity continuously instead of only during startup
     if (main.getStatus() == ComponentStatus::FAILURE) {
         #ifdef TESTING
-        Serial.println("Main parachute ignitor failed");
+            LOG_ERROR("Main parachute ignitor failed");
         #endif
 
         // LOG_ERROR("Broken ignitor for main parachute");
@@ -27,7 +27,7 @@ IgnitorCollection::IgnitorCollection()
     }
     if (drogue.getStatus() == ComponentStatus::FAILURE) {
         #ifdef TESTING
-        Serial.println("Drogue parachute ignitor failed");
+            LOG_ERROR("Drogue parachute ignitor failed");
         #endif
 
         // LOG_ERROR("Broken ignitor for drogue parachute");

@@ -8,6 +8,7 @@
 #include "Arduino.h"
 #endif
 #undef abs
+#include "log.hpp"
 
 namespace extra {
 namespace estimator {
@@ -19,10 +20,8 @@ AltitudeAvg::AltitudeAvg(SensorCollection &sensors, Hal::t_point initial_time)
                 BASE_MOVING_AVERAGE_ALPHA),
       agl_alt_(0), velocity_z_(0), last_agl_alt_(0), last_t_(initial_time) {
         #ifdef TESTING
-        Serial.print("base alt (avg): ");
-        Serial.println(base_alt_.getAverage());
-        Serial.print("agl alt (avg): ");
-        Serial.println(agl_alt_.getAverage());
+            LOG_DEBUG(("base alt (avg): " + std::to_string(base_alt_.getAverage())).c_str());
+            LOG_DEBUG(("agl alt (avg): " + std::to_string(agl_alt_.getAverage())).c_str());
         #endif
       }
 

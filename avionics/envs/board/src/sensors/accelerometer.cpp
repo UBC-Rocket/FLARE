@@ -2,11 +2,12 @@
 #include "sensors/accelerometer.h"
 #include "options.h"
 #include "Arduino.h"
+#include "log.hpp"
 
 Accelerometer::Accelerometer(float *const buf) : SensorBase(buf) {
 /*init accerlerometer*/
 #ifdef TESTING
-    Serial.println("Initializing accelerometer");
+    LOG_DEBUG("Initializing accelerometer");
 #endif
     accelerometer.setI2CAddr(ACCELEROMETER_ADDRESS);
     accelerometer.begin(LIS331::USE_I2C);
@@ -22,12 +23,9 @@ void Accelerometer::readData(void) {
     data_[2] = accelerometer.convertToG(ACCELEROMETER_SCALE, z);
 
 #ifdef TESTING
-    Serial.println("Polling accelerometer");
-    Serial.print("x:  ");
-    Serial.println(data_[0]);
-    Serial.print("y: ");
-    Serial.println(data_[1]);
-    Serial.print("z: ");
-    Serial.println(data_[2]);
+    LOG_DEBUG("Polling accelerometer");
+    LOG_DEBUG(("x: " + std::to_string(data_[0])).c_str());
+    LOG_DEBUG(("y: " + std::to_string(data_[1])).c_str());
+    LOG_DEBUG(("z: " + std::to_string(data_[2])).c_str());
 #endif
 }
