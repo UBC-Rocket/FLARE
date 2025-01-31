@@ -4,6 +4,8 @@
 #include "cameras.h"
 #include "hardware/ignitor.h"
 #include "repeated_check_base.hpp"
+#include "options.h"
+#include "log.hpp"
 
 namespace State {
 template <StateId next_id, int num_checks>
@@ -41,7 +43,7 @@ class DrogueDescent
      */
     void extraOnExit() { 
         #ifdef TESTING
-            Serial.println("firing main"); 
+            LOG_DEBUG("Firing main"); 
         #endif
         ignitor_.fire(); 
     }

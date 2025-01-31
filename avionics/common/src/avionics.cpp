@@ -72,9 +72,9 @@ int main(void) {
         Hal::sleep_ms(100);
 }
     Hal::sleep_ms(1000);
-    Serial.println("[ TESTING MODE ]");
+    LOG_INFO("[ TESTING MODE ]");
 #endif
-    Serial.println("Initializing...");
+    LOG_INFO("Initializing...");
 
     Radio::initialize();
     LOG_INFO("Initialized radio");
@@ -87,9 +87,9 @@ int main(void) {
     auto &ignitors = rocket.ignitors;
 
     if (rocket.datalog.ok()) {
-        Serial.println("Datalogging initialized");
+        LOG_INFO("Datalogging initialized");
     } else {
-        Serial.println("Datalogging failed to initialize");
+        LOG_ERROR("Datalogging failed to initialize");
     }
 
     // Create instance of landed buzzer

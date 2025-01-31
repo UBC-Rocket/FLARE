@@ -18,6 +18,7 @@
 /*Includes------------------------------------------------------------*/
 #include "sensors/GPS.h"
 #include "options.h"
+#include "log.hpp"
 
 GPS::GPS(Hal::CustomSerial &seri, float *const data)
     : SensorBase(data),
@@ -33,7 +34,7 @@ GPS::GPS(Hal::CustomSerial &seri, float *const data)
 
 {
 #ifdef TESTING
-    Serial.println("Initializing GPS");
+    LOG_DEBUG("Initializing GPS");
 #endif
     serial_port_.begin(4800); // baud rate of Copernicus II DIP module
     while (!serial_port_) {
@@ -59,9 +60,9 @@ void GPS::readData() {
 
 #ifdef TESTING
     if (gpsSuccess) {
-        Serial.println("GPS SUCCESS");
+        LOG_DEBUG("GPS SUCCESS");
     } else {
-        Serial.println("GPS FAIL");
+        LOG_DEBUG("GPS FAIL");
     }
 #endif
 
@@ -70,10 +71,10 @@ void GPS::readData() {
     data_[2] = gps.f_altitude();
 
     #ifdef TESTING
-        Serial.println("Polling GPS");
-        Serial.print("gps lat: "); Serial.println(data_[0], 10);
-        Serial.print("gps lon: "); Serial.println(data_[1], 10);
-        Serial.print("gps alt: "); Serial.println(data_[2], 10);
+        LOG_DEBUG("Polling GPS");
+        LOG_DEBUG(("GPS Latitude: " + std::to_string(data_[0])).c_str());
+        LOG_DEBUG(("GPS Longitude: " + std::to_string(data_[1])).c_str());
+        LOG_DEBUG(("GPS Altitude: " + std::to_string(data_[2])).c_str());
     #endif
 
     status = SensorStatus::NOMINAL;

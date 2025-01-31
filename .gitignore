@@ -7,3 +7,6 @@
 .ccls-cache/
 .clangd/
 .idea/
+
+build
+venv

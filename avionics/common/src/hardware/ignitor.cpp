@@ -18,10 +18,7 @@ Ignitor::Ignitor(Pin ignitePin, Pin continuityPin, Pin continuityADCPin)
     int continuity = Hal::analogRead(continuityADCPin_);
 
     #ifdef TESTING
-        Serial.print("Continuity read for ignitor on pin ");
-        Serial.print(static_cast<uint8_t>(ignitePin_));
-        Serial.print(": ");
-        Serial.println(continuity);
+        LOG_DEBUG(("Continuity read for ignitor on pin " + std::to_string(static_cast<uint8_t>(ignitePin_)) + ": " + std::to_string(continuity)).c_str());
     #endif
 
 
