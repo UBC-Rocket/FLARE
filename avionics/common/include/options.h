@@ -23,13 +23,15 @@
 #define BODY // enable or disable body-avionics specific functionality
 // #define SERVO //if drogue release utilizes CO2 canister
 #define POW // if drogue release utilizes black powder charge
-#define TESTING //enable or disable debug output
+// #define TESTING //enable or disable debug output
 // #define GROUND_TEST
 
 // #define THERMOCOUPLE    // if thermocouple is utilized or not
 
 // Set the serial port to use UART5
+#ifdef TESTING
 #undef Serial
 #define Serial Serial5
+#endif
 
 // Refer to README or the wiki for more information.
