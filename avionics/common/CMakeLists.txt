@@ -47,3 +47,8 @@ target_sources(
     PRIVATE
     ${common_files}
 )
+target_sources(
+    Garibaldi
+    PRIVATE
+    ${common_files}
+)
