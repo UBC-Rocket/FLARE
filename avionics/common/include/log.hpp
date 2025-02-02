@@ -13,6 +13,8 @@
 // x86 configurations.
 #include "log_control.hpp"
 
+Serial5.println()
+
 // Log at a specified level. Strongly recommended to instead use the defined log
 // level macros instead of this.
 #define LOG_AT_SPECIFIED_LEVEL(level, expr) \
