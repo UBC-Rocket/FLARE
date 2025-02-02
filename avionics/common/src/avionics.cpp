@@ -64,8 +64,8 @@ int main(void) {
 /* Setup all UART comms */
 // Serial comms to computer
 #ifdef TESTING
-    Serial.begin(9600);
-    while (!Serial) {
+    SerialLogger.begin(9600);
+    while (!SerialLogger) {
         Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HI);
         Hal::sleep_ms(100);
     Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);

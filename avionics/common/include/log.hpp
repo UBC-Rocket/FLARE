@@ -18,6 +18,11 @@
 #define LOG_AT_SPECIFIED_LEVEL(level, expr) \
     rktlog::Logger::logAt<level>(__FILE__, __LINE__) << expr << rktlog::Endl()
 
+// Define an overridable serial logging interface.
+#ifndef SerialLogger
+  #define SerialLogger Serial
+#endif
+
 /*
 Defined logging levels. Usage:
 */
@@ -26,10 +31,10 @@ Defined logging levels. Usage:
   // This is kinda a hack to get logging through serial
   #ifdef LOG_CONTROL_SERIAL_LOGGING  // LOG_CONTROL_SERIAL_LOGGING
 
-    #define LOG_DEBUG(expr) Serial.print("DEBUG: "); Serial.println(expr)
-    #define LOG_INFO(expr) Serial.print("INFO: "); Serial.println(expr)
-    #define LOG_WARN(expr) Serial.print("WARN: "); Serial.println(expr)
-    #define LOG_ERROR(expr) Serial.print("ERROR: "); Serial.println(expr)
+    #define LOG_DEBUG(expr) SerialLogger.print("DEBUG: "); SerialLogger.println(expr)
+    #define LOG_INFO(expr) SerialLogger.print("INFO: "); SerialLogger.println(expr)
+    #define LOG_WARN(expr) SerialLogger.print("WARN: "); SerialLogger.println(expr)
+    #define LOG_ERROR(expr) SerialLogger.print("ERROR: "); SerialLogger.println(expr)
 
   #else  // LOG_CONTROL_SERIAL_LOGGING
 
