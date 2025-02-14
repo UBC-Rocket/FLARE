@@ -24,8 +24,8 @@ void Accelerometer::readData(void) {
 
 #ifdef TESTING
     LOG_DEBUG("Polling accelerometer");
-    LOG_DEBUG(("x: " + std::to_string(data_[0])).c_str());
-    LOG_DEBUG(("y: " + std::to_string(data_[1])).c_str());
-    LOG_DEBUG(("z: " + std::to_string(data_[2])).c_str());
+    FLOG_DEBUG("x: ", data_[0]);
+    FLOG_DEBUG("y: ", data_[1]);
+    FLOG_DEBUG("z: ", data_[2]);
 #endif
 }

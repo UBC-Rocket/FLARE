@@ -40,13 +40,13 @@ void IMU::readData() {
 
 #ifdef TESTING
     LOG_DEBUG("Polling IMU");
-    LOG_DEBUG(("ax: " + std::to_string(data_[0])).c_str());
-    LOG_DEBUG(("ay: " + std::to_string(data_[1])).c_str());
-    LOG_DEBUG(("az: " + std::to_string(data_[2])).c_str());
-    LOG_DEBUG(("gx: " + std::to_string(data_[3])).c_str());
-    LOG_DEBUG(("gy: " + std::to_string(data_[4])).c_str());
-    LOG_DEBUG(("gz: " + std::to_string(data_[5])).c_str());
-    LOG_DEBUG(("imuTemp: " + std::to_string(data_[6])).c_str());
+    FLOG_DEBUG("ax: ", data_[0]);
+    FLOG_DEBUG("ay: ", data_[1]);
+    FLOG_DEBUG("az: ", data_[2]);
+    FLOG_DEBUG("gx: ", data_[3]);
+    FLOG_DEBUG("gy: ", data_[4]);
+    FLOG_DEBUG("gz: ", data_[5]);
+    FLOG_DEBUG("imuTemp: ", data_[6]);
 #endif
 
 }

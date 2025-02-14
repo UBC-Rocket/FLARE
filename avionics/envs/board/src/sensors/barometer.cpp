@@ -33,7 +33,7 @@ void Barometer::readData() {
 
 #ifdef TESTING
     LOG_DEBUG("Polling barometer");
-    LOG_DEBUG(("Pressure [Pa]: " + std::to_string(data_[0])).c_str());
-    LOG_DEBUG(("Temperature [0.01 C]: " + std::to_string(data_[1])).c_str());
+    FLOG_DEBUG("Pressure [Pa]: ", data_[0]);
+    FLOG_DEBUG("Temperature [0.01 C]: ", data_[1]);
 #endif
 }

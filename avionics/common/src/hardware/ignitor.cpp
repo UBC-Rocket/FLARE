@@ -18,7 +18,8 @@ Ignitor::Ignitor(Pin ignitePin, Pin continuityPin, Pin continuityADCPin)
     int continuity = Hal::analogRead(continuityADCPin_);
 
     #ifdef TESTING
-        LOG_DEBUG(("Continuity read for ignitor on pin " + std::to_string(static_cast<uint8_t>(ignitePin_)) + ": " + std::to_string(continuity)).c_str());
+        FLOG_DEBUG("Continuity read for ignitor on pin: ", static_cast<uint8_t>(ignitePin_));
+        FLOG_DEBUG("Continuity value: ", continuity);
     #endif
 
 
@@ -38,7 +39,6 @@ void Ignitor::fire() {
     // different ignitions.
     Radio::sendEvent(Hal::tpoint_to_uint(Hal::now_ms()),
                      EventId::IGNITOR_FIRED);
-    LOG_INFO(("Firing ignitor at pin " +
-         std::to_string(static_cast<int>(ignitePin_)) + " at time " +
-         std::to_string(static_cast<std::int32_t>(Hal::millis())) + "ms").c_str());
+    FLOG_INFO("Firing ignitor at pin: ", static_cast<int>(ignitePin_)); 
+    FLOG_INFO("At time (ms): ", static_cast<std::int32_t>(Hal::millis()));
 }

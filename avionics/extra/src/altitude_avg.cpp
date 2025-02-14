@@ -20,8 +20,8 @@ AltitudeAvg::AltitudeAvg(SensorCollection &sensors, Hal::t_point initial_time)
                 BASE_MOVING_AVERAGE_ALPHA),
       agl_alt_(0), velocity_z_(0), last_agl_alt_(0), last_t_(initial_time) {
         #ifdef TESTING
-            LOG_DEBUG(("base alt (avg): " + std::to_string(base_alt_.getAverage())).c_str());
-            LOG_DEBUG(("agl alt (avg): " + std::to_string(agl_alt_.getAverage())).c_str());
+            FLOG_DEBUG("base alt (avg): ", base_alt_.getAverage());
+            FLOG_DEBUG("agl alt (avg): ", agl_alt_.getAverage());
         #endif
       }
 

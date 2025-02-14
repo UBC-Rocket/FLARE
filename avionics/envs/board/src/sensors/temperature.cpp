@@ -52,6 +52,6 @@ void Temperature::readData() {
 
 #ifdef TESTING
     LOG_DEBUG("Polling temperature sensor");
-    LOG_DEBUG(("cTemp: " + std::to_string(data_[0])).c_str());
+    FLOG_DEBUG("cTemp: ", data_[0]);
 #endif
 }

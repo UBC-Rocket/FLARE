@@ -72,9 +72,9 @@ void GPS::readData() {
 
     #ifdef TESTING
         LOG_DEBUG("Polling GPS");
-        LOG_DEBUG(("GPS Latitude: " + std::to_string(data_[0])).c_str());
-        LOG_DEBUG(("GPS Longitude: " + std::to_string(data_[1])).c_str());
-        LOG_DEBUG(("GPS Altitude: " + std::to_string(data_[2])).c_str());
+        FLOG_DEBUG("GPS Latitude: ", data_[0]);
+        FLOG_DEBUG("GPS Longitude: ", data_[1]);
+        FLOG_DEBUG("GPS Altitude: ", data_[2]);
     #endif
 
     status = SensorStatus::NOMINAL;
