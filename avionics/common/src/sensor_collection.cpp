@@ -11,11 +11,11 @@ constexpr char SensorCollection::LOG_FILE_HEADER[];
 SensorCollection::SensorCollection()
     : barometer(BEGIN + BAROMETER_INDEX),
       gps(Hal::SerialInst::GPS, BEGIN + GPS_INDEX),
-      accelerometer(BEGIN + ACCEL_INDEX), 
+      accelerometer(BEGIN + ACCEL_INDEX),
       imuSensor(BEGIN + IMU_INDEX),
     //   battery(Pin::VOLTAGE_SENSOR, BEGIN + BATTERY_INDEX), // No voltage sensor for 2022/23
       temperature(BEGIN + TEMP_INDEX) {
-    
+
     updateStatus();
 }
 
@@ -41,7 +41,7 @@ void SensorCollection::updateStatus() {
     status_bitfield_[0] = 0;
     if (barometer.getStatus() == SensorStatus::FAILURE) {
         #ifdef TESTING
-        Serial.println("Barometer failed");
+            LOG_ERROR("Barometer failed");
         #endif
 
         LOG_ERROR("Barometer failed");
@@ -51,7 +51,7 @@ void SensorCollection::updateStatus() {
 
     if (gps.getStatus() == SensorStatus::FAILURE) {
         #ifdef TESTING
-        Serial.println("GPS failed");
+            LOG_ERROR("GPS failed");
         #endif
 
         LOG_WARN("GPS failed");
@@ -60,7 +60,7 @@ void SensorCollection::updateStatus() {
     }
     if (accelerometer.getStatus() == SensorStatus::FAILURE) {
         #ifdef TESTING
-        Serial.println("Accelerometer failed");
+            LOG_ERROR("Accelerometer failed");
         #endif
 
         LOG_WARN("Accelerometer failed");
@@ -69,7 +69,7 @@ void SensorCollection::updateStatus() {
     }
     if (imuSensor.getStatus() == SensorStatus::FAILURE) {
         #ifdef TESTING
-        Serial.println("IMU failed");
+            LOG_ERROR("IMU failed");
         #endif
 
         LOG_WARN("IMU failed");
@@ -78,7 +78,7 @@ void SensorCollection::updateStatus() {
     }
     if (temperature.getStatus() == SensorStatus::FAILURE) {
         #ifdef TESTING
-        Serial.println("Temperature sensor failed");
+            LOG_ERROR("Temperature sensor failed");
         #endif
 
         LOG_WARN("Temperature sensor failed");
@@ -87,7 +87,7 @@ void SensorCollection::updateStatus() {
     }
     // if (battery.getStatus() == SensorStatus::FAILURE) {
     //     #ifdef TESTING
-    //     Serial.println("Voltage sensor failed");
+    //     LOG_ERROR("Voltage sensor failed");
     //     #endif
 
     //     LOG_WARN("Voltage sensor failed");

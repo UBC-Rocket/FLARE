@@ -18,12 +18,10 @@ Ignitor::Ignitor(Pin ignitePin, Pin continuityPin, Pin continuityADCPin)
     int continuity = Hal::analogRead(continuityADCPin_);
 
     #ifdef TESTING
-        Serial.print("Continuity read for ignitor on pin "); 
-        Serial.print(static_cast<uint8_t>(ignitePin_));
-        Serial.print(": "); 
-        Serial.println(continuity);
+        FLOG_DEBUG("Continuity read for ignitor on pin: ", static_cast<uint8_t>(ignitePin_));
+        FLOG_DEBUG("Continuity value: ", continuity);
     #endif
-    
+
 
     if (continuity <= DISCONTINUOUS_THRESHOLD) {
         status = HardwareStatus::FAILURE;
@@ -41,7 +39,6 @@ void Ignitor::fire() {
     // different ignitions.
     Radio::sendEvent(Hal::tpoint_to_uint(Hal::now_ms()),
                      EventId::IGNITOR_FIRED);
-    LOG_INFO("Firing ignitor at pin "
-             << static_cast<int>(ignitePin_) << " at time "
-             << static_cast<std::int32_t>(Hal::millis()) << "ms");
+    FLOG_INFO("Firing ignitor at pin: ", static_cast<int>(ignitePin_)); 
+    FLOG_INFO("At time (ms): ", static_cast<std::int32_t>(Hal::millis()));
 }

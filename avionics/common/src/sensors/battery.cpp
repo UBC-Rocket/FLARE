@@ -22,6 +22,8 @@
 #include "HAL/time.h"
 #include "radio.h"
 #include "sensors/battery_sensor.h"
+#include "options.h"
+#include "log.hpp"
 
 /*Constants------------------------------------------------------------*/
 #define MINIMUM_BATTERY_VOLTAGE 10
@@ -35,7 +37,7 @@ Battery::Battery(Pin batterySensorPin, float *const data) : SensorBase(data) {
 
 /*init voltage sensor*/
 #ifdef TESTING
-    Serial.println("Initializing battery voltage sensor");
+    LOG_DEBUG("Initializing battery voltage sensor");
 #endif
     lowVoltageWarningSent = false;
     m_divider = static_cast<float>(R2) / (R1 + R2);
@@ -58,7 +60,7 @@ float sensor_range_map(int x, int in_min, int in_max, int out_min,
 
 float Battery::getBatteryVoltage() {
 #ifdef TESTING
-    Serial.println("Polling battery voltage sensor");
+    LOG_DEBUG("Polling battery voltage sensor");
 #endif
     int inputValue = Hal::analogRead(m_batterySensorPin);
     // map it to the range the analog out:

@@ -2,9 +2,9 @@
 
 namespace Hal {
 
-HardwareSerial CustomSerial1(10, 9); // PA_10, PA_9
-HardwareSerial CustomSerial2(3, 2); // PA_3, PA_2
-HardwareSerial CustomSerial3(47, 47); // PC_15 (unused)
+HardwareSerial CustomSerial1(197, 196); // RX: PC0, TX: PC1
+HardwareSerial CustomSerial2(192, 193); // RX: PA1, TX: PA0
+HardwareSerial CustomSerial3(194, 194); // RX: PA4 (unused), TX: PA4 (unused)
 
 CustomSerial SerialInst::GPS{CustomSerial1};
 CustomSerial SerialInst::Radio{CustomSerial2};

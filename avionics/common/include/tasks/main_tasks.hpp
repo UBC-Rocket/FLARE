@@ -18,6 +18,7 @@ class ReadEvalLog {
      * @brief polss sensors, logs data, and updates state machine
      */
     void run() {
+        LOG_DEBUG("ReadEvalLog task started");
         auto &state_machine = rocket_.state_machine;
         auto &init_status = rocket_.init_status;
         auto &sensors = rocket_.sensors;
@@ -43,7 +44,7 @@ class ReadEvalLog {
         std::tie(old_state, new_state) = state_machine.update(calc);
         if (old_state != new_state) {
             // state transition has occurred
-            
+
             // if (new_state == StateId::MAIN_DESCENT) {
             //     // restart the camera periodically once in main descent
             //     Scheduler::scheduleTask(
@@ -88,7 +89,7 @@ class RadioTxBulk {
 
     /**
      * @brief Construct a new Radio Tx Bulk object
-     * @param rkt 
+     * @param rkt
      */
     RadioTxBulk(Rocket &rkt) : rocket(rkt) {}
     static constexpr Hal::ms freq{500};
@@ -99,6 +100,7 @@ class RadioTxBulk {
      * @brief sends bulk sensor data
      */
     void run() {
+        LOG_DEBUG("RadioTxBulk task started");
         StateId state = rocket.state_machine.getState();
         Radio::sendBulkSensor(
             Hal::tpoint_to_uint(rocket.sensors.last_poll_time()),

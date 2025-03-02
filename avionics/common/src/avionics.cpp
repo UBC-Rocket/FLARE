@@ -54,7 +54,7 @@ void registerTask(TaskID id, Scheduler::Task task, bool repeat = true,
 int main(void) {
     // Initialize Arduino
     init();
-    
+
     // Before anything else there's some environment specific setup to be done
     env_initialize();
     LOG_INFO("Everything is starting now");
@@ -63,16 +63,18 @@ int main(void) {
 
 /* Setup all UART comms */
 // Serial comms to computer
-#ifdef TESTING
-    Serial.begin(9600);
-    while (!Serial) {
+#if defined(TESTING) && defined(LOG_CONTROL_ENABLE_LOGGING) && defined(LOG_CONTROL_SERIAL_LOGGING)
+    SerialLogger.begin(9600);
+    while (!SerialLogger) {
         Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HI);
         Hal::sleep_ms(100);
-        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
+    Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
         Hal::sleep_ms(100);
-    }
-    Serial.println("Initializing...");
+}
+    Hal::sleep_ms(1000);
+    LOG_INFO("[ TESTING MODE ]");
 #endif
+    LOG_INFO("Initializing...");
 
     Radio::initialize();
     LOG_INFO("Initialized radio");
@@ -83,6 +85,12 @@ int main(void) {
     auto &init_status = rocket.init_status;
     auto &sensors = rocket.sensors;
     auto &ignitors = rocket.ignitors;
+
+    if (rocket.datalog.ok()) {
+        LOG_INFO("Datalogging initialized");
+    } else {
+        LOG_ERROR("Datalogging failed to initialize");
+    }
 
     // Create instance of landed buzzer
     LandedBuzzer landedBuzzer(rocket.buzzer);
@@ -98,11 +106,12 @@ int main(void) {
     /* Register all tasks */
     typedef Scheduler::Task Task;
 
+    // Read sensors, evaluate state, log data, and send status
     ReadEvalLog read_eval_logger(rocket);
     Task read_eval_log(ReadEvalLog::run, &read_eval_logger, Hal::ms(50));
     registerTask(TaskID::ReadEvalLog, read_eval_log);
 
-    // Radio needs to be scheduled later; sensors need to be read first
+    // // Radio needs to be scheduled later; sensors need to be read first
     RadioTxBulk radio_txer(rocket);
     Task radio_tx(RadioTxBulk::run, &radio_txer, RadioTxBulk::freq);
     Scheduler::preregisterTask(static_cast<int>(TaskID::RadioTxBulk), radio_tx,
@@ -111,14 +120,12 @@ int main(void) {
                             static_cast<int>(TaskID::RadioTxBulk));
 
     Task led_blink(LEDBlinker::toggle, nullptr, LEDBlinker::freq);
+    registerTask(TaskID::LEDBlinker, led_blink);
 
-    displayStatus(init_status, rocket.buzzer);
-    if (init_status == RocketStatus::NONCRITICAL_FAILURE) {
-        registerTask(TaskID::LEDBlinker, led_blink);
-    }
-    
-    Task buzzer(LandedBuzzer::run, &landedBuzzer, Hal::ms(45000));
-    Scheduler::preregisterTask(static_cast<int>(TaskID::BuzzerBeacon), buzzer, true, false);
+    // displayStatus(init_status, rocket.buzzer);
+    // if (init_status == RocketStatus::NONCRITICAL_FAILURE) {
+    //     registerTask(TaskID::LEDBlinker, led_blink);
+    // }
 
     // RestartCamera restart_camera_(rocket.cam);
     // // This tasks sets its own reschedule interval (since the same task is run

@@ -18,6 +18,7 @@
 /*Includes------------------------------------------------------------*/
 #include "sensors/GPS.h"
 #include "options.h"
+#include "log.hpp"
 
 GPS::GPS(Hal::CustomSerial &seri, float *const data)
     : SensorBase(data),
@@ -33,7 +34,7 @@ GPS::GPS(Hal::CustomSerial &seri, float *const data)
 
 {
 #ifdef TESTING
-    Serial.println("Initializing GPS");
+    LOG_DEBUG("Initializing GPS");
 #endif
     serial_port_.begin(4800); // baud rate of Copernicus II DIP module
     while (!serial_port_) {
@@ -57,15 +58,23 @@ void GPS::readData() {
         status = SensorStatus::FAILURE;
     }
 
+#ifdef TESTING
+    if (gpsSuccess) {
+        LOG_DEBUG("GPS SUCCESS");
+    } else {
+        LOG_DEBUG("GPS FAIL");
+    }
+#endif
+
     unsigned long fix_age;
     gps.f_get_position(data_, data_ + 1, &fix_age);
     data_[2] = gps.f_altitude();
 
     #ifdef TESTING
-        Serial.println("Polling GPS");
-        Serial.print("gps lat: "); Serial.println(data_[0], 10);
-        Serial.print("gps lon: "); Serial.println(data_[1], 10);
-        Serial.print("gps alt: "); Serial.println(data_[2], 10);
+        LOG_DEBUG("Polling GPS");
+        FLOG_DEBUG("GPS Latitude: ", data_[0]);
+        FLOG_DEBUG("GPS Longitude: ", data_[1]);
+        FLOG_DEBUG("GPS Altitude: ", data_[2]);
     #endif
 
     status = SensorStatus::NOMINAL;

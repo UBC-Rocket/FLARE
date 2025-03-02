@@ -1,22 +1,23 @@
 /*Includes------------------------------------------------------------*/
 #include "sensors/IMU.h"
 #include "options.h"
+#include "log.hpp"
 
 /*Variables------------------------------------------------------------*/
 
 IMU::IMU(float *const data) : SensorBase(data), bmi088{BMI088_ACC_ALT_ADDRESS, BMI088_GYRO_ALT_ADDRESS} {
 #ifdef TESTING
-    Serial.println("Initializing IMU");
+    LOG_DEBUG("Initializing IMU");
 #endif
     if (bmi088.isConnection()) {
         bmi088.initialize();
         status = SensorStatus::NOMINAL;
 #ifdef TESTING
-        Serial.println("BMI088 is connected");
+        LOG_DEBUG("BMI088 is connected");
 #endif
     } else {
 #ifdef TESTING
-        Serial.println("BMI088 is not connected");
+        LOG_DEBUG("BMI088 is not connected");
 #endif
         status = SensorStatus::FAILURE;
     }
@@ -38,21 +39,14 @@ void IMU::readData() {
     data_[6] = imuTemp;
 
 #ifdef TESTING
-    Serial.println("Polling IMU");
-    Serial.print("ax:  ");
-    Serial.println(data_[0]);
-    Serial.print("ay: ");
-    Serial.println(data_[1]);
-    Serial.print("az: ");
-    Serial.println(data_[2]);
-    Serial.print("gx:  ");
-    Serial.println(data_[3]);
-    Serial.print("gy: ");
-    Serial.println(data_[4]);
-    Serial.print("gz: ");
-    Serial.println(data_[5]);
-    Serial.print("imuTemp: ");
-    Serial.println(data_[6]);
+    LOG_DEBUG("Polling IMU");
+    FLOG_DEBUG("ax: ", data_[0]);
+    FLOG_DEBUG("ay: ", data_[1]);
+    FLOG_DEBUG("az: ", data_[2]);
+    FLOG_DEBUG("gx: ", data_[3]);
+    FLOG_DEBUG("gy: ", data_[4]);
+    FLOG_DEBUG("gz: ", data_[5]);
+    FLOG_DEBUG("imuTemp: ", data_[6]);
 #endif
 
 }

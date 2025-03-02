@@ -8,35 +8,69 @@
 // TODO: provide more granularity (i.e. specify log level to keep) in
 // log_control.hpp
 
-// Define the macro LOG_CONTROL_DISABLE_LOGGING in log_control.hpp to disable
+// Define the macro LOG_CONTROL_ENABLE_LOGGING in log_control.hpp to enable
 // logging. Seperate versions of log_control.hpp are used between the board and
 // x86 configurations.
 #include "log_control.hpp"
 
-/*
-Defined logging levels. Usage:
-LOG_WARN("Warning message; warning code: " << 123 << " addnl string")
-*/
-#ifndef LOG_CONTROL_DISABLE_LOGGING
-
-#define LOG_DEBUG(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kDebug, expr)
-#define LOG_INFO(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kInfo, expr)
-#define LOG_WARN(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kWarn, expr)
-#define LOG_ERROR(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kErr, expr)
-
-#else // LOG_CONTROL_DISABLE_LOGGING
-
-#define LOG_DEBUG(expr)
-#define LOG_INFO(expr)
-#define LOG_WARN(expr)
-#define LOG_ERROR(expr)
-
-#endif // LOG_CONTROL_DISABLE_LOGGING
-
 // Log at a specified level. Strongly recommended to instead use the defined log
 // level macros instead of this.
-#define LOG_AT_SPECIFIED_LEVEL(level, expr)                                    \
+#define LOG_AT_SPECIFIED_LEVEL(level, expr) \
     rktlog::Logger::logAt<level>(__FILE__, __LINE__) << expr << rktlog::Endl()
+
+// Define an overridable serial logging interface.
+#ifndef SerialLogger
+    #define SerialLogger Serial
+#endif
+
+/*
+Defined logging levels. Usage:
+*/
+#ifdef LOG_CONTROL_ENABLE_LOGGING  // LOG_CONTROL_ENABLE_LOGGING
+
+    // This is kinda a hack to get logging through serial
+    #ifdef LOG_CONTROL_SERIAL_LOGGING  // LOG_CONTROL_SERIAL_LOGGING
+
+        #define LOG_DEBUG(expr) SerialLogger.print("DEBUG: "); SerialLogger.println(expr)
+        #define LOG_INFO(expr) SerialLogger.print("INFO: "); SerialLogger.println(expr)
+        #define LOG_WARN(expr) SerialLogger.print("WARN: "); SerialLogger.println(expr)
+        #define LOG_ERROR(expr) SerialLogger.print("ERROR: "); SerialLogger.println(expr)
+
+        // FLOG is used to print out floating point data inline since there's a bug with serial where concatenating
+        // a string with a float freezes the output
+        // @param expr1: must be a string
+        // @param expr2: can be any numerical type (not tested but should work)
+        #define FLOG_DEBUG(expr1, expr2) SerialLogger.print("DEBUG: "); SerialLogger.print(expr1); SerialLogger.println(expr2)
+        #define FLOG_INFO(expr1, expr2) SerialLogger.print("INFO: "); SerialLogger.print(expr1); SerialLogger.println(expr2)
+        #define FLOG_WARN(expr1, expr2) SerialLogger.print("WARN: "); SerialLogger.print(expr1); SerialLogger.println(expr2)
+        #define FLOG_ERROR(expr1, expr2) SerialLogger.print("ERROR: "); SerialLogger.print(expr1); SerialLogger.println(expr2)
+
+    #else  // LOG_CONTROL_SERIAL_LOGGING
+
+        #define LOG_DEBUG(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kDebug, expr)
+        #define LOG_INFO(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kInfo, expr)
+        #define LOG_WARN(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kWarn, expr)
+        #define LOG_ERROR(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kErr, expr)
+
+        #define FLOG_DEBUG(expr1, expr2) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kDebug, expr1 << expr2)
+        #define FLOG_INFO(expr1, expr2) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kInfo, expr1 << expr2)
+        #define FLOG_WARN(expr1, expr2) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kWarn, expr1 << expr2)
+        #define FLOG_ERROR(expr1, expr2) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kErr, expr1 << expr2)
+
+    #endif  // LOG_CONTROL_SERIAL_LOGGING
+
+#else  // LOG_CONTROL_ENABLE_LOGGING
+
+    #define LOG_DEBUG(expr)
+    #define LOG_INFO(expr)
+    #define LOG_WARN(expr)
+    #define LOG_ERROR(expr)
+    #define FLOG_DEBUG(expr1, expr2)
+    #define FLOG_INFO(expr1, expr2)
+    #define FLOG_WARN(expr1, expr2)
+    #define FLOG_ERROR(expr1, expr2)
+
+#endif  // LOG_CONTROL_ENABLE_LOGGING
 
 namespace rktlog {
 

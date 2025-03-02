@@ -1,7 +1,8 @@
 #include "env_config.h"
 
 void env_initialize() {
-    Wire.setSCL(22); // PB6
-    Wire.setSDA(23); // PB7
+    // Should be handled by compiler flags now
+    // Wire.setSCL(10); // PB6
+    // Wire.setSDA(21); // PB7
     Wire.begin();
 }
