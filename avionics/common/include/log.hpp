@@ -36,7 +36,7 @@ Defined logging levels. Usage:
         #define LOG_WARN(expr) SerialLogger.print("WARN: "); SerialLogger.println(expr)
         #define LOG_ERROR(expr) SerialLogger.print("ERROR: "); SerialLogger.println(expr)
 
-        // FLOG is used to print out floating point data inline since there's a bug with serial where concatenating 
+        // FLOG is used to print out floating point data inline since there's a bug with serial where concatenating
         // a string with a float freezes the output
         // @param expr1: must be a string
         // @param expr2: can be any numerical type (not tested but should work)
@@ -52,10 +52,10 @@ Defined logging levels. Usage:
         #define LOG_WARN(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kWarn, expr)
         #define LOG_ERROR(expr) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kErr, expr)
 
-        #define FLOG_DEBUG(expr1, expr2) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kDebug, (expr1 + std::to_string(expr2)).c_str())
-        #define FLOG_INFO(expr1, expr2) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kInfo, (expr1 + std::to_string(expr2)).c_str())
-        #define FLOG_WARN(expr1, expr2) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kWarn, (expr1 + std::to_string(expr2)).c_str())
-        #define FLOG_ERROR(expr1, expr2) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kErr, (expr1 + std::to_string(expr2)).c_str())
+        #define FLOG_DEBUG(expr1, expr2) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kDebug, expr1 << expr2)
+        #define FLOG_INFO(expr1, expr2) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kInfo, expr1 << expr2)
+        #define FLOG_WARN(expr1, expr2) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kWarn, expr1 << expr2)
+        #define FLOG_ERROR(expr1, expr2) LOG_AT_SPECIFIED_LEVEL(rktlog::Level::kErr, expr1 << expr2)
 
     #endif  // LOG_CONTROL_SERIAL_LOGGING
 
