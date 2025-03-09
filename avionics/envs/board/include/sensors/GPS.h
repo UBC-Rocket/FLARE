@@ -30,20 +30,20 @@
 /*Variables------------------------------------------------------------*/
 
 class GPS : public SensorBase<GPS_DATA_LENGTH> {
-  public:
-    GPS(Hal::CustomSerial &seri, float *const data);
-    void readData();
+    public:
+        GPS(Hal::CustomSerial &seri, float *const data);
+        void readData();
 
-  private:
-    constexpr static int GPS_FIELD_LENGTH = 20;
-    constexpr static int GPS_TIMEOUT = 100;
+    private:
+        constexpr static int GPS_FIELD_LENGTH = 20;
+        constexpr static int GPS_TIMEOUT = 200;
 
-    Hal::CustomSerial &serial_port_;
-    TinyGPS gps;
+        Hal::CustomSerial &serial_port_;
+        TinyGPS gps;
 
-    /*GPS initialization commands*/
-    const std::array<uint8_t, 9> GPS_reset_defaults;
-    const std::array<uint8_t, 11> GPS_set_baud_rate;    // 4800
-    const std::array<uint8_t, 16> GPS_set_NMEA_message; // GPGGA
-    const std::array<uint8_t, 10> GPS_set_update_rate;  // 1 Hz
+        /*GPS initialization commands*/
+        // const std::array<uint8_t, 9> GPS_reset_defaults;
+        // const std::array<uint8_t, 11> GPS_set_baud_rate;    // 9600
+        // const std::array<uint8_t, 16> GPS_set_NMEA_message; // GPGGA
+        // const std::array<uint8_t, 10> GPS_set_update_rate;  // 1 Hz
 };
