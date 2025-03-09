@@ -22,7 +22,8 @@
 
 #include "sensors_interface.h"
 #include <HAL/port_impl.h>
-#include <TinyGPS.h>
+// #include <TinyGPS.h>
+#include <Adafruit_GPS.h>
 #include <elapsedMillis.h>
 
 /*Constants------------------------------------------------------------*/
@@ -38,8 +39,10 @@ class GPS : public SensorBase<GPS_DATA_LENGTH> {
         constexpr static int GPS_FIELD_LENGTH = 20;
         constexpr static int GPS_TIMEOUT = 200;
 
-        Hal::CustomSerial &serial_port_;
-        TinyGPS gps;
+        // Hal::CustomSerial &serial_port_;
+        // TinyGPS gps;
+        Adafruit_GPS gps;
+
 
         /*GPS initialization commands*/
         // const std::array<uint8_t, 9> GPS_reset_defaults;

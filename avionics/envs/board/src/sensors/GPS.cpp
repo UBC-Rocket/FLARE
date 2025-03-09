@@ -20,19 +20,14 @@
 #include "options.h"
 #include "log.hpp"
 
-GPS::GPS(Hal::CustomSerial &seri, float *const data) : SensorBase(data),
-        serial_port_(seri)/**, GPS_reset_defaults{0xA0, 0xA1, 0x00, 0x02, 0x04, 0x00, 0x04, 0x0D, 0x0A},
-        GPS_set_baud_rate{0xA0, 0xA1, 0x00, 0x04, 0x05, 0x00, 0x00, 0x00, 0x05, 0x0D, 0x0A},
-        GPS_set_NMEA_message{0xA0, 0xA1, 0x00, 0x09, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x0D, 0x0A},
-        GPS_set_update_rate{0xA0, 0xA1, 0x00, 0x03, 0x0E, 0x01, 0x00, 0x0F, 0x0D, 0x0A}*/
-
+GPS::GPS(Hal::CustomSerial &seri, float *const data) : SensorBase(data), gps(&seri.getSerial())
 {
 #ifdef TESTING
     LOG_DEBUG("Initializing GPS");
 #endif
-    serial_port_.begin(9600); // baud rate of Adafruit Mini GPS PA1010D module
-    while (!serial_port_) {
-    }
+    gps.begin(9600); // 9600 NMEA is the default baud rate for Adafruit MTK GPS's
+    // while (!serial_port_) {
+    // }
 
     // while (1) {
     //     if (serial_port_.available()) {
@@ -41,6 +36,10 @@ GPS::GPS(Hal::CustomSerial &seri, float *const data) : SensorBase(data),
     //         LOG_DEBUG("SERIAL FAIL");
     //     }
     // }
+
+    // gps.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
+    // gps.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
+    // gps.sendCommand(PGCMD_ANTENNA);
 
     status = SensorStatus::NOMINAL;
 }
@@ -63,22 +62,22 @@ void GPS::readData() {
     // // SerialLogger.println("<EOT>");
 
     // TODO add timeout
-    while (serial_port_.available()) {
-            char c = serial_port_.read();
-            SerialLogger.print(c);
-            bool val = gps.encode(c);
-            if (val) {
-                gpsSuccess = true;
-                SerialLogger.print("[GPS DATA]");
-                break;   
-            }
-            // if (c == '*') {
-            //     if (val) {
-            //         SerialLogger.print("Y");
-            //     } else {
-            //         SerialLogger.print("N");
-            //     }
-            // }
+    while (1) {
+        char c = gps.read();
+        SerialLogger.print(c);
+        if (gps.newNMEAreceived() && gps.parse(gps.lastNMEA())) {
+            gpsSuccess = true;
+            SerialLogger.print("[GPS DATA]");
+            // break;
+        }
+        // GPS.parse(GPS.lastNMEA())
+        // if (c == '*') {
+        //     if (val) {
+        //         SerialLogger.print("Y");
+        //     } else {
+        //         SerialLogger.print("N");
+        //     }
+        // }
 
     }
 
@@ -94,16 +93,16 @@ void GPS::readData() {
     }
 #endif
 
-    unsigned long fix_age;
-    gps.f_get_position(data_, data_ + 1, &fix_age);
-    data_[2] = gps.f_altitude();
+    // unsigned long fix_age;
+    // gps.f_get_position(data_, data_ + 1, &fix_age);
+    // data_[2] = gps.f_altitude();
 
-    #ifdef TESTING
-        LOG_DEBUG("Polling GPS");
-        FLOG_DEBUG("GPS Latitude: ", data_[0]);
-        FLOG_DEBUG("GPS Longitude: ", data_[1]);
-        FLOG_DEBUG("GPS Altitude: ", data_[2]);
-    #endif
+    // #ifdef TESTING
+    //     LOG_DEBUG("Polling GPS");
+    //     FLOG_DEBUG("GPS Latitude: ", data_[0]);
+    //     FLOG_DEBUG("GPS Longitude: ", data_[1]);
+    //     FLOG_DEBUG("GPS Altitude: ", data_[2]);
+    // #endif
 
     status = SensorStatus::NOMINAL;
 }
