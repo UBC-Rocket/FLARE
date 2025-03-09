@@ -28,6 +28,11 @@ set(common_files
     ${CMAKE_CURRENT_LIST_DIR}/lib/CalcHelpers/barometric.cpp
 )
 target_sources(
+    Sunburst
+    PRIVATE
+    ${common_files}
+)
+target_sources(
     Garibaldi
     PRIVATE
     ${common_files}

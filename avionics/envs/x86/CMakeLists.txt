@@ -10,6 +10,12 @@ set(x86_specific_files
 )
 
 target_sources(
+    Sunburst
+    PRIVATE
+        ${x86_specific_files}
+)
+
+target_sources(
     Garibaldi
     PRIVATE
         ${x86_specific_files}

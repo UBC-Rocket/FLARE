@@ -11,15 +11,17 @@ else()
     set(CMAKE_CXX_FLAGS "-pthread -static-libstdc++ -static-libgcc -Wall -Wextra -g")
 endif()
 
+add_executable(Sunburst common/src/avionics.cpp)
 add_executable(Garibaldi common/src/avionics.cpp)
 add_executable(BNBStage1 common/src/avionics.cpp)
 add_executable(BNBStage2 common/src/avionics.cpp)
 add_executable(Hollyburn common/src/avionics.cpp)
 add_executable(Silvertip common/src/avionics.cpp)
 
-add_subdirectory(rockets/garibaldi)
 add_subdirectory(common)
 add_subdirectory(envs/x86)
+add_subdirectory(rockets/sunburst)
+add_subdirectory(rockets/garibaldi)
 add_subdirectory(rockets/bnb_stage_1)
 add_subdirectory(rockets/bnb_stage_2)
 add_subdirectory(rockets/hollyburn)
@@ -35,6 +37,11 @@ include_directories(
 )
 
 # Rocket-specific directories
+target_include_directories(Sunburst PUBLIC
+  rockets/sunburst/include
+)
+target_sources(Sunburst PUBLIC extra/src/altitude_avg.cpp)
+
 target_include_directories(Garibaldi PUBLIC
   rockets/garibaldi/include
 )
@@ -66,14 +73,20 @@ target_sources(Silvertip PUBLIC extra/src/altitude_avg.cpp)
 ### Setup Radio defines
 ###
 
+add_compile_definitions(RADIO_CONFIG_PACKET_SIM_ACTIVE=1)
+
+target_compile_definitions(Sunburst PUBLIC
+    RADIO_CONFIG_PACKET_ROCKET_ID=9
+)
+
 target_compile_definitions(Garibaldi PUBLIC
     RADIO_CONFIG_PACKET_ROCKET_ID=7
 )
 
-add_compile_definitions(RADIO_CONFIG_PACKET_SIM_ACTIVE=1)
 target_compile_definitions(BNBStage1 PUBLIC
     RADIO_CONFIG_PACKET_ROCKET_ID=0
 )
+
 target_compile_definitions(BNBStage2 PUBLIC
     RADIO_CONFIG_PACKET_ROCKET_ID=1
 )
