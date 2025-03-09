@@ -16,8 +16,8 @@ export DISPLAY=":1"
 
 # Start setting up Python for GS
 sudo apt-get install -y tk-dev
-env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.7.9
-pyenv global 3.7.9
+env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install -s 3.12
+pyenv global 3.12
 python --version
 python -m pip install --upgrade pip setuptools wheel
 
