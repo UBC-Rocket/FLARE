@@ -76,6 +76,34 @@ int main(void) {
 #endif
     LOG_INFO("Initializing...");
 
+    Hal::pinMode(Pin::DROGUE_IGNITOR, Hal::PinMode::OUTPUT);
+    Hal::digitalWrite(Pin::DROGUE_IGNITOR, Hal::PinDigital::LO);
+    Hal::pinMode(Pin::MAIN_IGNITOR, Hal::PinMode::OUTPUT);
+    Hal::digitalWrite(Pin::MAIN_IGNITOR, Hal::PinDigital::LO);
+    
+    Hal::pinMode(Pin::DROGUE_CONTINUITY_TEST, Hal::PinMode::OUTPUT);
+    Hal::digitalWrite(Pin::DROGUE_CONTINUITY_TEST, Hal::PinDigital::LO);
+    Hal::pinMode(Pin::MAIN_CONTINUITY_TEST, Hal::PinMode::OUTPUT);
+    Hal::digitalWrite(Pin::MAIN_CONTINUITY_TEST, Hal::PinDigital::LO);
+
+    Hal::pinMode(Pin::PIN_PA10, Hal::PinMode::INPUT);
+    Hal::pinMode(Pin::PIN_PA9, Hal::PinMode::INPUT);
+    Hal::pinMode(Pin::PIN_PA8, Hal::PinMode::INPUT);
+    int ign_chk1;
+    int ign_chk2;
+    int ign_chk3;
+    
+    while (1) {
+        ign_chk1 = Hal::analogRead(Pin::PIN_PA10);
+        FLOG_INFO("IGN_CHK1 read:", ign_chk1);
+        ign_chk2 = Hal::analogRead(Pin::PIN_PA9);
+        FLOG_INFO("IGN_CHK2 read:", ign_chk2);
+        ign_chk3 = Hal::analogRead(Pin::PIN_PA8);
+        FLOG_INFO("IGN_CHK3 read:", ign_chk3);
+        LOG_INFO("");
+        Hal::sleep_ms(1000);
+    }
+
     Radio::initialize();
     LOG_INFO("Initialized radio");
     Rocket rocket;
