@@ -68,10 +68,10 @@ void initPins(void) {
     Hal::pinMode(Pin::BUILTIN_LED, Hal::PinMode::OUTPUT);
 
     /* Initialize ignitor pins to be off. This also exists in ignitor but may be called too late? */
-    Hal::pinMode(Pin::DROGUE_IGNITOR, Hal::PinMode::OUTPUT);
-    Hal::digitalWrite(Pin::DROGUE_IGNITOR, Hal::PinDigital::LO);
-    Hal::pinMode(Pin::MAIN_IGNITOR, Hal::PinMode::OUTPUT);
-    Hal::digitalWrite(Pin::MAIN_IGNITOR, Hal::PinDigital::LO);
+    // Hal::pinMode(Pin::DROGUE_IGNITOR, Hal::PinMode::OUTPUT);
+    // Hal::digitalWrite(Pin::DROGUE_IGNITOR, Hal::PinDigital::LO);
+    // Hal::pinMode(Pin::MAIN_IGNITOR, Hal::PinMode::OUTPUT);
+    // Hal::digitalWrite(Pin::MAIN_IGNITOR, Hal::PinDigital::LO);
 
     // Ignitor and continuity pins are initialized in the ignitor constructor
 
