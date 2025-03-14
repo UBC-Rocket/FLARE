@@ -35,6 +35,9 @@ enum class Pin {
     DROGUE_IGNITOR = 4, // IGN2_1 - PB5
     DROGUE_CONTINUITY_TEST = 29, // IGN2_2 - PC11
     DROGUE_CONTINUITY_READ = 8, // IGN_CHK2 - PA9
+    PIN_PA10 = 2,
+    PIN_PA9 = 8,
+    PIN_PA8 = 7,
     VOLTAGE_SENSOR = 42, // PB14, unused
     SD_CHIP_SELECT = 31, // PC9
 };
