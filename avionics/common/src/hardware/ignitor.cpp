@@ -6,24 +6,21 @@
 
 #include "hardware/ignitor.h"
 
-Ignitor::Ignitor(Pin ignitePin, Pin continuityPin, Pin continuityADCPin)
-    : ignitePin_(ignitePin), continuityPin_(continuityPin),
-      continuityADCPin_(continuityADCPin) {
+Ignitor::Ignitor(Pin ignitePin, Pin continuityPin) : ignitePin_(ignitePin), continuityPin_(continuityPin) {
     /*init ignitor*/
     Hal::pinMode(ignitePin_, Hal::PinMode::OUTPUT);
     Hal::digitalWrite(ignitePin_, Hal::PinDigital::LO);
 
     /*continuity check */
-    Hal::pinMode(continuityADCPin_, Hal::PinMode::INPUT);
-    int continuity = Hal::analogRead(continuityADCPin_);
+    pinMode(static_cast<uint32_t>(continuityPin_), 0); // 0 = digitalRead mode from Arduino's wiring_digital.c file
+    int continuity = digitalRead(static_cast<uint32_t>(continuityPin_));
 
     #ifdef TESTING
         FLOG_DEBUG("Continuity read for ignitor on pin: ", static_cast<uint8_t>(ignitePin_));
         FLOG_DEBUG("Continuity value: ", continuity);
     #endif
 
-
-    if (continuity <= DISCONTINUOUS_THRESHOLD) {
+    if (continuity) {
         status = HardwareStatus::FAILURE;
     } else {
         status = HardwareStatus::NOMINAL;

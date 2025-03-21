@@ -14,6 +14,7 @@ class IgnitorCollection {
 
     Ignitor drogue;
     Ignitor main;
+    Ignitor backup;
 
     /**
      * @brief Get the status_bitfield_ of IgnitorCollection
@@ -28,6 +29,6 @@ class IgnitorCollection {
     RocketStatus getStatus() const { return status_; }
 
   private:
-    uint8_t status_bitfield_[2];
+    uint8_t status_bitfield_[3];
     RocketStatus status_;
 };
