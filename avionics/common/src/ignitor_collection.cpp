@@ -9,10 +9,9 @@
 
 
 IgnitorCollection::IgnitorCollection()
-    : drogue(Pin::DROGUE_IGNITOR, Pin::DROGUE_CONTINUITY_TEST,
-             Pin::DROGUE_CONTINUITY_READ),
-      main(Pin::MAIN_IGNITOR, Pin::MAIN_CONTINUITY_TEST,
-           Pin::MAIN_CONTINUITY_READ) {
+    : drogue(Pin::DROGUE_IGNITOR, Pin::DROGUE_CONTINUITY_READ),
+      main(Pin::MAIN_IGNITOR, Pin::MAIN_CONTINUITY_READ),
+      backup(Pin::BACKUP_IGNITOR, Pin::BACKUP_CONTINUITY_READ) {
     status_ = RocketStatus::NOMINAL;
 
     // TODO: Check continuity continuously instead of only during startup
@@ -32,6 +31,15 @@ IgnitorCollection::IgnitorCollection()
 
         // LOG_ERROR("Broken ignitor for drogue parachute");
         status_bitfield_[0] |= 0x40;
+        // status_ = RocketStatus::CRITICAL_FAILURE;
+    }
+    if (backup.getStatus() == ComponentStatus::FAILURE) {
+        #ifdef TESTING
+            LOG_ERROR("Backup parachute ignitor failed");
+        #endif
+
+        // LOG_ERROR("Broken ignitor for drogue parachute");
+        status_bitfield_[0] |= 0xC0;
         // status_ = RocketStatus::CRITICAL_FAILURE;
     }
 }
