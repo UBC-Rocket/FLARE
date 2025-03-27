@@ -16,6 +16,8 @@ export DISPLAY=":1"
 
 # Start setting up Python for GS
 sudo apt-get install -y tk-dev
+sudo apt-get install -y libxcb-xinerama0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xkb1 libxcb-shape0 libxkbcommon-x11-0
+
 env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install -s 3.12
 pyenv global 3.12
 python --version
