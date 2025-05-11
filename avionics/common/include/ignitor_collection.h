@@ -14,6 +14,7 @@ class IgnitorCollection {
 
     Ignitor drogue;
     Ignitor main;
+    Ignitor backup;
 
     /**
      * @brief Get the status_bitfield_ of IgnitorCollection

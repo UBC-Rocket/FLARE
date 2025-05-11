@@ -19,6 +19,7 @@ enum class PinDigital { LO = 0, HI = 1 };
 
 void pinMode(::Pin pin, PinMode mode);
 void digitalWrite(::Pin pin, PinDigital val);
+int digitalRead(::Pin pin);
 int analogRead(::Pin pin);
 
 // int LED_BUILTIN(); // function because c++ doesn't have forward declaration
