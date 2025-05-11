@@ -7,7 +7,7 @@
  *  drogue and main parachute releases, status LEDs, buzzer.
  *
  *  The drogue servo control function and main parachute release functions are
- *  also contained here. There is a function that im plements continuity testing
+ *  also contained here. There is a function that implements continuity testing
  *  of the ematch - required as per IREC regulations.
  *
  * @section LICENSE
@@ -68,10 +68,13 @@ void initPins(void) {
     Hal::pinMode(Pin::BUILTIN_LED, Hal::PinMode::OUTPUT);
 
     /* Initialize ignitor pins to be off. This also exists in ignitor but may be called too late? */
+    /* We initialize it both times. Should be fine. Intended. Wont fix. */
     Hal::pinMode(Pin::DROGUE_IGNITOR, Hal::PinMode::OUTPUT);
     Hal::digitalWrite(Pin::DROGUE_IGNITOR, Hal::PinDigital::LO);
     Hal::pinMode(Pin::MAIN_IGNITOR, Hal::PinMode::OUTPUT);
     Hal::digitalWrite(Pin::MAIN_IGNITOR, Hal::PinDigital::LO);
+    Hal::pinMode(Pin::BACKUP_IGNITOR, Hal::PinMode::OUTPUT);
+    Hal::digitalWrite(Pin::BACKUP_IGNITOR, Hal::PinDigital::LO);
 
     // Ignitor and continuity pins are initialized in the ignitor constructor
 
