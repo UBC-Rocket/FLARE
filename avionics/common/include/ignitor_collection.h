@@ -29,6 +29,6 @@ class IgnitorCollection {
     RocketStatus getStatus() const { return status_; }
 
   private:
-    uint8_t status_bitfield_[3];
+    uint8_t status_bitfield_[2];
     RocketStatus status_;
 };
