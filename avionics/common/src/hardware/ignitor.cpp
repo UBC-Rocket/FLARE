@@ -12,8 +12,8 @@ Ignitor::Ignitor(Pin ignitePin, Pin continuityPin) : ignitePin_(ignitePin), cont
     Hal::digitalWrite(ignitePin_, Hal::PinDigital::LO);
 
     /*continuity check */
-    pinMode(static_cast<uint32_t>(continuityPin_), 0); // 0 = digitalRead mode from Arduino's wiring_digital.c file
-    int continuity = digitalRead(static_cast<uint32_t>(continuityPin_));
+    Hal::pinMode(continuityPin_, Hal::PinMode::INPUT);
+    int continuity = Hal::digitalRead(continuityPin_);
 
     #ifdef TESTING
         FLOG_DEBUG("Continuity read for ignitor on pin: ", static_cast<uint8_t>(ignitePin_));
@@ -36,6 +36,6 @@ void Ignitor::fire() {
     // different ignitions.
     Radio::sendEvent(Hal::tpoint_to_uint(Hal::now_ms()),
                      EventId::IGNITOR_FIRED);
-    FLOG_INFO("Firing ignitor at pin: ", static_cast<int>(ignitePin_)); 
+    FLOG_INFO("Firing ignitor at pin: ", static_cast<int>(ignitePin_));
     FLOG_INFO("At time (ms): ", static_cast<std::int32_t>(Hal::millis()));
 }
