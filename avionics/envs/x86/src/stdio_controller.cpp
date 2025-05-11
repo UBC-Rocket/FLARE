@@ -102,6 +102,21 @@ void StdIoController::putPacket(uint8_t const id, char const *c,
     // to being allowed
 }
 
+int StdIoController::requestDigitalRead(uint8_t const pin_id) {
+    uint8_t const PACKET_ID = static_cast<uint8_t>(PacketIds::digital_read);
+    blockingRequest(PACKET_ID, &pin_id, 1);
+
+    const std::lock_guard<std::mutex> lock(istream_mutex_);
+
+    int val = istreams_[PACKET_ID].front();
+    istreams_[PACKET_ID].pop();
+    val *= 256;
+    val += istreams_[PACKET_ID].front();
+    istreams_[PACKET_ID].pop();
+
+    return val;
+}
+
 int StdIoController::requestAnalogRead(uint8_t const pin_id) {
     uint8_t const PACKET_ID = static_cast<uint8_t>(PacketIds::analog_read);
     blockingRequest(PACKET_ID, &pin_id, 1);
@@ -145,7 +160,7 @@ uint32_t StdIoController::requestTimeUpdate(uint32_t delta_us) {
     blockingRequest(PACKET_ID, chars, sizeof(delta_us));
 
     const std::lock_guard<std::mutex> lock(istream_mutex_);
-    
+
     uint8_t packetData[sizeof(uint32_t)];
     for (std::size_t i = 0; i < sizeof(uint32_t); i++) {
         packetData[i] = istreams_[PACKET_ID].front();
