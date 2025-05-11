@@ -15,15 +15,6 @@ IgnitorCollection::IgnitorCollection()
     status_ = RocketStatus::NOMINAL;
 
     // TODO: Check continuity continuously instead of only during startup
-    if (main.getStatus() == ComponentStatus::FAILURE) {
-        #ifdef TESTING
-            LOG_ERROR("Main parachute ignitor failed");
-        #endif
-
-        // LOG_ERROR("Broken ignitor for main parachute");
-        status_bitfield_[0] |= 0x80;
-        // status_ = RocketStatus::CRITICAL_FAILURE;
-    }
     if (drogue.getStatus() == ComponentStatus::FAILURE) {
         #ifdef TESTING
             LOG_ERROR("Drogue parachute ignitor failed");
@@ -31,6 +22,15 @@ IgnitorCollection::IgnitorCollection()
 
         // LOG_ERROR("Broken ignitor for drogue parachute");
         status_bitfield_[0] |= 0x40;
+        // status_ = RocketStatus::CRITICAL_FAILURE;
+    }
+    if (main.getStatus() == ComponentStatus::FAILURE) {
+        #ifdef TESTING
+            LOG_ERROR("Main parachute ignitor failed");
+        #endif
+
+        // LOG_ERROR("Broken ignitor for main parachute");
+        status_bitfield_[0] |= 0x80;
         // status_ = RocketStatus::CRITICAL_FAILURE;
     }
     if (backup.getStatus() == ComponentStatus::FAILURE) {
