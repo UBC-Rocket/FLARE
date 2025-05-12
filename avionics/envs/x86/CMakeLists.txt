@@ -10,10 +10,23 @@ set(x86_specific_files
 )
 
 target_sources(
+    Sunburst
+    PRIVATE
+        ${x86_specific_files}
+)
+
+target_sources(
+    Garibaldi
+    PRIVATE
+        ${x86_specific_files}
+)
+
+target_sources(
     BNBStage1
     PRIVATE
         ${x86_specific_files}
 )
+
 target_sources(
     BNBStage2
     PRIVATE
@@ -28,12 +41,6 @@ target_sources(
 
 target_sources(
     Silvertip
-    PRIVATE
-        ${x86_specific_files}
-)
-
-target_sources(
-    Garibaldi
     PRIVATE
         ${x86_specific_files}
 )
