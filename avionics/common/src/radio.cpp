@@ -67,24 +67,20 @@ namespace {
     constexpr uint8_t gain = 6;
     constexpr long loraFrequency = 900E6;
     constexpr uint32_t loraInitError = 50;
+    constexpr int maxQueuedBytes = 800;
+    constexpr int maxQueuedSubpkts = maxQueuedBytes / 20; // 20 bytes per subpkt on average
+    constexpr int packetPayloadSpace = 255;
 
-// constexpr uint32_t kDefaultFlaregunAddrMsb = 0x0013A200;
-// constexpr uint32_t kDefaultFlaregunAddrLsb = 0x41678FC0;
-// constexpr uint32_t kRadioBaudRate = 921600;
-// constexpr uint8_t kMaxPacketsPerRxLoop = 8;
-// constexpr int kMaxQueuedBytes = 800;
-// // 20 bytes per subpkt on average
-// constexpr int kMaxQueuedSubpkts = kMaxQueuedBytes / 20;
+    // *** constexpr uint32_t kDefaultFlaregunAddrMsb = 0x0013A200;
+    // *** constexpr uint32_t kDefaultFlaregunAddrLsb = 0x41678FC0;
+    // *** constexpr uint32_t kRadioBaudRate = 921600;
+    // *** constexpr uint8_t kMaxPacketsPerRxLoop = 8;
+    // *** constexpr int kMaxQueuedBytes = 800;
+    // *** // 20 bytes per subpkt on average
+    // *** constexpr int kMaxQueuedSubpkts = kMaxQueuedBytes / 20;
 
 } // namespace
-
-/*  Many parts of the XBee library use uint8 for length (e.g. getFrameData).
-    Even though the HW likely supports more, this is the theoretical max for
-    this XBee library implementation.
-
-    TODO: If we deem this was an implementation error, we could PR a fix to the
-    library and then increase this */
-// constexpr unsigned short kPacketPayloadSpace = 255 - ZB_TX_API_LENGTH;
+// *** constexpr unsigned short kPacketPayloadSpace = 255;
 
 /**
  * The purpose of RadioMembers is to have a set of static member variables for
@@ -110,33 +106,38 @@ namespace {
 class Radio::RadioMembers {
     friend class Radio;
 
-//   public:
-//     RadioMembers()
-//         : tx_q_(kPacketPayloadSpace, kMaxQueuedBytes, kMaxQueuedSubpkts),
+  public:
+    RadioMembers()
+        : spi_(LORA_MOSI_PIN, LORA_MISO_PIN, LORA_SCK_PIN),
+          tx_q_(packetPayloadSpace, maxQueuedBytes, maxQueuedSubpkts) {}
+        // : tx_q_(kPacketPayloadSpace, kMaxQueuedBytes, kMaxQueuedSubpkts),
 //           tx_packet_(
 //               XBeeAddress64(kDefaultFlaregunAddrMsb, kDefaultFlaregunAddrLsb),
 //               payload_, kPacketPayloadSpace) {}
 
-//   private:
-//     roar::Buffer tx_q_; // the [ueue] is silent :)
-//     uint8_t payload_[kPacketPayloadSpace];
+  private:
+    SPIClass spi_;
+    roar::Buffer tx_q_; // the [ueue] is silent :)
+    uint8_t payload_[packetPayloadSpace];
 
 //     XBee xbee_;
 //     ZBTxRequest tx_packet_;
 //     ZBRxResponse rx;
 
-  public:
-    RadioMembers()
-        : spi_(LORA_MOSI_PIN, LORA_MISO_PIN, LORA_SCK_PIN) {}
-
-  private:
-    SPIClass spi_;
-    // roar::Buffer tx_q_;
-    // uint8_t payload_[kPacketPayloadSpace];
-
-    // XBee xbee_;
-    // ZBTxRequest tx_packet_;
-    // ZBRxResponse rx;
+// ***  public:
+// ***    RadioMembers()
+// ***        : tx_q_(kPacketPayloadSpace, kMaxQueuedBytes, kMaxQueuedSubpkts),
+// ***          tx_packet_(
+// ***              XBeeAddress64(kDefaultFlaregunAddrMsb, kDefaultFlaregunAddrLsb),
+// ***              payload_, kPacketPayloadSpace) {}
+// ***
+// ***  private:
+// ***    roar::Buffer tx_q_; // the [ueue] is silent :)
+// ***    uint8_t payload_[kPacketPayloadSpace];
+// ***
+// ***    XBee xbee_;
+// ***    ZBTxRequest tx_packet_;
+// ***    ZBRxResponse rx;
 };
 static Radio::RadioMembers self;
 
@@ -150,7 +151,7 @@ void Radio::initialize() {
     LoRa.setSignalBandwidth(signalBandwidth);
     LoRa.setCodingRate4(codingRateDenominator);
     LoRa.setPreambleLength(preambleLength);
-    LoRa.setGain(gain); 
+    LoRa.setGain(gain);
 
     // Set the pins for the LoRa module
     LoRa.setSPI(self.spi_);
@@ -165,156 +166,185 @@ void Radio::initialize() {
         }
     } else LOG_INFO("LoRa initalized!");
 
-    // auto &serial = Hal::SerialInst::Radio;
-    // serial.begin(kRadioBaudRate);
-    // while (!serial)
-    //     ;
+    Radio::sendMessage(Hal::millis(), "Radio initialized");
 
-    // self.xbee_.setSerial(serial);
+    // *** auto &serial = Hal::SerialInst::Radio;
+    // *** serial.begin(kRadioBaudRate);
+    // *** while (!serial)
+    // ***     ;
 
-    // Radio::sendMessage(Hal::millis(), "Radio initialized");
-    // Radio::send();
+    // *** self.xbee_.setSerial(serial);
+
+    // *** Radio::sendMessage(Hal::millis(), "Radio initialized");
+    // *** Radio::send();
 }
 
 void Radio::addIdTime(command_t id, uint32_t time) {
-    // self.tx_q_.write(static_cast<uint8_t>(id));
-    // self.tx_q_.write((&time), sizeof(time));
+    self.tx_q_.write(static_cast<uint8_t>(id));
+    self.tx_q_.write((&time), sizeof(time));
 }
 
 void Radio::send() {
-    // if (!self.tx_q_.empty()) {
-    //     self.tx_packet_.setPayloadLength(self.tx_q_.fillPayload(self.payload_));
-    //     self.xbee_.send(self.tx_packet_);
-    // }
+    if (!self.tx_q_.empty()) {
+        LoRa.beginPacket();
+        int payload_len = self.tx_q_.fillPayload(self.payload_);
+        LoRa.beginPacket();
+        LoRa.write(self.payload_, payload_len);
+        LoRa.endPacket();
+    }
+
+    // *** if (!self.tx_q_.empty()) {
+    // ***     self.tx_packet_.setPayloadLength(self.tx_q_.fillPayload(self.payload_));
+    // ***     self.xbee_.send(self.tx_packet_);
+    // *** }
 }
 
 void Radio::sendStatus(uint32_t time, RocketStatus status,
                        SensorCollection &sensors, IgnitorCollection &ignitors) {
-    // self.tx_q_.allocSubpkt(10);
-    // addIdTime(command_t::status_ping, time);
+    self.tx_q_.allocSubpkt(10);
+    addIdTime(command_t::status_ping, time);
 
-    // self.tx_q_.write(static_cast<uint8_t>(status));
-    // self.tx_q_.write(sensors.getStatusBitfield(), 2);
-    // self.tx_q_.write(ignitors.getStatusBitfield(), 2);
-    LoRa.beginPacket();
-    LoRa.print("Hello World!\n");
-    LoRa.endPacket();
+    self.tx_q_.write(static_cast<uint8_t>(status));
+    self.tx_q_.write(sensors.getStatusBitfield(), 2);
+    self.tx_q_.write(ignitors.getStatusBitfield(), 2);
+
+    send();
 }
 
 void Radio::sendBulkSensor(uint32_t time, float alt, Accelerometer &xl,
                            IMU &imu, GPS &gps, uint16_t state_id) {
-    // self.tx_q_.allocSubpkt(43);
-    // addIdTime(command_t::bulk_sensor, time);
+    self.tx_q_.allocSubpkt(43);
+    addIdTime(command_t::bulk_sensor, time);
 
-    // // Altitude
-    // self.tx_q_.write(&alt, 4);
+    // Altitude
+    self.tx_q_.write(&alt, 4);
 
-    // // Accelerometer
-    // self.tx_q_.write(xl.getData(), 12);
+    // Accelerometer
+    self.tx_q_.write(xl.getData(), 12);
 
-    // // IMU // TODO - check that these are the correct 3 floats to send for
-    // // orientation
-    // self.tx_q_.write(imu.getData(), 12);
+    // IMU // TODO - check that these are the correct 3 floats to send for
+    // orientation
+    self.tx_q_.write(imu.getData(), 12);
 
-    // // GPS
-    // self.tx_q_.write(gps.getData(), 8);
+    // GPS
+    self.tx_q_.write(gps.getData(), 8);
 
-    // // State
-    // self.tx_q_.write(&state_id, sizeof(uint16_t));
+    // State
+    self.tx_q_.write(&state_id, sizeof(uint16_t));
+
+    send();
 }
 
 void Radio::sendMessage(const uint32_t time, const char *str) {
-    // auto strlen = std::strlen(str);
-    // assert(strlen + 5 <= kPacketPayloadSpace);
+    auto strlen = std::strlen(str);
+    assert(strlen + 5 <= kPacketPayloadSpace);
 
-    // self.tx_q_.allocSubpkt(6 + strlen);
-    // addIdTime(command_t::message, time);
+    self.tx_q_.allocSubpkt(6 + strlen);
+    addIdTime(command_t::message, time);
 
-    // self.tx_q_.write(strlen);
-    // self.tx_q_.write(str, strlen);
+    self.tx_q_.write(strlen);
+    self.tx_q_.write(str, strlen);
+
+    send();
 }
 
 void Radio::sendGPS(const uint32_t time, GPS &gps) {
-    // self.tx_q_.allocSubpkt(17);
+    self.tx_q_.allocSubpkt(17);
 
-    // addIdTime(command_t::gps, time);
-    // self.tx_q_.write(gps.getData(), 12);
+    addIdTime(command_t::gps, time);
+    self.tx_q_.write(gps.getData(), 12);
+
+    send();
 }
 
 void Radio::sendSingleSensor(const uint32_t time, uint8_t id, float data) {
-    // self.tx_q_.allocSubpkt(9);
+    self.tx_q_.allocSubpkt(9);
 
-    // self.tx_q_.write(id);
-    // self.tx_q_.write(&time, sizeof(time));
-    // self.tx_q_.write(&data, 4);
+    self.tx_q_.write(id);
+    self.tx_q_.write(&time, sizeof(time));
+    self.tx_q_.write(&data, 4);
+
+    send();
 }
 
 void Radio::sendState(const uint32_t time, uint16_t state_id) {
-    // self.tx_q_.allocSubpkt(7);
+    self.tx_q_.allocSubpkt(7);
 
-    // addIdTime(command_t::state, time);
-    // self.tx_q_.write(&state_id, sizeof(state_id));
+    addIdTime(command_t::state, time);
+    self.tx_q_.write(&state_id, sizeof(state_id));
+
+    send();
 }
 
 void Radio::sendConfig(const uint32_t time) {
-    // self.tx_q_.allocSubpkt(47);
-    // addIdTime(command_t::config, time);
+    self.tx_q_.allocSubpkt(47);
+    addIdTime(command_t::config, time);
 
-    // // Defined in CMakeLists/platformio.ini
-    // self.tx_q_.write(RADIO_CONFIG_PACKET_SIM_ACTIVE);
-    // self.tx_q_.write(RADIO_CONFIG_PACKET_ROCKET_ID);
+    // Defined in CMakeLists/platformio.ini
+    self.tx_q_.write(RADIO_CONFIG_PACKET_SIM_ACTIVE);
+    self.tx_q_.write(RADIO_CONFIG_PACKET_ROCKET_ID);
 
-    // // -1 because null terminated string
-    // constexpr size_t len = sizeof(RADIO_CONFIG_PACKET_VERSION_STR) - 1;
-    // static_assert(len == 40, "RADIO_CONFIG_PACKET_VERSION_STR incorrect size!");
+    // -1 because null terminated string
+    constexpr size_t len = sizeof(RADIO_CONFIG_PACKET_VERSION_STR) - 1;
+    static_assert(len == 40, "RADIO_CONFIG_PACKET_VERSION_STR incorrect size!");
 
-    // self.tx_q_.write(RADIO_CONFIG_PACKET_VERSION_STR, len);
+    self.tx_q_.write(RADIO_CONFIG_PACKET_VERSION_STR, len);
+
+    send();
 }
 
 void Radio::sendEvent(const uint32_t time, const EventId event) {
-    // self.tx_q_.allocSubpkt(7);
+    self.tx_q_.allocSubpkt(7);
 
-    // addIdTime(command_t::event, time);
-    // self.tx_q_.write(&event, sizeof(uint16_t));
+    addIdTime(command_t::event, time);
+    self.tx_q_.write(&event, sizeof(uint16_t));
+
+    send();
 }
 
 int Radio::read_count_ = 0;
 
 Radio::fwd_cmd_t Radio::readPacket(command_t *&command_dat_out,
                                    uint8_t &command_len_out) {
-    // fwd_cmd_t result = 0;
-    // command_len_out = 0;
 
-    // while (read_count_ < kMaxPacketsPerRxLoop) {
-    //     self.xbee_.readPacket();
-    //     read_count_++;
-    //     if (!(self.xbee_.getResponse().isAvailable() ||
-    //           self.xbee_.getResponse().isError())) {
-    //         break;
-    //     }
+    // TODO - implement this
+    return 0;
 
-    //     if (self.xbee_.getResponse().isError()) {
-    //         // TODO - figure out whether there's anything
-    //         // we should do about Xbee errors / log error
-    //     } else if (self.xbee_.getResponse().getApiId() ==
-    //                ZB_TX_STATUS_RESPONSE) {
-    //         result |= CAN_SEND_FLAG;
-    //         // If we get 2 responses in a row, implies previously we sent an
-    //         // extra one, so we shouldn't respond twice again.
-    //     } else if (self.xbee_.getResponse().getApiId() == ZB_RX_RESPONSE) {
-    //         // received command from xbee_
-    //         self.xbee_.getResponse().getZBRxResponse(self.rx);
-    //         command_dat_out = (command_t *) self.rx.getData();
-    //         command_len_out = self.rx.getDataLength();
-    //         return result;
-    //     } else {
-    //         // TODO - log unrecognized API Id
-    //     }
-    // }
-    // result |= STOP_PARSE_FLAG;
-    // return result;
+    // *** fwd_cmd_t result = 0;
+    // *** command_len_out = 0;
+
+    // *** while (read_count_ < kMaxPacketsPerRxLoop) {
+    // ***     self.xbee_.readPacket();
+    // ***     read_count_++;
+    // ***     if (!(self.xbee_.getResponse().isAvailable() ||
+    // ***           self.xbee_.getResponse().isError())) {
+    // ***         break;
+    // ***     }
+
+    // ***     if (self.xbee_.getResponse().isError()) {
+    // ***         // TODO - figure out whether there's anything
+    // ***         // we should do about Xbee errors / log error
+    // ***     } else if (self.xbee_.getResponse().getApiId() ==
+    // ***                ZB_TX_STATUS_RESPONSE) {
+    // ***         result |= CAN_SEND_FLAG;
+    // ***         // If we get 2 responses in a row, implies previously we sent an
+    // ***         // extra one, so we shouldn't respond twice again.
+    // ***     } else if (self.xbee_.getResponse().getApiId() == ZB_RX_RESPONSE) {
+    // ***         // received command from xbee_
+    // ***         self.xbee_.getResponse().getZBRxResponse(self.rx);
+    // ***         command_dat_out = (command_t *) self.rx.getData();
+    // ***         command_len_out = self.rx.getDataLength();
+    // ***         return result;
+    // ***     } else {
+    // ***         // TODO - log unrecognized API Id
+    // ***     }
+    // *** }
+    // *** result |= STOP_PARSE_FLAG;
+    // *** return result;
 }
 
 void Radio::updateAddress() {
-    // self.tx_packet_.setAddress64(self.rx.getRemoteAddress64());
+    // TODO - implement this
+
+    // *** self.tx_packet_.setAddress64(self.rx.getRemoteAddress64());
 }

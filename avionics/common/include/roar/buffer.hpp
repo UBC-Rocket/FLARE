@@ -52,7 +52,7 @@ class Buffer {
 
     /**
      * @brief Write data to the last allocated subpacket.
-     * @param byte pointer to source 
+     * @param byte pointer to source
      * @param len length of data we want to write in bytes
      */
     template <class T> void write(const T *byte, int len) {
@@ -125,7 +125,7 @@ class Buffer {
      * @brief Increments data iterator; takes care of wrapping
      * @param it data iterator which we want to increment
      * @param add amount we want to increment data iterator by
-     * @return the data iterator after incrementation 
+     * @return the data iterator after incrementation
      */
     DataIt addIt(DataIt it, int add);
 
@@ -139,7 +139,7 @@ class Buffer {
 
     /**
      * @brief Difference between data iterator
-     * @param a operand 1 
+     * @param a operand 1
      * @param b operand 2
      * @return Difference between data iterators a and b
      */
@@ -175,7 +175,7 @@ class Buffer {
 
         /**
          * @brief Construct a new Data It object
-         * @param i 
+         * @param i
          */
         DataIt(int i) : index(i) {}
 

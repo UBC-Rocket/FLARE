@@ -100,47 +100,44 @@ int main(void) {
         state_machine.abort();
     }
 
-    while (1) {
-        Hal::sleep_ms(500);
-        Radio::sendStatus(Hal::millis(), init_status, sensors, ignitors);
-        LOG_INFO("Sent startup status");
-    }
+    Radio::sendStatus(Hal::millis(), init_status, sensors, ignitors);
+    LOG_INFO("Sent startup status");
 
     /* Register all tasks */
-    // typedef Scheduler::Task Task;
+    typedef Scheduler::Task Task;
 
-    // // Read sensors, evaluate state, log data, and send status
-    // ReadEvalLog read_eval_logger(rocket);
-    // Task read_eval_log(ReadEvalLog::run, &read_eval_logger, Hal::ms(50));
-    // registerTask(TaskID::ReadEvalLog, read_eval_log);
+    // Read sensors, evaluate state, log data, and send status
+    ReadEvalLog read_eval_logger(rocket);
+    Task read_eval_log(ReadEvalLog::run, &read_eval_logger, Hal::ms(50));
+    registerTask(TaskID::ReadEvalLog, read_eval_log);
 
-    // // // Radio needs to be scheduled later; sensors need to be read first
-    // RadioTxBulk radio_txer(rocket);
-    // Task radio_tx(RadioTxBulk::run, &radio_txer, RadioTxBulk::freq);
-    // Scheduler::preregisterTask(static_cast<int>(TaskID::RadioTxBulk), radio_tx,
-    //                            true, false);
-    // Scheduler::scheduleTask(Hal::now_ms() + Hal::ms(1),
-    //                         static_cast<int>(TaskID::RadioTxBulk));
+    // // Radio needs to be scheduled later; sensors need to be read first
+    RadioTxBulk radio_txer(rocket);
+    Task radio_tx(RadioTxBulk::run, &radio_txer, RadioTxBulk::freq);
+    Scheduler::preregisterTask(static_cast<int>(TaskID::RadioTxBulk), radio_tx,
+                               true, false);
+    Scheduler::scheduleTask(Hal::now_ms() + Hal::ms(1),
+                            static_cast<int>(TaskID::RadioTxBulk));
 
-    // Task led_blink(LEDBlinker::toggle, nullptr, LEDBlinker::freq);
-    // registerTask(TaskID::LEDBlinker, led_blink);
+    Task led_blink(LEDBlinker::toggle, nullptr, LEDBlinker::freq);
+    registerTask(TaskID::LEDBlinker, led_blink);
 
-    // // displayStatus(init_status, rocket.buzzer);
-    // // if (init_status == RocketStatus::NONCRITICAL_FAILURE) {
-    // //     registerTask(TaskID::LEDBlinker, led_blink);
-    // // }
+    // displayStatus(init_status, rocket.buzzer);
+    // if (init_status == RocketStatus::NONCRITICAL_FAILURE) {
+    //     registerTask(TaskID::LEDBlinker, led_blink);
+    // }
 
-    // // RestartCamera restart_camera_(rocket.cam);
-    // // // This tasks sets its own reschedule interval (since the same task is run
-    // // // both to start and stop the recording)
-    // // Task restart_camera_task_(RestartCamera::togglePower, &restart_camera_,
-    // //                           Hal::ms{0});
-    // // Scheduler::preregisterTask(static_cast<int>(TaskID::RestartCamera),
-    // //                            restart_camera_task_, true, false);
+    // RestartCamera restart_camera_(rocket.cam);
+    // // This tasks sets its own reschedule interval (since the same task is run
+    // // both to start and stop the recording)
+    // Task restart_camera_task_(RestartCamera::togglePower, &restart_camera_,
+    //                           Hal::ms{0});
+    // Scheduler::preregisterTask(static_cast<int>(TaskID::RestartCamera),
+    //                            restart_camera_task_, true, false);
 
-    // LOG_INFO("Initialization done; starting scheduler");
+    LOG_INFO("Initialization done; starting scheduler");
 
-    // Scheduler::run();
+    Scheduler::run();
 
-    // LOG_ERROR("Somehow finished all tasks; main executable exiting");
+    LOG_ERROR("Somehow finished all tasks; main executable exiting");
 }
