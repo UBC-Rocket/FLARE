@@ -13,7 +13,7 @@ class DrogueDescent
     : public RepeatedCheckBase<StateId::DROGUE_DESCENT, next_id, num_checks,
                                DrogueDescent<next_id, num_checks>> {
   public:
-    
+
     /**
      * @brief Construct a new state object
      * @param main_altitude
@@ -26,6 +26,7 @@ class DrogueDescent
     friend RepeatedCheckBase<StateId::DROGUE_DESCENT, next_id, num_checks,
                              DrogueDescent<next_id, num_checks>>;
     float main_altitude_;
+    float last_alt_;
     Ignitor &ignitor_;
 
     /**
@@ -34,20 +35,27 @@ class DrogueDescent
      * @return true if current altitude < main_altitude_
      */
     bool accept(Calculator const &input) {
-        return input.altitude() < main_altitude_;
+        float altitude = input.altitude();
+        bool isAccepted = altitude < main_altitude_ && altitude < last_alt_;
+        last_alt_ = altitude;
+        return isAccepted;
+    }
+
+    void extraOnEntry() {
+      last_alt_ = 0;
     }
 
     /**
      * @brief additional logic ran when exiting state
      *
      */
-    void extraOnExit() { 
+    void extraOnExit() {
         #ifdef TESTING
-            LOG_DEBUG("Firing main"); 
+            LOG_DEBUG("Firing main");
         #endif
-        ignitor_.fire(); 
+        ignitor_.fire();
     }
 };
 
-} 
+}
 #endif
