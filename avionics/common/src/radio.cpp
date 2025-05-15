@@ -159,12 +159,20 @@ void Radio::initialize() {
 
     // Initialize the LoRa module
     if (!LoRa.begin(loraFrequency)) {
-        LOG_WARN("Failed to initalize LoRa!");
+        #ifdef TESTING
+            LOG_WARN("Failed to initalize LoRa!");
+        #endif
         while (!LoRa.begin(loraFrequency)) {
-            LOG_ERROR("FAILED TO INIT RADIO!");
+            #ifdef TESTING
+                LOG_ERROR("FAILED TO INIT RADIO!");
+            #endif
             Hal::sleep_ms(loraInitError);
         }
-    } else LOG_INFO("LoRa initalized!");
+    } else {
+        #ifdef TESTING
+            LOG_INFO("LoRa initalized!");
+        #endif
+    }
 
     Radio::sendMessage(Hal::millis(), "Radio initialized");
 
