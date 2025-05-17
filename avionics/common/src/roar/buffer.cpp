@@ -50,6 +50,11 @@ int Buffer::allocSubpkt(int size) {
     // In addition to not making sense, a subpacket with size 0 screws with
     // computing data usage of the buffer
     assert(size > 0);
+
+    // Add an extra byte to account for the packet size
+    size += 1;
+
+    // Check if the requested size is larger than the maximum subpacket size
     assert(size <= pkt_size_);
 
     // Ensure there's space in the subpacket buffer
@@ -79,6 +84,9 @@ int Buffer::allocSubpkt(int size) {
     // Mark end of newly allocated subpacket
     deref(addIt(subpkts_end, 1)) = addIt(pos_, size);
     ++subpkt_count_;
+
+    // Add the size of the subpacket to the subpacket buffer
+    write(static_cast<uint8_t>(size));
 
     return drop_count;
 }
