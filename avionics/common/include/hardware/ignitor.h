@@ -33,10 +33,8 @@ class Ignitor : public IIgnitor {
      * brought high
      * @param continuityPin the pin for checking continuity - when testing
      * continuity, this pin is brought high briefly
-     * @param continuityADCPin the pin for the ADC for checking continuity -
-     * when testing continuity, the value at this pin is read
      */
-    Ignitor(Pin ignitePin, Pin continuityPin, Pin continuityADCPin);
+    Ignitor(Pin ignitePin, Pin continuityPin);
 
     /**
      * @brief fires ignitor at pin ignitePin_
@@ -46,7 +44,6 @@ class Ignitor : public IIgnitor {
   private:
     Pin ignitePin_;
     Pin continuityPin_;
-    Pin continuityADCPin_;
 };
 
 #endif

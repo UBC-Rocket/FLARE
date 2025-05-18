@@ -13,6 +13,7 @@ std::vector<float> StdIoController::requestSensorRead(uint8_t,
     return std::vector<float>(num_floats, 0);
 }
 
+int StdIoController::requestDigitalRead(uint8_t) { return 0; }
 int StdIoController::requestAnalogRead(uint8_t) { return 0; }
 int StdIoController::available(uint8_t) { return 0; }
 bool StdIoController::get(uint8_t, uint8_t &) { return false; }

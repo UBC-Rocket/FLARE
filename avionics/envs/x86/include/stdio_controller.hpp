@@ -38,6 +38,7 @@ class StdIoController {
     static std::condition_variable blocking_request_cv_;
 
     enum class PacketIds : uint8_t {
+        digital_read= 0x60,
         analog_read = 0x61,
         sensor_read = 0x73,
         time_update = 0x74,
@@ -48,7 +49,7 @@ class StdIoController {
                   "Code assumes floating point numbers are 4 bytes");
 
     /**
-     * @brief Sends a packet request on stream_id, and blocks until a response 
+     * @brief Sends a packet request on stream_id, and blocks until a response
      * is heard.
      **/
     static void blockingRequest(const uint8_t stream_id, const uint8_t *const packet,
@@ -93,6 +94,13 @@ class StdIoController {
      */
     static void putPacket(uint8_t const id, uint8_t const *c,
                           uint16_t const length);
+
+    /**
+     * @brief Corresponds to Request Digital Read packet in Confluence spec.
+     * @param pin_id ID of the pin being read.
+     * @return Read value.
+     */
+    static int requestDigitalRead(uint8_t const pin_id);
 
     /**
      * @brief Corresponds to Request Analog Read packet in Confluence spec.
