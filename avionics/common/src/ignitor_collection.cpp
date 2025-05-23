@@ -21,8 +21,8 @@ IgnitorCollection::IgnitorCollection()
         #endif
 
         // LOG_ERROR("Broken ignitor for drogue parachute");
-        status_bitfield_[0] |= 0x40;
-        // status_ = RocketStatus::CRITICAL_FAILURE;
+        // status_bitfield_[0] |= 0x40;
+        status_ = RocketStatus::CRITICAL_FAILURE;
     }
     if (main.getStatus() == ComponentStatus::FAILURE) {
         #ifdef TESTING
@@ -30,8 +30,8 @@ IgnitorCollection::IgnitorCollection()
         #endif
 
         // LOG_ERROR("Broken ignitor for main parachute");
-        status_bitfield_[0] |= 0x80;
-        // status_ = RocketStatus::CRITICAL_FAILURE;
+        // status_bitfield_[0] |= 0x80;
+        status_ = RocketStatus::CRITICAL_FAILURE;
     }
     if (backup.getStatus() == ComponentStatus::FAILURE) {
         #ifdef TESTING
@@ -39,7 +39,7 @@ IgnitorCollection::IgnitorCollection()
         #endif
 
         // LOG_ERROR("Broken ignitor for drogue parachute");
-        status_bitfield_[0] |= 0xC0;
-        // status_ = RocketStatus::CRITICAL_FAILURE;
+        // status_bitfield_[0] |= 0xC0;
+        status_ = RocketStatus::CRITICAL_FAILURE;
     }
 }

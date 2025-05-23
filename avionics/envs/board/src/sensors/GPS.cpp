@@ -20,25 +20,14 @@
 #include "options.h"
 #include "log.hpp"
 
-GPS::GPS(Hal::CustomSerial &seri, float *const data)
-    : SensorBase(data),
-      serial_port_(seri), GPS_reset_defaults{0xA0, 0xA1, 0x00,
-                                                         0x02, 0x04, 0x00,
-                                                         0x04, 0x0D, 0x0A},
-      GPS_set_baud_rate{0xA0, 0xA1, 0x00, 0x04, 0x05, 0x00,
-                        0x00, 0x00, 0x05, 0x0D, 0x0A},
-      GPS_set_NMEA_message{0xA0, 0xA1, 0x00, 0x09, 0x08, 0x01, 0x00, 0x00,
-                           0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x0D, 0x0A},
-      GPS_set_update_rate{0xA0, 0xA1, 0x00, 0x03, 0x0E,
-                          0x01, 0x00, 0x0F, 0x0D, 0x0A}
-
+GPS::GPS(Hal::CustomSerial &seri, float *const data) : SensorBase(data), gps(&seri.getSerial())
 {
 #ifdef TESTING
     LOG_DEBUG("Initializing GPS");
 #endif
-    serial_port_.begin(4800); // baud rate of Copernicus II DIP module
-    while (!serial_port_) {
-    }
+    gps.begin(9600); // baud rate of Adafruit Mini GPS PA1010D module
+    // while (!serial_port_) {
+    // }
 
     status = SensorStatus::NOMINAL;
 }
@@ -46,11 +35,15 @@ GPS::GPS(Hal::CustomSerial &seri, float *const data)
 void GPS::readData() {
     bool gpsSuccess = false;
     elapsedMillis timeout;
-    while (serial_port_.available() && (timeout < GPS_TIMEOUT)) {
-        char c = serial_port_.read();
-        if (gps.encode(c)) {
+    while (gps.available()) {
+        char c = gps.read();
+        if (gps.newNMEAreceived() && gps.parse(gps.lastNMEA())) {
             gpsSuccess = true;
-            break;
+            SerialLogger.print("[GPS DATA]");
+            data_[0] = gps.latitudeDegrees;
+            data_[1] = gps.longitudeDegrees;
+            data_[2] = gps.altitude;
+            // break;
         }
     }
 
@@ -58,17 +51,17 @@ void GPS::readData() {
         status = SensorStatus::FAILURE;
     }
 
-#ifdef TESTING
-    if (gpsSuccess) {
-        LOG_DEBUG("GPS SUCCESS");
-    } else {
-        LOG_DEBUG("GPS FAIL");
-    }
-#endif
+    #ifdef TESTING
+        if (gpsSuccess) {
+            LOG_DEBUG("GPS SUCCESS");
+        } else {
+            LOG_DEBUG("GPS FAIL");
+        }
+    #endif
 
-    unsigned long fix_age;
-    gps.f_get_position(data_, data_ + 1, &fix_age);
-    data_[2] = gps.f_altitude();
+    // unsigned long fix_age;
+    // gps.f_get_position(data_, data_ + 1, &fix_age);
+    // data_[2] = gps.f_altitude();
 
     #ifdef TESTING
         LOG_DEBUG("Polling GPS");

@@ -36,7 +36,7 @@ struct StateMachineConfig {
     constexpr static int LAND_CHECKS = 6;
     constexpr static float LAND_VELOCITY_THRESHOLD = 4;
 
-    constexpr static long APOGEE_PRESSURE_DELAY = 3000;
+    constexpr static long APOGEE_PRESSURE_DELAY = 1000;
     constexpr static long LANDING_TIME_INTERVAL = 10000;
     constexpr static long TOGGLE_CAMERA_INTERVAL = 200;
 

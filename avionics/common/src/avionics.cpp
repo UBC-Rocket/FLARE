@@ -90,6 +90,7 @@ int main(void) {
         LOG_INFO("Datalogging initialized");
     } else {
         LOG_ERROR("Datalogging failed to initialize");
+        init_status = RocketStatus::CRITICAL_FAILURE;
     }
 
     // Create instance of landed buzzer
@@ -98,6 +99,15 @@ int main(void) {
     if (init_status == RocketStatus::CRITICAL_FAILURE) {
         LOG_ERROR("Critical failure; aborting in state machine");
         state_machine.abort();
+        while(1) {
+            rocket.buzzer.buzz(4500, 500);
+        }
+    } else {
+        rocket.buzzer.buzzWithPause(4000, 500, 100);
+        rocket.buzzer.buzzWithPause(4000, 500, 100);
+        rocket.buzzer.buzzWithPause(4000, 500, 100);
+        rocket.buzzer.buzzWithPause(4000, 500, 100);
+        rocket.buzzer.buzzWithPause(4000, 500, 100);
     }
 
     Radio::sendStatus(Hal::millis(), init_status, sensors, ignitors);
