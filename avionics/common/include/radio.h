@@ -240,7 +240,7 @@ class Radio {
                                 uint8_t &command_len_out);
 
     /**
-     * @brief Fills in the ID and timestamp given a subpacket pointer.
+     * @brief Fills in the ID and timestamp in HMS format given a subpacket pointer.
      * Note that this method expects that the buffer has already been
      * appropreiately sized.
      * To avoid needing to deal with move semantics, this method expects a

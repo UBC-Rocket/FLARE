@@ -22,11 +22,11 @@ SensorCollection::SensorCollection()
 void SensorCollection::poll() {
     last_poll_time_ = Hal::now_ms();
     barometer.readData();
-    gps.readData();
-    accelerometer.readData();
-    imuSensor.readData();
-    // battery.readData(); // No voltage sensor for 2022/23
-    temperature.readData();
+    // gps.readData();
+    // accelerometer.readData();
+    // imuSensor.readData();
+    // // battery.readData(); // No voltage sensor for 2022/23
+    // temperature.readData();
 }
 
 RocketStatus SensorCollection::getStatus(bool refresh) {

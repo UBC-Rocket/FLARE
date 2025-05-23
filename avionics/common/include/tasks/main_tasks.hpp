@@ -92,7 +92,7 @@ class RadioTxBulk {
      * @param rkt
      */
     RadioTxBulk(Rocket &rkt) : rocket(rkt) {}
-    static constexpr Hal::ms freq{500};
+    static constexpr Hal::ms freq{1000};
 
   private:
 

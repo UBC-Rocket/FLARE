@@ -52,7 +52,7 @@ int Buffer::allocSubpkt(int size) {
     assert(size > 0);
 
     // Add an extra byte to account for the packet size
-    size += 1;
+    // size += 1;
 
     // Check if the requested size is larger than the maximum subpacket size
     assert(size <= pkt_size_);
@@ -86,7 +86,7 @@ int Buffer::allocSubpkt(int size) {
     ++subpkt_count_;
 
     // Add the size of the subpacket to the subpacket buffer
-    write(static_cast<uint8_t>(size));
+    // write(static_cast<uint8_t>(size));
 
     return drop_count;
 }
