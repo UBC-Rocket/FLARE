@@ -68,7 +68,7 @@ int main(void) {
     while (!SerialLogger) {
         Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::HI);
         Hal::sleep_ms(100);
-    Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
+        Hal::digitalWrite(Pin::BUILTIN_LED, Hal::PinDigital::LO);
         Hal::sleep_ms(100);
 }
     Hal::sleep_ms(1000);

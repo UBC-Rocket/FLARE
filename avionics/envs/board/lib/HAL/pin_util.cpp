@@ -14,6 +14,8 @@ void digitalWrite(::Pin pin, PinDigital val) {
     ::digitalWrite(static_cast<uint8_t>(pin), static_cast<uint8_t>(val));
 }
 
+int digitalRead(::Pin pin) { return ::digitalRead(static_cast<uint8_t>(pin)); }
+
 int analogRead(::Pin pin) { return ::analogRead(static_cast<uint8_t>(pin)); }
 
 // int LED_BUILTIN() { return ARDUIN_BUILTIN_LED; }
