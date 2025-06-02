@@ -21,10 +21,13 @@
 #include <cassert>
 #include <cstring>
 #include <utility> //for std::move
+#include <SPI.h>
 
 #include "HAL/port_impl.h"
 
-#include "XBee.h"
+// #include "XBee.h"
+#include "LoRa.h"
+#include "log.hpp"
 #include "ignitor_collection.h"
 #include "radio.h"
 #include "roar/buffer.hpp"
@@ -34,37 +37,50 @@
 // Some defines that are actually done in CMake, but set here to get
 // Intellisense to stop yelling.
 
-#ifndef RADIO_CONFIG_PACKET_SIM_ACTIVE
-#define RADIO_CONFIG_PACKET_SIM_ACTIVE 2
-#endif
+// #ifndef RADIO_CONFIG_PACKET_SIM_ACTIVE
+// #define RADIO_CONFIG_PACKET_SIM_ACTIVE 2
+// #endif
 
-#ifndef RADIO_CONFIG_PACKET_ROCKET_ID
-#define RADIO_CONFIG_PACKET_ROCKET_ID 255
-#endif
+// #ifndef RADIO_CONFIG_PACKET_ROCKET_ID
+// #define RADIO_CONFIG_PACKET_ROCKET_ID 255
+// #endif
 
-#ifndef RADIO_CONFIG_PACKET_VERSION_STR
-#define RADIO_CONFIG_PACKET_VERSION_STR                                        \
-    "Fake version string; quiet Intellisense "
-#endif
+// #ifndef RADIO_CONFIG_PACKET_VERSION_STR
+// #define RADIO_CONFIG_PACKET_VERSION_STR                                        \
+//     "Fake version string; quiet Intellisense "
+// #endif
+
+// TODO PLACE THIS SOMEWHERE ELSE
+#define LORA_CS_PIN     204  // PC4
+#define LORA_RESET_PIN  195  // PB0
+#define LORA_IRQ_PIN    203  // PB1
+#define LORA_MOSI_PIN   198  // PA7
+#define LORA_MISO_PIN   199  // PA6
+#define LORA_SCK_PIN    205  // PA5
 
 namespace {
-constexpr uint32_t kDefaultFlaregunAddrMsb = 0x0013A200;
-constexpr uint32_t kDefaultFlaregunAddrLsb = 0x41678FC0;
-constexpr uint32_t kRadioBaudRate = 921600;
-constexpr uint8_t kMaxPacketsPerRxLoop = 8;
-constexpr int kMaxQueuedBytes = 800;
-// 20 bytes per subpkt on average
-constexpr int kMaxQueuedSubpkts = kMaxQueuedBytes / 20;
+    constexpr int txPower = 20;
+    constexpr int spreadingFactor = 12;
+    constexpr long signalBandwidth = 125E3;
+    constexpr int codingRateDenominator = 8;
+    constexpr long preambleLength = 8;
+    constexpr uint8_t gain = 6;
+    constexpr long loraFrequency = 900E6;
+    constexpr uint32_t loraInitError = 50;
+    constexpr int maxQueuedBytes = 800;
+    constexpr int maxQueuedSubpkts = maxQueuedBytes / 20; // 20 bytes per subpkt on average
+    constexpr int packetPayloadSpace = 255;
+
+    // *** constexpr uint32_t kDefaultFlaregunAddrMsb = 0x0013A200;
+    // *** constexpr uint32_t kDefaultFlaregunAddrLsb = 0x41678FC0;
+    // *** constexpr uint32_t kRadioBaudRate = 921600;
+    // *** constexpr uint8_t kMaxPacketsPerRxLoop = 8;
+    // *** constexpr int kMaxQueuedBytes = 800;
+    // *** // 20 bytes per subpkt on average
+    // *** constexpr int kMaxQueuedSubpkts = kMaxQueuedBytes / 20;
 
 } // namespace
-
-/*  Many parts of the XBee library use uint8 for length (e.g. getFrameData).
-    Even though the HW likely supports more, this is the theoretical max for
-    this XBee library implementation.
-
-    TODO: If we deem this was an implementation error, we could PR a fix to the
-    library and then increase this */
-constexpr unsigned short kPacketPayloadSpace = 255 - ZB_TX_API_LENGTH;
+// *** constexpr unsigned short kPacketPayloadSpace = 255;
 
 /**
  * The purpose of RadioMembers is to have a set of static member variables for
@@ -92,18 +108,36 @@ class Radio::RadioMembers {
 
   public:
     RadioMembers()
-        : tx_q_(kPacketPayloadSpace, kMaxQueuedBytes, kMaxQueuedSubpkts),
-          tx_packet_(
-              XBeeAddress64(kDefaultFlaregunAddrMsb, kDefaultFlaregunAddrLsb),
-              payload_, kPacketPayloadSpace) {}
+        : spi_(LORA_MOSI_PIN, LORA_MISO_PIN, LORA_SCK_PIN),
+          tx_q_(packetPayloadSpace, maxQueuedBytes, maxQueuedSubpkts) {}
+        // : tx_q_(kPacketPayloadSpace, kMaxQueuedBytes, kMaxQueuedSubpkts),
+//           tx_packet_(
+//               XBeeAddress64(kDefaultFlaregunAddrMsb, kDefaultFlaregunAddrLsb),
+//               payload_, kPacketPayloadSpace) {}
 
   private:
+    SPIClass spi_;
     roar::Buffer tx_q_; // the [ueue] is silent :)
-    uint8_t payload_[kPacketPayloadSpace];
+    uint8_t payload_[packetPayloadSpace];
 
-    XBee xbee_;
-    ZBTxRequest tx_packet_;
-    ZBRxResponse rx;
+//     XBee xbee_;
+//     ZBTxRequest tx_packet_;
+//     ZBRxResponse rx;
+
+// ***  public:
+// ***    RadioMembers()
+// ***        : tx_q_(kPacketPayloadSpace, kMaxQueuedBytes, kMaxQueuedSubpkts),
+// ***          tx_packet_(
+// ***              XBeeAddress64(kDefaultFlaregunAddrMsb, kDefaultFlaregunAddrLsb),
+// ***              payload_, kPacketPayloadSpace) {}
+// ***
+// ***  private:
+// ***    roar::Buffer tx_q_; // the [ueue] is silent :)
+// ***    uint8_t payload_[kPacketPayloadSpace];
+// ***
+// ***    XBee xbee_;
+// ***    ZBTxRequest tx_packet_;
+// ***    ZBRxResponse rx;
 };
 static Radio::RadioMembers self;
 
@@ -111,15 +145,46 @@ constexpr Hal::ms Radio::WATCHDOG_SEND_INTERVAL;
 bool Radio::can_send_ = true;
 
 void Radio::initialize() {
-    auto &serial = Hal::SerialInst::Radio;
-    serial.begin(kRadioBaudRate);
-    while (!serial)
-        ;
+    // Initialize the LoRa radio
+    LoRa.setTxPower(txPower);
+    LoRa.setSpreadingFactor(spreadingFactor);
+    LoRa.setSignalBandwidth(signalBandwidth);
+    LoRa.setCodingRate4(codingRateDenominator);
+    LoRa.setPreambleLength(preambleLength);
+    LoRa.setGain(gain);
 
-    self.xbee_.setSerial(serial);
+    // Set the pins for the LoRa module
+    LoRa.setSPI(self.spi_);
+    LoRa.setPins(LORA_CS_PIN, LORA_RESET_PIN, LORA_IRQ_PIN);
+
+    // Initialize the LoRa module
+    if (!LoRa.begin(loraFrequency)) {
+        #ifdef TESTING
+            LOG_WARN("Failed to initalize LoRa!");
+        #endif
+        while (!LoRa.begin(loraFrequency)) {
+            #ifdef TESTING
+                LOG_ERROR("FAILED TO INIT RADIO!");
+            #endif
+            Hal::sleep_ms(loraInitError);
+        }
+    } else {
+        #ifdef TESTING
+            LOG_INFO("LoRa initalized!");
+        #endif
+    }
 
     Radio::sendMessage(Hal::millis(), "Radio initialized");
-    Radio::send();
+
+    // *** auto &serial = Hal::SerialInst::Radio;
+    // *** serial.begin(kRadioBaudRate);
+    // *** while (!serial)
+    // ***     ;
+
+    // *** self.xbee_.setSerial(serial);
+
+    // *** Radio::sendMessage(Hal::millis(), "Radio initialized");
+    // *** Radio::send();
 }
 
 void Radio::addIdTime(command_t id, uint32_t time) {
@@ -129,9 +194,17 @@ void Radio::addIdTime(command_t id, uint32_t time) {
 
 void Radio::send() {
     if (!self.tx_q_.empty()) {
-        self.tx_packet_.setPayloadLength(self.tx_q_.fillPayload(self.payload_));
-        self.xbee_.send(self.tx_packet_);
+        LoRa.beginPacket();
+        int payload_len = self.tx_q_.fillPayload(self.payload_);
+        LoRa.beginPacket();
+        LoRa.write(self.payload_, payload_len);
+        LoRa.endPacket();
     }
+
+    // *** if (!self.tx_q_.empty()) {
+    // ***     self.tx_packet_.setPayloadLength(self.tx_q_.fillPayload(self.payload_));
+    // ***     self.xbee_.send(self.tx_packet_);
+    // *** }
 }
 
 void Radio::sendStatus(uint32_t time, RocketStatus status,
@@ -142,6 +215,8 @@ void Radio::sendStatus(uint32_t time, RocketStatus status,
     self.tx_q_.write(static_cast<uint8_t>(status));
     self.tx_q_.write(sensors.getStatusBitfield(), 2);
     self.tx_q_.write(ignitors.getStatusBitfield(), 2);
+
+    send();
 }
 
 void Radio::sendBulkSensor(uint32_t time, float alt, Accelerometer &xl,
@@ -164,6 +239,8 @@ void Radio::sendBulkSensor(uint32_t time, float alt, Accelerometer &xl,
 
     // State
     self.tx_q_.write(&state_id, sizeof(uint16_t));
+
+    send();
 }
 
 void Radio::sendMessage(const uint32_t time, const char *str) {
@@ -175,6 +252,8 @@ void Radio::sendMessage(const uint32_t time, const char *str) {
 
     self.tx_q_.write(strlen);
     self.tx_q_.write(str, strlen);
+
+    send();
 }
 
 void Radio::sendGPS(const uint32_t time, GPS &gps) {
@@ -182,6 +261,8 @@ void Radio::sendGPS(const uint32_t time, GPS &gps) {
 
     addIdTime(command_t::gps, time);
     self.tx_q_.write(gps.getData(), 12);
+
+    send();
 }
 
 void Radio::sendSingleSensor(const uint32_t time, uint8_t id, float data) {
@@ -190,6 +271,8 @@ void Radio::sendSingleSensor(const uint32_t time, uint8_t id, float data) {
     self.tx_q_.write(id);
     self.tx_q_.write(&time, sizeof(time));
     self.tx_q_.write(&data, 4);
+
+    send();
 }
 
 void Radio::sendState(const uint32_t time, uint16_t state_id) {
@@ -197,6 +280,8 @@ void Radio::sendState(const uint32_t time, uint16_t state_id) {
 
     addIdTime(command_t::state, time);
     self.tx_q_.write(&state_id, sizeof(state_id));
+
+    send();
 }
 
 void Radio::sendConfig(const uint32_t time) {
@@ -212,6 +297,8 @@ void Radio::sendConfig(const uint32_t time) {
     static_assert(len == 40, "RADIO_CONFIG_PACKET_VERSION_STR incorrect size!");
 
     self.tx_q_.write(RADIO_CONFIG_PACKET_VERSION_STR, len);
+
+    send();
 }
 
 void Radio::sendEvent(const uint32_t time, const EventId event) {
@@ -219,45 +306,53 @@ void Radio::sendEvent(const uint32_t time, const EventId event) {
 
     addIdTime(command_t::event, time);
     self.tx_q_.write(&event, sizeof(uint16_t));
+
+    send();
 }
 
 int Radio::read_count_ = 0;
 
 Radio::fwd_cmd_t Radio::readPacket(command_t *&command_dat_out,
                                    uint8_t &command_len_out) {
-    fwd_cmd_t result = 0;
-    command_len_out = 0;
 
-    while (read_count_ < kMaxPacketsPerRxLoop) {
-        self.xbee_.readPacket();
-        read_count_++;
-        if (!(self.xbee_.getResponse().isAvailable() ||
-              self.xbee_.getResponse().isError())) {
-            break;
-        }
+    // TODO - implement this
+    return 0;
 
-        if (self.xbee_.getResponse().isError()) {
-            // TODO - figure out whether there's anything
-            // we should do about Xbee errors / log error
-        } else if (self.xbee_.getResponse().getApiId() ==
-                   ZB_TX_STATUS_RESPONSE) {
-            result |= CAN_SEND_FLAG;
-            // If we get 2 responses in a row, implies previously we sent an
-            // extra one, so we shouldn't respond twice again.
-        } else if (self.xbee_.getResponse().getApiId() == ZB_RX_RESPONSE) {
-            // received command from xbee_
-            self.xbee_.getResponse().getZBRxResponse(self.rx);
-            command_dat_out = (command_t *) self.rx.getData();
-            command_len_out = self.rx.getDataLength();
-            return result;
-        } else {
-            // TODO - log unrecognized API Id
-        }
-    }
-    result |= STOP_PARSE_FLAG;
-    return result;
+    // *** fwd_cmd_t result = 0;
+    // *** command_len_out = 0;
+
+    // *** while (read_count_ < kMaxPacketsPerRxLoop) {
+    // ***     self.xbee_.readPacket();
+    // ***     read_count_++;
+    // ***     if (!(self.xbee_.getResponse().isAvailable() ||
+    // ***           self.xbee_.getResponse().isError())) {
+    // ***         break;
+    // ***     }
+
+    // ***     if (self.xbee_.getResponse().isError()) {
+    // ***         // TODO - figure out whether there's anything
+    // ***         // we should do about Xbee errors / log error
+    // ***     } else if (self.xbee_.getResponse().getApiId() ==
+    // ***                ZB_TX_STATUS_RESPONSE) {
+    // ***         result |= CAN_SEND_FLAG;
+    // ***         // If we get 2 responses in a row, implies previously we sent an
+    // ***         // extra one, so we shouldn't respond twice again.
+    // ***     } else if (self.xbee_.getResponse().getApiId() == ZB_RX_RESPONSE) {
+    // ***         // received command from xbee_
+    // ***         self.xbee_.getResponse().getZBRxResponse(self.rx);
+    // ***         command_dat_out = (command_t *) self.rx.getData();
+    // ***         command_len_out = self.rx.getDataLength();
+    // ***         return result;
+    // ***     } else {
+    // ***         // TODO - log unrecognized API Id
+    // ***     }
+    // *** }
+    // *** result |= STOP_PARSE_FLAG;
+    // *** return result;
 }
 
 void Radio::updateAddress() {
-    self.tx_packet_.setAddress64(self.rx.getRemoteAddress64());
+    // TODO - implement this
+
+    // *** self.tx_packet_.setAddress64(self.rx.getRemoteAddress64());
 }
