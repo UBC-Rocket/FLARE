@@ -189,13 +189,16 @@ void Radio::initialize() {
 
 void Radio::addIdTime(command_t id, uint32_t time) {
     // self.tx_q_.write(static_cast<uint8_t>(id));
-    unsigned long totalSeconds = time / 1000;
-    uint8_t seconds = totalSeconds % 60;
-    uint8_t minutes = (totalSeconds / 60) % 60;
-    uint8_t hours = totalSeconds / 3600;
-    self.tx_q_.write(&hours, 1);
-    self.tx_q_.write(&minutes, 1);
-    self.tx_q_.write(&seconds, 1);
+
+    self.tx_q_.write((&time), sizeof(time));
+
+    // unsigned long totalSeconds = time / 1000;
+    // uint8_t seconds = totalSeconds % 60;
+    // uint8_t minutes = (totalSeconds / 60) % 60;
+    // uint8_t hours = totalSeconds / 3600;
+    // self.tx_q_.write(&hours, 1);
+    // self.tx_q_.write(&minutes, 1);
+    // self.tx_q_.write(&seconds, 1);
 }
 
 void Radio::send() {
@@ -227,7 +230,7 @@ void Radio::sendStatus(uint32_t time, RocketStatus status,
 
 void Radio::sendBulkSensor(uint32_t time, float alt, Accelerometer &xl,
                            IMU &imu, GPS &gps, uint16_t state_id) {
-    self.tx_q_.allocSubpkt(9);
+    self.tx_q_.allocSubpkt(10);
     addIdTime(command_t::bulk_sensor, time);
 
     // Altitude
