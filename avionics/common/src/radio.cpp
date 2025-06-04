@@ -190,6 +190,9 @@ void Radio::initialize() {
 void Radio::addIdTime(command_t id, uint32_t time) {
     // self.tx_q_.write(static_cast<uint8_t>(id));
 
+    // Start every packet with 0xFF
+    self.tx_q_.write(0xFF);
+
     self.tx_q_.write((&time), sizeof(time));
 
     // unsigned long totalSeconds = time / 1000;
@@ -230,7 +233,7 @@ void Radio::sendStatus(uint32_t time, RocketStatus status,
 
 void Radio::sendBulkSensor(uint32_t time, float alt, Accelerometer &xl,
                            IMU &imu, GPS &gps, uint16_t state_id) {
-    self.tx_q_.allocSubpkt(10);
+    self.tx_q_.allocSubpkt(11);
     addIdTime(command_t::bulk_sensor, time);
 
     // Altitude
