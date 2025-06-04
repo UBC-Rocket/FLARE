@@ -218,14 +218,14 @@ void Radio::send() {
 
 void Radio::sendStatus(uint32_t time, RocketStatus status,
                        SensorCollection &sensors, IgnitorCollection &ignitors) {
-    self.tx_q_.allocSubpkt(10);
-    addIdTime(command_t::status_ping, time);
+    // self.tx_q_.allocSubpkt(10);
+    // addIdTime(command_t::status_ping, time);
 
-    self.tx_q_.write(static_cast<uint8_t>(status));
-    self.tx_q_.write(sensors.getStatusBitfield(), 2);
-    self.tx_q_.write(ignitors.getStatusBitfield(), 2);
+    // self.tx_q_.write(static_cast<uint8_t>(status));
+    // self.tx_q_.write(sensors.getStatusBitfield(), 2);
+    // self.tx_q_.write(ignitors.getStatusBitfield(), 2);
 
-    send();
+    // send();
 }
 
 void Radio::sendBulkSensor(uint32_t time, float alt, Accelerometer &xl,
@@ -253,70 +253,70 @@ void Radio::sendBulkSensor(uint32_t time, float alt, Accelerometer &xl,
 }
 
 void Radio::sendMessage(const uint32_t time, const char *str) {
-    auto strlen = std::strlen(str);
-    assert(strlen + 5 <= kPacketPayloadSpace);
+    // auto strlen = std::strlen(str);
+    // assert(strlen + 5 <= kPacketPayloadSpace);
 
-    self.tx_q_.allocSubpkt(6 + strlen);
-    addIdTime(command_t::message, time);
+    // self.tx_q_.allocSubpkt(6 + strlen);
+    // addIdTime(command_t::message, time);
 
-    self.tx_q_.write(strlen);
-    self.tx_q_.write(str, strlen);
+    // self.tx_q_.write(strlen);
+    // self.tx_q_.write(str, strlen);
 
-    send();
+    // send();
 }
 
 void Radio::sendGPS(const uint32_t time, GPS &gps) {
-    self.tx_q_.allocSubpkt(17);
+    // self.tx_q_.allocSubpkt(17);
 
-    addIdTime(command_t::gps, time);
-    self.tx_q_.write(gps.getData(), 12);
+    // addIdTime(command_t::gps, time);
+    // self.tx_q_.write(gps.getData(), 12);
 
-    send();
+    // send();
 }
 
 void Radio::sendSingleSensor(const uint32_t time, uint8_t id, float data) {
-    self.tx_q_.allocSubpkt(9);
+    // self.tx_q_.allocSubpkt(9);
 
-    self.tx_q_.write(id);
-    self.tx_q_.write(&time, sizeof(time));
-    self.tx_q_.write(&data, 4);
+    // self.tx_q_.write(id);
+    // self.tx_q_.write(&time, sizeof(time));
+    // self.tx_q_.write(&data, 4);
 
-    send();
+    // send();
 }
 
 void Radio::sendState(const uint32_t time, uint16_t state_id) {
-    self.tx_q_.allocSubpkt(7);
+    // self.tx_q_.allocSubpkt(7);
 
-    addIdTime(command_t::state, time);
-    self.tx_q_.write(&state_id, sizeof(state_id));
+    // addIdTime(command_t::state, time);
+    // self.tx_q_.write(&state_id, sizeof(state_id));
 
-    send();
+    // send();
 }
 
 void Radio::sendConfig(const uint32_t time) {
-    self.tx_q_.allocSubpkt(47);
-    addIdTime(command_t::config, time);
+    // self.tx_q_.allocSubpkt(47);
+    // addIdTime(command_t::config, time);
 
-    // Defined in CMakeLists/platformio.ini
-    self.tx_q_.write(RADIO_CONFIG_PACKET_SIM_ACTIVE);
-    self.tx_q_.write(RADIO_CONFIG_PACKET_ROCKET_ID);
+    // // Defined in CMakeLists/platformio.ini
+    // self.tx_q_.write(RADIO_CONFIG_PACKET_SIM_ACTIVE);
+    // self.tx_q_.write(RADIO_CONFIG_PACKET_ROCKET_ID);
 
-    // -1 because null terminated string
-    constexpr size_t len = sizeof(RADIO_CONFIG_PACKET_VERSION_STR) - 1;
-    static_assert(len == 40, "RADIO_CONFIG_PACKET_VERSION_STR incorrect size!");
+    // // -1 because null terminated string
+    // constexpr size_t len = sizeof(RADIO_CONFIG_PACKET_VERSION_STR) - 1;
+    // static_assert(len == 40, "RADIO_CONFIG_PACKET_VERSION_STR incorrect size!");
 
-    self.tx_q_.write(RADIO_CONFIG_PACKET_VERSION_STR, len);
+    // self.tx_q_.write(RADIO_CONFIG_PACKET_VERSION_STR, len);
 
-    send();
+    // send();
 }
 
 void Radio::sendEvent(const uint32_t time, const EventId event) {
-    self.tx_q_.allocSubpkt(7);
+    // self.tx_q_.allocSubpkt(7);
 
-    addIdTime(command_t::event, time);
-    self.tx_q_.write(&event, sizeof(uint16_t));
+    // addIdTime(command_t::event, time);
+    // self.tx_q_.write(&event, sizeof(uint16_t));
 
-    send();
+    // send();
 }
 
 int Radio::read_count_ = 0;
