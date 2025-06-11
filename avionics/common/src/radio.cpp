@@ -70,6 +70,7 @@ namespace {
     constexpr int maxQueuedBytes = 800;
     constexpr int maxQueuedSubpkts = maxQueuedBytes / 20; // 20 bytes per subpkt on average
     constexpr int packetPayloadSpace = 255;
+    constexpr bool enableCRC = true;
 
     // *** constexpr uint32_t kDefaultFlaregunAddrMsb = 0x0013A200;
     // *** constexpr uint32_t kDefaultFlaregunAddrLsb = 0x41678FC0;
@@ -152,6 +153,9 @@ void Radio::initialize() {
     LoRa.setCodingRate4(codingRateDenominator);
     LoRa.setPreambleLength(preambleLength);
     LoRa.setGain(gain);
+
+    // Enable CRC
+    if (enableCRC) LoRa.enableCrc();
 
     // Set the pins for the LoRa module
     LoRa.setSPI(self.spi_);
