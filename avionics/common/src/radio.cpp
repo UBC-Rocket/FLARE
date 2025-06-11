@@ -65,7 +65,7 @@ namespace {
     constexpr int codingRateDenominator = 8;
     constexpr long preambleLength = 8;
     constexpr uint8_t gain = 6;
-    constexpr long loraFrequency = 900E6;
+    constexpr long loraFrequency = 902E6;
     constexpr uint32_t loraInitError = 50;
     constexpr int maxQueuedBytes = 800;
     constexpr int maxQueuedSubpkts = maxQueuedBytes / 20; // 20 bytes per subpkt on average
